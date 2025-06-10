@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Button, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
+import { ParticipantTile } from './ParticipantTile';
 
 export function PrejoinScreen() {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ export function PrejoinScreen() {
   return (
     <Center mih="100vh">
       <Group>
-        <Card h={200} w={300} />
+        <ParticipantTile height={200} width={300} />
 
         <Stack>
           <Title>Interview with Joe</Title>

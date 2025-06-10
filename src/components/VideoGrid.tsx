@@ -1,6 +1,7 @@
-import { Box, Paper, Text } from '@mantine/core';
+import { Box } from '@mantine/core';
 import { GALLERY_VIEW_ASPECT_RATIO, GALLERY_VIEW_MARGIN } from '../constants';
 import useGalleryViewLayout from '../hooks/useGalleryViewLayout';
+import { ParticipantTile } from './ParticipantTile';
 
 export function VideoGrid() {
   const participantCount = 2;
@@ -24,19 +25,7 @@ export function VideoGrid() {
       }}
     >
       {Array.from({ length: participantCount }).map((_, i) => (
-        <Paper
-          key={i}
-          withBorder
-          style={{
-            width: participantVideoWidth,
-            height: participantHeight,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Text>Participant {i + 1}</Text>
-        </Paper>
+        <ParticipantTile key={i} height={participantHeight} width={participantVideoWidth} />
       ))}
     </Box>
   );
