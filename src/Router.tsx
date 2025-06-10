@@ -1,11 +1,14 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { HomePage } from './pages/Home.page';
+import { PrejoinScreen } from './components/PrejoinScreen';
+import { Room } from './components/Room';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <HomePage />,
+    element: <PrejoinScreen />,
   },
+
+  { path: '/room', element: <Room /> },
 ]);
 
 export function Router() {
