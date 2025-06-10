@@ -28,7 +28,7 @@ export function ParticipantTile({
     }
     return () => {
       if (container) {
-        container.innerHTML = '';
+        container?.replaceChildren();
       }
     };
   }, [attach]);
