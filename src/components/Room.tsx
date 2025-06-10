@@ -17,7 +17,7 @@ export function Room() {
       </AppShell.Main>
 
       <AppShell.Footer>
-        <MenuBar />
+        <MenuBar onToggleMic={() => {}} onToggleVideo={() => {}} />
       </AppShell.Footer>
     </AppShell>
   );

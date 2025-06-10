@@ -1,29 +1,26 @@
-import { useEffect, useState } from 'react';
-import { useAppStore } from '../store';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { requestLocalMedia } from '../utils';
 
 export function useLocalMedia() {
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const setError = useAppStore((state) => state.setError);
+  const activeStreamRef = useRef<MediaStream | null>(null);
+
+  const acquire = useCallback(async () => {
+    const s = await requestLocalMedia();
+    if (s) {
+      setStream(s);
+      activeStreamRef.current = s;
+    }
+    return s;
+  }, []);
 
   useEffect(() => {
-    let activeStream: MediaStream;
-
-    const start = async () => {
-      try {
-        const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        setStream(s);
-        activeStream = s;
-      } catch {
-        setError('Could not access camera or microphone');
-      }
-    };
-
-    start();
+    acquire();
 
     return () => {
-      activeStream?.getTracks().forEach((track) => track.stop());
+      activeStreamRef.current?.getTracks().forEach((track) => track.stop());
     };
-  }, [setError]);
+  }, [acquire]);
 
-  return stream;
+  return { stream, acquire };
 }

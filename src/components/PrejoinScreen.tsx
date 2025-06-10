@@ -1,15 +1,21 @@
 import { useNavigate } from 'react-router-dom';
 import { Button, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import { useLocalMedia } from '@/hooks/useLocalMedia';
+import { useAppStore } from '@/store';
+import { MenuBar } from './MenuBar';
 import { ParticipantTile } from './ParticipantTile';
 
 export function PrejoinScreen() {
   const navigate = useNavigate();
 
-  const localStream = useLocalMedia();
+  const { stream, acquire } = useLocalMedia();
+
+  const isMediaDenied = useAppStore((state) => state.isMediaDenied);
+  const toggleIsVideoOn = useAppStore((state) => state.toggleIsVideoOn);
+  const toggleIsAudioOn = useAppStore((state) => state.toggleIsAudioOn);
 
   function attachLocalVideo(el: HTMLElement) {
-    if (!localStream) {
+    if (!stream) {
       return;
     }
 
@@ -17,7 +23,7 @@ export function PrejoinScreen() {
     video.autoplay = true;
     video.muted = true;
     video.playsInline = true;
-    video.srcObject = localStream;
+    video.srcObject = stream;
     video.style.width = '100%';
     video.style.height = '100%';
     video.style.objectFit = 'cover';
@@ -32,7 +38,27 @@ export function PrejoinScreen() {
   return (
     <Center mih="100vh">
       <Group>
-        <ParticipantTile height={200} width={300} attach={attachLocalVideo} />
+        <Stack>
+          <ParticipantTile height={250} width={350} attach={attachLocalVideo} />
+
+          <MenuBar
+            onToggleMic={() => {
+              if (isMediaDenied) {
+                acquire();
+              } else {
+                toggleIsAudioOn();
+              }
+            }}
+            onToggleVideo={() => {
+              if (isMediaDenied) {
+                acquire();
+              } else {
+                toggleIsVideoOn();
+              }
+            }}
+            isPrejoin
+          />
+        </Stack>
 
         <Stack>
           <Title>Interview with Joe</Title>
