@@ -21,8 +21,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
   setError: (error) => set({ error }),
   clearError: () => set({ error: null }),
 
-  isAudioOn: false,
-  isVideoOn: false,
+  isAudioOn: true,
+  isVideoOn: true,
   setIsAudioOn: (value) => set({ isAudioOn: value }),
   setIsVideoOn: (value) => set({ isVideoOn: value }),
   toggleIsAudioOn: () => set({ isAudioOn: !get().isAudioOn }),

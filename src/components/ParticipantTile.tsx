@@ -28,12 +28,7 @@ export function ParticipantTile({
     if (container && attach) {
       attach(container);
     }
-    return () => {
-      if (container) {
-        container?.replaceChildren();
-      }
-    };
-  }, [attach]);
+  }, [attach, isVideoOn]);
 
   return (
     <Card

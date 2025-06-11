@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import { useLocalMedia } from '@/hooks/useLocalMedia';
@@ -8,29 +9,46 @@ import { ParticipantTile } from './ParticipantTile';
 export function PrejoinScreen() {
   const navigate = useNavigate();
 
-  const { stream, acquire } = useLocalMedia();
+  const { stream, acquire, isAcquiring, startVideo, stopVideo, startAudio, stopAudio } =
+    useLocalMedia();
 
   const isMediaDenied = useAppStore((state) => state.isMediaDenied);
   const toggleIsVideoOn = useAppStore((state) => state.toggleIsVideoOn);
   const isVideoOn = useAppStore((state) => state.isVideoOn);
   const toggleIsAudioOn = useAppStore((state) => state.toggleIsAudioOn);
+  const isAudioOn = useAppStore((state) => state.isAudioOn);
 
-  function attachLocalVideo(el: HTMLElement) {
-    if (!stream) {
-      return;
-    }
+  const attachLocalVideo = useCallback(
+    (el: HTMLElement) => {
+      const existing = el.querySelector('video');
 
-    const video = document.createElement('video');
-    video.autoplay = true;
-    video.muted = true;
-    video.playsInline = true;
-    video.srcObject = stream;
-    video.style.width = '100%';
-    video.style.height = '100%';
-    video.style.objectFit = 'cover';
+      if (!stream || !isVideoOn) {
+        if (existing) {
+          existing.pause();
+          existing.srcObject = null;
+          existing.remove();
+        }
+        return;
+      }
 
-    el.replaceChildren(video);
-  }
+      let video = existing;
+      if (!video) {
+        video = document.createElement('video');
+        video.autoplay = true;
+        video.muted = true;
+        video.playsInline = true;
+        video.style.width = '100%';
+        video.style.height = '100%';
+        video.style.objectFit = 'cover';
+        el.appendChild(video);
+      }
+
+      if (video.srcObject !== stream) {
+        video.srcObject = stream;
+      }
+    },
+    [stream, isVideoOn]
+  );
 
   function join() {
     navigate('/room');
@@ -48,21 +66,32 @@ export function PrejoinScreen() {
           />
 
           <MenuBar
-            onToggleMic={() => {
+            onToggleMic={async () => {
               if (isMediaDenied) {
-                acquire();
+                await acquire();
               } else {
+                if (isAudioOn) {
+                  stopAudio();
+                } else {
+                  await startAudio();
+                }
                 toggleIsAudioOn();
               }
             }}
-            onToggleVideo={() => {
+            onToggleVideo={async () => {
               if (isMediaDenied) {
-                acquire();
+                await acquire();
               } else {
+                if (isVideoOn) {
+                  stopVideo();
+                } else {
+                  await startVideo();
+                }
                 toggleIsVideoOn();
               }
             }}
             isPrejoin
+            disableMediaButtons={isAcquiring}
           />
         </Stack>
 
