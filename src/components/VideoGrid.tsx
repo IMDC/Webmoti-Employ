@@ -4,7 +4,7 @@ import useGalleryViewLayout from '../hooks/useGalleryViewLayout';
 import { ParticipantTile } from './ParticipantTile';
 
 export function VideoGrid() {
-  const participantCount = 2;
+  const participantCount = 5;
   const { participantVideoWidth, containerRef } = useGalleryViewLayout(participantCount);
 
   const participantHeight = participantVideoWidth * GALLERY_VIEW_ASPECT_RATIO;
@@ -19,7 +19,7 @@ export function VideoGrid() {
         alignContent: 'center',
         gap: GALLERY_VIEW_MARGIN,
         padding: GALLERY_VIEW_MARGIN,
-        background: '#000',
+        background: '#111',
         flex: 1,
         overflow: 'auto',
       }}
