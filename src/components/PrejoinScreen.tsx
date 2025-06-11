@@ -1,8 +1,9 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Box, Button, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import { useLocalMedia } from '@/hooks/useLocalMedia';
 import { useAppStore } from '@/store';
+import { ColorSchemeToggle } from './ColorSchemeToggle';
 import { MenuBar } from './MenuBar';
 import { ParticipantTile } from './ParticipantTile';
 
@@ -56,6 +57,10 @@ export function PrejoinScreen() {
 
   return (
     <Center mih="100vh">
+      <Box pos="absolute" top={16} left={16}>
+        <ColorSchemeToggle />
+      </Box>
+
       <Group>
         <Stack>
           <ParticipantTile

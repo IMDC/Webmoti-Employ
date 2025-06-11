@@ -1,4 +1,4 @@
-import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
+import { ColorSchemeToggle } from '../components/ColorSchemeToggle';
 import { Welcome } from '../components/Welcome/Welcome';
 
 export function HomePage() {
