@@ -1,6 +1,5 @@
 import {
   IconChevronUp,
-  IconMenu2,
   IconMicrophone,
   IconMicrophoneOff,
   IconPhoneOff,
@@ -9,6 +8,7 @@ import {
 } from '@tabler/icons-react';
 import { Button, Flex, Indicator } from '@mantine/core';
 import { useAppStore } from '@/store';
+import { ControlsMenu } from './ControlsMenu';
 
 type MenuBarProps = {
   onToggleMic: () => void;
@@ -69,9 +69,7 @@ export function MenuBar({
         {isMediaDenied ? <Indicator color="orange">{VideoButton}</Indicator> : VideoButton}
       </Button.Group>
 
-      <Button variant="default">
-        <IconMenu2 stroke={1.5} size={16} />
-      </Button>
+      <ControlsMenu />
 
       {!isPrejoin && (
         <Button color="red">
