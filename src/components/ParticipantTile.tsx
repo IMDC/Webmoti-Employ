@@ -1,10 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { IconMicrophoneOff } from '@tabler/icons-react';
-import { Box, Card, Text } from '@mantine/core';
+import { Avatar, Box, Card, Center, Text } from '@mantine/core';
 
 type ParticipantTileProps = {
   name?: string;
   isMuted?: boolean;
+  isVideoOn?: boolean;
   isSpeaking?: boolean;
   attach?: (el: HTMLElement) => void;
   height: number | string;
@@ -14,6 +15,7 @@ type ParticipantTileProps = {
 export function ParticipantTile({
   name,
   isMuted,
+  isVideoOn,
   isSpeaking,
   attach,
   height,
@@ -46,6 +48,12 @@ export function ParticipantTile({
         border: isSpeaking ? '2px solid lime' : '1px solid #444',
       }}
     >
+      {!isVideoOn && (
+        <Center w="100%" h="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
+          <Avatar size={100} />
+        </Center>
+      )}
+
       <Box ref={containerRef} w="100%" h="100%" />
 
       {name && (

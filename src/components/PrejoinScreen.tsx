@@ -12,6 +12,7 @@ export function PrejoinScreen() {
 
   const isMediaDenied = useAppStore((state) => state.isMediaDenied);
   const toggleIsVideoOn = useAppStore((state) => state.toggleIsVideoOn);
+  const isVideoOn = useAppStore((state) => state.isVideoOn);
   const toggleIsAudioOn = useAppStore((state) => state.toggleIsAudioOn);
 
   function attachLocalVideo(el: HTMLElement) {
@@ -39,7 +40,12 @@ export function PrejoinScreen() {
     <Center mih="100vh">
       <Group>
         <Stack>
-          <ParticipantTile height={250} width={350} attach={attachLocalVideo} />
+          <ParticipantTile
+            height={250}
+            width={350}
+            attach={attachLocalVideo}
+            isVideoOn={isVideoOn && !isMediaDenied}
+          />
 
           <MenuBar
             onToggleMic={() => {
