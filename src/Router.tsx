@@ -1,14 +1,24 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { PrejoinScreen } from './components/PrejoinScreen';
-import { Room } from './components/Room';
+import { Admin } from './pages/Admin';
+import { NotFoundPage } from './pages/NotFoundPage';
+import { VideoApp } from './pages/VideoApp';
 
 const router = createBrowserRouter([
+  { path: '/admin', element: <Admin /> },
+
   {
     path: '/',
-    element: <PrejoinScreen />,
+    element: <VideoApp />,
+  },
+  {
+    path: '/:meetingId',
+    element: <VideoApp />,
   },
 
-  { path: '/room', element: <Room /> },
+  {
+    path: '*',
+    element: <NotFoundPage />,
+  },
 ]);
 
 export function Router() {

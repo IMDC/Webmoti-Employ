@@ -10,18 +10,20 @@ import { Button, Flex, Indicator } from '@mantine/core';
 import { useAppStore } from '@/store';
 import { ControlsMenu } from './ControlsMenu';
 
-type MenuBarProps = {
+interface MenuBarProps {
   onToggleMic: () => void;
   onToggleVideo: () => void;
   isPrejoin?: boolean;
   disableMediaButtons?: boolean;
-};
+  onLeave?: () => void;
+}
 
 export function MenuBar({
   onToggleMic,
   onToggleVideo,
   isPrejoin = false,
   disableMediaButtons = false,
+  onLeave,
 }: MenuBarProps) {
   const isMediaDenied = useAppStore((state) => state.isMediaDenied);
   const isAudioOn = useAppStore((state) => state.isAudioOn);
@@ -72,7 +74,7 @@ export function MenuBar({
       <ControlsMenu />
 
       {!isPrejoin && (
-        <Button color="red">
+        <Button color="red" onClick={onLeave}>
           <IconPhoneOff stroke={1.5} size={16} />
         </Button>
       )}

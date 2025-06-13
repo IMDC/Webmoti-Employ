@@ -2,7 +2,11 @@ import { AppShell } from '@mantine/core';
 import { MenuBar } from './MenuBar';
 import { VideoGrid } from './VideoGrid';
 
-export function Room() {
+interface RoomProps {
+  onLeave: () => void;
+}
+
+export function Room({ onLeave }: RoomProps) {
   return (
     <AppShell
       footer={{ height: 60 }}
@@ -17,7 +21,7 @@ export function Room() {
       </AppShell.Main>
 
       <AppShell.Footer>
-        <MenuBar onToggleMic={() => {}} onToggleVideo={() => {}} />
+        <MenuBar onToggleMic={() => {}} onToggleVideo={() => {}} onLeave={onLeave} />
       </AppShell.Footer>
     </AppShell>
   );

@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Box, Button, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import { useLocalMedia } from '@/hooks/useLocalMedia';
 import { useAppStore } from '@/store';
@@ -7,9 +6,11 @@ import { ColorSchemeToggle } from './ColorSchemeToggle';
 import { MenuBar } from './MenuBar';
 import { ParticipantTile } from './ParticipantTile';
 
-export function PrejoinScreen() {
-  const navigate = useNavigate();
+interface PrejoinScreenProps {
+  onJoin: () => void;
+}
 
+export function PrejoinScreen({ onJoin }: PrejoinScreenProps) {
   const { stream, acquire, isAcquiring, startVideo, stopVideo, startAudio, stopAudio } =
     useLocalMedia();
 
@@ -50,10 +51,6 @@ export function PrejoinScreen() {
     },
     [stream, isVideoOn]
   );
-
-  function join() {
-    navigate('/room');
-  }
 
   return (
     <Center mih="100vh">
@@ -107,7 +104,7 @@ export function PrejoinScreen() {
 
           <TextInput placeholder="Your name" />
 
-          <Button onClick={join}>Join now</Button>
+          <Button onClick={onJoin}>Join now</Button>
         </Stack>
       </Group>
     </Center>

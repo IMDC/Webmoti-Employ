@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Avatar, Box, Card, Center, Text } from '@mantine/core';
 import AudioLevelIndicator from './AudioLevelIndicator';
 
-type ParticipantTileProps = {
+interface ParticipantTileProps {
   name?: string;
   isMuted?: boolean;
   isVideoOn?: boolean;
@@ -11,7 +11,7 @@ type ParticipantTileProps = {
   height: number | string;
   width: number | string;
   mediaStreamTrack?: MediaStreamTrack;
-};
+}
 
 export function ParticipantTile({
   name,
