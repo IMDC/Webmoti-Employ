@@ -68,6 +68,7 @@ export function PrejoinScreen() {
             width={350}
             attach={attachLocalVideo}
             isVideoOn={isVideoOn && !isMediaDenied}
+            mediaStreamTrack={stream?.getAudioTracks()[0]}
           />
 
           <MenuBar

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { IconMicrophoneOff } from '@tabler/icons-react';
 import { Avatar, Box, Card, Center, Text } from '@mantine/core';
+import AudioLevelIndicator from './AudioLevelIndicator';
 
 type ParticipantTileProps = {
   name?: string;
@@ -10,6 +10,7 @@ type ParticipantTileProps = {
   attach?: (el: HTMLElement) => void;
   height: number | string;
   width: number | string;
+  mediaStreamTrack?: MediaStreamTrack;
 };
 
 export function ParticipantTile({
@@ -20,6 +21,7 @@ export function ParticipantTile({
   attach,
   height,
   width,
+  mediaStreamTrack,
 }: ParticipantTileProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -66,16 +68,16 @@ export function ParticipantTile({
         </Text>
       )}
 
-      {isMuted && (
+      {mediaStreamTrack && (
         <Box
           style={{
             position: 'absolute',
-            top: 6,
-            right: 8,
+            bottom: 6,
+            left: 8,
             zIndex: 1,
           }}
         >
-          <IconMicrophoneOff size={16} />
+          <AudioLevelIndicator mediaStreamTrack={mediaStreamTrack} isTrackEnabled={!isMuted} />
         </Box>
       )}
     </Card>
