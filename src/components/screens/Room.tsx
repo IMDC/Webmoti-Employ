@@ -1,6 +1,6 @@
 import { AppShell } from '@mantine/core';
-import { MenuBar } from './MenuBar';
-import { VideoGrid } from './VideoGrid';
+import { MenuBar } from '../MenuBar';
+import { VideoGrid } from '../VideoGrid';
 
 interface RoomProps {
   onLeave: () => void;

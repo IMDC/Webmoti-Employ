@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { EndScreen } from '@/components/EndScreen';
-import { PrejoinScreen } from '@/components/PrejoinScreen';
-import { Room } from '@/components/Room';
+import { EndScreen } from '../components/screens/EndScreen';
+import { PrejoinScreen } from '../components/screens/PrejoinScreen';
+import { Room } from '../components/screens/Room';
 
 export function VideoApp() {
   const [phase, setPhase] = useState('prejoin');

@@ -2,9 +2,9 @@ import { useCallback } from 'react';
 import { Box, Button, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import { useLocalMedia } from '@/hooks/useLocalMedia';
 import { useAppStore } from '@/store';
-import { ColorSchemeToggle } from './ColorSchemeToggle';
-import { MenuBar } from './MenuBar';
-import { ParticipantTile } from './ParticipantTile';
+import { ColorSchemeToggle } from '../ColorSchemeToggle';
+import { MenuBar } from '../MenuBar';
+import { ParticipantTile } from '../ParticipantTile';
 
 interface PrejoinScreenProps {
   onJoin: () => void;
