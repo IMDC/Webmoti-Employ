@@ -6,8 +6,9 @@ import {
   IconVideo,
   IconVideoOff,
 } from '@tabler/icons-react';
-import { Button, Flex, Indicator } from '@mantine/core';
-import { useAppStore } from '@/store';
+import { Button, Flex, Indicator, Popover } from '@mantine/core';
+import { useAppStore } from '../store';
+import { ChangeMediaDevice } from './ChangeMediaDevice';
 import { ControlsMenu } from './ControlsMenu';
 
 interface MenuBarProps {
@@ -58,16 +59,34 @@ export function MenuBar({
   return (
     <Flex justify="center" align="center" h="100%" gap="md">
       <Button.Group>
-        <Button variant="default" disabled={disableMediaButtons}>
-          <IconChevronUp stroke={1.5} size={16} />
-        </Button>
+        <Popover>
+          <Popover.Target>
+            <Button variant="default" disabled={disableMediaButtons}>
+              <IconChevronUp stroke={1.5} size={16} />
+            </Button>
+          </Popover.Target>
+
+          <Popover.Dropdown>
+            <ChangeMediaDevice mediaType="audio" />
+          </Popover.Dropdown>
+        </Popover>
+
         {isMediaDenied ? <Indicator color="orange">{MicButton}</Indicator> : MicButton}
       </Button.Group>
 
       <Button.Group>
-        <Button variant="default" disabled={disableMediaButtons}>
-          <IconChevronUp stroke={1.5} size={16} />
-        </Button>
+        <Popover>
+          <Popover.Target>
+            <Button variant="default" disabled={disableMediaButtons}>
+              <IconChevronUp stroke={1.5} size={16} />
+            </Button>
+          </Popover.Target>
+
+          <Popover.Dropdown>
+            <ChangeMediaDevice mediaType="video" />
+          </Popover.Dropdown>
+        </Popover>
+
         {isMediaDenied ? <Indicator color="orange">{VideoButton}</Indicator> : VideoButton}
       </Button.Group>
 
