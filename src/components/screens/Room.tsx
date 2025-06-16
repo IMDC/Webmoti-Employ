@@ -4,6 +4,7 @@ import { GALLERY_VIEW_MARGIN } from '@/constants';
 import { Chat } from '../Chat';
 import { MenuBar } from '../MenuBar';
 import { VideoGrid } from '../VideoGrid';
+import { SpotlightView } from '../SpotlightView';
 
 interface RoomProps {
   onLeave: () => void;
@@ -38,9 +39,10 @@ export function Room({ onLeave }: RoomProps) {
               padding: GALLERY_VIEW_MARGIN,
               background: '#111',
               flex: 1,
+              minWidth: 0
             }}
           >
-            <VideoGrid containerRef={participantStageRef} />
+            <SpotlightView containerRef={participantStageRef} />
           </Box>
 
           {isChatOpen && (
