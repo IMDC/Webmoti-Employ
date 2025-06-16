@@ -2,7 +2,11 @@ import { IconLayoutGrid, IconMenu2, IconScreenShare, IconSettings } from '@table
 import { Button, Menu } from '@mantine/core';
 import { useAppStore } from '@/store';
 
-export function ControlsMenu() {
+interface ControlsMenuProps {
+  onLayoutOpen?: () => void;
+}
+
+export function ControlsMenu({ onLayoutOpen }: ControlsMenuProps) {
   const setIsSettingsOpen = useAppStore((state) => state.setIsSettingsOpen);
 
   return (
@@ -16,7 +20,9 @@ export function ControlsMenu() {
       <Menu.Dropdown>
         <Menu.Label>Controls</Menu.Label>
 
-        <Menu.Item leftSection={<IconLayoutGrid size={14} />}>Layout</Menu.Item>
+        <Menu.Item leftSection={<IconLayoutGrid size={14} />} onClick={onLayoutOpen}>
+          Layout
+        </Menu.Item>
 
         <Menu.Item leftSection={<IconScreenShare size={14} />}>Share Screen</Menu.Item>
 

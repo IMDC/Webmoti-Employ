@@ -8,7 +8,9 @@ import {
   IconVideoOff,
 } from '@tabler/icons-react';
 import { Button, Flex, Indicator, Popover } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { useAppStore } from '../store';
+import { ChangeLayoutModal } from './ChangeLayoutModal/ChangeLayoutModal';
 import { ChangeMediaDevice } from './ChangeMediaDevice';
 import { ControlsMenu } from './ControlsMenu';
 
@@ -32,6 +34,9 @@ export function MenuBar({
   const isMediaDenied = useAppStore((state) => state.isMediaDenied);
   const isAudioOn = useAppStore((state) => state.isAudioOn);
   const isVideoOn = useAppStore((state) => state.isVideoOn);
+
+  const [isLayoutModalOpen, { open: openLayoutModal, close: closeLayoutModal }] =
+    useDisclosure(false);
 
   const MicButton = (
     <Button
@@ -93,7 +98,9 @@ export function MenuBar({
         {isMediaDenied ? <Indicator color="orange">{VideoButton}</Indicator> : VideoButton}
       </Button.Group>
 
-      <ControlsMenu />
+      <ControlsMenu onLayoutOpen={openLayoutModal} />
+
+      <ChangeLayoutModal isOpen={isLayoutModalOpen} onClose={closeLayoutModal} />
 
       {!isPrejoin && (
         <>
