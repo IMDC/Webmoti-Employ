@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { GALLERY_VIEW_ASPECT_RATIO, GALLERY_VIEW_MARGIN } from '../constants';
 
 /**
@@ -23,13 +23,15 @@ export const layoutIsTooSmall = (
 };
 
 /**
- * This hook returns the appropriate width for each participant's video and a ref
- * to be used for the app's container. The actual layout is determined by CSS Flexbox.
+ * This hook returns the appropriate width for each participant's video.
+ * The actual layout is determined by CSS Flexbox.
  * This ensures that the gallery view of participants' videos will always fit within the given screen size.
  */
 
-export default function useGalleryViewLayout(participantCount: number) {
-  const containerRef = useRef<HTMLDivElement>(null);
+export default function useGalleryViewLayout(
+  participantCount: number,
+  containerRef: React.RefObject<HTMLDivElement | null>
+) {
   const [participantVideoWidth, setParticipantVideoWidth] = useState(0);
 
   const updateLayout = useCallback(() => {
@@ -76,6 +78,5 @@ export default function useGalleryViewLayout(participantCount: number) {
 
   return {
     participantVideoWidth,
-    containerRef,
   };
 }

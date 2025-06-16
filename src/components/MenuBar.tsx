@@ -1,5 +1,6 @@
 import {
   IconChevronUp,
+  IconMessage,
   IconMicrophone,
   IconMicrophoneOff,
   IconPhoneOff,
@@ -14,6 +15,7 @@ import { ControlsMenu } from './ControlsMenu';
 interface MenuBarProps {
   onToggleMic: () => void;
   onToggleVideo: () => void;
+  onToggleChat?: () => void;
   isPrejoin?: boolean;
   disableMediaButtons?: boolean;
   onLeave?: () => void;
@@ -22,6 +24,7 @@ interface MenuBarProps {
 export function MenuBar({
   onToggleMic,
   onToggleVideo,
+  onToggleChat,
   isPrejoin = false,
   disableMediaButtons = false,
   onLeave,
@@ -93,9 +96,15 @@ export function MenuBar({
       <ControlsMenu />
 
       {!isPrejoin && (
-        <Button color="red" onClick={onLeave}>
-          <IconPhoneOff stroke={1.5} size={16} />
-        </Button>
+        <>
+          <Button variant="default" onClick={onToggleChat}>
+            <IconMessage stroke={1.5} size={16} />
+          </Button>
+
+          <Button color="red" onClick={onLeave}>
+            <IconPhoneOff stroke={1.5} size={16} />
+          </Button>
+        </>
       )}
     </Flex>
   );
