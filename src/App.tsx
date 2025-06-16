@@ -1,4 +1,5 @@
 import '@mantine/core/styles.css';
+import './frimousse.css';
 
 import { MantineProvider } from '@mantine/core';
 import { ErrorDialog } from './components/ErrorDialog';

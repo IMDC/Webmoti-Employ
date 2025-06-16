@@ -14,6 +14,7 @@ import {
   Textarea,
   useMantineTheme,
 } from '@mantine/core';
+import { MyEmojiPicker } from './MyEmojiPicker';
 
 function Message() {
   return (
@@ -85,9 +86,7 @@ export function Chat() {
             )}
           </FileButton>
 
-          <ActionIcon size="sm" variant="subtle">
-            <IconMoodHappy stroke={1.5} />
-          </ActionIcon>
+          <MyEmojiPicker addEmoji={(emojiString) => setChatText((prev) => prev + emojiString)} />
         </Group>
 
         <Textarea
