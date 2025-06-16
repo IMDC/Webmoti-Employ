@@ -29,7 +29,6 @@ export function ParticipantTile({
   name,
   isMuted,
   isVideoOn,
-  isSpeaking,
   attach,
   height,
   width,
@@ -50,13 +49,10 @@ export function ParticipantTile({
       h={height}
       w={width}
       p={0}
-      withBorder
       radius="lg"
       style={{
         position: 'relative',
         overflow: 'hidden',
-        backgroundColor: 'black',
-        border: isSpeaking ? '2px solid lime' : '1px solid #444',
       }}
     >
       {!isVideoOn && (
@@ -80,10 +76,11 @@ export function ParticipantTile({
             }}
           >
             <Avatar
-              size={100}
-              radius="xl"
               style={{
                 backgroundColor: avatar,
+                height: 'clamp(50px, 25%, 150px)',
+                width: 'auto',
+                aspectRatio: '1 / 1',
               }}
             />
           </Center>
