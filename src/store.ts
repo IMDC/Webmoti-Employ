@@ -14,6 +14,9 @@ type AppStore = {
 
   isMediaDenied: boolean;
   setIsMediaDenied: (value: boolean) => void;
+
+  isSettingsOpen: boolean;
+  setIsSettingsOpen: (value: boolean) => void;
 };
 
 export const useAppStore = create<AppStore>((set, get) => ({
@@ -30,4 +33,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   isMediaDenied: false,
   setIsMediaDenied: (value) => set({ isMediaDenied: value }),
+
+  isSettingsOpen: false,
+  setIsSettingsOpen: (value) => set({ isSettingsOpen: value }),
 }));

@@ -1,13 +1,10 @@
-import {
-  IconInfoCircle,
-  IconMenu2,
-  IconScreenShare,
-  IconSettings,
-  IconSpeakerphone,
-} from '@tabler/icons-react';
+import { IconLayoutGrid, IconMenu2, IconScreenShare, IconSettings } from '@tabler/icons-react';
 import { Button, Menu } from '@mantine/core';
+import { useAppStore } from '@/store';
 
 export function ControlsMenu() {
+  const setIsSettingsOpen = useAppStore((state) => state.setIsSettingsOpen);
+
   return (
     <Menu shadow="md">
       <Menu.Target>
@@ -19,13 +16,13 @@ export function ControlsMenu() {
       <Menu.Dropdown>
         <Menu.Label>Controls</Menu.Label>
 
-        <Menu.Item leftSection={<IconSpeakerphone size={14} />}>Speaker View</Menu.Item>
+        <Menu.Item leftSection={<IconLayoutGrid size={14} />}>Layout</Menu.Item>
 
         <Menu.Item leftSection={<IconScreenShare size={14} />}>Share Screen</Menu.Item>
 
-        <Menu.Item leftSection={<IconSettings size={14} />}>Settings</Menu.Item>
-
-        <Menu.Item leftSection={<IconInfoCircle size={14} />}>About</Menu.Item>
+        <Menu.Item onClick={() => setIsSettingsOpen(true)} leftSection={<IconSettings size={14} />}>
+          Settings
+        </Menu.Item>
       </Menu.Dropdown>
     </Menu>
   );
