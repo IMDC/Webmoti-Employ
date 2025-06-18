@@ -3,16 +3,20 @@ import './frimousse.css';
 
 import { MantineProvider } from '@mantine/core';
 import { ErrorDialog } from './components/ErrorDialog';
-import { SettingsMenu } from './components/SettingsMenu';
+import { VideoServiceProvider } from './contexts/VideoServiceContext';
 import { Router } from './Router';
+import { ZoomVideoService } from './services/ZoomVideoService';
 import { theme } from './theme';
+
+const videoService = new ZoomVideoService();
 
 export default function App() {
   return (
     <MantineProvider theme={theme} defaultColorScheme="dark">
-      <Router />
-      <ErrorDialog />
-      <SettingsMenu />
+      <VideoServiceProvider value={videoService}>
+        <Router />
+        <ErrorDialog />
+      </VideoServiceProvider>
     </MantineProvider>
   );
 }
