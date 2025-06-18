@@ -23,6 +23,7 @@
     "@mantine/core": "8.1.0",
     "@mantine/hooks": "8.1.0",
     "@tabler/icons-react": "^3.34.0",
+    "@zoom/videosdk": "^2.2.0",
     "d3-timer": "^3.0.1",
     "frimousse": "^0.2.0",
     "react": "^19.1.0",
