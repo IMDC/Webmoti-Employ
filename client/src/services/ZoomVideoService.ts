@@ -24,9 +24,23 @@ export class ZoomVideoService implements IVideoService {
     ZoomVideo.preloadDependentAssets();
   }
 
+  private async fetchToken(identity: string, roomName: string): Promise<string> {
+    const body = { sessionName: roomName, role: 1, userIdentity: identity };
+    const res = await fetch(`/api/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    const { signature } = await res.json();
+    return signature;
+  }
+
   async join(name: string, roomName: string) {
     await this.initPromise;
-    await this.client.join(roomName, '<JWT>', name);
+    const token = await this.fetchToken(name, roomName);
+    await this.client.join(roomName, token, name);
 
     this.stream = this.client.getMediaStream();
   }
