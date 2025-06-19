@@ -9,7 +9,7 @@ import {
 } from '@tabler/icons-react';
 import { Button, Flex, Indicator, Popover } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useAppStore } from '../store';
+import { useAppStore } from '../stores/store';
 import { ChangeLayoutModal } from './ChangeLayoutModal/ChangeLayoutModal';
 import { ChangeMediaDevice } from './ChangeMediaDevice';
 import { ControlsMenu } from './ControlsMenu';

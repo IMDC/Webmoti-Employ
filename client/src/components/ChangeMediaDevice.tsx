@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { IconMicrophone, IconVideo, IconVolume } from '@tabler/icons-react';
 import { Select, Text } from '@mantine/core';
-import { useAppStore } from '@/store';
+import { useAppStore } from '@/stores/store';
 
 interface ChangeMediaDeviceProps {
   mediaType: 'audio' | 'video';

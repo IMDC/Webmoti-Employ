@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { Box, Button, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import { useLocalMedia } from '@/hooks/useLocalMedia';
-import { useAppStore } from '@/store';
+import { useAppStore } from '@/stores/store';
 import { ColorSchemeToggle } from '../ColorSchemeToggle';
 import { MenuBar } from '../MenuBar';
 import { ParticipantTile } from '../ParticipantTile';

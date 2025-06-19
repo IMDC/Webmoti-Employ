@@ -1,5 +1,5 @@
 import { Modal, Text } from '@mantine/core';
-import { useAppStore } from '@/store';
+import { useAppStore } from '@/stores/store';
 
 export function SettingsMenu() {
   const isSettingsOpened = useAppStore((state) => state.isSettingsOpen);

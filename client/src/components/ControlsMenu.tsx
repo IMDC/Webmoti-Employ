@@ -1,6 +1,6 @@
 import { IconLayoutGrid, IconMenu2, IconScreenShare, IconSettings } from '@tabler/icons-react';
 import { Button, Menu } from '@mantine/core';
-import { useAppStore } from '@/store';
+import { useAppStore } from '@/stores/store';
 
 interface ControlsMenuProps {
   onLayoutOpen?: () => void;
