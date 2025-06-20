@@ -1,55 +1,55 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Box, Button, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
-import { useLocalMedia } from '@/hooks/useLocalMedia';
-import { useAppStore } from '@/stores/store';
+import { useZoomPreviewStore } from '@/stores/ZoomPreviewStore';
+import { useZoomVideoStore } from '@/stores/ZoomVideoStore';
 import { ColorSchemeToggle } from '../ColorSchemeToggle';
 import { MenuBar } from '../MenuBar';
-import { ParticipantTile } from '../ParticipantTile';
+import { LocalPreview } from '../participant/LocalPreview';
 
 interface PrejoinScreenProps {
   onJoin: () => void;
 }
 
 export function PrejoinScreen({ onJoin }: PrejoinScreenProps) {
-  const { stream, acquire, isAcquiring, startVideo, stopVideo, startAudio, stopAudio } =
-    useLocalMedia();
+  // const isMediaDenied = useAppStore((state) => state.isMediaDenied);
+  // const toggleIsVideoOn = useAppStore((state) => state.toggleIsVideoOn);
+  // const isVideoOn = useAppStore((state) => state.isVideoOn);
+  // const toggleIsAudioOn = useAppStore((state) => state.toggleIsAudioOn);
+  // const isAudioOn = useAppStore((state) => state.isAudioOn);
 
-  const isMediaDenied = useAppStore((state) => state.isMediaDenied);
-  const toggleIsVideoOn = useAppStore((state) => state.toggleIsVideoOn);
-  const isVideoOn = useAppStore((state) => state.isVideoOn);
-  const toggleIsAudioOn = useAppStore((state) => state.toggleIsAudioOn);
-  const isAudioOn = useAppStore((state) => state.isAudioOn);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  const startCamera = useZoomPreviewStore((store) => store.startCamera);
+  const initZoom = useZoomVideoStore((store) => store.initClient);
+
+  useEffect(() => {
+    async function init() {
+      await initZoom();
+    }
+
+    init();
+  }, []);
 
   const attachLocalVideo = useCallback(
     (el: HTMLElement) => {
-      const existing = el.querySelector('video');
-
-      if (!stream || !isVideoOn) {
-        if (existing) {
-          existing.pause();
-          existing.srcObject = null;
-          existing.remove();
-        }
+      if (videoRef.current) {
         return;
       }
 
-      let video = existing;
-      if (!video) {
-        video = document.createElement('video');
-        video.autoplay = true;
-        video.muted = true;
-        video.playsInline = true;
-        video.style.width = '100%';
-        video.style.height = '100%';
-        video.style.objectFit = 'cover';
-        el.appendChild(video);
-      }
+      const video = document.createElement('video');
+      video.autoplay = true;
+      video.muted = true;
+      video.playsInline = true;
+      video.style.width = '100%';
+      video.style.height = '100%';
+      video.style.objectFit = 'cover';
 
-      if (video.srcObject !== stream) {
-        video.srcObject = stream;
-      }
+      el.appendChild(video);
+      videoRef.current = video;
+
+      startCamera(video);
     },
-    [stream, isVideoOn]
+    [startCamera]
   );
 
   return (
@@ -60,41 +60,13 @@ export function PrejoinScreen({ onJoin }: PrejoinScreenProps) {
 
       <Group>
         <Stack>
-          <ParticipantTile
-            height={250}
-            width={350}
-            attach={attachLocalVideo}
-            isVideoOn={isVideoOn && !isMediaDenied}
-            mediaStreamTrack={stream?.getAudioTracks()[0]}
-          />
+          <LocalPreview height={250} width={350} attach={attachLocalVideo} />
 
           <MenuBar
-            onToggleMic={async () => {
-              if (isMediaDenied) {
-                await acquire();
-              } else {
-                if (isAudioOn) {
-                  stopAudio();
-                } else {
-                  await startAudio();
-                }
-                toggleIsAudioOn();
-              }
-            }}
-            onToggleVideo={async () => {
-              if (isMediaDenied) {
-                await acquire();
-              } else {
-                if (isVideoOn) {
-                  stopVideo();
-                } else {
-                  await startVideo();
-                }
-                toggleIsVideoOn();
-              }
-            }}
+            onToggleMic={async () => {}}
+            onToggleVideo={async () => {}}
             isPrejoin
-            disableMediaButtons={isAcquiring}
+            disableMediaButtons={false}
           />
         </Stack>
 

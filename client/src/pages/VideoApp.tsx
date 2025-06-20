@@ -1,51 +1,37 @@
 import { useEffect, useState } from 'react';
 import { JoiningScreen } from '@/components/screens/JoiningScreen';
 import { SettingsMenu } from '@/components/SettingsMenu';
-import { useVideoServiceContext } from '@/contexts/VideoServiceContext';
+import { useZoomVideoStore } from '@/stores/ZoomVideoStore';
 import { EndScreen } from '../components/screens/EndScreen';
 import { PrejoinScreen } from '../components/screens/PrejoinScreen';
 import { Room } from '../components/screens/Room';
 
 export function VideoApp() {
-  const [phase, setPhase] = useState('prejoin');
-
-  const videoService = useVideoServiceContext();
-
-  // fake join timer
-  useEffect(() => {
-    if (phase === 'joining') {
-      const timeout = setTimeout(() => {
-        setPhase('room');
-      }, 500);
-
-      return () => clearTimeout(timeout);
-    }
-  }, [phase]);
+  const callState = useZoomVideoStore((s) => s.callState);
+  const joinZoom = useZoomVideoStore((s) => s.join);
+  const leaveZoom = useZoomVideoStore((s) => s.leave);
 
   return (
     <>
-      {phase === 'prejoin' && (
+      {callState === 'prejoin' && (
         <PrejoinScreen
           onJoin={async () => {
-            setPhase('joining');
-            await videoService.join('Joe', 'TestRoom');
+            await joinZoom('Joe', 'Test');
           }}
         />
       )}
 
-      <JoiningScreen visible={phase === 'joining'} />
+      <JoiningScreen visible={callState === 'joining'} />
 
-      {phase === 'room' && (
+      {callState === 'joined' && (
         <Room
           onLeave={async () => {
-            await videoService.leave();
-            setPhase('prejoin');
+            await leaveZoom();
           }}
         />
       )}
 
-      {/* TODO use later */}
-      {phase === 'end' && <EndScreen />}
+      {callState === 'left' && <EndScreen />}
 
       <SettingsMenu />
     </>

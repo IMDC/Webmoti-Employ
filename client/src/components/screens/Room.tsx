@@ -3,7 +3,6 @@ import { AppShell, Box } from '@mantine/core';
 import { GALLERY_VIEW_MARGIN } from '@/constants';
 import { Chat } from '../Chat';
 import { MenuBar } from '../MenuBar';
-import { SpotlightView } from '../SpotlightView';
 import { VideoGrid } from '../VideoGrid';
 
 interface RoomProps {
@@ -42,7 +41,7 @@ export function Room({ onLeave }: RoomProps) {
               minWidth: 0,
             }}
           >
-            <SpotlightView />
+            <VideoGrid containerRef={participantStageRef}/>
           </Box>
 
           {isChatOpen && (
