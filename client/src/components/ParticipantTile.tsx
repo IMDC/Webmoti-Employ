@@ -1,17 +1,22 @@
-import { Participant } from '@zoom/videosdk';
-import { Avatar, Box, Card, Center, Text } from '@mantine/core';
-import AudioLevelIndicator from './AudioLevelIndicator';
+import { Card, Text } from '@mantine/core';
 import { Corner } from './participant/Corner';
 import { NoVideoBackground } from './participant/NoVideoBackground';
-import { VideoRenderer } from './VideoRenderer';
 
 interface ParticipantTileProps {
   height: number | string;
   width: number | string;
-  participant: Participant;
+  name?: string;
+  showAvatarFallback?: boolean;
+  children: React.ReactNode;
 }
 
-export function ParticipantTile({ height, width, participant }: ParticipantTileProps) {
+export function ParticipantTile({
+  height,
+  width,
+  name,
+  showAvatarFallback = false,
+  children,
+}: ParticipantTileProps) {
   return (
     <Card
       h={height}
@@ -23,21 +28,17 @@ export function ParticipantTile({ height, width, participant }: ParticipantTileP
         overflow: 'hidden',
       }}
     >
-      {/* {!participant.bVideoOn && <NoVideoBackground />} */}
+      {showAvatarFallback && <NoVideoBackground />}
 
-      {participant.bVideoOn ? <VideoRenderer userId={participant.userId} /> : <NoVideoBackground />}
+      {children}
 
-      <Corner>
-        <Text size="sm" c="white">
-          {participant.displayName}
-        </Text>
-      </Corner>
-
-      {/* {mediaStreamTrack && (
+      {name && (
         <Corner>
-          <AudioLevelIndicator mediaStreamTrack={mediaStreamTrack} isTrackEnabled={!isMuted} />
+          <Text size="sm" c="white">
+            {name}
+          </Text>
         </Corner>
-      )} */}
+      )}
     </Card>
   );
 }

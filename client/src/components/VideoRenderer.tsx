@@ -1,42 +1,31 @@
 import { useEffect, useRef } from 'react';
-import { useZoomVideoStore } from '@/stores/ZoomVideoStore';
+import type { VideoPlayer } from '@zoom/videosdk';
 
 interface VideoRendererProps {
-  userId: number;
+  attach: (el: VideoPlayer) => Promise<void>;
+  detach: () => void;
 }
 
-export function VideoRenderer({ userId }: VideoRendererProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const createVideoPlayer = useZoomVideoStore((s) => s.createVideoPlayer);
-  const detachVideoPlayer = useZoomVideoStore((s) => s.detachVideoPlayer);
+export function VideoRenderer({ attach, detach }: VideoRendererProps) {
+  const ref = useRef<VideoPlayer>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) {
       return;
     }
-
-    let mounted = true;
-
-    createVideoPlayer(userId).then((videoEl) => {
-      if (mounted && videoEl) {
-        el.innerHTML = '';
-        el.appendChild(videoEl);
-      }
-    });
-
+  
+    attach(el);
+ 
     return () => {
-      mounted = false;
-      detachVideoPlayer(userId);
-      if (el) {
-        el.innerHTML = '';
-      }
+      detach();
+      el.innerHTML = '';
     };
-  }, [userId, createVideoPlayer, detachVideoPlayer]);
+  }, [attach, detach]);
 
   return (
-    <div className="video-player-container">
-      <div className="video-player" ref={ref} />
-    </div>
+    <video-player-container>
+      <video-player ref={ref} />
+    </video-player-container>
   );
 }

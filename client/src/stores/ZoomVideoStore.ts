@@ -1,4 +1,4 @@
-import ZoomVideo, { Participant } from '@zoom/videosdk';
+import ZoomVideo, { Participant, VideoPlayer } from '@zoom/videosdk';
 import { create } from 'zustand';
 
 const client = ZoomVideo.createClient();
@@ -51,7 +51,7 @@ type ZoomVideoStore = {
 
   startVideo: () => Promise<void>;
 
-  createVideoPlayer: (userId: number) => Promise<HTMLElement | null>;
+  attachVideoPlayer: (userId: number, element: VideoPlayer) => Promise<void>;
   detachVideoPlayer: (userId: number) => Promise<void>;
 };
 
@@ -102,19 +102,17 @@ export const useZoomVideoStore = create<ZoomVideoStore>((set, get) => ({
     await stream.startVideo();
   },
 
-  createVideoPlayer: async (userId: number) => {
+  attachVideoPlayer: async (userId: number, element: VideoPlayer) => {
     const stream = get().stream;
     if (!stream) {
       // todo set error
-      return null;
+      console.error('error no stream');
+      return;
     }
 
-    const video = await stream.attachVideo(userId, 3);
+    console.log("attaching video player")
 
-    if (video instanceof HTMLElement) {
-      return video;
-    }
-    return null;
+    await stream.attachVideo(userId, 3, element);
   },
 
   detachVideoPlayer: async (userId: number) => {

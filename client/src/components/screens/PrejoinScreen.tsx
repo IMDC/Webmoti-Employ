@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { Box, Button, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import { useZoomPreviewStore } from '@/stores/ZoomPreviewStore';
 import { useZoomVideoStore } from '@/stores/ZoomVideoStore';
 import { ColorSchemeToggle } from '../ColorSchemeToggle';
 import { MenuBar } from '../MenuBar';
-import { LocalPreview } from '../participant/LocalPreview';
+import { ParticipantTile } from '../ParticipantTile';
+import { VideoRenderer } from '../VideoRenderer';
 
 interface PrejoinScreenProps {
   onJoin: () => void;
@@ -17,40 +18,22 @@ export function PrejoinScreen({ onJoin }: PrejoinScreenProps) {
   // const toggleIsAudioOn = useAppStore((state) => state.toggleIsAudioOn);
   // const isAudioOn = useAppStore((state) => state.isAudioOn);
 
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  // const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const startCamera = useZoomPreviewStore((store) => store.startCamera);
-  const initZoom = useZoomVideoStore((store) => store.initClient);
+  const initZoom = useZoomVideoStore((s) => s.initClient);
+  const initDevices = useZoomPreviewStore((s) => s.initDevices);
+  const startCamera = useZoomPreviewStore((s) => s.startCamera);
+  const stopCamera = useZoomPreviewStore((s) => s.stopCamera);
+  const cameraPermission = useZoomPreviewStore((s) => s.cameraPermission);
 
   useEffect(() => {
     async function init() {
       await initZoom();
+      await initDevices();
     }
 
     init();
   }, []);
-
-  const attachLocalVideo = useCallback(
-    (el: HTMLElement) => {
-      if (videoRef.current) {
-        return;
-      }
-
-      const video = document.createElement('video');
-      video.autoplay = true;
-      video.muted = true;
-      video.playsInline = true;
-      video.style.width = '100%';
-      video.style.height = '100%';
-      video.style.objectFit = 'cover';
-
-      el.appendChild(video);
-      videoRef.current = video;
-
-      startCamera(video);
-    },
-    [startCamera]
-  );
 
   return (
     <Center mih="100vh">
@@ -60,7 +43,11 @@ export function PrejoinScreen({ onJoin }: PrejoinScreenProps) {
 
       <Group>
         <Stack>
-          <LocalPreview height={250} width={350} attach={attachLocalVideo} />
+          <ParticipantTile height={196.875} width={350} name="You">
+            {cameraPermission === 'granted' && (
+              <VideoRenderer attach={(el) => startCamera(el)} detach={stopCamera} />
+            )}
+          </ParticipantTile>
 
           <MenuBar
             onToggleMic={async () => {}}
