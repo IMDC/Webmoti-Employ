@@ -1,5 +1,6 @@
 import ZoomVideo, { LocalVideoTrack, VideoPlayer } from '@zoom/videosdk';
 import { create } from 'zustand';
+import { useAppStore } from './store';
 
 type PermissionState = 'idle' | 'acquiring' | 'granted' | 'denied';
 
@@ -21,16 +22,23 @@ export const useZoomPreviewStore = create<ZoomPreviewStore>((set, get) => ({
   cameraPermission: 'idle',
 
   initDevices: async () => {
-    try {
-      const devices = await ZoomVideo.getDevices();
-      const videoDevices = devices.filter((d) => d.kind === 'videoinput');
-      const audioDevices = devices.filter((d) => d.kind === 'audioinput');
+    // try catch doesn't work on this function
+    const devices = await ZoomVideo.getDevices();
 
-      set({ videoDevices, audioDevices, cameraPermission: 'granted' });
-    } catch (err) {
-      // TODO set error here
+    const videoDevices = devices.filter((d) => d.kind === 'videoinput');
+    const audioDevices = devices.filter((d) => d.kind === 'audioinput');
+
+    // need to check for dummy devices when permission denied
+    const isValidDevice = (d: MediaDeviceInfo) => d.deviceId && d.label;
+    const hasPermission = [...videoDevices, ...audioDevices].some(isValidDevice);
+
+    if (!hasPermission) {
+      useAppStore.getState().setError('Could not access media devices');
       set({ cameraPermission: 'denied' });
+      return;
     }
+
+    set({ videoDevices, audioDevices, cameraPermission: 'granted' });
   },
 
   startCamera: async (element) => {
