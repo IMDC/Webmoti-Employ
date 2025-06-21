@@ -4,8 +4,7 @@ import { useZoomPreviewStore } from '@/stores/ZoomPreviewStore';
 import { useZoomVideoStore } from '@/stores/ZoomVideoStore';
 import { ColorSchemeToggle } from '../ColorSchemeToggle';
 import { MenuBar } from '../MenuBar';
-import { ParticipantTile } from '../ParticipantTile';
-import { VideoRenderer } from '../VideoRenderer';
+import { PreviewTile } from '../PreviewTile';
 
 interface PrejoinScreenProps {
   onJoin: () => void;
@@ -22,9 +21,6 @@ export function PrejoinScreen({ onJoin }: PrejoinScreenProps) {
 
   const initZoom = useZoomVideoStore((s) => s.initClient);
   const initDevices = useZoomPreviewStore((s) => s.initDevices);
-  const startCamera = useZoomPreviewStore((s) => s.startCamera);
-  const stopCamera = useZoomPreviewStore((s) => s.stopCamera);
-  const cameraPermission = useZoomPreviewStore((s) => s.cameraPermission);
 
   useEffect(() => {
     async function init() {
@@ -43,11 +39,7 @@ export function PrejoinScreen({ onJoin }: PrejoinScreenProps) {
 
       <Group>
         <Stack>
-          <ParticipantTile height={196.875} width={350} name="You">
-            {cameraPermission === 'granted' && (
-              <VideoRenderer attach={(el) => startCamera(el)} detach={stopCamera} />
-            )}
-          </ParticipantTile>
+          <PreviewTile height={196.875} width={350} />
 
           <MenuBar
             onToggleMic={async () => {}}
