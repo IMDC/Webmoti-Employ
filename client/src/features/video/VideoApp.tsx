@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { JoiningScreen } from '@/components/screens/JoiningScreen';
-import { SettingsMenu } from '@/components/SettingsMenu';
+import { JoiningScreen } from '@/features/video/prejoin/JoiningScreen';
+import { SettingsMenu } from '@/features/video/components/SettingsMenu';
 import { useZoomVideoStore } from '@/stores/ZoomVideoStore';
-import { EndScreen } from '../components/screens/EndScreen';
-import { PrejoinScreen } from '../components/screens/PrejoinScreen';
-import { Room } from '../components/screens/Room';
+import { PrejoinScreen } from './prejoin/PrejoinScreen';
+import { Room } from './session/Room';
+import { EndScreen } from './end/EndScreen';
 
 export function VideoApp() {
   const callState = useZoomVideoStore((s) => s.callState);

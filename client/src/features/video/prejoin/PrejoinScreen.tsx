@@ -3,9 +3,9 @@ import { Box, Button, Center, Group, Stack, Text, TextInput, Title } from '@mant
 import { useAppStore } from '@/stores/store';
 import { useZoomPreviewStore } from '@/stores/ZoomPreviewStore';
 import { useZoomVideoStore } from '@/stores/ZoomVideoStore';
-import { ColorSchemeToggle } from '../ColorSchemeToggle';
-import { MenuBar } from '../MenuBar';
-import { PreviewTile } from '../PreviewTile';
+import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
+import { PreviewTile } from './PreviewTile';
+import { MenuBar } from '../components/MenuBar';
 
 interface PrejoinScreenProps {
   onJoin: () => void;

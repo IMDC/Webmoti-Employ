@@ -1,6 +1,6 @@
 import { AspectRatio, Box } from '@mantine/core';
 import { GALLERY_VIEW_MARGIN } from '@/constants';
-import { ParticipantTile } from './ParticipantTile';
+import { ParticipantTile } from '../../components/ParticipantTile';
 
 export function SpotlightView() {
   return (

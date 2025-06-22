@@ -9,9 +9,9 @@ import {
 } from '@tabler/icons-react';
 import { Button, Flex, Indicator, Popover } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useAppStore } from '../stores/store';
-import { ChangeLayoutModal } from './ChangeLayoutModal/ChangeLayoutModal';
-import { ControlsMenu } from './ControlsMenu';
+import { useAppStore } from '@/stores/store';
+import { ChangeLayoutModal } from '../session/components/ChangeLayoutModal/ChangeLayoutModal';
+import { ControlsMenu } from '../session/components/ControlsMenu';
 
 interface MenuBarProps {
   onToggleMic: () => void;

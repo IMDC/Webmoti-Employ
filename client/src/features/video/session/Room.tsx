@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react';
 import { AppShell, Box } from '@mantine/core';
 import { GALLERY_VIEW_MARGIN } from '@/constants';
-import { Chat } from '../Chat';
-import { MenuBar } from '../MenuBar';
-import { VideoGrid } from '../VideoGrid';
+import { VideoGrid } from './components/VideoGrid';
+import { Chat } from '../chat/Chat';
+import { MenuBar } from '../components/MenuBar';
 
 interface RoomProps {
   onLeave: () => void;
@@ -41,7 +41,7 @@ export function Room({ onLeave }: RoomProps) {
               minWidth: 0,
             }}
           >
-            <VideoGrid containerRef={participantStageRef}/>
+            <VideoGrid containerRef={participantStageRef} />
           </Box>
 
           {isChatOpen && (

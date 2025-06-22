@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IconFile, IconMoodHappy, IconSend } from '@tabler/icons-react';
+import { IconFile, IconSend } from '@tabler/icons-react';
 import {
   ActionIcon,
   Avatar,

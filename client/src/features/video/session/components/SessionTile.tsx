@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
 import { Participant, VideoPlayer } from '@zoom/videosdk';
-import { useZoomVideoStore } from '@/stores/ZoomVideoStore';
-import AudioLevelIndicator from './AudioLevelIndicator';
-import { Corner } from './participant/Corner';
-import { ParticipantTile } from './ParticipantTile';
-import { VideoRenderer } from './VideoRenderer';
 import { useAppStore } from '@/stores/store';
+import { useZoomVideoStore } from '@/stores/ZoomVideoStore';
+import { Corner } from '../../../../components/Corner';
+import AudioLevelIndicator from '../../components/AudioLevelIndicator';
+import { ParticipantTile } from '../../components/ParticipantTile';
+import { VideoRenderer } from './VideoRenderer';
 
 interface SessionTileProps {
   height: number;
