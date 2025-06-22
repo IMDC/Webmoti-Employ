@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 
+type PermissionState = 'idle' | 'acquiring' | 'granted' | 'denied';
+
 type AppStore = {
   error: string | null;
   setError: (error: string | null) => void;
@@ -12,8 +14,8 @@ type AppStore = {
   toggleIsAudioOn: () => void;
   toggleIsVideoOn: () => void;
 
-  isMediaDenied: boolean;
-  setIsMediaDenied: (value: boolean) => void;
+  permissionState: PermissionState;
+  setPermissionState: (value: PermissionState) => void;
 
   isSettingsOpen: boolean;
   setIsSettingsOpen: (value: boolean) => void;
@@ -31,8 +33,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
   toggleIsAudioOn: () => set({ isAudioOn: !get().isAudioOn }),
   toggleIsVideoOn: () => set({ isVideoOn: !get().isVideoOn }),
 
-  isMediaDenied: false,
-  setIsMediaDenied: (value) => set({ isMediaDenied: value }),
+  permissionState: 'idle',
+  setPermissionState: (value) => set({ permissionState: value }),
 
   isSettingsOpen: false,
   setIsSettingsOpen: (value) => set({ isSettingsOpen: value }),

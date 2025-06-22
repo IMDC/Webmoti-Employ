@@ -53,6 +53,11 @@ type ZoomVideoStore = {
 
   attachVideoPlayer: (userId: number, element: VideoPlayer) => Promise<void>;
   detachVideoPlayer: (userId: number) => Promise<void>;
+
+  startAudio: () => Promise<void>;
+  stopAudio: () => Promise<void>;
+  muteAudio: () => Promise<void>;
+  unmuteAudio: () => Promise<void>;
 };
 
 export const useZoomVideoStore = create<ZoomVideoStore>((set, get) => ({
@@ -81,6 +86,7 @@ export const useZoomVideoStore = create<ZoomVideoStore>((set, get) => ({
     const stream = client.getMediaStream();
 
     await stream.startVideo();
+    await stream.startAudio();
 
     set({ stream, callState: 'joined' });
 
@@ -110,7 +116,7 @@ export const useZoomVideoStore = create<ZoomVideoStore>((set, get) => ({
       return;
     }
 
-    console.log("attaching video player")
+    console.log('attaching video player');
 
     await stream.attachVideo(userId, 3, element);
   },
@@ -118,5 +124,23 @@ export const useZoomVideoStore = create<ZoomVideoStore>((set, get) => ({
   detachVideoPlayer: async (userId: number) => {
     const stream = get().stream;
     await stream?.detachVideo(userId);
+  },
+
+  startAudio: async () => {
+    const stream = get().stream!;
+    await stream.startVideo();
+  },
+  stopAudio: async () => {
+    // this will stop the user from both sharing and hearing audio
+    const stream = get().stream!;
+    await stream.stopAudio();
+  },
+  muteAudio: async () => {
+    const stream = get().stream!;
+    await stream.muteAudio();
+  },
+  unmuteAudio: async () => {
+    const stream = get().stream!;
+    await stream.unmuteAudio();
   },
 }));
