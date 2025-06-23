@@ -6,6 +6,7 @@ import { useZoomPreviewStore } from '@/stores/usePreviewStore';
 import { useZoomVideoStore } from '@/stores/useZoomVideoStore';
 import { MenuBar } from '../components/MenuBar';
 import { PreviewTile } from './PreviewTile';
+import { useDeviceStore } from '@/stores/useDeviceStore';
 
 interface PrejoinScreenProps {
   onJoin: () => void;
@@ -18,7 +19,7 @@ export function PrejoinScreen({ onJoin }: PrejoinScreenProps) {
   const permissionState = useAppStore((s) => s.permissionState);
 
   const initZoom = useZoomVideoStore((s) => s.initClient);
-  const initDevices = useZoomPreviewStore((s) => s.initDevices);
+  const initDevices = useDeviceStore((s) => s.initDevices);
 
   useEffect(() => {
     async function init() {

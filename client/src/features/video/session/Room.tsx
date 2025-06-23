@@ -2,11 +2,11 @@ import { useRef, useState } from 'react';
 import { AppShell, Box } from '@mantine/core';
 import { GALLERY_VIEW_MARGIN } from '@/constants';
 import { useAppStore } from '@/stores/useAppStore';
-import { useZoomPreviewStore } from '@/stores/usePreviewStore';
 import { useZoomVideoStore } from '@/stores/useZoomVideoStore';
 import { Chat } from '../chat/Chat';
 import { MenuBar } from '../components/MenuBar';
 import { VideoGrid } from './components/VideoGrid';
+import { useDeviceStore } from '@/stores/useDeviceStore';
 
 interface RoomProps {
   onLeave: () => void;
@@ -23,7 +23,7 @@ export function Room({ onLeave }: RoomProps) {
   const setIsAudioOn = useAppStore((s) => s.setIsAudioOn);
 
   // TODO maybe remove this in favour of startVideo permission check
-  const initDevices = useZoomPreviewStore((s) => s.initDevices);
+  const initDevices = useDeviceStore((s) => s.initDevices);
 
   const startVideo = useZoomVideoStore((s) => s.startVideo);
   const stopVideo = useZoomVideoStore((s) => s.stopVideo);

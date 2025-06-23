@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { IconMicrophone, IconVideo, IconVolume } from '@tabler/icons-react';
 import { Radio, Select, Stack, Text } from '@mantine/core';
 import { useAppStore } from '@/stores/useAppStore';
-import { useZoomPreviewStore } from '@/stores/usePreviewStore';
+import { useDeviceStore } from '@/stores/useDeviceStore';
 
 type MediaType = 'audio' | 'video';
 type Variant = 'dropdown' | 'radio';
@@ -13,7 +13,9 @@ interface ChangeMediaDeviceProps {
 }
 
 export function ChangeMediaDevice({ mediaType, variant = 'dropdown' }: ChangeMediaDeviceProps) {
-  const { audioInputDevices, audioOutputDevices, videoDevices } = useZoomPreviewStore();
+  const audioInputDevices = useDeviceStore((s) => s.audioInputDevices);
+  const audioOutputDevices = useDeviceStore((s) => s.audioOutputDevices);
+  const videoDevices = useDeviceStore((s) => s.videoDevices);
 
   const permissionState = useAppStore((s) => s.permissionState);
 
