@@ -83,6 +83,7 @@ export function Room({ onLeave }: RoomProps) {
           onToggleMic={async () => {
             if (permissionState !== 'granted') {
               await initDevices();
+              return;
             }
 
             if (isAudioOn) {
@@ -96,6 +97,7 @@ export function Room({ onLeave }: RoomProps) {
           onToggleVideo={async () => {
             if (permissionState !== 'granted') {
               await initDevices();
+              return;
             }
 
             if (isVideoOn) {

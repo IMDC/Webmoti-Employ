@@ -70,6 +70,8 @@ export function Chat() {
   const messages = useChatStore((s) => s.messages);
   const sendChat = useChatStore((s) => s.sendChat);
 
+  const isChatTextValid = chatText !== ""
+
   function sendMessage() {
     sendChat(chatText);
     setChatText('');
@@ -130,8 +132,8 @@ export function Chat() {
             }
           }}
           rightSection={
-            <ActionIcon variant="subtle" onClick={sendMessage}>
-              <IconSend stroke={1.5} size="lg" />
+            <ActionIcon variant="subtle" onClick={sendMessage} disabled={!isChatTextValid}>
+              <IconSend stroke={1.5} />
             </ActionIcon>
           }
         />

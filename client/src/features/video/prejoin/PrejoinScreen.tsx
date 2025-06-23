@@ -47,12 +47,14 @@ export function PrejoinScreen({ onJoin }: PrejoinScreenProps) {
             onToggleMic={async () => {
               if (permissionState !== 'granted') {
                 await initDevices();
+                return;
               }
               toggleMuteMicrophone();
             }}
             onToggleVideo={async () => {
               if (permissionState !== 'granted') {
                 await initDevices();
+                return;
               }
               toggleIsVideoOn();
             }}
