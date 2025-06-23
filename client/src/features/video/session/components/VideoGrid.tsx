@@ -1,4 +1,4 @@
-import { useZoomVideoStore } from '@/stores/ZoomVideoStore';
+import { useZoomVideoStore } from '@/stores/useZoomVideoStore';
 import { GALLERY_VIEW_ASPECT_RATIO } from '../../../../constants';
 import useGalleryViewLayout from '../hooks/useGalleryViewLayout';
 import { SessionTile } from './SessionTile';

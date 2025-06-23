@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { IconMicrophone, IconVideo, IconVolume } from '@tabler/icons-react';
 import { Radio, Select, Stack, Text } from '@mantine/core';
-import { useAppStore } from '@/stores/store';
-import { useZoomPreviewStore } from '@/stores/ZoomPreviewStore';
+import { useAppStore } from '@/stores/useAppStore';
+import { useZoomPreviewStore } from '@/stores/usePreviewStore';
 
 type MediaType = 'audio' | 'video';
 type Variant = 'dropdown' | 'radio';

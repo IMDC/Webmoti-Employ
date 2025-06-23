@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useAppStore } from '@/stores/store';
-import { useZoomPreviewStore } from '@/stores/ZoomPreviewStore';
+import { Corner } from '@/components/Corner';
+import { useAppStore } from '@/stores/useAppStore';
+import { useZoomPreviewStore } from '@/stores/usePreviewStore';
+import AudioLevelIndicator from '../components/AudioLevelIndicator';
 import { ParticipantTile } from '../components/ParticipantTile';
 import { VideoRenderer } from '../session/components/VideoRenderer';
-import { Corner } from '@/components/Corner';
-import AudioLevelIndicator from '../components/AudioLevelIndicator';
 
 interface PreviewTileProps {
   height: number;

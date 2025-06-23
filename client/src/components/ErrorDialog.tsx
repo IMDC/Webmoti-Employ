@@ -1,5 +1,5 @@
 import { Dialog, Text } from '@mantine/core';
-import { useAppStore } from '@/stores/store';
+import { useAppStore } from '@/stores/useAppStore';
 
 export function ErrorDialog() {
   const error = useAppStore((state) => state.error);

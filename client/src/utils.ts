@@ -1,4 +1,4 @@
-import { useAppStore } from './stores/store';
+import { useAppStore } from './stores/useAppStore';
 
 export async function requestLocalMedia(
   constraints: MediaStreamConstraints = { video: true, audio: true }

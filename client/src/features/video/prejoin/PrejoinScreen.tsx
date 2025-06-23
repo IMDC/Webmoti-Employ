@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { Box, Button, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
-import { useAppStore } from '@/stores/store';
-import { useZoomPreviewStore } from '@/stores/ZoomPreviewStore';
-import { useZoomVideoStore } from '@/stores/ZoomVideoStore';
+import { useAppStore } from '@/stores/useAppStore';
+import { useZoomPreviewStore } from '@/stores/usePreviewStore';
+import { useZoomVideoStore } from '@/stores/useZoomVideoStore';
 import { MenuBar } from '../components/MenuBar';
 import { PreviewTile } from './PreviewTile';
 

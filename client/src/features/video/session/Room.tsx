@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react';
 import { AppShell, Box } from '@mantine/core';
 import { GALLERY_VIEW_MARGIN } from '@/constants';
-import { useAppStore } from '@/stores/store';
-import { useZoomPreviewStore } from '@/stores/ZoomPreviewStore';
-import { useZoomVideoStore } from '@/stores/ZoomVideoStore';
+import { useAppStore } from '@/stores/useAppStore';
+import { useZoomPreviewStore } from '@/stores/usePreviewStore';
+import { useZoomVideoStore } from '@/stores/useZoomVideoStore';
 import { Chat } from '../chat/Chat';
 import { MenuBar } from '../components/MenuBar';
 import { VideoGrid } from './components/VideoGrid';

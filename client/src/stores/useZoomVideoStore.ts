@@ -1,6 +1,6 @@
 import ZoomVideo, { Participant, VideoPlayer } from '@zoom/videosdk';
 import { create } from 'zustand';
-import { useAppStore } from './store';
+import { useAppStore } from './useAppStore';
 
 const client = ZoomVideo.createClient();
 

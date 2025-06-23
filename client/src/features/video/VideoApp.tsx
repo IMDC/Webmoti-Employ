@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { SettingsMenu } from '@/features/video/components/SettingsMenu';
 import { JoiningScreen } from '@/features/video/prejoin/JoiningScreen';
-import { useZoomVideoStore } from '@/stores/ZoomVideoStore';
+import { useZoomVideoStore } from '@/stores/useZoomVideoStore';
 import { ChatContextProvider } from './chat/ChatContextProvider';
 import { EndScreen } from './end/EndScreen';
 import { PrejoinScreen } from './prejoin/PrejoinScreen';

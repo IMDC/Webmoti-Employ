@@ -1,6 +1,6 @@
 import ZoomVideo, { LocalAudioTrack, LocalVideoTrack, VideoPlayer } from '@zoom/videosdk';
 import { create } from 'zustand';
-import { useAppStore } from './store';
+import { useAppStore } from './useAppStore';
 
 type ZoomPreviewStore = {
   // TODO move the devices/selected device into other store
