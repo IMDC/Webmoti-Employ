@@ -3,25 +3,30 @@ import { create } from 'zustand';
 import { useAppStore } from './store';
 
 type ZoomPreviewStore = {
+  // TODO move the devices/selected device into other store
   videoDevices: MediaDeviceInfo[];
-  audioDevices: MediaDeviceInfo[];
+  audioInputDevices: MediaDeviceInfo[];
+  audioOutputDevices: MediaDeviceInfo[];
   localVideoTrack: LocalVideoTrack | null;
   localAudioTrack: LocalAudioTrack | null;
 
   initDevices: () => Promise<void>;
   startCamera: (element: VideoPlayer) => Promise<void>;
   stopCamera: () => Promise<void>;
+  switchCamera: (cameraId: string) => Promise<void>;
 
   startMicrophone: () => Promise<void>;
   stopMicrophone: () => Promise<void>;
   unmuteMicrophone: () => Promise<void>;
   muteMicrophone: () => Promise<void>;
   toggleMuteMicrophone: () => Promise<void>;
+  switchMicrophone: (microphoneId: string) => Promise<void>;
 };
 
 export const useZoomPreviewStore = create<ZoomPreviewStore>((set, get) => ({
   videoDevices: [],
-  audioDevices: [],
+  audioInputDevices: [],
+  audioOutputDevices: [],
   localVideoTrack: null,
   localAudioTrack: null,
 
@@ -30,11 +35,12 @@ export const useZoomPreviewStore = create<ZoomPreviewStore>((set, get) => ({
     const devices = await ZoomVideo.getDevices();
 
     const videoDevices = devices.filter((d) => d.kind === 'videoinput');
-    const audioDevices = devices.filter((d) => d.kind === 'audioinput');
+    const audioInputDevices = devices.filter((d) => d.kind === 'audioinput');
+    const audioOutputDevices = devices.filter((d) => d.kind === 'audiooutput');
 
     // need to check for dummy devices when permission denied
     const isValidDevice = (d: MediaDeviceInfo) => d.deviceId && d.label;
-    const hasPermission = [...videoDevices, ...audioDevices].some(isValidDevice);
+    const hasPermission = [...videoDevices, ...audioInputDevices].some(isValidDevice);
 
     if (!hasPermission) {
       useAppStore.getState().setError('Could not access media devices');
@@ -44,7 +50,7 @@ export const useZoomPreviewStore = create<ZoomPreviewStore>((set, get) => ({
       return;
     }
 
-    set({ videoDevices, audioDevices });
+    set({ videoDevices, audioInputDevices, audioOutputDevices });
     useAppStore.getState().setPermissionState('granted');
   },
 
@@ -67,8 +73,13 @@ export const useZoomPreviewStore = create<ZoomPreviewStore>((set, get) => ({
     }
   },
 
+  switchCamera: async (deviceId) => {
+    const localVideoTrack = get().localVideoTrack;
+    localVideoTrack?.switchCamera(deviceId);
+  },
+
   startMicrophone: async () => {
-    const audioDevices = get().audioDevices;
+    const audioDevices = get().audioInputDevices;
 
     if (!audioDevices.length) {
       throw new Error('No audio devices found');
@@ -107,5 +118,14 @@ export const useZoomPreviewStore = create<ZoomPreviewStore>((set, get) => ({
       await localAudioTrack?.unmute();
     }
     useAppStore.getState().toggleIsAudioOn();
+  },
+  switchMicrophone: async (microphoneId) => {
+    const localAudioTrack = get().localAudioTrack;
+    await localAudioTrack?.stop();
+
+    const newLocalAudioTrack = ZoomVideo.createLocalAudioTrack(microphoneId);
+    await newLocalAudioTrack.start();
+    newLocalAudioTrack.unmute();
+    set({ localAudioTrack: newLocalAudioTrack });
   },
 }));

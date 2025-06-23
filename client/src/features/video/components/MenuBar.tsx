@@ -12,6 +12,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useAppStore } from '@/stores/store';
 import { ChangeLayoutModal } from '../session/components/ChangeLayoutModal/ChangeLayoutModal';
 import { ControlsMenu } from '../session/components/ControlsMenu';
+import { ChangeMediaDevice } from './ChangeMediaDevice';
 
 interface MenuBarProps {
   onToggleMic: () => void;
@@ -73,7 +74,9 @@ export function MenuBar({
             </Button>
           </Popover.Target>
 
-          <Popover.Dropdown>{/* <ChangeMediaDevice mediaType="audio" /> */}</Popover.Dropdown>
+          <Popover.Dropdown>
+            <ChangeMediaDevice mediaType="audio" variant="radio" />
+          </Popover.Dropdown>
         </Popover>
 
         {permissionState === 'denied' ? (
@@ -91,7 +94,9 @@ export function MenuBar({
             </Button>
           </Popover.Target>
 
-          <Popover.Dropdown>{/* <ChangeMediaDevice mediaType="video" /> */}</Popover.Dropdown>
+          <Popover.Dropdown>
+            <ChangeMediaDevice mediaType="video" variant="radio" />
+          </Popover.Dropdown>
         </Popover>
 
         {permissionState === 'denied' ? (
