@@ -51,6 +51,7 @@ type ZoomVideoStore = {
   leave: () => Promise<void>;
 
   startVideo: () => Promise<void>;
+  stopVideo: () => Promise<void>;
 
   attachVideoPlayer: (userId: number, element: VideoPlayer) => Promise<void>;
   detachVideoPlayer: (userId: number) => Promise<void>;
@@ -111,6 +112,11 @@ export const useZoomVideoStore = create<ZoomVideoStore>((set, get) => ({
     await stream.startVideo();
   },
 
+  stopVideo: async () => {
+    const stream = get().stream!;
+    await stream.stopVideo();
+  },
+
   attachVideoPlayer: async (userId: number, element: VideoPlayer) => {
     const stream = get().stream;
     if (!stream) {
@@ -131,7 +137,7 @@ export const useZoomVideoStore = create<ZoomVideoStore>((set, get) => ({
 
   startAudio: async () => {
     const stream = get().stream!;
-    await stream.startVideo();
+    await stream.startAudio();
   },
   stopAudio: async () => {
     // this will stop the user from both sharing and hearing audio

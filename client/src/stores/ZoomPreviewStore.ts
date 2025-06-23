@@ -40,6 +40,7 @@ export const useZoomPreviewStore = create<ZoomPreviewStore>((set, get) => ({
       useAppStore.getState().setError('Could not access media devices');
       useAppStore.getState().setPermissionState('denied');
       useAppStore.getState().setIsVideoOn(false);
+      useAppStore.getState().setIsAudioOn(false);
       return;
     }
 

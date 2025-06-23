@@ -1,9 +1,12 @@
 import { useRef, useState } from 'react';
 import { AppShell, Box } from '@mantine/core';
 import { GALLERY_VIEW_MARGIN } from '@/constants';
-import { VideoGrid } from './components/VideoGrid';
+import { useAppStore } from '@/stores/store';
+import { useZoomPreviewStore } from '@/stores/ZoomPreviewStore';
+import { useZoomVideoStore } from '@/stores/ZoomVideoStore';
 import { Chat } from '../chat/Chat';
 import { MenuBar } from '../components/MenuBar';
+import { VideoGrid } from './components/VideoGrid';
 
 interface RoomProps {
   onLeave: () => void;
@@ -12,6 +15,20 @@ interface RoomProps {
 export function Room({ onLeave }: RoomProps) {
   const participantStageRef = useRef<HTMLDivElement>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
+
+  const permissionState = useAppStore((s) => s.permissionState);
+  const isVideoOn = useAppStore((s) => s.isVideoOn);
+  const setIsVideoOn = useAppStore((s) => s.setIsVideoOn);
+  const isAudioOn = useAppStore((s) => s.isAudioOn);
+  const setIsAudioOn = useAppStore((s) => s.setIsAudioOn);
+
+  // TODO maybe remove this in favour of startVideo permission check
+  const initDevices = useZoomPreviewStore((s) => s.initDevices);
+
+  const startVideo = useZoomVideoStore((s) => s.startVideo);
+  const stopVideo = useZoomVideoStore((s) => s.stopVideo);
+  const startAudio = useZoomVideoStore((s) => s.startAudio);
+  const stopAudio = useZoomVideoStore((s) => s.stopAudio);
 
   return (
     <AppShell
@@ -60,8 +77,32 @@ export function Room({ onLeave }: RoomProps) {
 
       <AppShell.Footer>
         <MenuBar
-          onToggleMic={() => {}}
-          onToggleVideo={() => {}}
+          onToggleMic={async () => {
+            if (permissionState !== 'granted') {
+              await initDevices();
+            }
+
+            if (isAudioOn) {
+              setIsAudioOn(false);
+              await stopAudio();
+            } else {
+              setIsAudioOn(true);
+              await startAudio();
+            }
+          }}
+          onToggleVideo={async () => {
+            if (permissionState !== 'granted') {
+              await initDevices();
+            }
+
+            if (isVideoOn) {
+              setIsVideoOn(false);
+              await stopVideo();
+            } else {
+              setIsVideoOn(true);
+              await startVideo();
+            }
+          }}
           onLeave={onLeave}
           onToggleChat={() => {
             setIsChatOpen(!isChatOpen);

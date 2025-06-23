@@ -1,24 +1,21 @@
 import { useEffect } from 'react';
 import { Box, Button, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
+import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
 import { useAppStore } from '@/stores/store';
 import { useZoomPreviewStore } from '@/stores/ZoomPreviewStore';
 import { useZoomVideoStore } from '@/stores/ZoomVideoStore';
-import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
-import { PreviewTile } from './PreviewTile';
 import { MenuBar } from '../components/MenuBar';
+import { PreviewTile } from './PreviewTile';
 
 interface PrejoinScreenProps {
   onJoin: () => void;
 }
 
 export function PrejoinScreen({ onJoin }: PrejoinScreenProps) {
-  const toggleIsVideoOn = useAppStore((state) => state.toggleIsVideoOn);
-  // const isVideoOn = useAppStore((state) => state.isVideoOn);
-  const toggleMuteMicrophone = useZoomPreviewStore((state) => state.toggleMuteMicrophone);
+  const toggleIsVideoOn = useAppStore((s) => s.toggleIsVideoOn);
+  const toggleMuteMicrophone = useZoomPreviewStore((s) => s.toggleMuteMicrophone);
 
-  const permissionState = useAppStore((state) => state.permissionState);
-
-  // const videoRef = useRef<HTMLVideoElement | null>(null);
+  const permissionState = useAppStore((s) => s.permissionState);
 
   const initZoom = useZoomVideoStore((s) => s.initClient);
   const initDevices = useZoomPreviewStore((s) => s.initDevices);
@@ -44,9 +41,15 @@ export function PrejoinScreen({ onJoin }: PrejoinScreenProps) {
 
           <MenuBar
             onToggleMic={async () => {
+              if (permissionState !== 'granted') {
+                await initDevices();
+              }
               toggleMuteMicrophone();
             }}
             onToggleVideo={async () => {
+              if (permissionState !== 'granted') {
+                await initDevices();
+              }
               toggleIsVideoOn();
             }}
             isPrejoin
