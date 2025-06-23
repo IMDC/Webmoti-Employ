@@ -1,6 +1,6 @@
+import { Corner } from '@/components/Corner';
 import { Card, Text } from '@mantine/core';
-import { Corner } from './participant/Corner';
-import { NoVideoBackground } from './participant/NoVideoBackground';
+import { NoVideoBackground } from './NoVideoBackground';
 
 interface ParticipantTileProps {
   height: number | string;

@@ -1,10 +1,10 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { Admin } from './pages/Admin';
-import { NotFoundPage } from './pages/NotFoundPage';
-import { VideoApp } from './pages/VideoApp';
+import { Home } from './features/home/Home';
+import { NotFoundPage } from './components/NotFoundPage';
+import { VideoApp } from './features/video/VideoApp';
 
 const router = createBrowserRouter([
-  { path: '/admin', element: <Admin /> },
+  { path: '/admin', element: <Home /> },
 
   {
     path: '/',

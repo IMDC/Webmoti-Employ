@@ -9,10 +9,9 @@ import {
 } from '@tabler/icons-react';
 import { Button, Flex, Indicator, Popover } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useAppStore } from '../stores/store';
-import { ChangeLayoutModal } from './ChangeLayoutModal/ChangeLayoutModal';
-import { ChangeMediaDevice } from './ChangeMediaDevice';
-import { ControlsMenu } from './ControlsMenu';
+import { useAppStore } from '@/stores/store';
+import { ChangeLayoutModal } from '../session/components/ChangeLayoutModal/ChangeLayoutModal';
+import { ControlsMenu } from '../session/components/ControlsMenu';
 
 interface MenuBarProps {
   onToggleMic: () => void;
@@ -31,7 +30,7 @@ export function MenuBar({
   disableMediaButtons = false,
   onLeave,
 }: MenuBarProps) {
-  const isMediaDenied = useAppStore((state) => state.isMediaDenied);
+  const permissionState = useAppStore((state) => state.permissionState);
   const isAudioOn = useAppStore((state) => state.isAudioOn);
   const isVideoOn = useAppStore((state) => state.isVideoOn);
 
@@ -74,12 +73,14 @@ export function MenuBar({
             </Button>
           </Popover.Target>
 
-          <Popover.Dropdown>
-            <ChangeMediaDevice mediaType="audio" />
-          </Popover.Dropdown>
+          <Popover.Dropdown>{/* <ChangeMediaDevice mediaType="audio" /> */}</Popover.Dropdown>
         </Popover>
 
-        {isMediaDenied ? <Indicator color="orange">{MicButton}</Indicator> : MicButton}
+        {permissionState === 'denied' ? (
+          <Indicator color="orange">{MicButton}</Indicator>
+        ) : (
+          MicButton
+        )}
       </Button.Group>
 
       <Button.Group>
@@ -90,12 +91,14 @@ export function MenuBar({
             </Button>
           </Popover.Target>
 
-          <Popover.Dropdown>
-            <ChangeMediaDevice mediaType="video" />
-          </Popover.Dropdown>
+          <Popover.Dropdown>{/* <ChangeMediaDevice mediaType="video" /> */}</Popover.Dropdown>
         </Popover>
 
-        {isMediaDenied ? <Indicator color="orange">{VideoButton}</Indicator> : VideoButton}
+        {permissionState === 'denied' ? (
+          <Indicator color="orange">{VideoButton}</Indicator>
+        ) : (
+          VideoButton
+        )}
       </Button.Group>
 
       <ControlsMenu onLayoutOpen={openLayoutModal} />
