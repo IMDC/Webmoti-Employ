@@ -17,6 +17,8 @@ export function SessionTile({ height, width, participant }: SessionTileProps) {
   const attach = useZoomVideoStore((s) => s.attachVideoPlayer);
   const detach = useZoomVideoStore((s) => s.detachVideoPlayer);
 
+  const permissionState = useAppStore((s) => s.permissionState);
+
   const isAudioOn = useAppStore((s) => s.isAudioOn);
 
   const attachStable = useCallback(
@@ -28,10 +30,15 @@ export function SessionTile({ height, width, participant }: SessionTileProps) {
 
   return (
     <ParticipantTile height={height} width={width} name={participant.displayName}>
-      <VideoRenderer attach={attachStable} detach={detachStable} />
+      {permissionState === 'granted' && (
+        <VideoRenderer attach={attachStable} detach={detachStable} />
+      )}
 
       <Corner position="bottom-right">
-        <AudioLevelIndicator volume={0} isTrackEnabled={isAudioOn} />
+        <AudioLevelIndicator
+          volume={0}
+          isTrackEnabled={isAudioOn && permissionState === 'granted'}
+        />
       </Corner>
     </ParticipantTile>
   );

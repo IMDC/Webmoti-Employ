@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { JoiningScreen } from '@/features/video/prejoin/JoiningScreen';
 import { SettingsMenu } from '@/features/video/components/SettingsMenu';
+import { JoiningScreen } from '@/features/video/prejoin/JoiningScreen';
 import { useZoomVideoStore } from '@/stores/ZoomVideoStore';
+import { ChatContextProvider } from './chat/ChatContextProvider';
+import { EndScreen } from './end/EndScreen';
 import { PrejoinScreen } from './prejoin/PrejoinScreen';
 import { Room } from './session/Room';
-import { EndScreen } from './end/EndScreen';
 
 export function VideoApp() {
   const callState = useZoomVideoStore((s) => s.callState);
@@ -24,11 +25,13 @@ export function VideoApp() {
       <JoiningScreen visible={callState === 'joining'} />
 
       {callState === 'joined' && (
-        <Room
-          onLeave={async () => {
-            await leaveZoom();
-          }}
-        />
+        <ChatContextProvider>
+          <Room
+            onLeave={async () => {
+              await leaveZoom();
+            }}
+          />
+        </ChatContextProvider>
       )}
 
       {callState === 'left' && <EndScreen />}

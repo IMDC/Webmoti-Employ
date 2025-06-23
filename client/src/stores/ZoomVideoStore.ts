@@ -1,5 +1,6 @@
 import ZoomVideo, { Participant, VideoPlayer } from '@zoom/videosdk';
 import { create } from 'zustand';
+import { useAppStore } from './store';
 
 const client = ZoomVideo.createClient();
 
@@ -85,8 +86,10 @@ export const useZoomVideoStore = create<ZoomVideoStore>((set, get) => ({
 
     const stream = client.getMediaStream();
 
-    await stream.startVideo();
-    await stream.startAudio();
+    if (useAppStore.getState().permissionState === 'granted') {
+      await stream.startVideo();
+      await stream.startAudio();
+    }
 
     set({ stream, callState: 'joined' });
 
