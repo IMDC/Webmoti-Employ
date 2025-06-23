@@ -15,6 +15,8 @@ export function createChatStore() {
   const chatClient = zoomClient.getChatClient();
 
   // initialize messages
+  // (this doesn't work since zoom sdk doesn't store/sync old chat messages)
+  // https://developers.zoom.us/docs/video-sdk/web/chat/#get-chat-history
   const messages = chatClient.getHistory();
 
   const chatStore = create<ChatStore>(() => ({

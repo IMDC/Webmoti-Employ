@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { IconFile, IconSend } from '@tabler/icons-react';
+import { ChatMessage } from '@zoom/videosdk';
 import {
   ActionIcon,
   Avatar,
@@ -15,22 +16,46 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import { MyEmojiPicker } from './MyEmojiPicker';
+import { useChatStore } from './useChatStore';
 
-function Message() {
+function formatRelativeTime(timestamp: number) {
+  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+  const diff = Date.now() - new Date(timestamp).getTime();
+
+  const seconds = Math.floor(diff / 1000);
+  if (seconds < 60) {
+    return rtf.format(-seconds, 'second');
+  }
+
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) {
+    return rtf.format(-minutes, 'minute');
+  }
+
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) {
+    return rtf.format(-hours, 'hour');
+  }
+
+  const days = Math.floor(hours / 24);
+  return rtf.format(-days, 'day');
+}
+
+function Message({ message, sender, timestamp }: ChatMessage) {
   return (
     <Group align="flex-start">
       <Avatar />
 
       <Stack gap={2} flex={1}>
         <Group align="flex-end" gap={10}>
-          <Text fw={500}>Joe</Text>
+          <Text fw={500}>{sender.name}</Text>
           <Text fz="xs" c="dimmed">
-            11:00 AM
+            {formatRelativeTime(timestamp)}
           </Text>
         </Group>
 
         <Paper p="xs" fz="sm" style={{ wordBreak: 'break-word' }}>
-          aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+          {message}
         </Paper>
       </Stack>
     </Group>
@@ -39,10 +64,14 @@ function Message() {
 
 export function Chat() {
   const theme = useMantineTheme();
-  const [file, setFile] = useState<File | null>(null);
+  const [_, setFile] = useState<File | null>(null);
   const [chatText, setChatText] = useState('');
 
+  const messages = useChatStore((s) => s.messages);
+  const sendChat = useChatStore((s) => s.sendChat);
+
   function sendMessage() {
+    sendChat(chatText);
     setChatText('');
   }
 
@@ -68,8 +97,8 @@ export function Chat() {
       <Box style={{ flex: 1, overflow: 'hidden', margin: '12px 0' }}>
         <ScrollArea style={{ height: '100%' }}>
           <Stack>
-            {Array.from({ length: 10 }).map((_, i) => (
-              <Message key={i} />
+            {Array.from(messages).map((chatMessage, i) => (
+              <Message key={i} {...chatMessage} />
             ))}
           </Stack>
         </ScrollArea>
