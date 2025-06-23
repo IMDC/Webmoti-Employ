@@ -1,6 +1,7 @@
 import ZoomVideo, { Participant, VideoPlayer } from '@zoom/videosdk';
 import { create } from 'zustand';
 import { useAppStore } from './useAppStore';
+import { useDeviceStore } from './useDeviceStore';
 
 const client = ZoomVideo.createClient();
 
@@ -52,6 +53,7 @@ type ZoomVideoStore = {
 
   startVideo: () => Promise<void>;
   stopVideo: () => Promise<void>;
+  switchCamera: (deviceId: string) => Promise<void>;
 
   attachVideoPlayer: (userId: number, element: VideoPlayer) => Promise<void>;
   detachVideoPlayer: (userId: number) => Promise<void>;
@@ -60,6 +62,7 @@ type ZoomVideoStore = {
   stopAudio: () => Promise<void>;
   muteAudio: () => Promise<void>;
   unmuteAudio: () => Promise<void>;
+  switchMicrophone: (deviceId: string) => Promise<void>;
 };
 
 export const useZoomVideoStore = create<ZoomVideoStore>((set, get) => ({
@@ -116,6 +119,11 @@ export const useZoomVideoStore = create<ZoomVideoStore>((set, get) => ({
     const stream = get().stream!;
     await stream.stopVideo();
   },
+  switchCamera: async (deviceId) => {
+    const stream = get().stream!;
+    await stream.switchCamera(deviceId);
+    useDeviceStore.setState({ selectedVideoDevice: deviceId });
+  },
 
   attachVideoPlayer: async (userId: number, element: VideoPlayer) => {
     const stream = get().stream;
@@ -151,5 +159,10 @@ export const useZoomVideoStore = create<ZoomVideoStore>((set, get) => ({
   unmuteAudio: async () => {
     const stream = get().stream!;
     await stream.unmuteAudio();
+  },
+  switchMicrophone: async (deviceId) => {
+    const stream = get().stream!;
+    stream.switchMicrophone(deviceId);
+    useDeviceStore.setState({ selectedAudioInputDevice: deviceId });
   },
 }));

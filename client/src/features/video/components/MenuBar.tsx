@@ -21,12 +21,17 @@ interface MenuBarProps {
   isPrejoin?: boolean;
   disableMediaButtons?: boolean;
   onLeave?: () => void;
+
+  onChangeVideoDevice?: (videoDeviceId: string) => Promise<void>;
+  onChangeAudioInputDevice?: (audioInputDeviceId: string) => Promise<void>;
 }
 
 export function MenuBar({
   onToggleMic,
   onToggleVideo,
   onToggleChat,
+  onChangeVideoDevice,
+  onChangeAudioInputDevice,
   isPrejoin = false,
   disableMediaButtons = false,
   onLeave,
@@ -75,7 +80,11 @@ export function MenuBar({
           </Popover.Target>
 
           <Popover.Dropdown>
-            <ChangeMediaDevice mediaType="audio" variant="radio" />
+            <ChangeMediaDevice
+              mediaType="audio"
+              variant="radio"
+              onSwitchMicrophone={onChangeAudioInputDevice}
+            />
           </Popover.Dropdown>
         </Popover>
 
@@ -95,7 +104,11 @@ export function MenuBar({
           </Popover.Target>
 
           <Popover.Dropdown>
-            <ChangeMediaDevice mediaType="video" variant="radio" />
+            <ChangeMediaDevice
+              mediaType="video"
+              variant="radio"
+              onSwitchCamera={onChangeVideoDevice}
+            />
           </Popover.Dropdown>
         </Popover>
 

@@ -2,11 +2,11 @@ import { useRef, useState } from 'react';
 import { AppShell, Box } from '@mantine/core';
 import { GALLERY_VIEW_MARGIN } from '@/constants';
 import { useAppStore } from '@/stores/useAppStore';
+import { useDeviceStore } from '@/stores/useDeviceStore';
 import { useZoomVideoStore } from '@/stores/useZoomVideoStore';
 import { Chat } from '../chat/Chat';
 import { MenuBar } from '../components/MenuBar';
 import { VideoGrid } from './components/VideoGrid';
-import { useDeviceStore } from '@/stores/useDeviceStore';
 
 interface RoomProps {
   onLeave: () => void;
@@ -29,6 +29,9 @@ export function Room({ onLeave }: RoomProps) {
   const stopVideo = useZoomVideoStore((s) => s.stopVideo);
   const startAudio = useZoomVideoStore((s) => s.startAudio);
   const stopAudio = useZoomVideoStore((s) => s.stopAudio);
+
+  const switchCamera = useZoomVideoStore((s) => s.switchCamera);
+  const switchMicrophone = useZoomVideoStore((s) => s.switchMicrophone);
 
   return (
     <AppShell
@@ -103,6 +106,8 @@ export function Room({ onLeave }: RoomProps) {
               await startVideo();
             }
           }}
+          onChangeAudioInputDevice={switchMicrophone}
+          onChangeVideoDevice={switchCamera}
           onLeave={onLeave}
           onToggleChat={() => {
             setIsChatOpen(!isChatOpen);

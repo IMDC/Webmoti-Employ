@@ -2,11 +2,11 @@ import { useEffect } from 'react';
 import { Box, Button, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
 import { useAppStore } from '@/stores/useAppStore';
+import { useDeviceStore } from '@/stores/useDeviceStore';
 import { useZoomPreviewStore } from '@/stores/usePreviewStore';
 import { useZoomVideoStore } from '@/stores/useZoomVideoStore';
 import { MenuBar } from '../components/MenuBar';
 import { PreviewTile } from './PreviewTile';
-import { useDeviceStore } from '@/stores/useDeviceStore';
 
 interface PrejoinScreenProps {
   onJoin: () => void;
@@ -15,6 +15,9 @@ interface PrejoinScreenProps {
 export function PrejoinScreen({ onJoin }: PrejoinScreenProps) {
   const toggleIsVideoOn = useAppStore((s) => s.toggleIsVideoOn);
   const toggleMuteMicrophone = useZoomPreviewStore((s) => s.toggleMuteMicrophone);
+
+  const switchCamera = useZoomPreviewStore((s) => s.switchCamera);
+  const switchMicrophone = useZoomPreviewStore((s) => s.switchMicrophone);
 
   const permissionState = useAppStore((s) => s.permissionState);
 
@@ -53,6 +56,8 @@ export function PrejoinScreen({ onJoin }: PrejoinScreenProps) {
               }
               toggleIsVideoOn();
             }}
+            onChangeAudioInputDevice={switchMicrophone}
+            onChangeVideoDevice={switchCamera}
             isPrejoin
             disableMediaButtons={permissionState === 'idle' || permissionState === 'acquiring'}
           />

@@ -24,12 +24,12 @@ export const useZoomPreviewStore = create<ZoomPreviewStore>((set, get) => ({
   localAudioTrack: null,
 
   startCamera: async (element) => {
-    const videoDevices = useDeviceStore.getState().videoDevices;
-    if (!videoDevices.length) {
-      throw new Error('No video devices found');
+    const selectedVideoDevice = useDeviceStore.getState().selectedVideoDevice;
+    if (!selectedVideoDevice) {
+      throw new Error('No video device found');
     }
 
-    const track = ZoomVideo.createLocalVideoTrack(videoDevices[0].deviceId);
+    const track = ZoomVideo.createLocalVideoTrack(selectedVideoDevice);
     await track.start(element);
     set({ localVideoTrack: track });
   },
@@ -45,16 +45,16 @@ export const useZoomPreviewStore = create<ZoomPreviewStore>((set, get) => ({
   switchCamera: async (deviceId) => {
     const localVideoTrack = get().localVideoTrack;
     localVideoTrack?.switchCamera(deviceId);
+    useDeviceStore.setState({ selectedVideoDevice: deviceId });
   },
 
   startMicrophone: async () => {
-    const audioDevices = useDeviceStore.getState().audioInputDevices;
-
-    if (!audioDevices.length) {
-      throw new Error('No audio devices found');
+    const selectedAudioInputDevice = useDeviceStore.getState().selectedAudioInputDevice;
+    if (!selectedAudioInputDevice) {
+      throw new Error('No audio device found');
     }
 
-    const track = ZoomVideo.createLocalAudioTrack(audioDevices[0].deviceId);
+    const track = ZoomVideo.createLocalAudioTrack(selectedAudioInputDevice);
     await track.start();
     await track?.unmute();
 
@@ -96,5 +96,6 @@ export const useZoomPreviewStore = create<ZoomPreviewStore>((set, get) => ({
     await newLocalAudioTrack.start();
     newLocalAudioTrack.unmute();
     set({ localAudioTrack: newLocalAudioTrack });
+    useDeviceStore.setState({ selectedAudioInputDevice: microphoneId });
   },
 }));

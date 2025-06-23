@@ -7,6 +7,10 @@ type DeviceStore = {
   audioInputDevices: MediaDeviceInfo[];
   audioOutputDevices: MediaDeviceInfo[];
 
+  selectedVideoDevice: string | null;
+  selectedAudioInputDevice: string | null;
+  selectedAudioOutputDevice: string | null;
+
   initDevices: () => Promise<void>;
 };
 
@@ -14,6 +18,11 @@ export const useDeviceStore = create<DeviceStore>((set) => ({
   videoDevices: [],
   audioInputDevices: [],
   audioOutputDevices: [],
+
+  // TODO: init these if switching this to a dynamic store with context
+  selectedVideoDevice: null,
+  selectedAudioInputDevice: null,
+  selectedAudioOutputDevice: null,
 
   initDevices: async () => {
     // try catch doesn't work on this function
@@ -35,7 +44,14 @@ export const useDeviceStore = create<DeviceStore>((set) => ({
       return;
     }
 
-    set({ videoDevices, audioInputDevices, audioOutputDevices });
+    set({
+      videoDevices,
+      audioInputDevices,
+      audioOutputDevices,
+      selectedVideoDevice: videoDevices[0]?.deviceId ?? null,
+      selectedAudioInputDevice: audioInputDevices[0]?.deviceId ?? null,
+      selectedAudioOutputDevice: audioOutputDevices[0]?.deviceId ?? null,
+    });
     useAppStore.getState().setPermissionState('granted');
   },
 }));
