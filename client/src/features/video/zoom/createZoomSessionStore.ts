@@ -119,6 +119,9 @@ export function createZoomSessionStore() {
         return;
       }
 
+      // need to detach first to ensure it works properly (this matters in strict mode)
+      await stream.detachVideo(userId);
+
       console.log('attaching video player');
 
       await stream.attachVideo(userId, 3, element);
