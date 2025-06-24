@@ -15,7 +15,6 @@ import {
   Textarea,
   useMantineTheme,
 } from '@mantine/core';
-import { MyEmojiPicker } from './MyEmojiPicker';
 import { useChatStore } from './useChatStore';
 
 function formatRelativeTime(timestamp: number) {
@@ -63,7 +62,6 @@ function Message({ message, sender, timestamp }: ChatMessage) {
 }
 
 export function Chat() {
-  const theme = useMantineTheme();
   const [_, setFile] = useState<File | null>(null);
   const [chatText, setChatText] = useState('');
 
@@ -113,8 +111,6 @@ export function Chat() {
               </ActionIcon>
             )}
           </FileButton>
-
-          <MyEmojiPicker addEmoji={(emojiString) => setChatText((prev) => prev + emojiString)} />
         </Group>
 
         <Textarea
