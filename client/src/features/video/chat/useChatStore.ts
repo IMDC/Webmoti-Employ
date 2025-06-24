@@ -7,7 +7,7 @@ export const ChatStoreContext = createContext<StoreApi<ChatStore> | null>(null);
 export function useChatStore<T>(selector: (state: ChatStore) => T): T {
   const store = useContext(ChatStoreContext);
   if (!store) {
-    throw new Error('useChatStoreContext must be used within a ChatContextProvider');
+    throw new Error('useChatStore must be used within a ChatContextProvider');
   }
   return useStore(store, selector);
 }

@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { Box, Button, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
+import { useZoomSessionStore } from '@/features/video/zoom/useZoomSessionStore';
 import { useAppStore } from '@/stores/useAppStore';
 import { useDeviceStore } from '@/stores/useDeviceStore';
 import { useZoomPreviewStore } from '@/stores/usePreviewStore';
-import { useZoomVideoStore } from '@/stores/useZoomVideoStore';
 import { MenuBar } from '../components/MenuBar';
 import { PreviewTile } from './PreviewTile';
 
@@ -21,7 +21,7 @@ export function PrejoinScreen({ onJoin }: PrejoinScreenProps) {
 
   const permissionState = useAppStore((s) => s.permissionState);
 
-  const initZoom = useZoomVideoStore((s) => s.initClient);
+  const initZoom = useZoomSessionStore((s) => s.initClient);
   const initDevices = useDeviceStore((s) => s.initDevices);
 
   useEffect(() => {

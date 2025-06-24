@@ -7,6 +7,7 @@ type AppStore = {
   setError: (error: string | null) => void;
   clearError: () => void;
 
+  // TODO move this to useZoomSessionStore
   isAudioOn: boolean;
   isVideoOn: boolean;
   setIsAudioOn: (value: boolean) => void;

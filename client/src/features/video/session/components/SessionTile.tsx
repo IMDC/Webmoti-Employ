@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { Participant, VideoPlayer } from '@zoom/videosdk';
-import { useZoomVideoStore } from '@/stores/useZoomVideoStore';
+import { useZoomSessionStore } from '@/features/video/zoom/useZoomSessionStore';
 import { Corner } from '../../../../components/Corner';
 import AudioLevelIndicator from '../../components/AudioLevelIndicator';
 import { ParticipantTile } from '../../components/ParticipantTile';
@@ -13,8 +13,8 @@ interface SessionTileProps {
 }
 
 export function SessionTile({ height, width, participant }: SessionTileProps) {
-  const attach = useZoomVideoStore((s) => s.attachVideoPlayer);
-  const detach = useZoomVideoStore((s) => s.detachVideoPlayer);
+  const attach = useZoomSessionStore((s) => s.attachVideoPlayer);
+  const detach = useZoomSessionStore((s) => s.detachVideoPlayer);
 
   const attachStable = useCallback(
     (el: VideoPlayer) => attach(participant.userId, el),

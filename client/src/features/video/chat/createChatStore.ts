@@ -1,6 +1,5 @@
-import { ChatClient, ChatMessage } from '@zoom/videosdk';
+import { ChatClient, ChatMessage, VideoClient } from '@zoom/videosdk';
 import { create } from 'zustand';
-import { useZoomVideoStore } from '@/stores/useZoomVideoStore';
 
 export type ChatStore = {
   chatClient: typeof ChatClient;
@@ -10,8 +9,7 @@ export type ChatStore = {
   sendChat: (messageText: string) => Promise<void>;
 };
 
-export function createChatStore() {
-  const zoomClient = useZoomVideoStore.getState().client;
+export function createChatStore(zoomClient: typeof VideoClient) {
   const chatClient = zoomClient.getChatClient();
 
   // initialize messages

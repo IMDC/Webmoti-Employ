@@ -1,15 +1,15 @@
 import { SettingsMenu } from '@/features/video/components/SettingsMenu';
 import { JoiningScreen } from '@/features/video/prejoin/JoiningScreen';
-import { useZoomVideoStore } from '@/stores/useZoomVideoStore';
+import { useZoomSessionStore } from '@/features/video/zoom/useZoomSessionStore';
 import { ChatContextProvider } from './chat/ChatContextProvider';
 import { EndScreen } from './end/EndScreen';
 import { PrejoinScreen } from './prejoin/PrejoinScreen';
 import { Room } from './session/Room';
 
 export function VideoApp() {
-  const callState = useZoomVideoStore((s) => s.callState);
-  const joinZoom = useZoomVideoStore((s) => s.join);
-  const leaveZoom = useZoomVideoStore((s) => s.leave);
+  const callState = useZoomSessionStore((s) => s.callState);
+  const joinZoom = useZoomSessionStore((s) => s.join);
+  const leaveZoom = useZoomSessionStore((s) => s.leave);
 
   return (
     <>

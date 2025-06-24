@@ -1,4 +1,4 @@
-import { useZoomVideoStore } from '@/stores/useZoomVideoStore';
+import { useZoomSessionStore } from '@/features/video/zoom/useZoomSessionStore';
 import { GALLERY_VIEW_ASPECT_RATIO } from '../../../../constants';
 import useGalleryViewLayout from '../hooks/useGalleryViewLayout';
 import { SessionTile } from './SessionTile';
@@ -8,7 +8,7 @@ interface VideoGridProps {
 }
 
 export function VideoGrid({ containerRef }: VideoGridProps) {
-  const participants = useZoomVideoStore((store) => store.participants);
+  const participants = useZoomSessionStore((store) => store.participants);
 
   const participantCount = participants.size;
   const { participantVideoWidth } = useGalleryViewLayout(participantCount, containerRef);

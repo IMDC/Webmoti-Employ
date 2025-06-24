@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react';
 import { AppShell, Box } from '@mantine/core';
 import { GALLERY_VIEW_MARGIN } from '@/constants';
+import { useZoomSessionStore } from '@/features/video/zoom/useZoomSessionStore';
 import { useAppStore } from '@/stores/useAppStore';
 import { useDeviceStore } from '@/stores/useDeviceStore';
-import { useZoomVideoStore } from '@/stores/useZoomVideoStore';
 import { Chat } from '../chat/Chat';
 import { MenuBar } from '../components/MenuBar';
 import { VideoGrid } from './components/VideoGrid';
@@ -25,13 +25,13 @@ export function Room({ onLeave }: RoomProps) {
   // TODO maybe remove this in favour of startVideo permission check
   const initDevices = useDeviceStore((s) => s.initDevices);
 
-  const startVideo = useZoomVideoStore((s) => s.startVideo);
-  const stopVideo = useZoomVideoStore((s) => s.stopVideo);
-  const startAudio = useZoomVideoStore((s) => s.startAudio);
-  const stopAudio = useZoomVideoStore((s) => s.stopAudio);
+  const startVideo = useZoomSessionStore((s) => s.startVideo);
+  const stopVideo = useZoomSessionStore((s) => s.stopVideo);
+  const startAudio = useZoomSessionStore((s) => s.startAudio);
+  const stopAudio = useZoomSessionStore((s) => s.stopAudio);
 
-  const switchCamera = useZoomVideoStore((s) => s.switchCamera);
-  const switchMicrophone = useZoomVideoStore((s) => s.switchMicrophone);
+  const switchCamera = useZoomSessionStore((s) => s.switchCamera);
+  const switchMicrophone = useZoomSessionStore((s) => s.switchMicrophone);
 
   return (
     <AppShell
