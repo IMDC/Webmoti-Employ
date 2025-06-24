@@ -19,11 +19,11 @@ Finally, start the server:
 ```bash
 # start both react app and this server:
 cd client
-pnpm run start
+pnpm start
 
 # start just this server:
 cd server
-pnpm run start
+pnpm start
 ```
 
 ## Usage
