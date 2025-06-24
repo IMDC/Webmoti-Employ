@@ -1,72 +1,68 @@
 import { useState } from 'react';
-import { IconFile, IconSend } from '@tabler/icons-react';
-import { ChatMessage } from '@zoom/videosdk';
+import { IconMessages, IconSend, IconTool, IconUserFilled } from '@tabler/icons-react';
+import { ChatMessage, Participant } from '@zoom/videosdk';
 import {
   ActionIcon,
-  Avatar,
   Box,
   Card,
-  FileButton,
+  Flex,
   Group,
-  Paper,
   ScrollArea,
+  Space,
   Stack,
   Text,
   Textarea,
-  useMantineTheme,
+  ThemeIcon,
 } from '@mantine/core';
+import { useZoomSessionStore } from '../zoom/useZoomSessionStore';
 import { useChatStore } from './useChatStore';
 
-function formatRelativeTime(timestamp: number) {
-  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
-  const diff = Date.now() - new Date(timestamp).getTime();
+function formatTo12HourTime(timestamp: number): string {
+  const date = new Date(timestamp);
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
 
-  const seconds = Math.floor(diff / 1000);
-  if (seconds < 60) {
-    return rtf.format(-seconds, 'second');
-  }
+  hours = hours % 12 || 12;
+  const mins = minutes.toString().padStart(2, '0');
 
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) {
-    return rtf.format(-minutes, 'minute');
-  }
-
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) {
-    return rtf.format(-hours, 'hour');
-  }
-
-  const days = Math.floor(hours / 24);
-  return rtf.format(-days, 'day');
+  return `${hours}:${mins}`;
 }
 
-function Message({ message, sender, timestamp }: ChatMessage) {
+type MessageProps = {
+  chatMessage: ChatMessage;
+  participants: Map<number, Participant>;
+};
+
+function Message({ chatMessage, participants }: MessageProps) {
+  const { message, sender, timestamp } = chatMessage;
+  const senderParticipant = participants.get(sender.userId);
+  const isHost = senderParticipant?.isHost ?? false;
+
   return (
-    <Group align="flex-start">
-      <Avatar />
+    <Flex justify="flex-start" align="center" direction="row" wrap="wrap">
+      <Text c="dimmed" size="sm">
+        {formatTo12HourTime(timestamp)}
+      </Text>
+      <Space w="xs" />
 
-      <Stack gap={2} flex={1}>
-        <Group align="flex-end" gap={10}>
-          <Text fw={500}>{sender.name}</Text>
-          <Text fz="xs" c="dimmed">
-            {formatRelativeTime(timestamp)}
-          </Text>
-        </Group>
-
-        <Paper p="xs" fz="sm" style={{ wordBreak: 'break-word' }}>
-          {message}
-        </Paper>
-      </Stack>
-    </Group>
+      <ThemeIcon size="sm" variant="light" mr={5}>
+        {isHost ? <IconTool size={14} /> : <IconUserFilled size={14} />}
+      </ThemeIcon>
+      <Text fw="bolder" mr={5}>
+        {sender.name}:
+      </Text>
+      <Text style={{ wordBreak: 'break-word' }}>{message}</Text>
+    </Flex>
   );
 }
 
 export function Chat() {
-  const [_, setFile] = useState<File | null>(null);
   const [chatText, setChatText] = useState('');
 
   const messages = useChatStore((s) => s.messages);
   const sendChat = useChatStore((s) => s.sendChat);
+
+  const participants = useZoomSessionStore((s) => s.participants);
 
   const isChatTextValid = chatText !== '';
 
@@ -86,51 +82,42 @@ export function Chat() {
       withBorder
     >
       {/* header */}
-      <Text size="lg" fw={600}>
-        Chat
-      </Text>
+      <Group>
+        <IconMessages />
+        <Text size="lg" fw={600}>
+          Chat
+        </Text>
+      </Group>
 
       {/* message list */}
       <Box style={{ flex: 1, overflow: 'hidden', margin: '12px 0' }}>
         <ScrollArea style={{ height: '100%' }}>
-          <Stack>
-            {Array.from(messages).map((chatMessage, i) => (
-              <Message key={i} {...chatMessage} />
+          <Stack gap={2}>
+            {messages.map((msg, i) => (
+              <Message key={i} chatMessage={msg} participants={participants} />
             ))}
           </Stack>
         </ScrollArea>
       </Box>
 
       {/* input area */}
-      <Stack gap={5}>
-        <Group gap={5}>
-          <FileButton onChange={setFile} accept="image/png,image/jpeg">
-            {(props) => (
-              <ActionIcon {...props} size="sm" variant="subtle">
-                <IconFile stroke={1.5} />
-              </ActionIcon>
-            )}
-          </FileButton>
-        </Group>
-
-        <Textarea
-          placeholder="Type a message..."
-          value={chatText}
-          onChange={(event) => setChatText(event.currentTarget.value)}
-          minRows={2}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' && !event.shiftKey) {
-              event.preventDefault();
-              sendMessage();
-            }
-          }}
-          rightSection={
-            <ActionIcon variant="subtle" onClick={sendMessage} disabled={!isChatTextValid}>
-              <IconSend stroke={1.5} />
-            </ActionIcon>
+      <Textarea
+        placeholder="Type a message..."
+        value={chatText}
+        onChange={(event) => setChatText(event.currentTarget.value)}
+        minRows={2}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
           }
-        />
-      </Stack>
+        }}
+        rightSection={
+          <ActionIcon variant="subtle" onClick={sendMessage} disabled={!isChatTextValid}>
+            <IconSend stroke={1.5} />
+          </ActionIcon>
+        }
+      />
     </Card>
   );
 }
