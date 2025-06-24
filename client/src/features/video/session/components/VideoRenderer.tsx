@@ -14,12 +14,11 @@ export function VideoRenderer({ attach, detach }: VideoRendererProps) {
     if (!el) {
       return;
     }
-  
+
     attach(el);
- 
+
     return () => {
       detach();
-      el.innerHTML = '';
     };
   }, [attach, detach]);
 
