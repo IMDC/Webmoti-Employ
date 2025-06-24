@@ -10,7 +10,7 @@ export function ControlsMenu({ onLayoutOpen }: ControlsMenuProps) {
   const setIsSettingsOpen = useAppStore((state) => state.setIsSettingsOpen);
 
   return (
-    <Menu shadow="md">
+    <Menu shadow="md" position="top-end">
       <Menu.Target>
         <Button variant="default">
           <IconMenu2 size={18} />

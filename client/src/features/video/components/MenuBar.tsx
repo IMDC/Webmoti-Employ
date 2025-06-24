@@ -74,70 +74,76 @@ export function MenuBar({
   );
 
   return (
-    <Flex justify="center" align="center" h="100%" gap="md">
-      <Button.Group>
-        <Popover>
-          <Popover.Target>
-            <Button variant="default" disabled={disableMediaButtons} px="xs">
-              <IconChevronUp size={18} />
-            </Button>
-          </Popover.Target>
+    <Flex justify="center" align="center" h="100%" px="md">
+      <div style={{ flex: 1 }} />
 
-          <Popover.Dropdown>
-            <ChangeMediaDevice
-              mediaType="audio"
-              variant="radio"
-              onSwitchMicrophone={onChangeAudioInputDevice}
-            />
-          </Popover.Dropdown>
-        </Popover>
+      {/* center section */}
+      <Flex align="center" gap="md">
+        <Button.Group>
+          <Popover>
+            <Popover.Target>
+              <Button variant="default" disabled={disableMediaButtons} px="xs">
+                <IconChevronUp size={18} />
+              </Button>
+            </Popover.Target>
+            <Popover.Dropdown>
+              <ChangeMediaDevice
+                mediaType="audio"
+                variant="radio"
+                onSwitchMicrophone={onChangeAudioInputDevice}
+              />
+            </Popover.Dropdown>
+          </Popover>
 
-        {permissionState === 'denied' ? (
-          <Indicator color="orange">{MicButton}</Indicator>
-        ) : (
-          MicButton
-        )}
-      </Button.Group>
+          {permissionState === 'denied' ? (
+            <Indicator color="orange">{MicButton}</Indicator>
+          ) : (
+            MicButton
+          )}
+        </Button.Group>
 
-      <Button.Group>
-        <Popover>
-          <Popover.Target>
-            <Button variant="default" disabled={disableMediaButtons} px="xs">
-              <IconChevronUp size={18} />
-            </Button>
-          </Popover.Target>
+        <Button.Group>
+          <Popover>
+            <Popover.Target>
+              <Button variant="default" disabled={disableMediaButtons} px="xs">
+                <IconChevronUp size={18} />
+              </Button>
+            </Popover.Target>
+            <Popover.Dropdown>
+              <ChangeMediaDevice
+                mediaType="video"
+                variant="radio"
+                onSwitchCamera={onChangeVideoDevice}
+              />
+            </Popover.Dropdown>
+          </Popover>
 
-          <Popover.Dropdown>
-            <ChangeMediaDevice
-              mediaType="video"
-              variant="radio"
-              onSwitchCamera={onChangeVideoDevice}
-            />
-          </Popover.Dropdown>
-        </Popover>
+          {permissionState === 'denied' ? (
+            <Indicator color="orange">{VideoButton}</Indicator>
+          ) : (
+            VideoButton
+          )}
+        </Button.Group>
 
-        {permissionState === 'denied' ? (
-          <Indicator color="orange">{VideoButton}</Indicator>
-        ) : (
-          VideoButton
-        )}
-      </Button.Group>
-
-      <ControlsMenu onLayoutOpen={openLayoutModal} />
-
-      <ChangeLayoutModal isOpen={isLayoutModalOpen} onClose={closeLayoutModal} />
-
-      {!isPrejoin && (
-        <>
-          <Button variant="default" onClick={onToggleChat}>
-            <IconMessageFilled size={18} />
-          </Button>
-
+        {!isPrejoin && (
           <Button color="red" onClick={onLeave}>
             <IconPhoneOff size={18} style={{ fill: 'white' }} />
           </Button>
-        </>
-      )}
+        )}
+      </Flex>
+
+      {/* right section */}
+      <Flex align="center" gap="md" style={{ flex: 1 }} justify="flex-end">
+        {!isPrejoin && (
+          <>
+            <Button variant="default" onClick={onToggleChat}>
+              <IconMessageFilled size={18} />
+            </Button>
+            <ControlsMenu onLayoutOpen={openLayoutModal} />
+            <ChangeLayoutModal isOpen={isLayoutModalOpen} onClose={closeLayoutModal} />
+          </>
+        )}
+      </Flex>
     </Flex>
   );
 }
