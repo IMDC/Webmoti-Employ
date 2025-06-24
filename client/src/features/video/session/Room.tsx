@@ -38,6 +38,7 @@ export function Room({ onLeave }: RoomProps) {
       footer={{ height: '60px' }}
       styles={{
         main: { height: 'calc(100vh - 60px)' },
+        footer: { border: 'none' },
       }}
     >
       <AppShell.Main>
@@ -56,7 +57,6 @@ export function Room({ onLeave }: RoomProps) {
               alignContent: 'center',
               gap: GALLERY_VIEW_MARGIN,
               padding: GALLERY_VIEW_MARGIN,
-              background: '#111',
               flex: 1,
               minWidth: 0,
             }}
@@ -69,8 +69,8 @@ export function Room({ onLeave }: RoomProps) {
               style={{
                 width: '30%',
                 height: '100%',
-                background: '#111',
               }}
+              p="lg"
             >
               <Chat />
             </Box>

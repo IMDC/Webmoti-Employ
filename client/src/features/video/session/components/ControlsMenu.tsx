@@ -13,7 +13,7 @@ export function ControlsMenu({ onLayoutOpen }: ControlsMenuProps) {
     <Menu shadow="md">
       <Menu.Target>
         <Button variant="default">
-          <IconMenu2 stroke={1.5} size={16} />
+          <IconMenu2 size={18} />
         </Button>
       </Menu.Target>
 

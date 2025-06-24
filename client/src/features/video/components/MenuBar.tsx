@@ -1,10 +1,10 @@
 import {
   IconChevronUp,
-  IconMessage,
-  IconMicrophone,
+  IconMessageFilled,
+  IconMicrophoneFilled,
   IconMicrophoneOff,
   IconPhoneOff,
-  IconVideo,
+  IconVideoFilled,
   IconVideoOff,
 } from '@tabler/icons-react';
 import { Button, Flex, Indicator, Popover } from '@mantine/core';
@@ -51,9 +51,9 @@ export function MenuBar({
       disabled={disableMediaButtons}
     >
       {isAudioOn ? (
-        <IconMicrophone stroke={1.5} size={16} />
+        <IconMicrophoneFilled size={18} />
       ) : (
-        <IconMicrophoneOff stroke={1.5} size={16} />
+        <IconMicrophoneOff size={18} style={{ fill: 'white' }} />
       )}
     </Button>
   );
@@ -65,7 +65,11 @@ export function MenuBar({
       onClick={onToggleVideo}
       disabled={disableMediaButtons}
     >
-      {isVideoOn ? <IconVideo stroke={1.5} size={16} /> : <IconVideoOff stroke={1.5} size={16} />}
+      {isVideoOn ? (
+        <IconVideoFilled size={18} />
+      ) : (
+        <IconVideoOff style={{ fill: 'white' }} size={18} />
+      )}
     </Button>
   );
 
@@ -74,8 +78,8 @@ export function MenuBar({
       <Button.Group>
         <Popover>
           <Popover.Target>
-            <Button variant="default" disabled={disableMediaButtons}>
-              <IconChevronUp stroke={1.5} size={16} />
+            <Button variant="default" disabled={disableMediaButtons} px="xs">
+              <IconChevronUp size={18} />
             </Button>
           </Popover.Target>
 
@@ -98,8 +102,8 @@ export function MenuBar({
       <Button.Group>
         <Popover>
           <Popover.Target>
-            <Button variant="default" disabled={disableMediaButtons}>
-              <IconChevronUp stroke={1.5} size={16} />
+            <Button variant="default" disabled={disableMediaButtons} px="xs">
+              <IconChevronUp size={18} />
             </Button>
           </Popover.Target>
 
@@ -126,11 +130,11 @@ export function MenuBar({
       {!isPrejoin && (
         <>
           <Button variant="default" onClick={onToggleChat}>
-            <IconMessage stroke={1.5} size={16} />
+            <IconMessageFilled size={18} />
           </Button>
 
           <Button color="red" onClick={onLeave}>
-            <IconPhoneOff stroke={1.5} size={16} />
+            <IconPhoneOff size={18} style={{ fill: 'white' }} />
           </Button>
         </>
       )}

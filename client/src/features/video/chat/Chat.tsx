@@ -70,7 +70,7 @@ export function Chat() {
   const messages = useChatStore((s) => s.messages);
   const sendChat = useChatStore((s) => s.sendChat);
 
-  const isChatTextValid = chatText !== ""
+  const isChatTextValid = chatText !== '';
 
   function sendMessage() {
     sendChat(chatText);
@@ -84,11 +84,8 @@ export function Chat() {
         flexDirection: 'column',
         height: '100%',
         padding: 16,
-        borderTopLeftRadius: theme.radius.md,
-        borderBottomLeftRadius: theme.radius.md,
-        borderTopRightRadius: 0,
-        borderBottomRightRadius: 0,
       }}
+      withBorder
     >
       {/* header */}
       <Text size="lg" fw={600}>

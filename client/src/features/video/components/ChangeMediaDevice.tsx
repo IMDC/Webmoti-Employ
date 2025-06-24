@@ -76,14 +76,14 @@ export function ChangeMediaDevice({
       <Stack>
         <DeviceSelect
           label="Audio Input"
-          icon={<IconMicrophone size={16} stroke={1.5} />}
+          icon={<IconMicrophone size={18} />}
           devices={audioInputDevices}
           selected={selectedAudioInputDevice}
           onChange={onSwitchMicrophone ?? (() => {})}
         />
         <DeviceSelect
           label="Audio Output"
-          icon={<IconVolume size={16} stroke={1.5} />}
+          icon={<IconVolume size={18} />}
           devices={audioOutputDevices}
           selected={selectedAudioOutputDevice}
           onChange={() => {}}
@@ -95,7 +95,7 @@ export function ChangeMediaDevice({
   return (
     <DeviceSelect
       label="Video Input"
-      icon={<IconVideo size={16} stroke={1.5} />}
+      icon={<IconVideo size={18} />}
       devices={videoDevices}
       selected={selectedVideoDevice}
       onChange={onSwitchCamera ?? (() => {})}
