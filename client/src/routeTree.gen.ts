@@ -10,15 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as HomeRouteImport } from './routes/home'
+import { Route as IdRouteImport } from './routes/$id'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as IdIndexRouteImport } from './routes/$id/index'
-import { Route as IdSessionRouteImport } from './routes/$id/session'
-import { Route as IdPrejoinRouteImport } from './routes/$id/prejoin'
-import { Route as IdEndRouteImport } from './routes/$id/end'
 
 const HomeRoute = HomeRouteImport.update({
   id: '/home',
   path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IdRoute = IdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -26,80 +28,35 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IdIndexRoute = IdIndexRouteImport.update({
-  id: '/$id/',
-  path: '/$id/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IdSessionRoute = IdSessionRouteImport.update({
-  id: '/$id/session',
-  path: '/$id/session',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IdPrejoinRoute = IdPrejoinRouteImport.update({
-  id: '/$id/prejoin',
-  path: '/$id/prejoin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IdEndRoute = IdEndRouteImport.update({
-  id: '/$id/end',
-  path: '/$id/end',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$id': typeof IdRoute
   '/home': typeof HomeRoute
-  '/$id/end': typeof IdEndRoute
-  '/$id/prejoin': typeof IdPrejoinRoute
-  '/$id/session': typeof IdSessionRoute
-  '/$id': typeof IdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$id': typeof IdRoute
   '/home': typeof HomeRoute
-  '/$id/end': typeof IdEndRoute
-  '/$id/prejoin': typeof IdPrejoinRoute
-  '/$id/session': typeof IdSessionRoute
-  '/$id': typeof IdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$id': typeof IdRoute
   '/home': typeof HomeRoute
-  '/$id/end': typeof IdEndRoute
-  '/$id/prejoin': typeof IdPrejoinRoute
-  '/$id/session': typeof IdSessionRoute
-  '/$id/': typeof IdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/home'
-    | '/$id/end'
-    | '/$id/prejoin'
-    | '/$id/session'
-    | '/$id'
+  fullPaths: '/' | '/$id' | '/home'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/home' | '/$id/end' | '/$id/prejoin' | '/$id/session' | '/$id'
-  id:
-    | '__root__'
-    | '/'
-    | '/home'
-    | '/$id/end'
-    | '/$id/prejoin'
-    | '/$id/session'
-    | '/$id/'
+  to: '/' | '/$id' | '/home'
+  id: '__root__' | '/' | '/$id' | '/home'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  IdRoute: typeof IdRoute
   HomeRoute: typeof HomeRoute
-  IdEndRoute: typeof IdEndRoute
-  IdPrejoinRoute: typeof IdPrejoinRoute
-  IdSessionRoute: typeof IdSessionRoute
-  IdIndexRoute: typeof IdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -111,6 +68,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HomeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$id': {
+      id: '/$id'
+      path: '/$id'
+      fullPath: '/$id'
+      preLoaderRoute: typeof IdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -118,44 +82,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/$id/': {
-      id: '/$id/'
-      path: '/$id'
-      fullPath: '/$id'
-      preLoaderRoute: typeof IdIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/$id/session': {
-      id: '/$id/session'
-      path: '/$id/session'
-      fullPath: '/$id/session'
-      preLoaderRoute: typeof IdSessionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/$id/prejoin': {
-      id: '/$id/prejoin'
-      path: '/$id/prejoin'
-      fullPath: '/$id/prejoin'
-      preLoaderRoute: typeof IdPrejoinRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/$id/end': {
-      id: '/$id/end'
-      path: '/$id/end'
-      fullPath: '/$id/end'
-      preLoaderRoute: typeof IdEndRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  IdRoute: IdRoute,
   HomeRoute: HomeRoute,
-  IdEndRoute: IdEndRoute,
-  IdPrejoinRoute: IdPrejoinRoute,
-  IdSessionRoute: IdSessionRoute,
-  IdIndexRoute: IdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

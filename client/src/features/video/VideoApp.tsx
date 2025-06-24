@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { SettingsMenu } from '@/features/video/components/SettingsMenu';
 import { JoiningScreen } from '@/features/video/prejoin/JoiningScreen';
 import { useZoomVideoStore } from '@/stores/useZoomVideoStore';
