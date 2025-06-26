@@ -1,4 +1,4 @@
-import { ReactNode, useRef } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { StoreApi } from 'zustand';
 import { useZoomSessionStore } from '../zoom/useZoomSessionStore';
 import { ChatStore, createChatStore } from './createChatStore';
@@ -10,12 +10,24 @@ interface ChatContextProviderProps {
 
 export function ChatContextProvider({ children }: ChatContextProviderProps) {
   const zoomClient = useZoomSessionStore((s) => s.client);
-  const storeRef = useRef<StoreApi<ChatStore> | null>(null);
+  const [store, setStore] = useState<StoreApi<ChatStore> | null>(null);
 
-  if (!storeRef.current) {
-    // when this component is mounted, create chat store
-    storeRef.current = createChatStore(zoomClient);
+  useEffect(() => {
+    if (!zoomClient) {
+      return;
+    }
+
+    const chatStore = createChatStore(zoomClient);
+    setStore(chatStore);
+
+    return () => {
+      chatStore.getState().cleanup();
+    };
+  }, [zoomClient]);
+
+  if (!store) {
+    return null;
   }
 
-  return <ChatStoreContext.Provider value={storeRef.current}>{children}</ChatStoreContext.Provider>;
+  return <ChatStoreContext.Provider value={store}>{children}</ChatStoreContext.Provider>;
 }

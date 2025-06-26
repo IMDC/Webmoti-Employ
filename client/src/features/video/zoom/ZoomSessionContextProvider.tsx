@@ -1,4 +1,4 @@
-import { ReactNode, useRef } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { StoreApi } from 'zustand';
 import { createZoomSessionStore, ZoomSessionStore } from './createZoomSessionStore';
 import { ZoomSessionContext } from './useZoomSessionStore';
@@ -8,14 +8,20 @@ interface ZoomSessionContextProviderProps {
 }
 
 export function ZoomSessionContextProvider({ children }: ZoomSessionContextProviderProps) {
-  const storeRef = useRef<StoreApi<ZoomSessionStore> | null>(null);
+  const [store] = useState<StoreApi<ZoomSessionStore>>(() => createZoomSessionStore());
 
-  // TODO add cleanup with useeffect
-  if (!storeRef.current) {
-    storeRef.current = createZoomSessionStore();
+  useEffect(() => {
+    return () => {
+      const current = store.getState();
+      (async () => {
+        await current.cleanup();
+      })();
+    };
+  }, [store]);
+
+  if (!store) {
+    return null;
   }
 
-  return (
-    <ZoomSessionContext.Provider value={storeRef.current}>{children}</ZoomSessionContext.Provider>
-  );
+  return <ZoomSessionContext.Provider value={store}>{children}</ZoomSessionContext.Provider>;
 }

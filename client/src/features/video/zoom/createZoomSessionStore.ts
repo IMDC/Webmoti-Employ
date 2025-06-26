@@ -1,5 +1,5 @@
-import ZoomVideo, { Participant, VideoClient, VideoPlayer } from '@zoom/videosdk';
-import { create } from 'zustand';
+import ZoomVideo, { Participant, VideoClient, VideoPlayer, VideoQuality } from '@zoom/videosdk';
+import { createStore } from 'zustand';
 import { useAppStore } from '@/stores/useAppStore';
 import { useDeviceStore } from '@/stores/useDeviceStore';
 
@@ -8,7 +8,6 @@ export type ZoomSessionStore = {
   stream: ReturnType<typeof VideoClient.getMediaStream> | null;
   callState: 'prejoin' | 'joining' | 'joined' | 'left';
 
-  // map userId to Participant
   participants: Map<number, Participant>;
 
   initialized: boolean;
@@ -29,6 +28,8 @@ export type ZoomSessionStore = {
   muteAudio: () => Promise<void>;
   unmuteAudio: () => Promise<void>;
   switchMicrophone: (deviceId: string) => Promise<void>;
+
+  cleanup: () => Promise<void>;
 };
 
 async function fetchToken(identity: string, roomName: string) {
@@ -47,114 +48,110 @@ async function fetchToken(identity: string, roomName: string) {
 export function createZoomSessionStore() {
   const client = ZoomVideo.createClient();
 
-  // ---------------------------------------------------------------------------
-  // This store will be returned and used as value in ZoomSessionContextProvider
-  // ---------------------------------------------------------------------------
-
-  const zoomSessionStore = create<ZoomSessionStore>((set, get) => ({
-    client,
-    stream: null,
-    callState: 'prejoin',
-    participants: new Map(),
-
-    initialized: false,
-    initClient: async () => {
-      await client.init('en-US', 'Global', {
-        patchJsMedia: true,
-        leaveOnPageUnload: true,
-      });
-
-      ZoomVideo.preloadDependentAssets();
-      set({ initialized: true });
-    },
-
-    join: async (name, roomName) => {
-      set({ callState: 'joining' });
-
-      const token = await fetchToken(name, roomName);
-      await client.join(roomName, token, name);
-
-      const stream = client.getMediaStream();
-
-      if (useAppStore.getState().permissionState === 'granted') {
-        await stream.startVideo();
-        await stream.startAudio();
+  const zoomSessionStore = createStore<ZoomSessionStore>((set, get) => {
+    const stream = () => {
+      const s = get().stream;
+      if (!s) {
+        throw new Error('Stream not initialized');
       }
+      return s;
+    };
 
-      set({ stream, callState: 'joined' });
+    return {
+      client,
+      stream: null,
+      callState: 'prejoin',
+      participants: new Map(),
 
-      updateParticipants();
-    },
-    leave: async () => {
-      set({
-        callState: 'left',
-        stream: null,
-        participants: new Map(),
-      });
+      initialized: false,
+      initClient: async () => {
+        await client.init('en-US', 'Global', {
+          patchJsMedia: true,
+          leaveOnPageUnload: true,
+        });
 
-      await client.leave();
-      await ZoomVideo.destroyClient();
-    },
+        ZoomVideo.preloadDependentAssets();
+        set({ initialized: true });
+      },
 
-    startVideo: async () => {
-      const stream = get().stream!;
-      await stream.startVideo();
-    },
+      join: async (name, roomName) => {
+        set({ callState: 'joining' });
 
-    stopVideo: async () => {
-      const stream = get().stream!;
-      await stream.stopVideo();
-    },
-    switchCamera: async (deviceId) => {
-      const stream = get().stream!;
-      await stream.switchCamera(deviceId);
-      useDeviceStore.setState({ selectedVideoDevice: deviceId });
-    },
+        const token = await fetchToken(name, roomName);
+        await client.join(roomName, token, name);
 
-    attachVideoPlayer: async (userId: number, element: VideoPlayer) => {
-      const stream = get().stream;
-      if (!stream) {
-        // todo set error
-        console.error('error no stream');
-        return;
-      }
+        const stream = client.getMediaStream();
 
-      // need to detach first to ensure it works properly (this matters in strict mode)
-      await stream.detachVideo(userId);
+        if (useAppStore.getState().permissionState === 'granted') {
+          await stream.startVideo();
+          await stream.startAudio();
+        }
 
-      console.log('attaching video player');
+        set({ stream, callState: 'joined' });
 
-      await stream.attachVideo(userId, 3, element);
-    },
+        updateParticipants();
+      },
+      leave: async () => {
+        set({
+          callState: 'left',
+          stream: null,
+          participants: new Map(),
+        });
 
-    detachVideoPlayer: async (userId: number) => {
-      const stream = get().stream;
-      await stream?.detachVideo(userId);
-    },
+        await client.leave();
+      },
 
-    startAudio: async () => {
-      const stream = get().stream!;
-      await stream.startAudio();
-    },
-    stopAudio: async () => {
-      // this will stop the user from both sharing and hearing audio
-      const stream = get().stream!;
-      await stream.stopAudio();
-    },
-    muteAudio: async () => {
-      const stream = get().stream!;
-      await stream.muteAudio();
-    },
-    unmuteAudio: async () => {
-      const stream = get().stream!;
-      await stream.unmuteAudio();
-    },
-    switchMicrophone: async (deviceId) => {
-      const stream = get().stream!;
-      stream.switchMicrophone(deviceId);
-      useDeviceStore.setState({ selectedAudioInputDevice: deviceId });
-    },
-  }));
+      startVideo: async () => {
+        await stream().startVideo();
+      },
+
+      stopVideo: async () => {
+        await stream().stopVideo();
+      },
+      switchCamera: async (deviceId) => {
+        await stream().switchCamera(deviceId);
+        useDeviceStore.setState({ selectedVideoDevice: deviceId });
+      },
+
+      attachVideoPlayer: async (userId: number, element: VideoPlayer) => {
+        // need to detach first to ensure it works properly (this matters in strict mode)
+        await stream().detachVideo(userId);
+
+        console.log('attaching video player');
+
+        await stream().attachVideo(userId, VideoQuality.Video_720P, element);
+      },
+
+      detachVideoPlayer: async (userId: number) => {
+        await stream().detachVideo(userId);
+      },
+
+      startAudio: async () => {
+        await stream().startAudio();
+      },
+      stopAudio: async () => {
+        // this will stop the user from both sharing and hearing audio
+        await stream().stopAudio();
+      },
+      muteAudio: async () => {
+        await stream().muteAudio();
+      },
+      unmuteAudio: async () => {
+        await stream().unmuteAudio();
+      },
+      switchMicrophone: async (deviceId) => {
+        stream().switchMicrophone(deviceId);
+        useDeviceStore.setState({ selectedAudioInputDevice: deviceId });
+      },
+
+      cleanup: async () => {
+        client.off('user-added', updateParticipants);
+        client.off('user-removed', updateParticipants);
+        client.off('user-updated', updateParticipants);
+        await ZoomVideo.destroyClient();
+      },
+    };
+  });
 
   // --------------------------------------------------
   // All zoom event listeners to keep state updated:

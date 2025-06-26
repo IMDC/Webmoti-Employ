@@ -1,5 +1,5 @@
 import { ChatClient, ChatMessage, VideoClient } from '@zoom/videosdk';
-import { create } from 'zustand';
+import { create, createStore } from 'zustand';
 
 export type ChatStore = {
   chatClient: typeof ChatClient;
@@ -7,6 +7,8 @@ export type ChatStore = {
   isChatUnread: boolean;
 
   sendChat: (messageText: string) => Promise<void>;
+
+  cleanup: () => void;
 };
 
 export function createChatStore(zoomClient: typeof VideoClient) {
@@ -17,7 +19,13 @@ export function createChatStore(zoomClient: typeof VideoClient) {
   // https://developers.zoom.us/docs/video-sdk/web/chat/#get-chat-history
   const messages = chatClient.getHistory();
 
-  const chatStore = create<ChatStore>(() => ({
+  const handleMessage = (message: ChatMessage) => {
+    chatStore.setState((s) => ({
+      messages: [...s.messages, message],
+    }));
+  };
+
+  const chatStore = createStore<ChatStore>(() => ({
     chatClient,
     messages,
     isChatUnread: false,
@@ -25,13 +33,12 @@ export function createChatStore(zoomClient: typeof VideoClient) {
     sendChat: async (messageText) => {
       await chatClient.sendToAll(messageText);
     },
+    cleanup: () => {
+      zoomClient.off('chat-on-message', handleMessage);
+    },
   }));
 
-  zoomClient.on('chat-on-message', (message) => {
-    chatStore.setState((s) => ({
-      messages: [...s.messages, message],
-    }));
-  });
+  zoomClient.on('chat-on-message', handleMessage);
 
   return chatStore;
 }
