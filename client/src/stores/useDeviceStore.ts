@@ -25,6 +25,12 @@ export const useDeviceStore = create<DeviceStore>((set) => ({
   selectedAudioOutputDevice: null,
 
   initDevices: async () => {
+    const appState = useAppStore.getState();
+    if (appState.permissionState === 'acquiring' || appState.permissionState === 'granted') {
+      return;
+    }
+    appState.setPermissionState('acquiring');
+
     // try catch doesn't work on this function
     const devices = await ZoomVideo.getDevices();
 
@@ -37,10 +43,10 @@ export const useDeviceStore = create<DeviceStore>((set) => ({
     const hasPermission = [...videoDevices, ...audioInputDevices].some(isValidDevice);
 
     if (!hasPermission) {
-      useAppStore.getState().setError('Could not access media devices');
-      useAppStore.getState().setPermissionState('denied');
-      useAppStore.getState().setIsVideoOn(false);
-      useAppStore.getState().setIsAudioOn(false);
+      appState.setError('Could not access media devices');
+      appState.setPermissionState('denied');
+      appState.setIsVideoOn(false);
+      appState.setIsAudioOn(false);
       return;
     }
 
@@ -52,6 +58,6 @@ export const useDeviceStore = create<DeviceStore>((set) => ({
       selectedAudioInputDevice: audioInputDevices[0]?.deviceId ?? null,
       selectedAudioOutputDevice: audioOutputDevices[0]?.deviceId ?? null,
     });
-    useAppStore.getState().setPermissionState('granted');
+    appState.setPermissionState('granted');
   },
 }));
