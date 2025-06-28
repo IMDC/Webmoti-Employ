@@ -1,9 +1,10 @@
-import { Hono } from 'hono'
+import { Hono } from "hono";
+import zoomTokenRoute from "./routes/zoom-token";
+import interviewsRoute from "./routes/interviews";
 
-const app = new Hono()
+const app = new Hono();
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
+app.route("/zoom-token", zoomTokenRoute);
+app.route("/interviews", interviewsRoute);
 
-export default app
+export default app;
