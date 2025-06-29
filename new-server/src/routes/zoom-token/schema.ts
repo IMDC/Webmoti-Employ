@@ -1,9 +1,24 @@
-import { z } from "zod";
+import { z } from "zod/v4";
+
+const allowedRegions = [
+  "AU",
+  "BR",
+  "CA",
+  "CN",
+  "DE",
+  "HK",
+  "IN",
+  "JP",
+  "MX",
+  "NL",
+  "SG",
+  "US",
+];
 
 // https://developers.zoom.us/docs/video-sdk/auth/#payload
 export const zoomTokenSchema = z.object({
   sessionName: z.string().min(1).max(199),
-  role: z.coerce.number().refine((v) => v === 0 || v === 1),
+  role: z.union([z.literal(0), z.literal(1)]),
   expirationSeconds: z.coerce
     .number()
     .optional()
@@ -15,47 +30,20 @@ export const zoomTokenSchema = z.object({
   geoRegions: z
     .string()
     .optional()
+    .transform((val) => val?.split(",").map((r) => r.trim()))
     .refine(
-      (val) => {
-        if (!val) return true;
-        const allowed = [
-          "AU",
-          "BR",
-          "CA",
-          "CN",
-          "DE",
-          "HK",
-          "IN",
-          "JP",
-          "MX",
-          "NL",
-          "SG",
-          "US",
-        ];
-        const regions = val.split(",").map((r) => r.trim());
-        return regions.every((r) => allowed.includes(r));
-      },
+      (regions) =>
+        regions === undefined ||
+        regions.every((r) => allowedRegions.includes(r)),
       {
         message: "Invalid geoRegions value(s)",
       }
     ),
-  cloudRecordingOption: z.coerce
-    .number()
-    .optional()
-    .refine((v) => v === 0 || v === 1),
-  cloudRecordingElection: z.coerce
-    .number()
-    .optional()
-    .refine((v) => v === 0 || v === 1),
+  cloudRecordingOption: z.union([z.literal(0), z.literal(1)]).optional(),
+  cloudRecordingElection: z.union([z.literal(0), z.literal(1)]).optional(),
   telemetryTrackingId: z.string().optional(),
-  videoWebRtcMode: z.coerce
-    .number()
-    .optional()
-    .refine((v) => v === 0 || v === 1),
-  audioWebRtcMode: z.coerce
-    .number()
-    .optional()
-    .refine((v) => v === 0 || v === 1),
+  videoWebRtcMode: z.union([z.literal(0), z.literal(1)]).optional(),
+  audioWebRtcMode: z.union([z.literal(0), z.literal(1)]).optional(),
 });
 
 export type ZoomTokenInput = z.infer<typeof zoomTokenSchema>;

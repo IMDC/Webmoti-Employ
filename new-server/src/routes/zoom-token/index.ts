@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { generateZoomJwt } from "./jwt";
 import { zoomTokenSchema } from "./schema";
 import { CloudflareBindings } from "../..";
+import { z } from "zod/v4";
 
 const zoomTokenRoute = new Hono<{ Bindings: CloudflareBindings }>();
 
@@ -10,7 +11,7 @@ zoomTokenRoute.post("/", async (c) => {
   const result = zoomTokenSchema.safeParse(body);
 
   if (!result.success) {
-    return c.json({ errors: result.error.flatten() }, 400);
+    return c.json({ error: z.prettifyError(result.error) }, 400);
   }
 
   const input = result.data;
