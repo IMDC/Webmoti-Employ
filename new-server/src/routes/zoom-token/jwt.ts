@@ -1,20 +1,8 @@
 import { SignJWT } from "jose";
-import { toStringArray } from "./utils";
+import { ZoomTokenInput } from "./schema";
 
-export type ZoomJwtInput = {
+export type ZoomJwtInput = ZoomTokenInput & {
   zoomVideoSdkKey: string;
-  role: number;
-  sessionName: string;
-  expirationSeconds?: number;
-  userIdentity?: string;
-  sessionKey?: string;
-  geoRegions?: string[] | string;
-  cloudRecordingOption?: number;
-  cloudRecordingElection?: number;
-  telemetryTrackingId?: string;
-  videoWebRtcMode?: number;
-  audioCompatibleMode?: number;
-  audioWebRtcMode?: number;
 };
 
 export async function generateZoomJwt({
@@ -29,14 +17,10 @@ export async function generateZoomJwt({
   cloudRecordingElection,
   telemetryTrackingId,
   videoWebRtcMode,
-  audioCompatibleMode,
   audioWebRtcMode,
 }: ZoomJwtInput) {
   const iat = Math.floor(Date.now() / 1000);
   const exp = expirationSeconds ? iat + expirationSeconds : iat + 60 * 60 * 2;
-
-  const joinGeoRegions = (geoRegions: unknown) =>
-    toStringArray(geoRegions)?.join(",");
 
   const payload = {
     app_key: zoomVideoSdkKey,
@@ -47,12 +31,12 @@ export async function generateZoomJwt({
     exp,
     user_identity: userIdentity,
     session_key: sessionKey,
-    geo_regions: joinGeoRegions(geoRegions),
+    geo_regions: geoRegions,
     cloud_recording_option: cloudRecordingOption,
     cloud_recording_election: cloudRecordingElection,
     telemetry_tracking_id: telemetryTrackingId,
     video_webrtc_mode: videoWebRtcMode,
-    audio_webrtc_mode: audioWebRtcMode ?? audioCompatibleMode,
+    audio_webrtc_mode: audioWebRtcMode,
   };
   const header = { alg: "HS256", typ: "JWT" };
   const secret = new TextEncoder().encode(zoomVideoSdkKey);
