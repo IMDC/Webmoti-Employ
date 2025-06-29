@@ -34,7 +34,7 @@ export type ZoomSessionStore = {
 
 async function fetchToken(identity: string, roomName: string) {
   const body = { sessionName: roomName, role: 1, userIdentity: identity };
-  const res = await fetch(`/api/token`, {
+  const res = await fetch(`/api/zoom-token`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
