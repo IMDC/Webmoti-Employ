@@ -3,10 +3,12 @@ import { ZoomTokenInput } from "./schema";
 
 export type ZoomJwtInput = ZoomTokenInput & {
   zoomVideoSdkKey: string;
+  zoomVideoSdkSecret: string;
 };
 
 export async function generateZoomJwt({
   zoomVideoSdkKey,
+  zoomVideoSdkSecret,
   role,
   sessionName,
   expirationSeconds,
@@ -39,7 +41,7 @@ export async function generateZoomJwt({
     audio_webrtc_mode: audioWebRtcMode,
   };
   const header = { alg: "HS256", typ: "JWT" };
-  const secret = new TextEncoder().encode(zoomVideoSdkKey);
+  const secret = new TextEncoder().encode(zoomVideoSdkSecret);
 
   const jwt = await new SignJWT(payload)
     .setProtectedHeader(header)

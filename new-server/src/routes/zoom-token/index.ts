@@ -19,6 +19,7 @@ zoomTokenRoute.post("/", async (c) => {
   const jwt = await generateZoomJwt({
     ...input,
     zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
+    zoomVideoSdkSecret: c.env.ZOOM_VIDEO_SDK_SECRET,
   });
 
   return c.json({ signature: jwt });

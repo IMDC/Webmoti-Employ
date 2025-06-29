@@ -4,6 +4,7 @@ import interviewsRoute from "./routes/interviews";
 
 export type CloudflareBindings = {
   ZOOM_VIDEO_SDK_KEY: string;
+  ZOOM_VIDEO_SDK_SECRET: string;
 };
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
