@@ -11,6 +11,9 @@ importers:
       hono:
         specifier: ^4.8.3
         version: 4.8.3
+      jose:
+        specifier: ^6.0.11
+        version: 6.0.11
     devDependencies:
       wrangler:
         specifier: ^4.4.0
@@ -410,6 +413,9 @@ packages:
   is-arrayish@0.3.2:
     resolution: {integrity: sha512-eVRqCvVlZbuw3GrM63ovNSNAeA1K16kaR/LRY/92w0zxQ5/1YzwblUX652i4Xs9RwAGjW9d9y6X88t8OaAJfWQ==}
 
+  jose@6.0.11:
+    resolution: {integrity: sha512-QxG7EaliDARm1O1S8BGakqncGT9s25bKL1WSf6/oa17Tkqwi8D2ZNglqCF+DsYF88/rV66Q/Q2mFAy697E1DUg==}
+
   mime@3.0.0:
     resolution: {integrity: sha512-jSCU7/VB1loIWBZe14aEYHU/+1UMEHoaO7qxCOVJOw9GgH72VAWppxNcjU+x9a2k3GSIBXNKxXQFqRvvZ7vr3A==}
     engines: {node: '>=10.0.0'}
@@ -781,6 +787,8 @@ snapshots:
   hono@4.8.3: {}
 
   is-arrayish@0.3.2: {}
+
+  jose@6.0.11: {}
 
   mime@3.0.0: {}
 
