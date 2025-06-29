@@ -2,7 +2,11 @@ import { Hono } from "hono";
 import zoomTokenRoute from "./routes/zoom-token";
 import interviewsRoute from "./routes/interviews";
 
-const app = new Hono();
+export type CloudflareBindings = {
+  ZOOM_VIDEO_SDK_KEY: string;
+};
+
+const app = new Hono<{ Bindings: CloudflareBindings }>();
 
 app.route("/zoom-token", zoomTokenRoute);
 app.route("/interviews", interviewsRoute);

@@ -1,9 +1,9 @@
 import { Hono } from "hono";
-import { env } from "hono/adapter";
 import { generateZoomJwt } from "./jwt";
 import { zoomTokenSchema } from "./schema";
+import { CloudflareBindings } from "../..";
 
-const zoomTokenRoute = new Hono();
+const zoomTokenRoute = new Hono<{ Bindings: CloudflareBindings }>();
 
 zoomTokenRoute.post("/", async (c) => {
   const body = await c.req.json();
@@ -14,11 +14,10 @@ zoomTokenRoute.post("/", async (c) => {
   }
 
   const input = result.data;
-  const { ZOOM_VIDEO_SDK_KEY } = env<{ ZOOM_VIDEO_SDK_KEY: string }>(c);
 
   const jwt = await generateZoomJwt({
     ...input,
-    zoomVideoSdkKey: ZOOM_VIDEO_SDK_KEY,
+    zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
   });
 
   return c.json({ signature: jwt });
