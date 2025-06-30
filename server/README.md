@@ -84,7 +84,8 @@ Setup:
    GRANT readwrite TO readwrite_imdc;
    ```
 
-4. Get the connection string. Make sure the role is readwrite_imdc.
+4. Get the connection string. Make sure the role is readwrite_imdc. Put this connection string in `.dev.vars` as the `DATABASE_URL` field.
+5. Run `pnpm run db-typegen` to generate types for the database. Do this whenever you change the Neon database.
 
 ## Server Usage
 
