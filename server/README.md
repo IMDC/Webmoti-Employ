@@ -7,6 +7,8 @@
 - [Deploying](#deploying)
 - [Services](#services)
   - [Database](#database)
+    - [Neon](#neon)
+    - [Cloudflare Hyperdrive](#cloudflare-hyperdrive)
 - [Server Usage](#server-usage)
 
 Todo or remove:
@@ -55,9 +57,9 @@ We use services for hosting, the database, and authentication.
 
 ### Database
 
-The database is postgres deployed with the Neon service.
+The database is postgres deployed with the Neon service. We also use Cloudflare hyperdrive to connect to the database.
 
-Setup:
+#### Neon
 
 1. Choose the closest region (Azure East US 2 (Virginia))
 2. Create the tables in the public schema:
@@ -86,6 +88,13 @@ Setup:
 
 4. Get the connection string. Make sure the role is readwrite_imdc. Put this connection string in `.dev.vars` as the `DATABASE_URL` field.
 5. Run `pnpm run db-typegen` to generate types for the database. Do this whenever you change the Neon database.
+
+#### Cloudflare Hyperdrive
+
+<https://developers.cloudflare.com/hyperdrive/get-started/>
+
+1. Login to cloudflare: `npx wrangler login`
+2. `npx wrangler hyperdrive create <YOUR_CONFIG_NAME> --connection-string="postgres://user:password@HOSTNAME_OR_IP_ADDRESS:PORT/database_name"`
 
 ## Server Usage
 

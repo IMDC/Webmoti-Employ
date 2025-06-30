@@ -2,5 +2,3 @@
 # https://developers.zoom.us/docs/video-sdk/get-credentials/
 ZOOM_VIDEO_SDK_KEY=YOUR_VIDEO_SDK_KEY_HERE
 ZOOM_VIDEO_SDK_SECRET=YOUR_VIDEO_SDK_SECRET_HERE
-
-DATABASE_URL=postgresql://username:password@yourdomain.com/database

@@ -1,11 +1,17 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
+  "$schema": "https://unpkg.com/wrangler@latest/config-schema.json",
   "name": "server",
   "main": "src/index.ts",
-  "compatibility_date": "2025-06-28"
-  // "compatibility_flags": [
-  //   "nodejs_compat"
-  // ],
+  "compatibility_date": "2025-06-28",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "0699657a53e04e64bf61be912ba70c66"
+    }
+  ]
   // "vars": {
   //   "MY_VAR": "my-variable"
   // },
