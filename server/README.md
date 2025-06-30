@@ -22,7 +22,7 @@ npm run cf-typegen
 ### Install dependencies
 
 ```bash
-cd new-server
+cd server
 
 pnpm install
 ```
@@ -35,7 +35,7 @@ Then rename `.dev.vars.example` to `.dev.vars`, edit the file contents to includ
 
 ```bash
 # start just this server:
-cd new-server
+cd server
 pnpm run dev
 
 # start both react app and this server:

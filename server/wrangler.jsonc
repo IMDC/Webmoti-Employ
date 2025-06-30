@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "new-server",
+  "name": "server",
   "main": "src/index.ts",
   "compatibility_date": "2025-06-28"
   // "compatibility_flags": [
