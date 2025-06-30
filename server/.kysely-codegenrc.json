@@ -1,0 +1,7 @@
+{
+    "outFile": "src/db/schema.ts",
+    "includePattern": "public.*",
+    "camelCase": true,
+    "envFile": ".dev.vars",
+    "dialect": "postgres"
+}

@@ -1,10 +1,10 @@
 import { Hono } from "hono";
 import { generateZoomJwt } from "./jwt";
 import { zoomTokenSchema } from "./schema";
-import { CloudflareBindings } from "../..";
+import { Env } from "../..";
 import { z } from "zod/v4";
 
-const zoomTokenRoute = new Hono<{ Bindings: CloudflareBindings }>();
+const zoomTokenRoute = new Hono<{ Bindings: Env }>();
 
 zoomTokenRoute.post("/", async (c) => {
   const body = await c.req.json();
