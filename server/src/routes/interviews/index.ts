@@ -1,10 +1,6 @@
 import { Hono } from "hono";
 import { DbContext } from "../..";
-import {
-  createInterview,
-  deleteInterview,
-  getAllInterviews,
-} from "../../db/queries";
+import { createInterview, deleteInterview, getAllInterviews } from "./queries";
 import { dbMiddleware } from "../../db/dbMiddleware";
 import { zValidator } from "@hono/zod-validator";
 import { interviewDeleteSchema, interviewPostSchema } from "./schema";
