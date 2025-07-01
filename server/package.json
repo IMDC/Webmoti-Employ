@@ -3,8 +3,9 @@
   "scripts": {
     "dev": "wrangler dev --remote",
     "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
-    "db-typegen": "kysely-codegen"
+    "cf-typegen": "wrangler types src/worker-configuration.d.ts --env-interface CloudflareBindings",
+    "db-typegen": "kysely-codegen",
+    "postinstall": "pnpm run cf-typegen"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.7.0",
@@ -23,5 +24,6 @@
     "kysely-codegen": "^0.18.5",
     "typescript-eslint": "^8.35.1",
     "wrangler": "^4.4.0"
-  }
+  },
+  "packageManager": "pnpm@10.12.1"
 }

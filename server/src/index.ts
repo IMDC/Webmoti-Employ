@@ -4,18 +4,8 @@ import interviewsRoute from "./routes/interviews";
 import { Kysely } from "kysely";
 import { DB } from "./db/schema";
 
-type Hyperdrive = {
-  connectionString: string;
-};
-
-export type Bindings = {
-  ZOOM_VIDEO_SDK_KEY: string;
-  ZOOM_VIDEO_SDK_SECRET: string;
-  HYPERDRIVE: Hyperdrive;
-};
-
 export type BaseContext = {
-  Bindings: Bindings;
+  Bindings: CloudflareBindings;
 };
 
 export type DbContext = BaseContext & {
