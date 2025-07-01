@@ -2,22 +2,15 @@ import { Hono } from "hono";
 import { generateZoomJwt } from "./jwt";
 import { zoomTokenSchema } from "./schema";
 import { BaseContext } from "../..";
-import { z } from "zod/v4";
+import { zValidator } from "@hono/zod-validator";
 
 const zoomTokenRoute = new Hono<BaseContext>();
 
-zoomTokenRoute.post("/", async (c) => {
-  const body = await c.req.json();
-  const result = zoomTokenSchema.safeParse(body);
-
-  if (!result.success) {
-    return c.json({ error: z.prettifyError(result.error) }, 400);
-  }
-
-  const input = result.data;
+zoomTokenRoute.post("/", zValidator("json", zoomTokenSchema), async (c) => {
+  const data = c.req.valid("json");
 
   const jwt = await generateZoomJwt({
-    ...input,
+    ...data,
     zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
     zoomVideoSdkSecret: c.env.ZOOM_VIDEO_SDK_SECRET,
   });
