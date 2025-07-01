@@ -9,12 +9,25 @@ export async function createInterview(
   db: Kysely<DB>,
   creatorId: string,
   startTime: Date,
-  endTime: Date
+  endTime: Date,
+  invites: Array<string> = []
 ) {
-  return await db
-    .insertInto("interview")
-    .values({ creatorId, startTime, endTime })
-    .executeTakeFirst();
+  await db.transaction().execute(async (trx) => {
+    // first add the interview to the table
+    const newInterview = await trx
+      .insertInto("interview")
+      .values({ creatorId, startTime, endTime })
+      .returning("interview.id")
+      .executeTakeFirstOrThrow();
+
+    // then add all invites to the interview_invite table
+    for (const inviteEmail of invites) {
+      await trx
+        .insertInto("interviewInvite")
+        .values({ email: inviteEmail, interviewId: newInterview.id })
+        .executeTakeFirstOrThrow();
+    }
+  });
 }
 
 export async function deleteInterview(db: Kysely<DB>, interviewId: number) {

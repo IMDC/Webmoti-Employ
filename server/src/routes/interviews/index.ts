@@ -1,7 +1,9 @@
 import { Hono } from "hono";
 import { DbContext } from "../..";
-import { getAllInterviews } from "../../db/queries";
+import { createInterview, getAllInterviews } from "../../db/queries";
 import { dbMiddleware } from "../../db/dbMiddleware";
+import { zValidator } from "@hono/zod-validator";
+import { interviewPostSchema } from "./schema";
 
 const interviewsRoute = new Hono<DbContext>();
 
@@ -12,16 +14,34 @@ interviewsRoute.get("/", async (c) => {
   return c.json({ interviews });
 });
 
-interviewsRoute.post("/", (c) => {
-  return c.text("Hello Hono!");
-});
+interviewsRoute.post(
+  "/",
+  zValidator("json", interviewPostSchema),
+  async (c) => {
+    const data = c.req.valid("json");
 
-interviewsRoute.patch("/", (c) => {
-  return c.text("Hello Hono!");
-});
+    try {
+      await createInterview(
+        c.var.db,
+        data.creatorId,
+        data.startTime,
+        data.endTime,
+        data.invites
+      );
+    } catch (error) {
+      return c.json({ error: "Error creating interview" }, 500);
+    }
+
+    return c.text("Hello Hono!");
+  }
+);
 
 interviewsRoute.delete("/", (c) => {
   return c.text("Hello Hono!");
 });
+
+// interviewsRoute.patch("/", (c) => {
+//   return c.text("Hello Hono!");
+// });
 
 export default interviewsRoute;
