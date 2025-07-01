@@ -1,13 +1,20 @@
-import { Center, Text } from '@mantine/core';
+import { Center, Skeleton, Text } from '@mantine/core';
+import { Interview } from './schema';
 
-export function InterviewList() {
+interface InterviewListProps {
+  interviews: Array<Interview>;
+}
+
+export function InterviewList({ interviews }: InterviewListProps) {
   return (
     <>
-      {/* <Skeleton height="100%" /> */}
+      <Skeleton height={60} />
+      <Skeleton height={60} />
+      <Skeleton height={60} />
 
-      <Center>
+      {/* <Center>
         <Text fw="bolder">You have no scheduled interviews</Text>
-      </Center>
+      </Center> */}
 
       {/* <ScrollArea>
               {[...Array(20)].map((_, i) => (

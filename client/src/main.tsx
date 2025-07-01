@@ -2,6 +2,7 @@ import '@mantine/core/styles.css';
 import './global.css';
 
 import { StrictMode } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import ReactDOM from 'react-dom/client';
 import { MantineProvider } from '@mantine/core';
@@ -18,15 +19,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+const queryClient = new QueryClient();
+
+const App = () => (
+  <StrictMode>
+    <MantineProvider theme={theme} defaultColorScheme="dark">
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+        <ErrorDialog />
+      </QueryClientProvider>
+    </MantineProvider>
+  </StrictMode>
+);
+
 const rootElement = document.getElementById('root')!;
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
-  root.render(
-    <StrictMode>
-      <MantineProvider theme={theme} defaultColorScheme="dark">
-        <RouterProvider router={router} />
-        <ErrorDialog />
-      </MantineProvider>
-    </StrictMode>
-  );
+  root.render(<App />);
 }
