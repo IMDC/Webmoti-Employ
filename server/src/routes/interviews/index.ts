@@ -1,9 +1,13 @@
 import { Hono } from "hono";
 import { DbContext } from "../..";
-import { createInterview, getAllInterviews } from "../../db/queries";
+import {
+  createInterview,
+  deleteInterview,
+  getAllInterviews,
+} from "../../db/queries";
 import { dbMiddleware } from "../../db/dbMiddleware";
 import { zValidator } from "@hono/zod-validator";
-import { interviewPostSchema } from "./schema";
+import { interviewDeleteSchema, interviewPostSchema } from "./schema";
 
 const interviewsRoute = new Hono<DbContext>();
 
@@ -29,6 +33,7 @@ interviewsRoute.post(
         data.invites
       );
     } catch (error) {
+      console.error("Error creating interview: ", error);
       return c.json({ error: "Error creating interview" }, 500);
     }
 
@@ -36,9 +41,22 @@ interviewsRoute.post(
   }
 );
 
-interviewsRoute.delete("/", (c) => {
-  return c.text("Hello Hono!");
-});
+interviewsRoute.delete(
+  "/:id",
+  zValidator("param", interviewDeleteSchema),
+  async (c) => {
+    const { id } = c.req.valid("param");
+
+    try {
+      await deleteInterview(c.var.db, id);
+    } catch (error) {
+      console.error("Error deleting interview: ", error);
+      return c.json({ error: "Error deleting interview" }, 500);
+    }
+
+    return c.text("Hello Hono!");
+  }
+);
 
 // interviewsRoute.patch("/", (c) => {
 //   return c.text("Hello Hono!");

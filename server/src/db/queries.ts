@@ -34,7 +34,7 @@ export async function deleteInterview(db: Kysely<DB>, interviewId: number) {
   return await db
     .deleteFrom("interview")
     .where("interview.id", "=", interviewId)
-    .executeTakeFirst();
+    .executeTakeFirstOrThrow();
 }
 
 export async function modifyInterview(
@@ -52,5 +52,5 @@ export async function modifyInterview(
     .updateTable("interview")
     .set(updates)
     .where("interview.id", "=", interviewId)
-    .executeTakeFirst();
+    .executeTakeFirstOrThrow();
 }

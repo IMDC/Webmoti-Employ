@@ -6,3 +6,5 @@ export const interviewPostSchema = z.object({
   endTime: z.date(),
   invites: z.array(z.email()).optional(),
 });
+
+export const interviewDeleteSchema = z.object({ id: z.number() });
