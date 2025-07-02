@@ -1,5 +1,15 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router';
+import { ErrorDialog } from '@/components/ErrorDialog';
 
 export const Route = createRootRoute({
-  component: Outlet,
+  component: RootRoute,
 });
+
+function RootRoute() {
+  return (
+    <>
+      <Outlet />
+      <ErrorDialog />
+    </>
+  );
+}
