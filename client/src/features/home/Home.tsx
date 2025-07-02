@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { UserButton } from '@clerk/clerk-react';
 import { IconCalendarPlus, IconSquareRoundedPlusFilled, IconVideoPlus } from '@tabler/icons-react';
 import {
   AppShell,
   Button,
-  Center,
   Divider,
   Flex,
+  Group,
   Modal,
   Popover,
   Stack,
@@ -13,6 +14,7 @@ import {
   TextInput,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
 import { InterviewList } from './InterviewList';
 import { ScheduleForm } from './ScheduleForm';
 
@@ -30,7 +32,9 @@ export function Home() {
       }}
     >
       <AppShell.Header>
-        <Center h="100%">
+        <Group justify="space-between" mr="lg" ml="lg">
+          <ColorSchemeToggle />
+
           <Text
             fz={50}
             fw={900}
@@ -39,7 +43,9 @@ export function Home() {
           >
             Web-Employ
           </Text>
-        </Center>
+
+          <UserButton />
+        </Group>
       </AppShell.Header>
 
       <AppShell.Main>
