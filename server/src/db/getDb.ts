@@ -1,4 +1,4 @@
-import { Kysely, PostgresDialect } from "kysely";
+import { CamelCasePlugin, Kysely, PostgresDialect } from "kysely";
 import { DB } from "./schema";
 import { Pool } from "pg";
 
@@ -9,6 +9,8 @@ export function getDb(dbUrl: string) {
       // PostgresDialect only accepts a Pool and not a Client.
       pool: new Pool({ connectionString: dbUrl, max: 1 }),
     }),
+    // this plugin makes it so when you get data from the db, it uses camelcase
+    plugins: [new CamelCasePlugin()],
   });
   return db;
 }

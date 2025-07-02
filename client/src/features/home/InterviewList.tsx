@@ -1,26 +1,104 @@
-import { Center, Skeleton, Text } from '@mantine/core';
-import { Interview } from './schema';
+import { IconCalendarEventFilled, IconVideoFilled } from '@tabler/icons-react';
+import { useQuery } from '@tanstack/react-query';
+import { z } from 'zod/v4';
+import {
+  Avatar,
+  Badge,
+  Button,
+  Card,
+  Center,
+  Group,
+  ScrollArea,
+  Skeleton,
+  Stack,
+  Text,
+} from '@mantine/core';
+import { InterviewsResponseSchema } from './schema';
 
-interface InterviewListProps {
-  interviews: Array<Interview>;
+async function getInterviews() {
+  const response = await fetch('/api/interviews');
+  const json = await response.json();
+
+  const result = InterviewsResponseSchema.safeParse(json);
+  if (!result.success) {
+    throw new Error(z.prettifyError(result.error));
+  }
+
+  return result.data.interviews;
 }
 
-export function InterviewList({ interviews }: InterviewListProps) {
-  return (
-    <>
-      <Skeleton height={60} />
-      <Skeleton height={60} />
-      <Skeleton height={60} />
+function formatInterviewTime(startTime: Date, endTime: Date) {
+  const start = new Date(startTime);
+  const end = new Date(endTime);
 
-      {/* <Center>
+  const date = start.toLocaleDateString('en-US', { dateStyle: 'medium' });
+  const startTimeStr = start.toLocaleTimeString('en-US', { timeStyle: 'short' });
+  const endTimeStr = end.toLocaleTimeString('en-US', { timeStyle: 'short' });
+
+  return `${date}, ${startTimeStr} to ${endTimeStr}`;
+}
+
+export function InterviewList() {
+  const {
+    data: interviews,
+    isPending,
+    error,
+  } = useQuery({
+    queryKey: ['interviews'],
+    queryFn: getInterviews,
+  });
+
+  if (isPending) {
+    return (
+      <>
+        <Skeleton height={60} />
+        <Skeleton height={60} />
+        <Skeleton height={60} />
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <Center>
+        <Stack>
+          <Text fw="bolder">Error fetching interviews:</Text>
+          <Text fw="bolder">{error.message}</Text>
+        </Stack>
+      </Center>
+    );
+  }
+
+  if (!interviews) {
+    return (
+      <Center>
         <Text fw="bolder">You have no scheduled interviews</Text>
-      </Center> */}
+      </Center>
+    );
+  }
 
-      {/* <ScrollArea>
-              {[...Array(20)].map((_, i) => (
-                <Text key={i}>Item {i + 1}</Text>
-              ))}
-            </ScrollArea> */}
-    </>
+  return (
+    <ScrollArea>
+      {interviews.map((interview) => (
+        <Card key={interview.id} shadow="sm" padding="sm" withBorder>
+          <Badge
+            variant="gradient"
+            gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
+            leftSection={<IconCalendarEventFilled size={12} />}
+          >
+            {formatInterviewTime(interview.startTime, interview.endTime)}
+          </Badge>
+
+          <Group justify="space-between" mt="md">
+            <Group>
+              <Avatar />
+              <Text fw="bolder">Interview with Joe</Text>
+            </Group>
+
+            <Button leftSection={<IconVideoFilled />}>Join</Button>
+          </Group>
+        </Card>
+      ))}
+    </ScrollArea>
   );
 }

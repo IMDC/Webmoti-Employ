@@ -1,16 +1,8 @@
-import { IconVideoFilled } from '@tabler/icons-react';
-import { useQuery } from '@tanstack/react-query';
+import { IconSquareRoundedPlusFilled } from '@tabler/icons-react';
 import { AppShell, Button, Center, Divider, Flex, Text, TextInput } from '@mantine/core';
 import { InterviewList } from './InterviewList';
 
-async function getInterviews() {
-  const response = await fetch('/api/interviews');
-  return await response.json();
-}
-
 export function Home() {
-  const { data } = useQuery({ queryKey: ['interviews'], queryFn: getInterviews });
-
   return (
     <AppShell
       header={{ height: 100 }}
@@ -36,7 +28,7 @@ export function Home() {
         <Flex justify="center" align="center" mt="lg">
           <Flex direction="column" h={400} w={500} gap="md">
             <Flex direction="row" gap="sm" justify="center">
-              <Button leftSection={<IconVideoFilled />}>New interview</Button>
+              <Button leftSection={<IconSquareRoundedPlusFilled />}>New interview</Button>
               <TextInput placeholder="Enter interview code" />
               <Button variant="subtle" disabled>
                 Join
@@ -45,7 +37,7 @@ export function Home() {
 
             <Divider size="md" mt="md" mb="md" />
 
-            <InterviewList interviews={data}/>
+            <InterviewList />
           </Flex>
         </Flex>
       </AppShell.Main>
