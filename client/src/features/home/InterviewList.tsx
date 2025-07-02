@@ -81,15 +81,19 @@ export function InterviewList() {
     <ScrollArea>
       {interviews.map((interview) => (
         <Card key={interview.id} shadow="sm" padding="sm" withBorder>
-          <Badge
-            variant="gradient"
-            gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
-            leftSection={<IconCalendarEventFilled size={12} />}
-          >
-            {formatInterviewTime(interview.startTime, interview.endTime)}
-          </Badge>
+          <Group>
+            <Badge
+              variant="gradient"
+              gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
+              leftSection={<IconCalendarEventFilled size={12} />}
+            >
+              {formatInterviewTime(interview.startTime, interview.endTime)}
+            </Badge>
 
-          <Group justify="space-between" mt="md">
+            <Badge>Interviewer</Badge>
+          </Group>
+
+          <Group justify="space-between" mt="sm">
             <Group>
               <Avatar />
               <Text fw="bolder">Interview with Joe</Text>

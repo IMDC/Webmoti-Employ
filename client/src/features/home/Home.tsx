@@ -1,8 +1,26 @@
-import { IconSquareRoundedPlusFilled } from '@tabler/icons-react';
-import { AppShell, Button, Center, Divider, Flex, Text, TextInput } from '@mantine/core';
+import { useState } from 'react';
+import { IconCalendarPlus, IconSquareRoundedPlusFilled, IconVideoPlus } from '@tabler/icons-react';
+import {
+  AppShell,
+  Button,
+  Center,
+  Divider,
+  Flex,
+  Modal,
+  Popover,
+  Stack,
+  Text,
+  TextInput,
+} from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { InterviewList } from './InterviewList';
+import { ScheduleForm } from './ScheduleForm';
 
 export function Home() {
+  const [isNewInterviewPopupOpen, setIsNewInterviewPopupOpen] = useState(false);
+  const [isScheduleModalOpened, { open: openScheduleModal, close: closeScheduleModal }] =
+    useDisclosure(false);
+
   return (
     <AppShell
       header={{ height: 100 }}
@@ -25,10 +43,39 @@ export function Home() {
       </AppShell.Header>
 
       <AppShell.Main>
+        <Modal opened={isScheduleModalOpened} onClose={closeScheduleModal} title="Hi">
+          <ScheduleForm />
+        </Modal>
+
         <Flex justify="center" align="center" mt="lg">
           <Flex direction="column" h={400} w={500} gap="md">
             <Flex direction="row" gap="sm" justify="center">
-              <Button leftSection={<IconSquareRoundedPlusFilled />}>New interview</Button>
+              <Popover opened={isNewInterviewPopupOpen} onChange={setIsNewInterviewPopupOpen}>
+                <Popover.Target>
+                  <Button
+                    onClick={() => setIsNewInterviewPopupOpen((o) => !o)}
+                    leftSection={<IconSquareRoundedPlusFilled />}
+                  >
+                    New interview
+                  </Button>
+                </Popover.Target>
+
+                <Popover.Dropdown>
+                  <Stack>
+                    <Button leftSection={<IconVideoPlus />}>Start interview now</Button>
+                    <Button
+                      leftSection={<IconCalendarPlus />}
+                      onClick={() => {
+                        setIsNewInterviewPopupOpen(false);
+                        openScheduleModal();
+                      }}
+                    >
+                      Schedule interview
+                    </Button>
+                  </Stack>
+                </Popover.Dropdown>
+              </Popover>
+
               <TextInput placeholder="Enter interview code" />
               <Button variant="subtle" disabled>
                 Join
