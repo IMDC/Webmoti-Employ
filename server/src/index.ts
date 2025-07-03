@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import zoomTokenRoute from "./routes/zoom-token";
+import sessionsRoute from "./routes/sessions";
 import interviewsRoute from "./routes/interviews";
 import { Kysely } from "kysely";
 import { DB } from "./db/schema";
@@ -16,7 +16,7 @@ export type DbContext = BaseContext & {
 
 const app = new Hono<BaseContext>();
 
-app.route("/zoom-token", zoomTokenRoute);
+app.route("/sessions", sessionsRoute);
 app.route("/interviews", interviewsRoute);
 
 export default app;

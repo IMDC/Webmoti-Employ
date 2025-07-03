@@ -24,6 +24,7 @@ export async function generateZoomJwt({
   const iat = Math.floor(Date.now() / 1000);
   const exp = expirationSeconds ? iat + expirationSeconds : iat + 60 * 60 * 2;
 
+  // https://developers.zoom.us/docs/video-sdk/auth/#payload
   const payload = {
     app_key: zoomVideoSdkKey,
     role_type: role,

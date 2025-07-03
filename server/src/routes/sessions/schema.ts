@@ -1,19 +1,19 @@
 import { z } from "zod/v4";
 
-const allowedRegions = [
-  "AU",
-  "BR",
-  "CA",
-  "CN",
-  "DE",
-  "HK",
-  "IN",
-  "JP",
-  "MX",
-  "NL",
-  "SG",
-  "US",
-];
+// const allowedRegions = [
+//   "AU",
+//   "BR",
+//   "CA",
+//   "CN",
+//   "DE",
+//   "HK",
+//   "IN",
+//   "JP",
+//   "MX",
+//   "NL",
+//   "SG",
+//   "US",
+// ];
 
 // https://developers.zoom.us/docs/video-sdk/auth/#payload
 export const zoomTokenSchema = z.object({
@@ -27,18 +27,7 @@ export const zoomTokenSchema = z.object({
     }),
   userIdentity: z.string().max(34).optional(),
   sessionKey: z.string().max(35).optional(),
-  geoRegions: z
-    .string()
-    .optional()
-    .transform((val) => val?.split(",").map((r) => r.trim()))
-    .refine(
-      (regions) =>
-        regions === undefined ||
-        regions.every((r) => allowedRegions.includes(r)),
-      {
-        message: "Invalid geoRegions value(s)",
-      }
-    ),
+  geoRegions: z.string().optional(),
   cloudRecordingOption: z.union([z.literal(0), z.literal(1)]).optional(),
   cloudRecordingElection: z.union([z.literal(0), z.literal(1)]).optional(),
   telemetryTrackingId: z.string().optional(),
