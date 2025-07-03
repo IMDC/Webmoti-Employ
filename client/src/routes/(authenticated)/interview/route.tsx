@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
-import { ZoomSessionContextProvider } from '@/features/video/zoom/ZoomSessionContextProvider';
+import { ZoomSessionContextProvider } from '@/features/interview/zoom/ZoomSessionContextProvider';
 
 export const Route = createFileRoute('/(authenticated)/interview')({
   component: ZoomSessionLayout,

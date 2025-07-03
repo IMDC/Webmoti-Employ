@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { Participant, VideoPlayer } from '@zoom/videosdk';
-import { useZoomSessionStore } from '@/features/video/zoom/useZoomSessionStore';
+import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore';
 import { Corner } from '../../../../components/Corner';
 import AudioLevelIndicator from '../../components/AudioLevelIndicator';
 import { ParticipantTile } from '../../components/ParticipantTile';

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Box, Button, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
-import { useZoomSessionStore } from '@/features/video/zoom/useZoomSessionStore';
+import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore';
 import { useAppStore } from '@/stores/useAppStore';
 import { useDeviceStore } from '@/stores/useDeviceStore';
 import { useZoomPreviewStore } from '@/stores/usePreviewStore';
