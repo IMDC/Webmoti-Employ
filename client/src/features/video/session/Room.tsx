@@ -8,11 +8,7 @@ import { Chat } from '../chat/Chat';
 import { MenuBar } from '../components/MenuBar';
 import { VideoGrid } from './components/VideoGrid';
 
-interface RoomProps {
-  onLeave: () => void;
-}
-
-export function Room({ onLeave }: RoomProps) {
+export function Room() {
   const participantStageRef = useRef<HTMLDivElement>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
@@ -110,7 +106,6 @@ export function Room({ onLeave }: RoomProps) {
           }}
           onChangeAudioInputDevice={switchMicrophone}
           onChangeVideoDevice={switchCamera}
-          onLeave={onLeave}
           onToggleChat={() => {
             setIsChatOpen(!isChatOpen);
           }}

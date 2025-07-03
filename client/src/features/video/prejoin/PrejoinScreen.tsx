@@ -8,11 +8,7 @@ import { useZoomPreviewStore } from '@/stores/usePreviewStore';
 import { MenuBar } from '../components/MenuBar';
 import { PreviewTile } from './PreviewTile';
 
-interface PrejoinScreenProps {
-  onJoin: () => void;
-}
-
-export function PrejoinScreen({ onJoin }: PrejoinScreenProps) {
+export function PrejoinScreen() {
   const toggleIsVideoOn = useAppStore((s) => s.toggleIsVideoOn);
   const toggleMuteMicrophone = useZoomPreviewStore((s) => s.toggleMuteMicrophone);
 
@@ -71,7 +67,7 @@ export function PrejoinScreen({ onJoin }: PrejoinScreenProps) {
 
           <TextInput placeholder="Your name" />
 
-          <Button onClick={onJoin}>Join now</Button>
+          <Button>Join now</Button>
         </Stack>
       </Group>
     </Center>

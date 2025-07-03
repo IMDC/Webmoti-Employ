@@ -13,7 +13,11 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as authenticatedRouteRouteImport } from './routes/(authenticated)/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as authenticatedHomeRouteImport } from './routes/(authenticated)/home'
-import { Route as authenticatedIdRouteImport } from './routes/(authenticated)/$id'
+import { Route as authenticatedEndRouteImport } from './routes/(authenticated)/end'
+import { Route as authenticatedInterviewRouteRouteImport } from './routes/(authenticated)/interview/route'
+import { Route as authenticatedInterviewIndexRouteImport } from './routes/(authenticated)/interview/index'
+import { Route as authenticatedInterviewPrejoinRouteImport } from './routes/(authenticated)/interview/prejoin'
+import { Route as authenticatedInterviewIdRouteImport } from './routes/(authenticated)/interview/$id'
 
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
@@ -34,44 +38,98 @@ const authenticatedHomeRoute = authenticatedHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => authenticatedRouteRoute,
 } as any)
-const authenticatedIdRoute = authenticatedIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
+const authenticatedEndRoute = authenticatedEndRouteImport.update({
+  id: '/end',
+  path: '/end',
   getParentRoute: () => authenticatedRouteRoute,
 } as any)
+const authenticatedInterviewRouteRoute =
+  authenticatedInterviewRouteRouteImport.update({
+    id: '/interview',
+    path: '/interview',
+    getParentRoute: () => authenticatedRouteRoute,
+  } as any)
+const authenticatedInterviewIndexRoute =
+  authenticatedInterviewIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => authenticatedInterviewRouteRoute,
+  } as any)
+const authenticatedInterviewPrejoinRoute =
+  authenticatedInterviewPrejoinRouteImport.update({
+    id: '/prejoin',
+    path: '/prejoin',
+    getParentRoute: () => authenticatedInterviewRouteRoute,
+  } as any)
+const authenticatedInterviewIdRoute =
+  authenticatedInterviewIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => authenticatedInterviewRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof authenticatedRouteRouteWithChildren
   '/sign-in': typeof SignInRoute
-  '/$id': typeof authenticatedIdRoute
+  '/interview': typeof authenticatedInterviewRouteRouteWithChildren
+  '/end': typeof authenticatedEndRoute
   '/home': typeof authenticatedHomeRoute
+  '/interview/$id': typeof authenticatedInterviewIdRoute
+  '/interview/prejoin': typeof authenticatedInterviewPrejoinRoute
+  '/interview/': typeof authenticatedInterviewIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof authenticatedRouteRouteWithChildren
   '/sign-in': typeof SignInRoute
-  '/$id': typeof authenticatedIdRoute
+  '/end': typeof authenticatedEndRoute
   '/home': typeof authenticatedHomeRoute
+  '/interview/$id': typeof authenticatedInterviewIdRoute
+  '/interview/prejoin': typeof authenticatedInterviewPrejoinRoute
+  '/interview': typeof authenticatedInterviewIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/(authenticated)': typeof authenticatedRouteRouteWithChildren
   '/sign-in': typeof SignInRoute
-  '/(authenticated)/$id': typeof authenticatedIdRoute
+  '/(authenticated)/interview': typeof authenticatedInterviewRouteRouteWithChildren
+  '/(authenticated)/end': typeof authenticatedEndRoute
   '/(authenticated)/home': typeof authenticatedHomeRoute
+  '/(authenticated)/interview/$id': typeof authenticatedInterviewIdRoute
+  '/(authenticated)/interview/prejoin': typeof authenticatedInterviewPrejoinRoute
+  '/(authenticated)/interview/': typeof authenticatedInterviewIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sign-in' | '/$id' | '/home'
+  fullPaths:
+    | '/'
+    | '/sign-in'
+    | '/interview'
+    | '/end'
+    | '/home'
+    | '/interview/$id'
+    | '/interview/prejoin'
+    | '/interview/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sign-in' | '/$id' | '/home'
+  to:
+    | '/'
+    | '/sign-in'
+    | '/end'
+    | '/home'
+    | '/interview/$id'
+    | '/interview/prejoin'
+    | '/interview'
   id:
     | '__root__'
     | '/'
     | '/(authenticated)'
     | '/sign-in'
-    | '/(authenticated)/$id'
+    | '/(authenticated)/interview'
+    | '/(authenticated)/end'
     | '/(authenticated)/home'
+    | '/(authenticated)/interview/$id'
+    | '/(authenticated)/interview/prejoin'
+    | '/(authenticated)/interview/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -110,23 +168,72 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedHomeRouteImport
       parentRoute: typeof authenticatedRouteRoute
     }
-    '/(authenticated)/$id': {
-      id: '/(authenticated)/$id'
-      path: '/$id'
-      fullPath: '/$id'
-      preLoaderRoute: typeof authenticatedIdRouteImport
+    '/(authenticated)/end': {
+      id: '/(authenticated)/end'
+      path: '/end'
+      fullPath: '/end'
+      preLoaderRoute: typeof authenticatedEndRouteImport
       parentRoute: typeof authenticatedRouteRoute
+    }
+    '/(authenticated)/interview': {
+      id: '/(authenticated)/interview'
+      path: '/interview'
+      fullPath: '/interview'
+      preLoaderRoute: typeof authenticatedInterviewRouteRouteImport
+      parentRoute: typeof authenticatedRouteRoute
+    }
+    '/(authenticated)/interview/': {
+      id: '/(authenticated)/interview/'
+      path: '/'
+      fullPath: '/interview/'
+      preLoaderRoute: typeof authenticatedInterviewIndexRouteImport
+      parentRoute: typeof authenticatedInterviewRouteRoute
+    }
+    '/(authenticated)/interview/prejoin': {
+      id: '/(authenticated)/interview/prejoin'
+      path: '/prejoin'
+      fullPath: '/interview/prejoin'
+      preLoaderRoute: typeof authenticatedInterviewPrejoinRouteImport
+      parentRoute: typeof authenticatedInterviewRouteRoute
+    }
+    '/(authenticated)/interview/$id': {
+      id: '/(authenticated)/interview/$id'
+      path: '/$id'
+      fullPath: '/interview/$id'
+      preLoaderRoute: typeof authenticatedInterviewIdRouteImport
+      parentRoute: typeof authenticatedInterviewRouteRoute
     }
   }
 }
 
+interface authenticatedInterviewRouteRouteChildren {
+  authenticatedInterviewIdRoute: typeof authenticatedInterviewIdRoute
+  authenticatedInterviewPrejoinRoute: typeof authenticatedInterviewPrejoinRoute
+  authenticatedInterviewIndexRoute: typeof authenticatedInterviewIndexRoute
+}
+
+const authenticatedInterviewRouteRouteChildren: authenticatedInterviewRouteRouteChildren =
+  {
+    authenticatedInterviewIdRoute: authenticatedInterviewIdRoute,
+    authenticatedInterviewPrejoinRoute: authenticatedInterviewPrejoinRoute,
+    authenticatedInterviewIndexRoute: authenticatedInterviewIndexRoute,
+  }
+
+const authenticatedInterviewRouteRouteWithChildren =
+  authenticatedInterviewRouteRoute._addFileChildren(
+    authenticatedInterviewRouteRouteChildren,
+  )
+
 interface authenticatedRouteRouteChildren {
-  authenticatedIdRoute: typeof authenticatedIdRoute
+  authenticatedInterviewRouteRoute: typeof authenticatedInterviewRouteRouteWithChildren
+  authenticatedEndRoute: typeof authenticatedEndRoute
   authenticatedHomeRoute: typeof authenticatedHomeRoute
 }
 
 const authenticatedRouteRouteChildren: authenticatedRouteRouteChildren = {
-  authenticatedIdRoute: authenticatedIdRoute,
+  authenticatedInterviewRouteRoute:
+    authenticatedInterviewRouteRouteWithChildren,
+  authenticatedEndRoute: authenticatedEndRoute,
   authenticatedHomeRoute: authenticatedHomeRoute,
 }
 

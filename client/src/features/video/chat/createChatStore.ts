@@ -1,5 +1,5 @@
 import { ChatClient, ChatMessage, VideoClient } from '@zoom/videosdk';
-import { create, createStore } from 'zustand';
+import { createStore } from 'zustand';
 
 export type ChatStore = {
   chatClient: typeof ChatClient;
