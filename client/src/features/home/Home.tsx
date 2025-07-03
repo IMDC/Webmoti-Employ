@@ -41,7 +41,7 @@ export function Home() {
             variant="gradient"
             gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
           >
-            Web-Employ
+            WebMoti-Employ
           </Text>
 
           <UserButton />
@@ -49,7 +49,11 @@ export function Home() {
       </AppShell.Header>
 
       <AppShell.Main>
-        <Modal opened={isScheduleModalOpened} onClose={closeScheduleModal} title="Hi">
+        <Modal
+          opened={isScheduleModalOpened}
+          onClose={closeScheduleModal}
+          title={<Text fw="bolder">New Interview</Text>}
+        >
           <ScheduleForm />
         </Modal>
 
