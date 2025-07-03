@@ -19,9 +19,33 @@ const ScheduleInterviewSchema = z.object({
   date: z.coerce.date(),
   startTime: z.string().regex(/^\d{2}:\d{2}$/), // ex: "09:00"
   invites: z.array(z.object({ email: z.email() })),
+  openGoogleCalendar: z.boolean(),
 });
 
 type ScheduleInterview = z.infer<typeof ScheduleInterviewSchema>;
+
+function openGoogleCalendarTab(start: Date, invites: string[]) {
+  const end = new Date(start.getTime() + 60 * 60 * 1000);
+
+  const formatDate = (d: Date) =>
+    `${d
+      .toISOString()
+      .replace(/[-:]|\.\d{3}/g, '')
+      .slice(0, 15)}Z`;
+
+  const title = encodeURIComponent('Interview');
+  const description = encodeURIComponent('Virtual interview on the WebMoti-Employ platform');
+  const location = encodeURIComponent('WebMoti-Employ');
+  const startDateTime = formatDate(start);
+  const endDateTime = formatDate(end);
+  const guests = encodeURIComponent(invites.join(','));
+
+  // TODO add link to description and location maybe
+
+  const url = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}&details=${description}&location=${location}&dates=${startDateTime}/${endDateTime}&add=${guests}`;
+
+  window.open(url, '_blank');
+}
 
 export function ScheduleForm() {
   const form = useForm({
@@ -31,6 +55,7 @@ export function ScheduleForm() {
       date: new Date(Date.now() + 86400000),
       startTime: '09:00',
       invites: [],
+      openGoogleCalendar: false,
     },
 
     validate: zod4Resolver(ScheduleInterviewSchema),
@@ -38,10 +63,15 @@ export function ScheduleForm() {
 
   function handleSubmit(values: ScheduleInterview) {
     const [hours, minutes] = values.startTime.split(':').map(Number);
-    const interviewDateTime = new Date(values.date);
-    interviewDateTime.setHours(hours, minutes, 0, 0);
+    const start = new Date(values.date);
+    start.setHours(hours, minutes, 0, 0);
 
-    console.log({ ...values, interviewDateTime });
+    if (values.openGoogleCalendar) {
+      const inviteEmails = values.invites.map((i) => i.email);
+      openGoogleCalendarTab(start, inviteEmails);
+    }
+
+    console.log({ ...values, start });
   }
 
   const invites = form.getValues().invites.map((_, index) => (
@@ -104,7 +134,11 @@ export function ScheduleForm() {
             label="Select this to open Google Calendar in a new tab after submitting so you can send a calendar event. All the fields will be filled in."
             refProp="rootRef"
           >
-            <Checkbox label="Open Google Calendar" />
+            <Checkbox
+              label="Open Google Calendar"
+              key={form.key(`openGoogleCalendar`)}
+              {...form.getInputProps(`openGoogleCalendar`, { type: 'checkbox' })}
+            />
           </Tooltip>
         </Group>
 
