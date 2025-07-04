@@ -1,29 +1,17 @@
-import { IconCalendarEventFilled, IconVideoFilled } from '@tabler/icons-react';
-import {
-  Avatar,
-  Badge,
-  Button,
-  Card,
-  Center,
-  Group,
-  ScrollArea,
-  Skeleton,
-  Stack,
-  Text,
-} from '@mantine/core';
+import { useState } from 'react';
+import { Center, Skeleton, Stack, Text } from '@mantine/core';
 import { useInterviews } from './queries';
-
-function formatInterviewTime(startTime: Date) {
-  const start = new Date(startTime);
-
-  const date = start.toLocaleDateString('en-US', { dateStyle: 'medium' });
-  const startTimeStr = start.toLocaleTimeString('en-US', { timeStyle: 'short' });
-
-  return `${date} | ${startTimeStr}`;
-}
+import { TimeTabs } from './TimeTabs';
+import { InterviewCards } from './InterviewCards';
 
 export function InterviewList() {
+  const [tab, setTab] = useState<'upcoming' | 'past'>('upcoming');
   const { interviews, isPending, error } = useInterviews();
+
+  const now = new Date();
+  const filtered = interviews?.filter((i) =>
+    tab === 'upcoming' ? new Date(i.endTime) > now : new Date(i.endTime) <= now
+  ) || [];
 
   if (isPending) {
     return (
@@ -55,31 +43,9 @@ export function InterviewList() {
   }
 
   return (
-    <ScrollArea>
-      {interviews.map((interview) => (
-        <Card key={interview.id} shadow="sm" padding="sm" withBorder>
-          <Group>
-            <Badge
-              variant="gradient"
-              gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
-              leftSection={<IconCalendarEventFilled size={12} />}
-            >
-              {formatInterviewTime(interview.startTime)}
-            </Badge>
-
-            <Badge>Interviewer</Badge>
-          </Group>
-
-          <Group justify="space-between" mt="sm">
-            <Group>
-              <Avatar />
-              <Text fw="bolder">Interview with Joe</Text>
-            </Group>
-
-            <Button leftSection={<IconVideoFilled />}>Join</Button>
-          </Group>
-        </Card>
-      ))}
-    </ScrollArea>
+    <>
+      <TimeTabs value={tab} onChange={(v) => v && setTab(v as 'upcoming' | 'past')} />
+      <InterviewCards interviews={filtered} />
+    </>
   );
 }

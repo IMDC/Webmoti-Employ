@@ -61,11 +61,11 @@ export function Home() {
             blur: 3,
           }}
         >
-          <ScheduleForm />
+          <ScheduleForm onSuccess={closeScheduleModal} />
         </Modal>
 
         <Flex justify="center" align="center" mt="lg">
-          <Flex direction="column" h={400} w={500} gap="md">
+          <Flex direction="column" h={500} w={500} gap="md">
             <Flex direction="row" gap="sm" justify="center">
               <Popover opened={isNewInterviewPopupOpen} onChange={setIsNewInterviewPopupOpen}>
                 <Popover.Target>

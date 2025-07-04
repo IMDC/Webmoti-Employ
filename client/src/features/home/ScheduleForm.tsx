@@ -46,7 +46,11 @@ function openGoogleCalendarTab(startTime: Date, endTime: Date, invites: string[]
   window.open(url, '_blank');
 }
 
-export function ScheduleForm() {
+interface ScheduleFormProps {
+  onSuccess: () => void;
+}
+
+export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
   const { scheduleInterviewMutation, isScheduleInterviewPending } = useScheduleInterview();
   const { user } = useUser();
 
@@ -88,6 +92,8 @@ export function ScheduleForm() {
         const inviteEmails = values.invites.map((i) => i.email);
         openGoogleCalendarTab(startTime, endTime, inviteEmails);
       }
+
+      onSuccess();
     } catch (error: unknown) {
       if (error instanceof HttpError) {
         setError({ message: error.message, status: error.status, details: error.details });
