@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { BaseContext } from "../../..";
-import { zValidator } from "@hono/zod-validator";
 import { generateZoomJwt } from "../jwt";
 import { z } from "zod/v4";
+import { zValidator } from "../../../validator-wrapper";
 
 const startSessionRoute = new Hono<BaseContext>();
 

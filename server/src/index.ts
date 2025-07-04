@@ -28,6 +28,11 @@ app.use("*", async (c, next) => {
   return next();
 });
 
+app.onError((err, c) => {
+  console.error(err);
+  return c.json({ error: "Internal Server Error" }, 500);
+});
+
 app.route("/sessions", sessionsRoute);
 app.route("/interviews", interviewsRoute);
 

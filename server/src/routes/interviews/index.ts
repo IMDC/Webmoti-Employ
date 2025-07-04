@@ -6,8 +6,8 @@ import {
   getAllInterviews,
 } from "./db-queries";
 import { dbMiddleware } from "../../db/dbMiddleware";
-import { zValidator } from "@hono/zod-validator";
 import { interviewDeleteSchema, interviewPostSchema } from "./schema";
+import { zValidator } from "../../validator-wrapper";
 
 const interviewsRoute = new Hono<DbContext>();
 
