@@ -56,6 +56,10 @@ export function Home() {
           opened={isScheduleModalOpened}
           onClose={closeScheduleModal}
           title={<Text fw="bolder">New Interview</Text>}
+          overlayProps={{
+            backgroundOpacity: 0.55,
+            blur: 3,
+          }}
         >
           <ScheduleForm />
         </Modal>

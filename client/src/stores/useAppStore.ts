@@ -1,10 +1,17 @@
 import { create } from 'zustand';
+import { Json } from '@/types/Json';
 
 type PermissionState = 'idle' | 'acquiring' | 'granted' | 'denied';
 
+export type AppError = {
+  message: string;
+  status?: number;
+  details?: Json;
+};
+
 type AppStore = {
-  error: string | null;
-  setError: (error: string | null) => void;
+  error: AppError | null;
+  setError: (error: AppError | null) => void;
   clearError: () => void;
 
   // TODO move this to useZoomSessionStore

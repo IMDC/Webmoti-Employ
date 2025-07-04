@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod/v4';
+import { HttpError } from '@/utils/HttpError';
 import { InterviewCreate, InterviewsResponseSchema } from './schema';
 
 const queryKeys = {
@@ -48,7 +49,8 @@ async function scheduleInterview(interview: InterviewCreate) {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to schedule interview: ${response.status}`);
+    const data = await response.json();
+    throw new HttpError('Failed to schedule interview', response.status, data);
   }
 }
 

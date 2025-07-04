@@ -43,7 +43,7 @@ export const useDeviceStore = create<DeviceStore>((set) => ({
     const hasPermission = [...videoDevices, ...audioInputDevices].some(isValidDevice);
 
     if (!hasPermission) {
-      appState.setError('Could not access media devices');
+      appState.setError({ message: 'Could not access media devices' });
       appState.setPermissionState('denied');
       appState.setIsVideoOn(false);
       appState.setIsAudioOn(false);
