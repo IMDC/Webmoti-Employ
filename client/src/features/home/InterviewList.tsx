@@ -1,6 +1,4 @@
 import { IconCalendarEventFilled, IconVideoFilled } from '@tabler/icons-react';
-import { useQuery } from '@tanstack/react-query';
-import { z } from 'zod/v4';
 import {
   Avatar,
   Badge,
@@ -13,19 +11,7 @@ import {
   Stack,
   Text,
 } from '@mantine/core';
-import { InterviewsResponseSchema } from './schema';
-
-async function getInterviews() {
-  const response = await fetch('/api/interviews');
-  const json = await response.json();
-
-  const result = InterviewsResponseSchema.safeParse(json);
-  if (!result.success) {
-    throw new Error(z.prettifyError(result.error));
-  }
-
-  return result.data.interviews;
-}
+import { useInterviews } from './queries';
 
 function formatInterviewTime(startTime: Date, endTime: Date) {
   const start = new Date(startTime);
@@ -39,14 +25,7 @@ function formatInterviewTime(startTime: Date, endTime: Date) {
 }
 
 export function InterviewList() {
-  const {
-    data: interviews,
-    isPending,
-    error,
-  } = useQuery({
-    queryKey: ['interviews'],
-    queryFn: getInterviews,
-  });
+  const { interviews, isPending, error } = useInterviews();
 
   if (isPending) {
     return (
@@ -69,7 +48,7 @@ export function InterviewList() {
     );
   }
 
-  if (!interviews) {
+  if (!interviews || interviews.length === 0) {
     return (
       <Center>
         <Text fw="bolder">You have no scheduled interviews</Text>

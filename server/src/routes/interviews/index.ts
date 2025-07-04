@@ -1,6 +1,10 @@
 import { Hono } from "hono";
 import { DbContext } from "../..";
-import { createInterview, deleteInterview, getAllInterviews } from "./queries";
+import {
+  createInterview,
+  deleteInterview,
+  getAllInterviews,
+} from "./db-queries";
 import { dbMiddleware } from "../../db/dbMiddleware";
 import { zValidator } from "@hono/zod-validator";
 import { interviewDeleteSchema, interviewPostSchema } from "./schema";
@@ -32,8 +36,6 @@ interviewsRoute.post(
       console.error("Error creating interview: ", error);
       return c.json({ error: "Error creating interview" }, 500);
     }
-
-    return c.text("Hello Hono!");
   }
 );
 
@@ -49,8 +51,6 @@ interviewsRoute.delete(
       console.error("Error deleting interview: ", error);
       return c.json({ error: "Error deleting interview" }, 500);
     }
-
-    return c.text("Hello Hono!");
   }
 );
 
