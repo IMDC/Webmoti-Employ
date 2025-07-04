@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { UserButton } from '@clerk/clerk-react';
 import { IconCalendarPlus, IconSquareRoundedPlusFilled, IconVideoPlus } from '@tabler/icons-react';
+import { useRouter } from '@tanstack/react-router';
 import {
   AppShell,
   Button,
@@ -22,6 +23,8 @@ export function Home() {
   const [isNewInterviewPopupOpen, setIsNewInterviewPopupOpen] = useState(false);
   const [isScheduleModalOpened, { open: openScheduleModal, close: closeScheduleModal }] =
     useDisclosure(false);
+
+  const router = useRouter();
 
   return (
     <AppShell
@@ -72,7 +75,14 @@ export function Home() {
 
                 <Popover.Dropdown>
                   <Stack>
-                    <Button leftSection={<IconVideoPlus />}>Start interview now</Button>
+                    <Button
+                      leftSection={<IconVideoPlus />}
+                      onClick={() => {
+                        router.navigate({ to: '/interview/prejoin/create' });
+                      }}
+                    >
+                      Start interview now
+                    </Button>
                     <Button
                       leftSection={<IconCalendarPlus />}
                       onClick={() => {

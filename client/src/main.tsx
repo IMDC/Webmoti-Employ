@@ -17,7 +17,7 @@ if (!CLERK_PUBLISHABLE_KEY) {
   throw new Error('Missing Clerk Publishable Key');
 }
 
-const router = createRouter({ routeTree });
+const router = createRouter({ routeTree, notFoundMode: 'root' });
 
 // Register the router instance for type safety
 declare module '@tanstack/react-router' {
