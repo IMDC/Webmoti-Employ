@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
-import { Box, Button, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
-import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
+import { Button, Center, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore';
 import { useAppStore } from '@/stores/useAppStore';
 import { useDeviceStore } from '@/stores/useDeviceStore';
@@ -31,10 +30,6 @@ export function PrejoinScreen() {
 
   return (
     <Center mih="100vh">
-      <Box pos="absolute" top={16} left={16}>
-        <ColorSchemeToggle />
-      </Box>
-
       <Group>
         <Stack>
           <PreviewTile height={196.875} width={350} />

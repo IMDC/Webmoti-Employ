@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { GALLERY_VIEW_ASPECT_RATIO, GALLERY_VIEW_MARGIN } from '@/constants';
-import { getFittedSize } from '@/utils';
+import { GALLERY_VIEW_ASPECT_RATIO, GALLERY_VIEW_MARGIN } from '@/utils/constants';
+import { getFittedSize } from '@/utils/utils';
 import { useContainerDimensions } from './useContainerDimensions';
 
 export function useSingleLayout(containerRef: React.RefObject<HTMLDivElement | null>) {

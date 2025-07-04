@@ -1,6 +1,5 @@
-import { AspectRatio, Box } from '@mantine/core';
-import { GALLERY_VIEW_MARGIN } from '@/constants';
-import { ParticipantTile } from '../../components/ParticipantTile';
+import { Box } from '@mantine/core';
+import { GALLERY_VIEW_MARGIN } from '@/utils/constants';
 
 export function SpotlightView() {
   return (
@@ -13,7 +12,7 @@ export function SpotlightView() {
           position: 'relative',
         }}
       >
-        <ParticipantTile width="100%" height="100%" />
+        {/* <ParticipantTile width="100%" height="100%" />
 
         <AspectRatio
           ratio={16 / 9}
@@ -25,7 +24,7 @@ export function SpotlightView() {
           }}
         >
           <ParticipantTile width="100%" height="100%" />
-        </AspectRatio>
+        </AspectRatio> */}
       </Box>
     </>
   );

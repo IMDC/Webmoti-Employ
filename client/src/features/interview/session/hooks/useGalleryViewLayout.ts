@@ -1,5 +1,5 @@
-import { GALLERY_VIEW_ASPECT_RATIO, GALLERY_VIEW_MARGIN } from '@/constants';
 import { useEffect, useState } from 'react';
+import { GALLERY_VIEW_ASPECT_RATIO, GALLERY_VIEW_MARGIN } from '@/utils/constants';
 import { useContainerDimensions } from './useContainerDimensions';
 
 /**

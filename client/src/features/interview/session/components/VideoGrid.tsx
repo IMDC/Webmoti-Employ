@@ -1,5 +1,5 @@
 import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore';
-import { GALLERY_VIEW_ASPECT_RATIO } from '../../../../constants';
+import { GALLERY_VIEW_ASPECT_RATIO } from '../../../../utils/constants';
 import useGalleryViewLayout from '../hooks/useGalleryViewLayout';
 import { SessionTile } from './SessionTile';
 
