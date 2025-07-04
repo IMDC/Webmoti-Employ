@@ -1,10 +1,14 @@
 import { Hono } from "hono";
 import { BaseContext } from "../../..";
 import { zValidator } from "@hono/zod-validator";
-import { StartSessionSchema } from "./schema";
 import { generateZoomJwt } from "../jwt";
+import { z } from "zod/v4";
 
 const startSessionRoute = new Hono<BaseContext>();
+
+const StartSessionSchema = z.object({
+  userIdentity: z.string().max(34),
+});
 
 startSessionRoute.post(
   "/",

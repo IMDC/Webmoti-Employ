@@ -12,10 +12,13 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export interface Interview {
+  createdAt: Generated<Timestamp>;
   creatorId: string;
   endTime: Timestamp;
   id: Generated<number>;
+  sessionName: Generated<string>;
   startTime: Timestamp;
+  updatedAt: Generated<Timestamp>;
 }
 
 export interface InterviewInvite {
