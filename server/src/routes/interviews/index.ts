@@ -24,18 +24,15 @@ interviewsRoute.post(
   async (c) => {
     const data = c.req.valid("json");
 
-    try {
-      await createInterview(
-        c.var.db,
-        data.creatorId,
-        data.startTime,
-        data.endTime,
-        data.invites
-      );
-    } catch (error) {
-      console.error("Error creating interview: ", error);
-      return c.json({ error: "Error creating interview" }, 500);
-    }
+    await createInterview(
+      c.var.db,
+      data.creatorId,
+      data.startTime,
+      data.endTime,
+      data.invites
+    );
+
+    return c.json({ message: "Interview created" }, 201);
   }
 );
 
@@ -45,12 +42,9 @@ interviewsRoute.delete(
   async (c) => {
     const { id } = c.req.valid("param");
 
-    try {
-      await deleteInterview(c.var.db, id);
-    } catch (error) {
-      console.error("Error deleting interview: ", error);
-      return c.json({ error: "Error deleting interview" }, 500);
-    }
+    await deleteInterview(c.var.db, id);
+
+    return c.body(null, 204);
   }
 );
 

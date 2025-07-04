@@ -1,6 +1,12 @@
-import { IconTrash } from '@tabler/icons-react';
+import { useUser } from '@clerk/clerk-react';
+import {
+  IconAt,
+  IconCalendarFilled,
+  IconCalendarPlus,
+  IconMailFast,
+  IconTrash,
+} from '@tabler/icons-react';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { z } from 'zod/v4';
 import {
   ActionIcon,
   Button,
@@ -14,19 +20,12 @@ import {
 } from '@mantine/core';
 import { DatePickerInput, getTimeRange, TimeGrid } from '@mantine/dates';
 import { useForm } from '@mantine/form';
+import { useAppStore } from '@/stores/useAppStore';
+import { HttpError } from '@/utils/HttpError';
+import { useScheduleInterview } from './queries';
+import { ScheduleInterview, ScheduleInterviewSchema } from './schema';
 
-const ScheduleInterviewSchema = z.object({
-  date: z.coerce.date(),
-  startTime: z.string().regex(/^\d{2}:\d{2}$/), // ex: "09:00"
-  invites: z.array(z.object({ email: z.email() })),
-  openGoogleCalendar: z.boolean(),
-});
-
-type ScheduleInterview = z.infer<typeof ScheduleInterviewSchema>;
-
-function openGoogleCalendarTab(start: Date, invites: string[]) {
-  const end = new Date(start.getTime() + 60 * 60 * 1000);
-
+function openGoogleCalendarTab(startTime: Date, endTime: Date, invites: string[]) {
   const formatDate = (d: Date) =>
     `${d
       .toISOString()
@@ -36,8 +35,8 @@ function openGoogleCalendarTab(start: Date, invites: string[]) {
   const title = encodeURIComponent('Interview');
   const description = encodeURIComponent('Virtual interview on the WebMoti-Employ platform');
   const location = encodeURIComponent('WebMoti-Employ');
-  const startDateTime = formatDate(start);
-  const endDateTime = formatDate(end);
+  const startDateTime = formatDate(startTime);
+  const endDateTime = formatDate(endTime);
   const guests = encodeURIComponent(invites.join(','));
 
   // TODO add link to description and location maybe
@@ -48,6 +47,11 @@ function openGoogleCalendarTab(start: Date, invites: string[]) {
 }
 
 export function ScheduleForm() {
+  const { scheduleInterviewMutation, isScheduleInterviewPending } = useScheduleInterview();
+  const { user } = useUser();
+
+  const setError = useAppStore((s) => s.setError);
+
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
@@ -61,23 +65,45 @@ export function ScheduleForm() {
     validate: zod4Resolver(ScheduleInterviewSchema),
   });
 
-  function handleSubmit(values: ScheduleInterview) {
+  async function handleSubmit(values: ScheduleInterview) {
     const [hours, minutes] = values.startTime.split(':').map(Number);
-    const start = new Date(values.date);
-    start.setHours(hours, minutes, 0, 0);
+    const startTime = new Date(values.date);
+    startTime.setHours(hours, minutes, 0, 0);
+    const endTime = new Date(startTime.getTime() + 60 * 60 * 1000);
 
-    if (values.openGoogleCalendar) {
-      const inviteEmails = values.invites.map((i) => i.email);
-      openGoogleCalendarTab(start, inviteEmails);
+    if (!user) {
+      setError({ message: 'User is not set' });
+      return;
     }
 
-    console.log({ ...values, start });
+    try {
+      await scheduleInterviewMutation({
+        creatorId: user.id,
+        startTime,
+        endTime,
+        invites: values.invites,
+      });
+
+      if (values.openGoogleCalendar) {
+        const inviteEmails = values.invites.map((i) => i.email);
+        openGoogleCalendarTab(startTime, endTime, inviteEmails);
+      }
+    } catch (error: unknown) {
+      if (error instanceof HttpError) {
+        setError({ message: error.message, status: error.status, details: error.details });
+      } else if (error instanceof Error) {
+        setError({ message: 'Failed to schedule interview', details: error.message });
+      } else {
+        setError({ message: 'Failed to schedule interview' });
+      }
+    }
   }
 
   const invites = form.getValues().invites.map((_, index) => (
     <Group key={index}>
       <TextInput
         placeholder="Email address"
+        leftSection={<IconAt size={16} />}
         withAsterisk
         style={{ flex: 1 }}
         key={form.key(`invites.${index}.email`)}
@@ -96,9 +122,12 @@ export function ScheduleForm() {
 
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>
-      <Stack>
+      <Stack pl="md" pr="md" pb="sm">
         <DatePickerInput
           withAsterisk
+          minDate={new Date()}
+          defaultDate={new Date(Date.now() + 86400000)}
+          leftSection={<IconCalendarFilled size={16} />}
           label="Interview date"
           key={form.key('date')}
           {...form.getInputProps('date')}
@@ -107,7 +136,7 @@ export function ScheduleForm() {
         <Input.Wrapper label="Interview time" withAsterisk {...form.getInputProps('startTime')}>
           <TimeGrid
             defaultValue="09:00"
-            data={getTimeRange({ startTime: '09:00', endTime: '17:00', interval: '01:00' })}
+            data={getTimeRange({ startTime: '09:00', endTime: '16:00', interval: '00:30' })}
             format="12h"
             key={form.key('startTime')}
           />
@@ -121,7 +150,10 @@ export function ScheduleForm() {
               You haven't invited anyone
             </Text>
           )}
-          <Button onClick={() => form.insertListItem('invites', { email: '' })}>
+          <Button
+            onClick={() => form.insertListItem('invites', { email: '' })}
+            leftSection={<IconMailFast />}
+          >
             Add invitation
           </Button>
         </Group>
@@ -142,7 +174,13 @@ export function ScheduleForm() {
           </Tooltip>
         </Group>
 
-        <Button type="submit">Schedule interview</Button>
+        <Button
+          type="submit"
+          loading={isScheduleInterviewPending}
+          leftSection={<IconCalendarPlus />}
+        >
+          Schedule interview
+        </Button>
       </Stack>
     </form>
   );

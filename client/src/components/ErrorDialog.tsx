@@ -10,11 +10,16 @@ export function formatAppError(error: AppError): string {
     lines.push(`Status: ${status}`);
   }
 
-  lines.push(`Message: ${message}`);
+  if (message && message.length > 0) {
+    lines.push(`Message: ${message}`);
+  }
 
   if (details !== undefined) {
     const detailsText = typeof details === 'string' ? details : JSON.stringify(details, null, 2);
-    lines.push(`Details:\n${detailsText}`);
+
+    if (detailsText.length > 0) {
+      lines.push(`Details:\n${detailsText}`);
+    }
   }
 
   return lines.join('\n');

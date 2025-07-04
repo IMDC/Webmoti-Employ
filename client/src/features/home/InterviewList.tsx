@@ -13,15 +13,13 @@ import {
 } from '@mantine/core';
 import { useInterviews } from './queries';
 
-function formatInterviewTime(startTime: Date, endTime: Date) {
+function formatInterviewTime(startTime: Date) {
   const start = new Date(startTime);
-  const end = new Date(endTime);
 
   const date = start.toLocaleDateString('en-US', { dateStyle: 'medium' });
   const startTimeStr = start.toLocaleTimeString('en-US', { timeStyle: 'short' });
-  const endTimeStr = end.toLocaleTimeString('en-US', { timeStyle: 'short' });
 
-  return `${date}, ${startTimeStr} to ${endTimeStr}`;
+  return `${date} | ${startTimeStr}`;
 }
 
 export function InterviewList() {
@@ -66,7 +64,7 @@ export function InterviewList() {
               gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
               leftSection={<IconCalendarEventFilled size={12} />}
             >
-              {formatInterviewTime(interview.startTime, interview.endTime)}
+              {formatInterviewTime(interview.startTime)}
             </Badge>
 
             <Badge>Interviewer</Badge>
