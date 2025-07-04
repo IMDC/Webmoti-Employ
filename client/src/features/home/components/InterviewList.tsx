@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Center, Skeleton, Stack, Text } from '@mantine/core';
-import { useInterviews } from './queries';
+import { useInterviews } from '../queries';
 import { TimeTabs } from './TimeTabs';
 import { InterviewCards } from './InterviewCards';
 
@@ -9,9 +9,10 @@ export function InterviewList() {
   const { interviews, isPending, error } = useInterviews();
 
   const now = new Date();
-  const filtered = interviews?.filter((i) =>
-    tab === 'upcoming' ? new Date(i.endTime) > now : new Date(i.endTime) <= now
-  ) || [];
+  const filtered =
+    interviews?.filter((i) =>
+      tab === 'upcoming' ? new Date(i.endTime) > now : new Date(i.endTime) <= now
+    ) || [];
 
   if (isPending) {
     return (

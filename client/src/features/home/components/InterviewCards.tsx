@@ -1,6 +1,6 @@
 import { IconCalendarEventFilled, IconVideoFilled } from '@tabler/icons-react';
 import { Avatar, Badge, Button, Card, Center, Group, ScrollArea, Stack, Text } from '@mantine/core';
-import { Interview } from './schema';
+import { Interview } from '../schema';
 
 interface InterviewCardsProps {
   interviews: Interview[];

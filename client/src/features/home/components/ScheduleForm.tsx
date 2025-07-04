@@ -22,8 +22,8 @@ import { DatePickerInput, getTimeRange, TimeGrid } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { useAppStore } from '@/stores/useAppStore';
 import { HttpError } from '@/utils/HttpError';
-import { useScheduleInterview } from './queries';
-import { ScheduleInterview, ScheduleInterviewSchema } from './schema';
+import { useScheduleInterview } from '../queries';
+import { ScheduleInterview, ScheduleInterviewSchema } from '../schema';
 
 function openGoogleCalendarTab(startTime: Date, endTime: Date, invites: string[]) {
   const formatDate = (d: Date) =>

@@ -16,8 +16,8 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
-import { InterviewList } from './InterviewList';
-import { ScheduleForm } from './ScheduleForm';
+import { InterviewList } from './components/InterviewList';
+import { ScheduleForm } from './components/ScheduleForm';
 
 export function Home() {
   const [isNewInterviewPopupOpen, setIsNewInterviewPopupOpen] = useState(false);
