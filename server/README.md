@@ -93,7 +93,7 @@ The database is postgres deployed with the Neon service. We also use Cloudflare 
 <https://developers.cloudflare.com/hyperdrive/get-started/>
 
 1. Login to cloudflare: `npx wrangler login`
-2. `npx wrangler hyperdrive create <YOUR_CONFIG_NAME> --connection-string="postgres://user:password@HOSTNAME_OR_IP_ADDRESS:PORT/database_name"`
+2. `npx wrangler hyperdrive create <YOUR_CONFIG_NAME> --connection-string="<MY_CONNECTION_STRING>"` (You get this connection string from the Neon dashboard. Make sure you turn off Connection pooling before copying it: <https://neon.com/blog/hyperdrive-neon-faq#so-should-i-use-hyperdrive-together-with-neons-pooling>) (If you already initialized it, you can update it like this: `npx wrangler hyperdrive update <MY_HYPERDRIVE_ID> --connection-string "<MY_CONNECTION_STRING_WITHOUT_POOLING>"`)
 
 Disable caching to prevent stale reads:
 <https://developers.cloudflare.com/hyperdrive/configuration/query-caching/>
