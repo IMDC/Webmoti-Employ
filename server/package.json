@@ -8,6 +8,7 @@
     "postinstall": "pnpm run cf-typegen"
   },
   "dependencies": {
+    "@hono/clerk-auth": "^3.0.1",
     "@hono/zod-validator": "^0.7.0",
     "@types/pg": "^8.15.4",
     "hono": "^4.8.3",
