@@ -35,7 +35,7 @@ async function getSessions(jwt: string) {
   return parsed.sessions;
 }
 
-export async function querySession(jwt: string) {
+export async function querySession(jwt: string, id: string) {
   try {
     const sessions = await getSessions(jwt);
 

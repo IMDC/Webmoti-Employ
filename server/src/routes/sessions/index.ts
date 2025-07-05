@@ -11,20 +11,20 @@ const StartSessionSchema = z.object({
   userIdentity: z.string().max(34),
 });
 
-sessionsRoute.post("/", zValidator("json", StartSessionSchema), async (c) => {
-  const data = c.req.valid("json");
+sessionsRoute.get("/", zValidator("query", StartSessionSchema), async (c) => {
+  const { userIdentity } = c.req.valid("query");
 
   const sessionName = crypto.randomUUID();
 
-  const jwt = await generateZoomJwt({
+  const token = await generateZoomJwt({
     zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
     zoomVideoSdkSecret: c.env.ZOOM_VIDEO_SDK_SECRET,
     sessionName: sessionName,
-    userIdentity: data.userIdentity,
+    userIdentity,
     role: 1,
   });
 
-  return c.json({ signature: jwt });
+  return c.json({ sessionName, token });
 });
 
 const JoinSessionSchema = z.object({
@@ -32,27 +32,37 @@ const JoinSessionSchema = z.object({
   sessionName: z.string().min(1).max(199),
 });
 
-sessionsRoute.post("/:id", zValidator("json", JoinSessionSchema), async (c) => {
-  const data = c.req.valid("json");
-
-  //   const adminJwt = await generateZoomJwt({
-  //     zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
-  //     zoomVideoSdkSecret: c.env.ZOOM_VIDEO_SDK_SECRET,
-  //     sessionName: data.sessionName,
-  //     role: 1,
-  //   });
-
-  //   await querySession(adminJwt);
-
-  //   const jwt = await generateZoomJwt({
-  //     zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
-  //     zoomVideoSdkSecret: c.env.ZOOM_VIDEO_SDK_SECRET,
-  //     sessionName: data.sessionName,
-  //     userIdentity: data.userIdentity,
-  //     role: 1,
-  //   });
-
-  return c.json({ signature: "jwt" });
+const RouteParamSchema = z.object({
+  id: z.string().min(1),
 });
+
+sessionsRoute.get(
+  "/:id",
+  zValidator("param", RouteParamSchema),
+  zValidator("query", JoinSessionSchema),
+  async (c) => {
+    const { id } = c.req.valid("param");
+    const { userIdentity, sessionName } = c.req.valid("query");
+
+    const adminJwt = await generateZoomJwt({
+      zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
+      zoomVideoSdkSecret: c.env.ZOOM_VIDEO_SDK_SECRET,
+      sessionName,
+      role: 1,
+    });
+
+    await querySession(adminJwt, id);
+
+    const token = await generateZoomJwt({
+      zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
+      zoomVideoSdkSecret: c.env.ZOOM_VIDEO_SDK_SECRET,
+      sessionName,
+      userIdentity,
+      role: 1,
+    });
+
+    return c.json({ sessionName, token });
+  }
+);
 
 export default sessionsRoute;
