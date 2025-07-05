@@ -1,7 +1,7 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router';
 import { Center, Divider, Group, Title } from '@mantine/core';
-import { ErrorDialog } from '@/components/ErrorDialog';
 import { Notifications } from '@mantine/notifications';
+import { ErrorDialog } from '@/components/ErrorDialog';
 
 export const Route = createRootRoute({
   component: RootRoute,

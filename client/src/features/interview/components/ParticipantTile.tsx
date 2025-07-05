@@ -1,5 +1,5 @@
-import { Corner } from '@/components/Corner';
 import { Card, Text } from '@mantine/core';
+import { Corner } from '@/components/Corner';
 import { NoVideoBackground } from './NoVideoBackground';
 
 interface ParticipantTileProps {

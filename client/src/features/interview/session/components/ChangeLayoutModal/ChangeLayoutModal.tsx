@@ -2,10 +2,10 @@ import { useState } from 'react';
 import {
   IconLayoutDashboard,
   IconLayoutGrid,
-  IconSquare,
   IconLayoutSidebarRight,
+  IconSquare,
 } from '@tabler/icons-react';
-import { Modal, Radio, Group, Stack, Text } from '@mantine/core';
+import { Group, Modal, Radio, Stack, Text } from '@mantine/core';
 import classes from './ChangeLayoutModal.module.css';
 
 interface ChangeLayoutModalProps {

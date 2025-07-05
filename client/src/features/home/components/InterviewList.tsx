@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Center, Skeleton, Stack, Text } from '@mantine/core';
 import { useInterviews } from '../queries';
-import { TimeTabs } from './TimeTabs';
 import { InterviewCards } from './InterviewCards';
+import { TimeTabs } from './TimeTabs';
 
 export function InterviewList() {
   const [tab, setTab] = useState<'upcoming' | 'past'>('upcoming');
