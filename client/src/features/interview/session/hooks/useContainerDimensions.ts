@@ -11,7 +11,7 @@ export function useContainerDimensions(containerRef: React.RefObject<HTMLElement
       width: containerRef.current.offsetWidth,
       height: containerRef.current.offsetHeight,
     });
-  }, []);
+  }, [containerRef]);
 
   useEffect(() => {
     const observer = new window.ResizeObserver(updateLayout);
@@ -19,7 +19,7 @@ export function useContainerDimensions(containerRef: React.RefObject<HTMLElement
     return () => {
       observer.disconnect();
     };
-  }, [updateLayout]);
+  }, [updateLayout, containerRef]);
 
   useLayoutEffect(updateLayout, [updateLayout]);
 

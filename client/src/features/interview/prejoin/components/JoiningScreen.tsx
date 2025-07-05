@@ -14,7 +14,15 @@ export function JoiningScreen({ visible }: JoiningScreenProps) {
       exitDuration={0}
     >
       {(styles) => (
-        <Center h="100vh" bg="black" style={styles}>
+        <Center
+          style={{
+            ...styles,
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'black',
+            zIndex: 1000,
+          }}
+        >
           <Group>
             <Loader color="white" />
             <Text size="lg">Joining...</Text>

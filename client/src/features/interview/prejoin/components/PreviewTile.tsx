@@ -33,7 +33,7 @@ export function PreviewTile({ height, width }: PreviewTileProps) {
     }
 
     startMic();
-  }, [permissionState]);
+  }, [permissionState, startMicrophone]);
 
   // polling to update volume indicator
   useEffect(() => {

@@ -16,7 +16,7 @@ export function ZoomSessionContextProvider({ children }: ZoomSessionContextProvi
     return () => {
       store.getState().cleanup();
     };
-  }, []);
+  }, [store]);
 
   return <ZoomSessionContext.Provider value={store}>{children}</ZoomSessionContext.Provider>;
 }

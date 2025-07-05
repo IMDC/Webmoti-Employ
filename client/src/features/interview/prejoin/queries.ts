@@ -62,8 +62,7 @@ export function useInterviewSession(args: InterviewSessionArgs) {
   } = useQuery({
     queryKey: getInterviewSessionKey(args),
     queryFn: () => fetchInterviewSession(args),
-    staleTime: 1000 * 60 * 60 * 2, // 2 hours (same as jwt exp)
-    refetchInterval: 1000 * 60 * 105, // 1 hour 45 minutes
+    refetchInterval: 1000 * 60 * 105, // 1 hour 45 minutes (15 less than jwt exp)
     refetchIntervalInBackground: true,
   });
 

@@ -16,7 +16,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
     return () => {
       store.getState().cleanup();
     };
-  }, []);
+  }, [store]);
 
   return <ChatStoreContext.Provider value={store}>{children}</ChatStoreContext.Provider>;
 }

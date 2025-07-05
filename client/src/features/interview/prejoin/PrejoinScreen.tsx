@@ -2,10 +2,13 @@ import { useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { Button, Center, Group, Loader, Stack, Text, Title } from '@mantine/core';
+import { CopyButton } from '@/components/CopyButton';
 import { useAppStore } from '@/stores/useAppStore';
 import { useDeviceStore } from '@/stores/useDeviceStore';
 import { useZoomPreviewStore } from '@/stores/usePreviewStore';
 import { MenuBar } from '../components/MenuBar';
+import { useZoomSessionStore } from '../zoom/useZoomSessionStore';
+import { JoiningScreen } from './components/JoiningScreen';
 import { PreviewTile } from './components/PreviewTile';
 import { InterviewSessionArgs, useInterviewSession } from './queries';
 
@@ -16,22 +19,19 @@ export function PrejoinScreen() {
   const switchCamera = useZoomPreviewStore((s) => s.switchCamera);
   const switchMicrophone = useZoomPreviewStore((s) => s.switchMicrophone);
 
-  const setError = useAppStore((s) => s.setError);
   const permissionState = useAppStore((s) => s.permissionState);
 
   const navigate = useNavigate();
 
   const initDevices = useDeviceStore((s) => s.initDevices);
 
+  const callState = useZoomSessionStore((s) => s.callState);
+  const joinZoom = useZoomSessionStore((s) => s.join);
+
   const { user } = useUser();
   const { id: sessionId } = useParams({ strict: false });
 
-  if (!user) {
-    setError({ message: 'User is null' });
-    return null;
-  }
-
-  const userIdentity = getUserIdentity(user);
+  const userIdentity = getUserIdentity(user!);
   const args = buildInterviewSessionArgs(sessionId, userIdentity);
 
   const { interviewSession, isInterviewSessionPending, interviewSessionError } =
@@ -43,6 +43,15 @@ export function PrejoinScreen() {
       useDeviceStore.getState().initDevices();
     }
   }, [interviewSession]);
+
+  useEffect(() => {
+    if (callState === 'joined' && interviewSession) {
+      navigate({
+        to: '/interview/$id',
+        params: { id: interviewSession.sessionName },
+      });
+    }
+  }, [callState, interviewSession, navigate]);
 
   if (isInterviewSessionPending) {
     return (
@@ -64,42 +73,57 @@ export function PrejoinScreen() {
     );
   }
 
+  if (!interviewSession) {
+    return null;
+  }
+
   return (
-    <Center mih="100vh">
-      <Group>
-        <Stack>
-          <PreviewTile height={196.875} width={350} />
+    <>
+      {/* stay visible when joined to avoid hiding while navigating */}
+      <JoiningScreen visible={callState === 'joining' || callState === 'joined'} />
 
-          <MenuBar
-            onToggleMic={async () => {
-              if (permissionState !== 'granted') {
-                await initDevices();
-                return;
+      <Center mih="100vh">
+        <Group>
+          <Stack>
+            <PreviewTile height={196.875} width={350} />
+
+            <MenuBar
+              onToggleMic={async () => {
+                if (permissionState !== 'granted') {
+                  await initDevices();
+                  return;
+                }
+                toggleMuteMicrophone();
+              }}
+              onToggleVideo={async () => {
+                if (permissionState !== 'granted') {
+                  await initDevices();
+                  return;
+                }
+                toggleIsVideoOn();
+              }}
+              onChangeAudioInputDevice={switchMicrophone}
+              onChangeVideoDevice={switchCamera}
+              isPrejoin
+              disableMediaButtons={permissionState === 'idle' || permissionState === 'acquiring'}
+            />
+          </Stack>
+
+          <Stack>
+            <Title>{`${args.action === 'create' ? 'New' : 'Join'} Interview`}</Title>
+            <Group>
+              <CopyButton copyText={interviewSession.sessionName} />
+              <Text>{interviewSession?.sessionName}</Text>
+            </Group>
+            <Button
+              onClick={async () =>
+                joinZoom(userIdentity, interviewSession.sessionName, interviewSession.token)
               }
-              toggleMuteMicrophone();
-            }}
-            onToggleVideo={async () => {
-              if (permissionState !== 'granted') {
-                await initDevices();
-                return;
-              }
-              toggleIsVideoOn();
-            }}
-            onChangeAudioInputDevice={switchMicrophone}
-            onChangeVideoDevice={switchCamera}
-            isPrejoin
-            disableMediaButtons={permissionState === 'idle' || permissionState === 'acquiring'}
-          />
-        </Stack>
-
-        <Stack>
-          <Title>Interview with Joe</Title>
-          <Text>2 PM</Text>
-
-          <Button>Join now</Button>
-        </Stack>
-      </Group>
-    </Center>
+            >{`${args.action === 'create' ? 'Start' : 'Join'}`}</Button>
+          </Stack>
+        </Group>
+      </Center>
+    </>
   );
 }
 
