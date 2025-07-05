@@ -21,7 +21,7 @@ import {
 import { DatePickerInput, getTimeRange, TimeGrid } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { useAppStore } from '@/stores/useAppStore';
-import { HttpError } from '@/utils/HttpError';
+import { handleServerError } from '@/utils/utils';
 import { useScheduleInterview } from '../queries';
 import { ScheduleInterview, ScheduleInterviewSchema } from '../schema';
 
@@ -95,13 +95,7 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
 
       onSuccess();
     } catch (error: unknown) {
-      if (error instanceof HttpError) {
-        setError({ message: error.message, status: error.status, details: error.details });
-      } else if (error instanceof Error) {
-        setError({ message: 'Failed to schedule interview', details: error.message });
-      } else {
-        setError({ message: 'Failed to schedule interview' });
-      }
+      handleServerError(error, setError, 'Failed to schedule interview');
     }
   }
 

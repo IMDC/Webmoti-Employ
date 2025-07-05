@@ -1,3 +1,6 @@
+import { AppError } from '@/stores/useAppStore';
+import { HttpError } from './HttpError';
+
 export function getFittedSize(
   containerWidth: number,
   containerHeight: number,
@@ -12,4 +15,18 @@ export function getFittedSize(
   }
 
   return [width, height];
+}
+
+export function handleServerError(
+  error: unknown,
+  setError: (e: AppError) => void,
+  defaultMessage: string
+) {
+  if (error instanceof HttpError) {
+    setError({ message: error.message, status: error.status, details: error.details });
+  } else if (error instanceof Error) {
+    setError({ message: defaultMessage, details: error.message });
+  } else {
+    setError({ message: defaultMessage });
+  }
 }

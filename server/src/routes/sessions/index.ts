@@ -7,11 +7,11 @@ import { querySession } from "./querySession";
 
 const sessionsRoute = new Hono<BaseContext>();
 
-const StartSessionSchema = z.object({
+const CreateQuerySchema = z.object({
   userIdentity: z.string().max(34),
 });
 
-sessionsRoute.get("/", zValidator("query", StartSessionSchema), async (c) => {
+sessionsRoute.get("/", zValidator("query", CreateQuerySchema), async (c) => {
   const { userIdentity } = c.req.valid("query");
 
   const sessionName = crypto.randomUUID();
@@ -27,22 +27,21 @@ sessionsRoute.get("/", zValidator("query", StartSessionSchema), async (c) => {
   return c.json({ sessionName, token });
 });
 
-const JoinSessionSchema = z.object({
+const JoinQuerySchema = z.object({
   userIdentity: z.string().max(34),
-  sessionName: z.string().min(1).max(199),
 });
 
-const RouteParamSchema = z.object({
-  id: z.string().min(1),
+const JoinParamSchema = z.object({
+  sessionName: z.string().min(1).max(199),
 });
 
 sessionsRoute.get(
   "/:id",
-  zValidator("param", RouteParamSchema),
-  zValidator("query", JoinSessionSchema),
+  zValidator("param", JoinParamSchema),
+  zValidator("query", JoinQuerySchema),
   async (c) => {
-    const { id } = c.req.valid("param");
-    const { userIdentity, sessionName } = c.req.valid("query");
+    const { sessionName } = c.req.valid("param");
+    const { userIdentity } = c.req.valid("query");
 
     const adminJwt = await generateZoomJwt({
       zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
@@ -51,7 +50,7 @@ sessionsRoute.get(
       role: 1,
     });
 
-    await querySession(adminJwt, id);
+    await querySession(adminJwt, sessionName);
 
     const token = await generateZoomJwt({
       zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
