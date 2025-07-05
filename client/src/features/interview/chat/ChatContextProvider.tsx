@@ -10,24 +10,13 @@ interface ChatContextProviderProps {
 
 export function ChatContextProvider({ children }: ChatContextProviderProps) {
   const zoomClient = useZoomSessionStore((s) => s.client);
-  const [store, setStore] = useState<StoreApi<ChatStore> | null>(null);
+  const [store] = useState<StoreApi<ChatStore>>(() => createChatStore(zoomClient));
 
   useEffect(() => {
-    if (!zoomClient) {
-      return;
-    }
-
-    const chatStore = createChatStore(zoomClient);
-    setStore(chatStore);
-
     return () => {
-      chatStore.getState().cleanup();
+      store.getState().cleanup();
     };
-  }, [zoomClient]);
-
-  if (!store) {
-    return null;
-  }
+  }, []);
 
   return <ChatStoreContext.Provider value={store}>{children}</ChatStoreContext.Provider>;
 }

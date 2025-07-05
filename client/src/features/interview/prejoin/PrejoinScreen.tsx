@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import { useParams } from '@tanstack/react-router';
-import { Button, Center, Group, Stack, Text, Title } from '@mantine/core';
+import { useNavigate, useParams } from '@tanstack/react-router';
+import { Button, Center, Group, Loader, Stack, Text, Title } from '@mantine/core';
 import { useAppStore } from '@/stores/useAppStore';
 import { useDeviceStore } from '@/stores/useDeviceStore';
 import { useZoomPreviewStore } from '@/stores/usePreviewStore';
@@ -18,6 +18,8 @@ export function PrejoinScreen() {
 
   const setError = useAppStore((s) => s.setError);
   const permissionState = useAppStore((s) => s.permissionState);
+
+  const navigate = useNavigate();
 
   const initDevices = useDeviceStore((s) => s.initDevices);
 
@@ -36,17 +38,28 @@ export function PrejoinScreen() {
     useInterviewSession(args);
 
   useEffect(() => {
-    async function init() {
-      await initDevices();
+    // wait until the interview session query is finished before init devices
+    if (interviewSession) {
+      useDeviceStore.getState().initDevices();
     }
+  }, [interviewSession]);
 
-    init();
-  }, []);
+  if (isInterviewSessionPending) {
+    return (
+      <Center mih="100vh">
+        <Loader type="dots" />
+      </Center>
+    );
+  }
 
   if (interviewSessionError) {
     return (
       <Center mih="100vh">
-        <Text>Hi errror</Text>
+        <Stack>
+          <Title>Error starting session</Title>
+          <Text>{interviewSessionError.message}</Text>
+          <Button onClick={() => navigate({ to: '/' })}>Exit Interview</Button>
+        </Stack>
       </Center>
     );
   }

@@ -12,6 +12,10 @@ export type ChatStore = {
 };
 
 export function createChatStore(zoomClient: typeof VideoClient) {
+  if (!zoomClient) {
+    throw new Error('zoomClient is required to create the chat store');
+  }
+
   const chatClient = zoomClient.getChatClient();
 
   // initialize messages
