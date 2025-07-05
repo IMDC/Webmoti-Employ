@@ -33,6 +33,13 @@ app.onError((err, c) => {
   return c.json({ error: "Internal Server Error" }, 500);
 });
 
+app.notFound((c) => {
+  return c.json(
+    { error: `Route not found: ${c.req.method} ${c.req.path}` },
+    404
+  );
+});
+
 app.route("/sessions", sessionsRoute);
 app.route("/interviews", interviewsRoute);
 
