@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from 'zod/v4';
 
 // const allowedRegions = [
 //   "AU",
@@ -23,7 +23,7 @@ export const zoomTokenSchema = z.object({
     .number()
     .optional()
     .refine((v) => v === undefined || (v >= 1800 && v <= 172800), {
-      message: "Must be between 1800 and 172800",
+      message: 'Must be between 1800 and 172800',
     }),
   userIdentity: z.string().max(34).optional(),
   sessionKey: z.string().max(35).optional(),

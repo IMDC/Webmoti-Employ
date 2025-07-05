@@ -1,6 +1,6 @@
-import { CamelCasePlugin, Kysely, PostgresDialect } from "kysely";
-import { DB } from "./schema";
-import { Pool } from "pg";
+import { DB } from './schema';
+import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely';
+import { Pool } from 'pg';
 
 export function getDb(dbUrl: string) {
   const db = new Kysely<DB>({

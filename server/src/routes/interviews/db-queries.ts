@@ -1,8 +1,8 @@
-import { Kysely } from "kysely";
-import { DB } from "../../db/schema";
+import { DB } from '../../db/schema';
+import { Kysely } from 'kysely';
 
 export async function getAllInterviews(db: Kysely<DB>) {
-  return await db.selectFrom("interview").selectAll().execute();
+  return await db.selectFrom('interview').selectAll().execute();
 }
 
 export async function createInterview(
@@ -15,15 +15,15 @@ export async function createInterview(
   await db.transaction().execute(async (trx) => {
     // first add the interview to the table
     const newInterview = await trx
-      .insertInto("interview")
+      .insertInto('interview')
       .values({ creatorId, startTime, endTime })
-      .returning("interview.id")
+      .returning('interview.id')
       .executeTakeFirstOrThrow();
 
     // then add all invites to the interview_invite table
     for (const inviteEmail of invites) {
       await trx
-        .insertInto("interviewInvite")
+        .insertInto('interviewInvite')
         .values({ email: inviteEmail, interviewId: newInterview.id })
         .executeTakeFirstOrThrow();
     }
@@ -32,8 +32,8 @@ export async function createInterview(
 
 export async function deleteInterview(db: Kysely<DB>, interviewId: number) {
   return await db
-    .deleteFrom("interview")
-    .where("interview.id", "=", interviewId)
+    .deleteFrom('interview')
+    .where('interview.id', '=', interviewId)
     .executeTakeFirstOrThrow();
 }
 
@@ -49,8 +49,8 @@ export async function modifyInterview(
   if (Object.keys(updates).length === 0) return;
 
   return await db
-    .updateTable("interview")
+    .updateTable('interview')
     .set(updates)
-    .where("interview.id", "=", interviewId)
+    .where('interview.id', '=', interviewId)
     .executeTakeFirstOrThrow();
 }

@@ -1,12 +1,12 @@
-import { z } from "zod/v4";
+import { z } from 'zod/v4';
 
-const ZOOM_API_BASE = "https://api.zoom.us/v2/videosdk";
+const ZOOM_API_BASE = 'https://api.zoom.us/v2/videosdk';
 
 async function zoomApi<T>(path: string, jwt: string): Promise<T> {
   const res = await fetch(`${ZOOM_API_BASE}${path}`, {
     headers: {
       Authorization: `Bearer ${jwt}`,
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
   });
 
@@ -30,7 +30,7 @@ const GetSessionsSchema = z.object({
 });
 
 async function getSessions(jwt: string) {
-  const raw = await zoomApi("/sessions", jwt);
+  const raw = await zoomApi('/sessions', jwt);
   const parsed = GetSessionsSchema.parse(raw);
   return parsed.sessions;
 }
@@ -40,7 +40,7 @@ export async function querySession(jwt: string, id: string) {
     const sessions = await getSessions(jwt);
 
     if (sessions.length === 0) {
-      console.log("No active or past sessions found.");
+      console.log('No active or past sessions found.');
       return;
     }
 
@@ -48,12 +48,10 @@ export async function querySession(jwt: string, id: string) {
       console.log(`Session: ${session.session_name}`);
       console.log(`  ID: ${session.id}`);
       console.log(`  Started: ${session.start_time.toISOString()}`);
-      console.log(
-        `  Ended: ${session.end_time?.toISOString() ?? "Still active"}`
-      );
-      console.log("---");
+      console.log(`  Ended: ${session.end_time?.toISOString() ?? 'Still active'}`);
+      console.log('---');
     }
   } catch (err) {
-    console.error("Failed to query sessions:", err);
+    console.error('Failed to query sessions:', err);
   }
 }

@@ -1,9 +1,9 @@
-import { Hono } from "hono";
-import { zValidator } from "../../validator-wrapper";
-import { generateZoomJwt } from "./jwt";
-import { BaseContext } from "../..";
-import { z } from "zod/v4";
-import { querySession } from "./querySession";
+import { BaseContext } from '../..';
+import { zValidator } from '../../validator-wrapper';
+import { generateZoomJwt } from './jwt';
+import { querySession } from './querySession';
+import { Hono } from 'hono';
+import { z } from 'zod/v4';
 
 const sessionsRoute = new Hono<BaseContext>();
 
@@ -11,8 +11,8 @@ const CreateQuerySchema = z.object({
   userIdentity: z.string().max(34),
 });
 
-sessionsRoute.get("/", zValidator("query", CreateQuerySchema), async (c) => {
-  const { userIdentity } = c.req.valid("query");
+sessionsRoute.get('/', zValidator('query', CreateQuerySchema), async (c) => {
+  const { userIdentity } = c.req.valid('query');
 
   const sessionName = crypto.randomUUID();
 
@@ -36,12 +36,12 @@ const JoinParamSchema = z.object({
 });
 
 sessionsRoute.get(
-  "/:id",
-  zValidator("param", JoinParamSchema),
-  zValidator("query", JoinQuerySchema),
+  '/:id',
+  zValidator('param', JoinParamSchema),
+  zValidator('query', JoinQuerySchema),
   async (c) => {
-    const { sessionName } = c.req.valid("param");
-    const { userIdentity } = c.req.valid("query");
+    const { sessionName } = c.req.valid('param');
+    const { userIdentity } = c.req.valid('query');
 
     const adminJwt = await generateZoomJwt({
       zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,

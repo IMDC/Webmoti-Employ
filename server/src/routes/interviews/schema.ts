@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from 'zod/v4';
 
 export const interviewPostSchema = z.object({
   creatorId: z.string(),

@@ -5,7 +5,8 @@
     "deploy": "wrangler deploy --minify",
     "cf-typegen": "wrangler types src/worker-configuration.d.ts --env-interface CloudflareBindings",
     "db-typegen": "kysely-codegen",
-    "postinstall": "pnpm run cf-typegen"
+    "postinstall": "pnpm run cf-typegen",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@hono/clerk-auth": "^3.0.1",
