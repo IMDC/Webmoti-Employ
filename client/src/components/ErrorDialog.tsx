@@ -42,7 +42,10 @@ export function ErrorDialog() {
       onClose={clearError}
       size="lg"
       radius="md"
-      p="xl"
+      pr="xl"
+      pl="xl"
+      pt="lg"
+      pb="sm"
       withBorder
       position={{ top: 20, right: 20 }}
       zIndex={9999}

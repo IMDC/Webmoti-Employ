@@ -18,8 +18,7 @@ import { Route as authenticatedInterviewRouteRouteImport } from './routes/(authe
 import { Route as authenticatedInterviewIndexRouteImport } from './routes/(authenticated)/interview/index'
 import { Route as authenticatedInterviewIdRouteImport } from './routes/(authenticated)/interview/$id'
 import { Route as authenticatedInterviewPrejoinIndexRouteImport } from './routes/(authenticated)/interview/prejoin/index'
-import { Route as authenticatedInterviewPrejoinCreateRouteImport } from './routes/(authenticated)/interview/prejoin/create'
-import { Route as authenticatedInterviewPrejoinJoinIdRouteImport } from './routes/(authenticated)/interview/prejoin/join.$id'
+import { Route as authenticatedInterviewPrejoinIdRouteImport } from './routes/(authenticated)/interview/prejoin/$id'
 
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
@@ -69,16 +68,10 @@ const authenticatedInterviewPrejoinIndexRoute =
     path: '/prejoin/',
     getParentRoute: () => authenticatedInterviewRouteRoute,
   } as any)
-const authenticatedInterviewPrejoinCreateRoute =
-  authenticatedInterviewPrejoinCreateRouteImport.update({
-    id: '/prejoin/create',
-    path: '/prejoin/create',
-    getParentRoute: () => authenticatedInterviewRouteRoute,
-  } as any)
-const authenticatedInterviewPrejoinJoinIdRoute =
-  authenticatedInterviewPrejoinJoinIdRouteImport.update({
-    id: '/prejoin/join/$id',
-    path: '/prejoin/join/$id',
+const authenticatedInterviewPrejoinIdRoute =
+  authenticatedInterviewPrejoinIdRouteImport.update({
+    id: '/prejoin/$id',
+    path: '/prejoin/$id',
     getParentRoute: () => authenticatedInterviewRouteRoute,
   } as any)
 
@@ -90,9 +83,8 @@ export interface FileRoutesByFullPath {
   '/home': typeof authenticatedHomeRoute
   '/interview/$id': typeof authenticatedInterviewIdRoute
   '/interview/': typeof authenticatedInterviewIndexRoute
-  '/interview/prejoin/create': typeof authenticatedInterviewPrejoinCreateRoute
+  '/interview/prejoin/$id': typeof authenticatedInterviewPrejoinIdRoute
   '/interview/prejoin': typeof authenticatedInterviewPrejoinIndexRoute
-  '/interview/prejoin/join/$id': typeof authenticatedInterviewPrejoinJoinIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof authenticatedRouteRouteWithChildren
@@ -101,9 +93,8 @@ export interface FileRoutesByTo {
   '/home': typeof authenticatedHomeRoute
   '/interview/$id': typeof authenticatedInterviewIdRoute
   '/interview': typeof authenticatedInterviewIndexRoute
-  '/interview/prejoin/create': typeof authenticatedInterviewPrejoinCreateRoute
+  '/interview/prejoin/$id': typeof authenticatedInterviewPrejoinIdRoute
   '/interview/prejoin': typeof authenticatedInterviewPrejoinIndexRoute
-  '/interview/prejoin/join/$id': typeof authenticatedInterviewPrejoinJoinIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,9 +106,8 @@ export interface FileRoutesById {
   '/(authenticated)/home': typeof authenticatedHomeRoute
   '/(authenticated)/interview/$id': typeof authenticatedInterviewIdRoute
   '/(authenticated)/interview/': typeof authenticatedInterviewIndexRoute
-  '/(authenticated)/interview/prejoin/create': typeof authenticatedInterviewPrejoinCreateRoute
+  '/(authenticated)/interview/prejoin/$id': typeof authenticatedInterviewPrejoinIdRoute
   '/(authenticated)/interview/prejoin/': typeof authenticatedInterviewPrejoinIndexRoute
-  '/(authenticated)/interview/prejoin/join/$id': typeof authenticatedInterviewPrejoinJoinIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -129,9 +119,8 @@ export interface FileRouteTypes {
     | '/home'
     | '/interview/$id'
     | '/interview/'
-    | '/interview/prejoin/create'
+    | '/interview/prejoin/$id'
     | '/interview/prejoin'
-    | '/interview/prejoin/join/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -140,9 +129,8 @@ export interface FileRouteTypes {
     | '/home'
     | '/interview/$id'
     | '/interview'
-    | '/interview/prejoin/create'
+    | '/interview/prejoin/$id'
     | '/interview/prejoin'
-    | '/interview/prejoin/join/$id'
   id:
     | '__root__'
     | '/'
@@ -153,9 +141,8 @@ export interface FileRouteTypes {
     | '/(authenticated)/home'
     | '/(authenticated)/interview/$id'
     | '/(authenticated)/interview/'
-    | '/(authenticated)/interview/prejoin/create'
+    | '/(authenticated)/interview/prejoin/$id'
     | '/(authenticated)/interview/prejoin/'
-    | '/(authenticated)/interview/prejoin/join/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -229,18 +216,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedInterviewPrejoinIndexRouteImport
       parentRoute: typeof authenticatedInterviewRouteRoute
     }
-    '/(authenticated)/interview/prejoin/create': {
-      id: '/(authenticated)/interview/prejoin/create'
-      path: '/prejoin/create'
-      fullPath: '/interview/prejoin/create'
-      preLoaderRoute: typeof authenticatedInterviewPrejoinCreateRouteImport
-      parentRoute: typeof authenticatedInterviewRouteRoute
-    }
-    '/(authenticated)/interview/prejoin/join/$id': {
-      id: '/(authenticated)/interview/prejoin/join/$id'
-      path: '/prejoin/join/$id'
-      fullPath: '/interview/prejoin/join/$id'
-      preLoaderRoute: typeof authenticatedInterviewPrejoinJoinIdRouteImport
+    '/(authenticated)/interview/prejoin/$id': {
+      id: '/(authenticated)/interview/prejoin/$id'
+      path: '/prejoin/$id'
+      fullPath: '/interview/prejoin/$id'
+      preLoaderRoute: typeof authenticatedInterviewPrejoinIdRouteImport
       parentRoute: typeof authenticatedInterviewRouteRoute
     }
   }
@@ -249,21 +229,17 @@ declare module '@tanstack/react-router' {
 interface authenticatedInterviewRouteRouteChildren {
   authenticatedInterviewIdRoute: typeof authenticatedInterviewIdRoute
   authenticatedInterviewIndexRoute: typeof authenticatedInterviewIndexRoute
-  authenticatedInterviewPrejoinCreateRoute: typeof authenticatedInterviewPrejoinCreateRoute
+  authenticatedInterviewPrejoinIdRoute: typeof authenticatedInterviewPrejoinIdRoute
   authenticatedInterviewPrejoinIndexRoute: typeof authenticatedInterviewPrejoinIndexRoute
-  authenticatedInterviewPrejoinJoinIdRoute: typeof authenticatedInterviewPrejoinJoinIdRoute
 }
 
 const authenticatedInterviewRouteRouteChildren: authenticatedInterviewRouteRouteChildren =
   {
     authenticatedInterviewIdRoute: authenticatedInterviewIdRoute,
     authenticatedInterviewIndexRoute: authenticatedInterviewIndexRoute,
-    authenticatedInterviewPrejoinCreateRoute:
-      authenticatedInterviewPrejoinCreateRoute,
+    authenticatedInterviewPrejoinIdRoute: authenticatedInterviewPrejoinIdRoute,
     authenticatedInterviewPrejoinIndexRoute:
       authenticatedInterviewPrejoinIndexRoute,
-    authenticatedInterviewPrejoinJoinIdRoute:
-      authenticatedInterviewPrejoinJoinIdRoute,
   }
 
 const authenticatedInterviewRouteRouteWithChildren =

@@ -82,7 +82,7 @@ export function Home() {
                     <Button
                       leftSection={<IconVideoPlus />}
                       onClick={() => {
-                        router.navigate({ to: '/interview/prejoin/create' });
+                        router.navigate({ to: '/interview/prejoin' });
                       }}
                     >
                       Start interview now

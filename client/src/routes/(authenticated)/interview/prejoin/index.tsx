@@ -1,7 +1,6 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { PrejoinScreen } from '@/features/interview/prejoin/PrejoinScreen';
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(authenticated)/interview/prejoin/')({
-  beforeLoad: () => {
-    throw redirect({ to: '/interview/prejoin/create' });
-  },
+  component: PrejoinScreen,
 });
