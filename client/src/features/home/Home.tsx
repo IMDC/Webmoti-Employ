@@ -15,6 +15,7 @@ import {
   TextInput,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
 import { InterviewList } from './components/InterviewList';
 import { ScheduleForm } from './components/ScheduleForm';
@@ -61,7 +62,15 @@ export function Home() {
             blur: 3,
           }}
         >
-          <ScheduleForm onSuccess={closeScheduleModal} />
+          <ScheduleForm
+            onSuccess={() => {
+              closeScheduleModal();
+              notifications.show({
+                title: 'Interview scheduled',
+                message: 'Your interview has been successfully scheduled.',
+              });
+            }}
+          />
         </Modal>
 
         <Flex justify="center" align="center" mt="lg">
