@@ -65,6 +65,7 @@ export function createZoomSessionStore() {
 
       initialized: false,
       initClient: async () => {
+        console.log('initializing zoom client...');
         await client.init('en-US', 'Global', {
           patchJsMedia: true,
           leaveOnPageUnload: true,

@@ -11,17 +11,12 @@ export function ZoomSessionContextProvider({ children }: ZoomSessionContextProvi
   const [store] = useState<StoreApi<ZoomSessionStore>>(() => createZoomSessionStore());
 
   useEffect(() => {
+    store.getState().initClient();
+
     return () => {
-      const current = store.getState();
-      (async () => {
-        await current.cleanup();
-      })();
+      store.getState().cleanup();
     };
   }, [store]);
-
-  if (!store) {
-    return null;
-  }
 
   return <ZoomSessionContext.Provider value={store}>{children}</ZoomSessionContext.Provider>;
 }
