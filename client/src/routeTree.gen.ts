@@ -12,8 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as authenticatedRouteRouteImport } from './routes/(authenticated)/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as authenticatedHomeRouteImport } from './routes/(authenticated)/home'
 import { Route as authenticatedEndRouteImport } from './routes/(authenticated)/end'
+import { Route as authenticatedDashboardRouteImport } from './routes/(authenticated)/dashboard'
 import { Route as authenticatedInterviewRouteRouteImport } from './routes/(authenticated)/interview/route'
 import { Route as authenticatedInterviewIndexRouteImport } from './routes/(authenticated)/interview/index'
 import { Route as authenticatedInterviewIdRouteImport } from './routes/(authenticated)/interview/$id'
@@ -34,14 +34,14 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const authenticatedHomeRoute = authenticatedHomeRouteImport.update({
-  id: '/home',
-  path: '/home',
-  getParentRoute: () => authenticatedRouteRoute,
-} as any)
 const authenticatedEndRoute = authenticatedEndRouteImport.update({
   id: '/end',
   path: '/end',
+  getParentRoute: () => authenticatedRouteRoute,
+} as any)
+const authenticatedDashboardRoute = authenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => authenticatedRouteRoute,
 } as any)
 const authenticatedInterviewRouteRoute =
@@ -79,8 +79,8 @@ export interface FileRoutesByFullPath {
   '/': typeof authenticatedRouteRouteWithChildren
   '/sign-in': typeof SignInRoute
   '/interview': typeof authenticatedInterviewRouteRouteWithChildren
+  '/dashboard': typeof authenticatedDashboardRoute
   '/end': typeof authenticatedEndRoute
-  '/home': typeof authenticatedHomeRoute
   '/interview/$id': typeof authenticatedInterviewIdRoute
   '/interview/': typeof authenticatedInterviewIndexRoute
   '/interview/prejoin/$id': typeof authenticatedInterviewPrejoinIdRoute
@@ -89,8 +89,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof authenticatedRouteRouteWithChildren
   '/sign-in': typeof SignInRoute
+  '/dashboard': typeof authenticatedDashboardRoute
   '/end': typeof authenticatedEndRoute
-  '/home': typeof authenticatedHomeRoute
   '/interview/$id': typeof authenticatedInterviewIdRoute
   '/interview': typeof authenticatedInterviewIndexRoute
   '/interview/prejoin/$id': typeof authenticatedInterviewPrejoinIdRoute
@@ -102,8 +102,8 @@ export interface FileRoutesById {
   '/(authenticated)': typeof authenticatedRouteRouteWithChildren
   '/sign-in': typeof SignInRoute
   '/(authenticated)/interview': typeof authenticatedInterviewRouteRouteWithChildren
+  '/(authenticated)/dashboard': typeof authenticatedDashboardRoute
   '/(authenticated)/end': typeof authenticatedEndRoute
-  '/(authenticated)/home': typeof authenticatedHomeRoute
   '/(authenticated)/interview/$id': typeof authenticatedInterviewIdRoute
   '/(authenticated)/interview/': typeof authenticatedInterviewIndexRoute
   '/(authenticated)/interview/prejoin/$id': typeof authenticatedInterviewPrejoinIdRoute
@@ -115,8 +115,8 @@ export interface FileRouteTypes {
     | '/'
     | '/sign-in'
     | '/interview'
+    | '/dashboard'
     | '/end'
-    | '/home'
     | '/interview/$id'
     | '/interview/'
     | '/interview/prejoin/$id'
@@ -125,8 +125,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/sign-in'
+    | '/dashboard'
     | '/end'
-    | '/home'
     | '/interview/$id'
     | '/interview'
     | '/interview/prejoin/$id'
@@ -137,8 +137,8 @@ export interface FileRouteTypes {
     | '/(authenticated)'
     | '/sign-in'
     | '/(authenticated)/interview'
+    | '/(authenticated)/dashboard'
     | '/(authenticated)/end'
-    | '/(authenticated)/home'
     | '/(authenticated)/interview/$id'
     | '/(authenticated)/interview/'
     | '/(authenticated)/interview/prejoin/$id'
@@ -174,18 +174,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(authenticated)/home': {
-      id: '/(authenticated)/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof authenticatedHomeRouteImport
-      parentRoute: typeof authenticatedRouteRoute
-    }
     '/(authenticated)/end': {
       id: '/(authenticated)/end'
       path: '/end'
       fullPath: '/end'
       preLoaderRoute: typeof authenticatedEndRouteImport
+      parentRoute: typeof authenticatedRouteRoute
+    }
+    '/(authenticated)/dashboard': {
+      id: '/(authenticated)/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof authenticatedDashboardRouteImport
       parentRoute: typeof authenticatedRouteRoute
     }
     '/(authenticated)/interview': {
@@ -249,15 +249,15 @@ const authenticatedInterviewRouteRouteWithChildren =
 
 interface authenticatedRouteRouteChildren {
   authenticatedInterviewRouteRoute: typeof authenticatedInterviewRouteRouteWithChildren
+  authenticatedDashboardRoute: typeof authenticatedDashboardRoute
   authenticatedEndRoute: typeof authenticatedEndRoute
-  authenticatedHomeRoute: typeof authenticatedHomeRoute
 }
 
 const authenticatedRouteRouteChildren: authenticatedRouteRouteChildren = {
   authenticatedInterviewRouteRoute:
     authenticatedInterviewRouteRouteWithChildren,
+  authenticatedDashboardRoute: authenticatedDashboardRoute,
   authenticatedEndRoute: authenticatedEndRoute,
-  authenticatedHomeRoute: authenticatedHomeRoute,
 }
 
 const authenticatedRouteRouteWithChildren =

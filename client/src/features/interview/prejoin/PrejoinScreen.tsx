@@ -67,7 +67,7 @@ export function PrejoinScreen() {
         <Stack>
           <Title>Error starting session</Title>
           <Text>{interviewSessionError.message}</Text>
-          <Button onClick={() => navigate({ to: '/' })}>Exit Interview</Button>
+          <Button onClick={() => navigate({ to: '/' })}>Go to Dashboard</Button>
         </Stack>
       </Center>
     );

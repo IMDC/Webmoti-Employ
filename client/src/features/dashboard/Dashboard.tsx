@@ -20,7 +20,7 @@ import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
 import { InterviewList } from './components/InterviewList';
 import { ScheduleForm } from './components/ScheduleForm';
 
-export function Home() {
+export function Dashboard() {
   const [isNewInterviewPopupOpen, setIsNewInterviewPopupOpen] = useState(false);
   const [isScheduleModalOpened, { open: openScheduleModal, close: closeScheduleModal }] =
     useDisclosure(false);
