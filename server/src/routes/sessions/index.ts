@@ -1,7 +1,7 @@
 import { BaseContext } from '../..';
 import { zValidator } from '../../validator-wrapper';
-import { generateZoomJwt } from './jwt';
-import { querySession } from './querySession';
+import { generateZoomApiJwt, generateZoomVideoJwt } from './jwt';
+import { ZoomClient, ZoomSession } from './ZoomClient';
 import { Hono } from 'hono';
 import { z } from 'zod/v4';
 
@@ -16,7 +16,7 @@ sessionsRoute.get('/', zValidator('query', CreateQuerySchema), async (c) => {
 
   const sessionName = crypto.randomUUID();
 
-  const token = await generateZoomJwt({
+  const token = await generateZoomVideoJwt({
     zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
     zoomVideoSdkSecret: c.env.ZOOM_VIDEO_SDK_SECRET,
     sessionName: sessionName,
@@ -36,31 +36,45 @@ const JoinParamSchema = z.object({
 });
 
 sessionsRoute.get(
-  '/:id',
+  '/:sessionName',
   zValidator('param', JoinParamSchema),
   zValidator('query', JoinQuerySchema),
   async (c) => {
     const { sessionName } = c.req.valid('param');
     const { userIdentity } = c.req.valid('query');
 
-    const adminJwt = await generateZoomJwt({
-      zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
-      zoomVideoSdkSecret: c.env.ZOOM_VIDEO_SDK_SECRET,
-      sessionName,
-      role: 1,
-    });
+    const apiToken = await generateZoomApiJwt(c.env.ZOOM_API_KEY, c.env.ZOOM_API_SECRET);
 
-    await querySession(adminJwt, sessionName);
+    let foundSession: ZoomSession | null = null;
+    try {
+      const client = new ZoomClient(apiToken);
+      // this array should only be one session since we search using sessionName
+      const liveSessions = await client.searchLiveSessions(sessionName);
+      for (const session of liveSessions) {
+        if (session.session_name === sessionName) {
+          foundSession = session;
+          break;
+        }
+      }
 
-    const token = await generateZoomJwt({
+      if (!foundSession) {
+        console.error('Unable to find session');
+        return c.json({ error: 'Unable to find session' }, 404);
+      }
+    } catch (error) {
+      console.error(error);
+      return c.json({ error: 'Failed to query sessions' }, 500);
+    }
+
+    const token = await generateZoomVideoJwt({
       zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
       zoomVideoSdkSecret: c.env.ZOOM_VIDEO_SDK_SECRET,
       sessionName,
       userIdentity,
-      role: 1,
+      role: 0, // the person with role 1 is already in the session at this point
     });
 
-    return c.json({ sessionName, token });
+    return c.json({ sessionName, token, userCount: foundSession.user_count });
   }
 );
 

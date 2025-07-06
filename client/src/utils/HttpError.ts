@@ -10,3 +10,7 @@ export class HttpError extends Error {
     this.details = details;
   }
 }
+
+export function isHttpError(error: unknown): error is HttpError {
+  return error instanceof HttpError;
+}

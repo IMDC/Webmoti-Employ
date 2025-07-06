@@ -9,6 +9,7 @@ import { useDeviceStore } from '@/stores/useDeviceStore';
 import { useZoomPreviewStore } from '@/stores/usePreviewStore';
 import { MenuBar } from '../components/MenuBar';
 import { useZoomSessionStore } from '../zoom/useZoomSessionStore';
+import { ErrorScreen } from './components/ErrorScreen';
 import { JoiningScreen } from './components/JoiningScreen';
 import { PreviewTile } from './components/PreviewTile';
 import { InterviewSessionArgs, useInterviewSession } from './queries';
@@ -39,11 +40,11 @@ export function PrejoinScreen() {
     useInterviewSession(args);
 
   useEffect(() => {
-    // wait until the interview session query is finished before init devices
-    if (interviewSession) {
+    // wait until the interview session query is successful before init devices
+    if (interviewSession && !interviewSessionError) {
       useDeviceStore.getState().initDevices();
     }
-  }, [interviewSession]);
+  }, [interviewSession, interviewSessionError]);
 
   useEffect(() => {
     if (callState === 'joined' && interviewSession) {
@@ -63,15 +64,7 @@ export function PrejoinScreen() {
   }
 
   if (interviewSessionError) {
-    return (
-      <Center mih="100vh">
-        <Stack>
-          <Title>Error starting session</Title>
-          <Text>{interviewSessionError.message}</Text>
-          <Button onClick={() => navigate({ to: '/' })}>Go to Dashboard</Button>
-        </Stack>
-      </Center>
-    );
+    return <ErrorScreen error={interviewSessionError} />;
   }
 
   if (!interviewSession) {

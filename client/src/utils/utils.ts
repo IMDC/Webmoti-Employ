@@ -1,4 +1,5 @@
 import { AppError } from '@/stores/useAppStore';
+import { Json } from '@/types/Json';
 import { HttpError } from './HttpError';
 
 export function getFittedSize(
@@ -29,4 +30,8 @@ export function handleServerError(
   } else {
     setError({ message: defaultMessage });
   }
+}
+
+export function jsonStringifyIndented(json: Json) {
+  return JSON.stringify(json, null, 2);
 }

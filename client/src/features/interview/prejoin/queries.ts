@@ -32,15 +32,14 @@ async function fetchInterviewSession(args: InterviewSessionArgs): Promise<Interv
   }
 
   const response = await fetch(endpoint);
+  const json = await response.json();
   if (!response.ok) {
-    const data = await response.json();
-    throw new HttpError(`Failed to ${action} session`, response.status, data);
+    throw new HttpError(`Failed to ${action} session`, response.status, json);
   }
 
-  const json = await response.json();
   const result = InterviewDataSchema.safeParse(json);
   if (!result.success) {
-    throw new Error(z.prettifyError(result.error));
+    throw new HttpError('Invalid response schema', 500, z.flattenError(result.error));
   }
 
   return result.data;

@@ -1,12 +1,41 @@
 import { ZoomTokenInput } from './schema';
-import { SignJWT } from 'jose';
+import { JWTPayload, SignJWT } from 'jose';
 
 export type ZoomJwtInput = ZoomTokenInput & {
   zoomVideoSdkKey: string;
   zoomVideoSdkSecret: string;
 };
 
-export async function generateZoomJwt({
+async function generateJwt(payload: JWTPayload, secret: string, iat: number, exp: number) {
+  const header = { alg: 'HS256', typ: 'JWT' };
+  const encodedSecret = new TextEncoder().encode(secret);
+
+  const jwt = await new SignJWT(payload)
+    .setProtectedHeader(header)
+    .setIssuedAt(iat)
+    .setExpirationTime(exp)
+    .sign(encodedSecret);
+
+  return jwt;
+}
+
+export async function generateZoomApiJwt(zoomApiKey: string, zoomApiSecret: string) {
+  const iat = Math.floor(Date.now() / 1000);
+  const expirationSeconds = 300; // 5 min
+  const exp = iat + expirationSeconds;
+
+  const payload = {
+    iss: zoomApiKey,
+    iat,
+    exp,
+  };
+
+  const jwt = await generateJwt(payload, zoomApiSecret, iat, exp);
+
+  return jwt;
+}
+
+export async function generateZoomVideoJwt({
   zoomVideoSdkKey,
   zoomVideoSdkSecret,
   role,
@@ -41,14 +70,8 @@ export async function generateZoomJwt({
     video_webrtc_mode: videoWebRtcMode,
     audio_webrtc_mode: audioWebRtcMode,
   };
-  const header = { alg: 'HS256', typ: 'JWT' };
-  const secret = new TextEncoder().encode(zoomVideoSdkSecret);
 
-  const jwt = await new SignJWT(payload)
-    .setProtectedHeader(header)
-    .setIssuedAt(iat)
-    .setExpirationTime(exp)
-    .sign(secret);
+  const jwt = await generateJwt(payload, zoomVideoSdkSecret, iat, exp);
 
   return jwt;
 }

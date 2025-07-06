@@ -1,5 +1,6 @@
 import { Dialog, Text } from '@mantine/core';
 import { AppError, useAppStore } from '@/stores/useAppStore';
+import { jsonStringifyIndented } from '@/utils/utils';
 
 export function formatAppError(error: AppError): string {
   const { status, message, details } = error;
@@ -15,7 +16,7 @@ export function formatAppError(error: AppError): string {
   }
 
   if (details !== undefined) {
-    const detailsText = typeof details === 'string' ? details : JSON.stringify(details, null, 2);
+    const detailsText = typeof details === 'string' ? details : jsonStringifyIndented(details);
 
     if (detailsText.length > 0) {
       lines.push(`Details:\n${detailsText}`);
