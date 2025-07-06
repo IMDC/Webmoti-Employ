@@ -11,8 +11,8 @@ interface CornerProps {
 export function Corner({
   children,
   position = 'top-left',
-  xOffset = 10,
-  yOffset = 10,
+  xOffset = 20,
+  yOffset = 20,
 }: CornerProps) {
   const styleMap = {
     'top-left': { top: yOffset, left: xOffset },

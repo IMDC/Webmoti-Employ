@@ -33,7 +33,7 @@ export function ParticipantTile({
       {children}
 
       {name && (
-        <Corner position="bottom-left">
+        <Corner position="bottom-left" yOffset={15} xOffset={15}>
           <Text size="sm" c="white">
             {name}
           </Text>

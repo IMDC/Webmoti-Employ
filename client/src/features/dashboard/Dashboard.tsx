@@ -39,7 +39,7 @@ export function Dashboard() {
       }}
     >
       <AppShell.Header>
-        <Corner yOffset={20} xOffset={20}>
+        <Corner>
           <ColorSchemeToggle />
         </Corner>
 
@@ -54,7 +54,7 @@ export function Dashboard() {
           </Text>
         </Center>
 
-        <Corner position="top-right" yOffset={20} xOffset={20}>
+        <Corner position="top-right">
           <UserButton />
         </Corner>
       </AppShell.Header>

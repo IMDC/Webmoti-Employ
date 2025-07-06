@@ -83,13 +83,13 @@ export function PrejoinScreen() {
       {/* stay visible when joined to avoid hiding while navigating */}
       <JoiningScreen visible={callState === 'joining' || callState === 'joined'} />
 
-      <Corner yOffset={20} xOffset={20}>
+      <Corner>
         <Button variant="subtle" onClick={() => navigate({ to: '/' })}>
           ← Back to Dashboard
         </Button>
       </Corner>
 
-      <Corner position="top-right" yOffset={20} xOffset={20}>
+      <Corner position="top-right">
         <UserButton />
       </Corner>
 
