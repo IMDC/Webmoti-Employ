@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { UserButton, useUser } from '@clerk/clerk-react';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { Button, Center, Group, Loader, Stack, Text, Title } from '@mantine/core';
 import { CopyButton } from '@/components/CopyButton';
@@ -87,6 +87,10 @@ export function PrejoinScreen() {
         <Button variant="subtle" onClick={() => navigate({ to: '/' })}>
           ← Back to Dashboard
         </Button>
+      </Corner>
+
+      <Corner position="top-right" yOffset={20} xOffset={20}>
+        <UserButton />
       </Corner>
 
       <Center mih="100vh">

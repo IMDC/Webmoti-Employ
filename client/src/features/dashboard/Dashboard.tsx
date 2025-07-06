@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { UserButton } from '@clerk/clerk-react';
 import { IconCalendarPlus, IconSquareRoundedPlusFilled, IconVideoPlus } from '@tabler/icons-react';
-import { useRouter } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import {
   AppShell,
   Button,
+  Center,
   Divider,
   Flex,
-  Group,
   Modal,
   Popover,
   Stack,
@@ -17,6 +17,7 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
+import { Corner } from '@/components/Corner';
 import { InterviewList } from './components/InterviewList';
 import { ScheduleForm } from './components/ScheduleForm';
 
@@ -25,7 +26,9 @@ export function Dashboard() {
   const [isScheduleModalOpened, { open: openScheduleModal, close: closeScheduleModal }] =
     useDisclosure(false);
 
-  const router = useRouter();
+  const [joinCodeInput, setJoinCodeInput] = useState('');
+
+  const navigate = useNavigate();
 
   return (
     <AppShell
@@ -36,9 +39,11 @@ export function Dashboard() {
       }}
     >
       <AppShell.Header>
-        <Group justify="space-between" mr="lg" ml="lg">
+        <Corner yOffset={20} xOffset={20}>
           <ColorSchemeToggle />
+        </Corner>
 
+        <Center>
           <Text
             fz={50}
             fw={900}
@@ -47,9 +52,11 @@ export function Dashboard() {
           >
             WebMoti-Employ
           </Text>
+        </Center>
 
+        <Corner position="top-right" yOffset={20} xOffset={20}>
           <UserButton />
-        </Group>
+        </Corner>
       </AppShell.Header>
 
       <AppShell.Main>
@@ -90,9 +97,7 @@ export function Dashboard() {
                   <Stack>
                     <Button
                       leftSection={<IconVideoPlus />}
-                      onClick={() => {
-                        router.navigate({ to: '/interview/prejoin' });
-                      }}
+                      onClick={() => navigate({ to: '/interview/prejoin' })}
                     >
                       Start interview now
                     </Button>
@@ -109,8 +114,17 @@ export function Dashboard() {
                 </Popover.Dropdown>
               </Popover>
 
-              <TextInput placeholder="Enter interview code" />
-              <Button variant="subtle" disabled>
+              <TextInput
+                placeholder="Enter interview code"
+                value={joinCodeInput}
+                onChange={(event) => setJoinCodeInput(event.currentTarget.value)}
+              />
+              <Button
+                disabled={!joinCodeInput}
+                onClick={() =>
+                  navigate({ to: '/interview/prejoin/$id', params: { id: joinCodeInput } })
+                }
+              >
                 Join
               </Button>
             </Flex>
