@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { AppShell, Box } from '@mantine/core';
 import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore';
 import { useAppStore } from '@/stores/useAppStore';
@@ -26,8 +27,20 @@ export function Room() {
   const startAudio = useZoomSessionStore((s) => s.startAudio);
   const stopAudio = useZoomSessionStore((s) => s.stopAudio);
 
+  const leave = useZoomSessionStore((s) => s.leave);
+
   const switchCamera = useZoomSessionStore((s) => s.switchCamera);
   const switchMicrophone = useZoomSessionStore((s) => s.switchMicrophone);
+
+  const navigate = useNavigate();
+
+  const callState = useZoomSessionStore((s) => s.callState);
+
+  useEffect(() => {
+    if (callState === 'left') {
+      navigate({ to: '/end' });
+    }
+  }, [callState, navigate]);
 
   return (
     <AppShell
@@ -109,6 +122,7 @@ export function Room() {
           onToggleChat={() => {
             setIsChatOpen(!isChatOpen);
           }}
+          onLeave={leave}
         />
       </AppShell.Footer>
     </AppShell>
