@@ -10,7 +10,7 @@ export function EndScreen() {
         <Title>Thanks for attending the interview</Title>
         <Group>
           <Button>Rejoin</Button>
-          <Button onClick={() => navigate({ to: '/dashboard' })}>Go to Dashboard</Button>
+          <Button onClick={() => navigate({ to: '/' })}>Go to Dashboard</Button>
         </Group>
       </Stack>
     </Center>
