@@ -33,7 +33,7 @@ export function ParticipantTile({
       {children}
 
       {name && (
-        <Corner>
+        <Corner position="bottom-left">
           <Text size="sm" c="white">
             {name}
           </Text>

@@ -55,7 +55,7 @@ export function PreviewTile({ height, width }: PreviewTileProps) {
         <VideoRenderer attach={startCamera} detach={stopCamera} />
       )}
 
-      <Corner position="bottom-right">
+      <Corner position="bottom-right" yOffset={6} xOffset={8}>
         <AudioLevelIndicator volume={volume || 0} isTrackEnabled={isAudioOn} />
       </Corner>
     </ParticipantTile>

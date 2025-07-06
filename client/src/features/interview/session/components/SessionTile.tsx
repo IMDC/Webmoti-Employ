@@ -27,7 +27,7 @@ export function SessionTile({ height, width, participant }: SessionTileProps) {
     <ParticipantTile height={height} width={width} name={participant.displayName}>
       {participant.bVideoOn && <VideoRenderer attach={attachStable} detach={detachStable} />}
 
-      <Corner position="bottom-right">
+      <Corner position="bottom-right" yOffset={6} xOffset={8}>
         <AudioLevelIndicator
           volume={0}
           isTrackEnabled={participant.audio === 'computer' || participant.audio === 'phone'}

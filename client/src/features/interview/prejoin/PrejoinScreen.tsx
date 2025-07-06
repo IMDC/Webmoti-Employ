@@ -3,6 +3,7 @@ import { useUser } from '@clerk/clerk-react';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { Button, Center, Group, Loader, Stack, Text, Title } from '@mantine/core';
 import { CopyButton } from '@/components/CopyButton';
+import { Corner } from '@/components/Corner';
 import { useAppStore } from '@/stores/useAppStore';
 import { useDeviceStore } from '@/stores/useDeviceStore';
 import { useZoomPreviewStore } from '@/stores/usePreviewStore';
@@ -82,6 +83,12 @@ export function PrejoinScreen() {
       {/* stay visible when joined to avoid hiding while navigating */}
       <JoiningScreen visible={callState === 'joining' || callState === 'joined'} />
 
+      <Corner yOffset={20} xOffset={20}>
+        <Button variant="subtle" onClick={() => navigate({ to: '/' })}>
+          ← Back to Dashboard
+        </Button>
+      </Corner>
+
       <Center mih="100vh">
         <Group>
           <Stack>
@@ -113,7 +120,7 @@ export function PrejoinScreen() {
             <Title>{`${args.action === 'create' ? 'New' : 'Join'} Interview`}</Title>
             <Group>
               <CopyButton copyText={interviewSession.sessionName} />
-              <Text>{interviewSession?.sessionName}</Text>
+              <Text ff="monospace">{interviewSession?.sessionName}</Text>
             </Group>
             <Button
               onClick={async () =>
