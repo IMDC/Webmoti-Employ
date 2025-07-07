@@ -2,6 +2,7 @@ import ZoomVideo, { Participant, VideoClient, VideoPlayer, VideoQuality } from '
 import { createStore } from 'zustand';
 import { useAppStore } from '@/stores/useAppStore';
 import { useDeviceStore } from '@/stores/useDeviceStore';
+import { logger } from '@/utils/logger';
 
 export type ZoomSessionStore = {
   client: typeof VideoClient;
@@ -52,7 +53,8 @@ export function createZoomSessionStore() {
 
       initialized: false,
       initClient: async () => {
-        console.log('initializing zoom client...');
+        logger.info('Initializing zoom client...');
+
         await client.init('en-US', 'Global', {
           patchJsMedia: true,
           leaveOnPageUnload: true,
@@ -104,8 +106,7 @@ export function createZoomSessionStore() {
         // need to detach first to ensure it works properly (this matters in strict mode)
         await stream().detachVideo(userId);
 
-        console.log('attaching video player');
-
+        logger.info('Attaching video player...');
         await stream().attachVideo(userId, VideoQuality.Video_720P, element);
       },
 
