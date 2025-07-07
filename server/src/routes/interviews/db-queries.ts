@@ -1,4 +1,5 @@
 import { DB } from '../../db/schema';
+import { InterviewInvite } from './schema';
 import { Kysely } from 'kysely';
 
 export async function getAllInterviews(db: Kysely<DB>) {
@@ -10,7 +11,7 @@ export async function createInterview(
   creatorId: string,
   startTime: Date,
   endTime: Date,
-  invites: Array<string> = []
+  invites: Array<InterviewInvite> = []
 ) {
   await db.transaction().execute(async (trx) => {
     // first add the interview to the table
@@ -21,10 +22,10 @@ export async function createInterview(
       .executeTakeFirstOrThrow();
 
     // then add all invites to the interview_invite table
-    for (const inviteEmail of invites) {
+    for (const invite of invites) {
       await trx
         .insertInto('interviewInvite')
-        .values({ email: inviteEmail, interviewId: newInterview.id })
+        .values({ email: invite.email, interviewId: newInterview.id })
         .executeTakeFirstOrThrow();
     }
   });

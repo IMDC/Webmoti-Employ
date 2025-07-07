@@ -1,10 +1,16 @@
 import { z } from 'zod/v4';
 
-export const interviewPostSchema = z.object({
+const InterviewInviteSchema = z.object({
+  email: z.email(),
+});
+
+export type InterviewInvite = z.infer<typeof InterviewInviteSchema>;
+
+export const InterviewPostSchema = z.object({
   creatorId: z.string(),
   startTime: z.coerce.date(),
   endTime: z.coerce.date(),
-  invites: z.array(z.email()).optional(),
+  invites: z.array(InterviewInviteSchema).optional(),
 });
 
-export const interviewDeleteSchema = z.object({ id: z.number() });
+export const InterviewDeleteSchema = z.object({ id: z.number() });
