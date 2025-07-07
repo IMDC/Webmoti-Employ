@@ -1,3 +1,4 @@
+import type { UserResource } from '@clerk/types';
 import { AppError } from '@/stores/useAppStore';
 import { Json } from '@/types/Json';
 import { HttpError } from './HttpError';
@@ -34,4 +35,8 @@ export function handleServerError(
 
 export function jsonStringifyIndented(json: Json) {
   return JSON.stringify(json, null, 2);
+}
+
+export function getUserIdentity(user: UserResource) {
+  return `${user.firstName} ${user.lastName}`;
 }

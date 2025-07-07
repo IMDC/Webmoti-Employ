@@ -7,6 +7,7 @@ import { Corner } from '@/components/Corner';
 import { useAppStore } from '@/stores/useAppStore';
 import { useDeviceStore } from '@/stores/useDeviceStore';
 import { useZoomPreviewStore } from '@/stores/usePreviewStore';
+import { getUserIdentity } from '@/utils/utils';
 import { MenuBar } from '../components/MenuBar';
 import { useZoomSessionStore } from '../zoom/useZoomSessionStore';
 import { ErrorScreen } from './components/ErrorScreen';
@@ -89,7 +90,7 @@ export function PrejoinScreen() {
       <Center mih="100vh">
         <Group>
           <Stack>
-            <PreviewTile height={196.875} width={350} />
+            <PreviewTile height={196.875} width={350} name={userIdentity} />
 
             <MenuBar
               onToggleMic={async () => {
@@ -129,13 +130,6 @@ export function PrejoinScreen() {
       </Center>
     </>
   );
-}
-
-function getUserIdentity(user: { firstName: string | null; lastName: string | null } | null) {
-  if (!user?.firstName || !user?.lastName) {
-    throw new Error('User identity is incomplete');
-  }
-  return `${user.firstName} ${user.lastName}`;
 }
 
 function buildInterviewSessionArgs(

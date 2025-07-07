@@ -5,8 +5,8 @@ import { NoVideoBackground } from './NoVideoBackground';
 interface ParticipantTileProps {
   height: number | string;
   width: number | string;
-  name?: string;
-  showAvatarFallback?: boolean;
+  name: string;
+  isVideoOn: boolean;
   children: React.ReactNode;
 }
 
@@ -14,7 +14,7 @@ export function ParticipantTile({
   height,
   width,
   name,
-  showAvatarFallback = false,
+  isVideoOn,
   children,
 }: ParticipantTileProps) {
   return (
@@ -28,13 +28,13 @@ export function ParticipantTile({
         overflow: 'hidden',
       }}
     >
-      {showAvatarFallback && <NoVideoBackground />}
+      {!isVideoOn && <NoVideoBackground />}
 
       {children}
 
       {name && (
         <Corner position="bottom-left" yOffset={15} xOffset={15}>
-          <Text size="sm" c="white">
+          <Text size="sm" c="white" style={{ userSelect: 'none' }}>
             {name}
           </Text>
         </Corner>

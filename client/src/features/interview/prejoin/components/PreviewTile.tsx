@@ -9,9 +9,10 @@ import { VideoRenderer } from '../../session/components/VideoRenderer';
 interface PreviewTileProps {
   height: number;
   width: number;
+  name: string;
 }
 
-export function PreviewTile({ height, width }: PreviewTileProps) {
+export function PreviewTile({ height, width, name }: PreviewTileProps) {
   const permissionState = useAppStore((s) => s.permissionState);
   const startCamera = useZoomPreviewStore((s) => s.startCamera);
   const stopCamera = useZoomPreviewStore((s) => s.stopCamera);
@@ -50,7 +51,7 @@ export function PreviewTile({ height, width }: PreviewTileProps) {
   }, [localAudioTrack]);
 
   return (
-    <ParticipantTile height={height} width={width} name="You">
+    <ParticipantTile height={height} width={width} name={name} isVideoOn={isVideoOn}>
       {permissionState === 'granted' && isVideoOn && (
         <VideoRenderer attach={startCamera} detach={stopCamera} />
       )}
