@@ -23,7 +23,7 @@ import { useForm } from '@mantine/form';
 import { useAppStore } from '@/stores/useAppStore';
 import { handleServerError } from '@/utils/utils';
 import { useScheduleInterview } from '../queries';
-import { ScheduleInterview, ScheduleInterviewSchema } from '../schema';
+import { ScheduleInterviewForm } from '../schema';
 
 function openGoogleCalendarTab(startTime: Date, endTime: Date, invites: string[]) {
   const formatDate = (d: Date) =>
@@ -66,10 +66,10 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
       openGoogleCalendar: false,
     },
 
-    validate: zod4Resolver(ScheduleInterviewSchema),
+    validate: zod4Resolver(ScheduleInterviewForm),
   });
 
-  async function handleSubmit(values: ScheduleInterview) {
+  async function handleSubmit(values: ScheduleInterviewForm) {
     const [hours, minutes] = values.startTime.split(':').map(Number);
     const startTime = new Date(values.date);
     startTime.setHours(hours, minutes, 0, 0);

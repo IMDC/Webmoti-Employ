@@ -1,7 +1,7 @@
-import { ZoomTokenInput } from './schema';
+import { ZoomToken } from './schema';
 import { JWTPayload, SignJWT } from 'jose';
 
-export type ZoomJwtInput = ZoomTokenInput & {
+export type ZoomJwtInput = ZoomToken & {
   zoomVideoSdkKey: string;
   zoomVideoSdkSecret: string;
 };

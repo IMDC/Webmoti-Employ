@@ -1,17 +1,17 @@
 import { BaseContext } from '../..';
 import { zValidator } from '../../validator-wrapper';
 import { generateZoomApiJwt, generateZoomVideoJwt } from './jwt';
-import { ZoomClient, ZoomSession } from './ZoomClient';
+import { Session, ZoomClient } from './ZoomClient';
 import { Hono } from 'hono';
 import { z } from 'zod/v4';
 
 const sessionsRoute = new Hono<BaseContext>();
 
-const CreateQuerySchema = z.object({
+const SessionsCreateRequestQuery = z.object({
   userIdentity: z.string().max(34),
 });
 
-sessionsRoute.get('/', zValidator('query', CreateQuerySchema), async (c) => {
+sessionsRoute.get('/', zValidator('query', SessionsCreateRequestQuery), async (c) => {
   const { userIdentity } = c.req.valid('query');
 
   const sessionName = crypto.randomUUID();
@@ -27,25 +27,25 @@ sessionsRoute.get('/', zValidator('query', CreateQuerySchema), async (c) => {
   return c.json({ sessionName, token });
 });
 
-const JoinQuerySchema = z.object({
+const SessionsJoinRequestQuery = z.object({
   userIdentity: z.string().max(34),
 });
 
-const JoinParamSchema = z.object({
+const SessionsJoinRequestParams = z.object({
   sessionName: z.string().min(1).max(199),
 });
 
 sessionsRoute.get(
   '/:sessionName',
-  zValidator('param', JoinParamSchema),
-  zValidator('query', JoinQuerySchema),
+  zValidator('param', SessionsJoinRequestParams),
+  zValidator('query', SessionsJoinRequestQuery),
   async (c) => {
     const { sessionName } = c.req.valid('param');
     const { userIdentity } = c.req.valid('query');
 
     const apiToken = await generateZoomApiJwt(c.env.ZOOM_API_KEY, c.env.ZOOM_API_SECRET);
 
-    let foundSession: ZoomSession | null = null;
+    let foundSession: Session | null = null;
     try {
       const client = new ZoomClient(apiToken);
       // this array should only be one session since we search using sessionName

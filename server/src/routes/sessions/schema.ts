@@ -16,7 +16,7 @@ import { z } from 'zod/v4';
 // ];
 
 // https://developers.zoom.us/docs/video-sdk/auth/#payload
-export const zoomTokenSchema = z.object({
+export const ZoomToken = z.object({
   sessionName: z.string().min(1).max(199),
   role: z.union([z.literal(0), z.literal(1)]),
   expirationSeconds: z.coerce
@@ -35,4 +35,4 @@ export const zoomTokenSchema = z.object({
   audioWebRtcMode: z.union([z.literal(0), z.literal(1)]).optional(),
 });
 
-export type ZoomTokenInput = z.infer<typeof zoomTokenSchema>;
+export type ZoomToken = z.infer<typeof ZoomToken>;

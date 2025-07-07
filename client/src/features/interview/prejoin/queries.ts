@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod/v4';
 import { HttpError } from '@/utils/HttpError';
-import { InterviewData, InterviewDataSchema } from './schema';
+import { SessionsGetResponse } from './schema';
 
 type CreateArgs = {
   action: 'create';
@@ -19,7 +19,7 @@ export type InterviewSessionArgs = CreateArgs | JoinArgs;
 // ----------------------------------------------------------------
 // GET /sessions
 
-async function fetchInterviewSession(args: InterviewSessionArgs): Promise<InterviewData> {
+async function fetchInterviewSession(args: InterviewSessionArgs): Promise<SessionsGetResponse> {
   const { action, userIdentity } = args;
 
   const params = new URLSearchParams({ userIdentity });
@@ -37,7 +37,7 @@ async function fetchInterviewSession(args: InterviewSessionArgs): Promise<Interv
     throw new HttpError(`Failed to ${action} session`, response.status, json);
   }
 
-  const result = InterviewDataSchema.safeParse(json);
+  const result = SessionsGetResponse.safeParse(json);
   if (!result.success) {
     throw new HttpError('Invalid response schema', 500, z.flattenError(result.error));
   }

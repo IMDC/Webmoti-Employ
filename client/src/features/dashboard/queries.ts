@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod/v4';
 import { HttpError } from '@/utils/HttpError';
-import { InterviewCreate, InterviewsResponseSchema } from './schema';
+import { InterviewsGetResponse, InterviewsPostRequest } from './schema';
 
 const queryKeys = {
   interviews: ['interviews'] as const,
@@ -17,7 +17,7 @@ async function getInterviews() {
   }
 
   const json = await response.json();
-  const result = InterviewsResponseSchema.safeParse(json);
+  const result = InterviewsGetResponse.safeParse(json);
   if (!result.success) {
     throw new Error(z.prettifyError(result.error));
   }

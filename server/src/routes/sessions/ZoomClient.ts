@@ -1,6 +1,6 @@
 import { z } from 'zod/v4';
 
-const SessionSchema = z.object({
+const Session = z.object({
   id: z.string(),
   session_name: z.string(),
   start_time: z.coerce.date(),
@@ -9,10 +9,10 @@ const SessionSchema = z.object({
   user_count: z.number(),
 });
 
-export type ZoomSession = z.infer<typeof SessionSchema>;
+export type Session = z.infer<typeof Session>;
 
-const GetSessionsSchema = z.object({
-  sessions: z.array(SessionSchema),
+const SessionsGetRequest = z.object({
+  sessions: z.array(Session),
 });
 
 export class ZoomClient {
@@ -46,7 +46,7 @@ export class ZoomClient {
       session_name: sessionName,
     });
     const data = await this.request('/sessions', params);
-    const parsed = GetSessionsSchema.safeParse(data);
+    const parsed = SessionsGetRequest.safeParse(data);
     if (!parsed.success) {
       throw new Error(z.prettifyError(parsed.error));
     }

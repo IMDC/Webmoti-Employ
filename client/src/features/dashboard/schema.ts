@@ -1,48 +1,48 @@
 import { z } from 'zod/v4';
 
 // ----------------------------------------------------------------
-// GET from interviews
+// GET /interviews
 
-const InterviewInviteSchema = z.object({
+const InterviewInvite = z.object({
   id: z.number(),
   interviewId: z.number(),
   email: z.email(),
 });
 
-export const InterviewSchema = z.object({
+export const Interview = z.object({
   id: z.number(),
   creatorId: z.string(),
   startTime: z.coerce.date(),
   endTime: z.coerce.date(),
-  invites: z.array(InterviewInviteSchema).optional(),
+  invites: z.array(InterviewInvite).optional(),
 });
 
-export const InterviewsResponseSchema = z.object({
-  interviews: z.array(InterviewSchema),
+export const InterviewsGetResponse = z.object({
+  interviews: z.array(Interview),
 });
 
-export type Interview = z.infer<typeof InterviewSchema>;
+export type Interview = z.infer<typeof Interview>;
 
 // ----------------------------------------------------------------
-// POST to interviews
+// POST /interviews
 
-export const InterviewCreateSchema = z.object({
+export const InterviewsPostRequest = z.object({
   creatorId: z.string(),
   startTime: z.date(),
   endTime: z.date(),
   invites: z.array(z.object({ email: z.email() })),
 });
 
-export type InterviewCreate = z.infer<typeof InterviewCreateSchema>;
+export type InterviewsPostRequest = z.infer<typeof InterviewsPostRequest>;
 
 // ----------------------------------------------------------------
 // Interview form schema:
 
-export const ScheduleInterviewSchema = z.object({
+export const ScheduleInterviewForm = z.object({
   date: z.coerce.date(),
   startTime: z.string().regex(/^\d{2}:\d{2}$/), // ex: "09:00"
   invites: z.array(z.object({ email: z.email() })),
   openGoogleCalendar: z.boolean(),
 });
 
-export type ScheduleInterview = z.infer<typeof ScheduleInterviewSchema>;
+export type ScheduleInterviewForm = z.infer<typeof ScheduleInterviewForm>;
