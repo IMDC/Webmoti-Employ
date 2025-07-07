@@ -1,11 +1,11 @@
-import { BaseContext } from '../..';
+import { AppContext } from '../..';
 import { zValidator } from '../../validator-wrapper';
 import { generateZoomApiJwt, generateZoomVideoJwt } from './jwt';
 import { Session, ZoomClient } from './ZoomClient';
 import { Hono } from 'hono';
 import { z } from 'zod/v4';
 
-const sessionsRoute = new Hono<BaseContext>();
+const sessionsRoute = new Hono<AppContext>();
 
 const SessionsCreateRequestQuery = z.object({
   userIdentity: z.string().max(34),

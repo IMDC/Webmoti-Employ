@@ -1,32 +1,25 @@
 import { DB } from './db/schema';
+import { useAuth } from './middleware/useAuth';
 import interviewsRoute from './routes/interviews';
 import sessionsRoute from './routes/sessions';
-import { clerkMiddleware, getAuth } from '@hono/clerk-auth';
+import { clerkMiddleware } from '@hono/clerk-auth';
 import { Hono } from 'hono';
 import { Kysely } from 'kysely';
 
-export type BaseContext = {
+export type AppContext = {
   Bindings: CloudflareBindings;
-};
-
-export type DbContext = BaseContext & {
   Variables: {
-    db: Kysely<DB>;
+    clerkUserId: string;
+    db?: Kysely<DB>;
   };
 };
 
-const app = new Hono<BaseContext>();
+const app = new Hono<AppContext>();
 
 app.use('*', clerkMiddleware());
 
 // all routes require authentication
-app.use('*', async (c, next) => {
-  const auth = getAuth(c);
-  if (!auth?.userId) {
-    return c.json({ message: 'Unauthorized' }, 401);
-  }
-  return next();
-});
+app.use('*', useAuth);
 
 app.onError((err, c) => {
   console.error(err);

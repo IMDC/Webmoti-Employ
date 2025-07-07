@@ -41,7 +41,7 @@ export function useInterviews() {
 // ----------------------------------------------------------------
 // POST to interviews
 
-async function scheduleInterview(interview: InterviewCreate) {
+async function scheduleInterview(interview: InterviewsPostRequest) {
   const response = await fetch('/api/interviews', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
