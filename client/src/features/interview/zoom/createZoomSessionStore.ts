@@ -53,7 +53,7 @@ export function createZoomSessionStore() {
 
       initialized: false,
       initClient: async () => {
-        logger.info('Initializing zoom client...');
+        logger.log('Initializing zoom client...');
 
         await client.init('en-US', 'Global', {
           patchJsMedia: true,
@@ -106,7 +106,7 @@ export function createZoomSessionStore() {
         // need to detach first to ensure it works properly (this matters in strict mode)
         await stream().detachVideo(userId);
 
-        logger.info('Attaching video player...');
+        logger.log('Attaching video player...');
         await stream().attachVideo(userId, VideoQuality.Video_720P, element);
       },
 
