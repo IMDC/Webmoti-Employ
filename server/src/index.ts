@@ -11,6 +11,7 @@ export type AppContext = {
   Variables: {
     clerkUserId: string;
     db?: Kysely<DB>;
+    userEmail?: string;
   };
 };
 

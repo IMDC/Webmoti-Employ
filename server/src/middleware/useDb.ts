@@ -8,7 +8,6 @@ import { Kysely } from 'kysely';
 
 export const useDb = createMiddleware<AppContext>(async (c, next) => {
   const db = getDb(c.env.HYPERDRIVE.connectionString);
-
   c.set('db', db);
 
   try {
@@ -18,10 +17,10 @@ export const useDb = createMiddleware<AppContext>(async (c, next) => {
   }
 });
 
-export function requireDb(c: Context): Kysely<DB> {
-  const db = c.get('db');
+export function requireDb(c: Context<AppContext>): Kysely<DB> {
+  const db = c.var.db;
   if (!db) {
-    throw new HTTPException(500, { message: 'Database not initialized' });
+    throw new HTTPException(500, { message: 'Database is missing from context' });
   }
   return db;
 }

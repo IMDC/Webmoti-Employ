@@ -2,8 +2,36 @@ import { DB } from '../../db/schema';
 import { InterviewInvite } from './schema';
 import { Kysely } from 'kysely';
 
-export async function getAllInterviews(db: Kysely<DB>) {
-  return await db.selectFrom('interview').selectAll().execute();
+export async function getInterviews(db: Kysely<DB>, userId: string, userEmail: string) {
+  return await db.transaction().execute(async (trx) => {
+    // first find all interviews the user is a creator of or invited to
+    const scheduledInterviewIds = await trx
+      .selectFrom('interview')
+      .leftJoin('interviewInvite', 'interviewInvite.interviewId', 'interview.id')
+      .where((expBuilder) =>
+        expBuilder.or([
+          expBuilder('interview.creatorId', '=', userId),
+          expBuilder('interviewInvite.email', '=', userEmail),
+        ])
+      )
+      .select('interview.id')
+      .distinct()
+      .execute();
+
+    if (!scheduledInterviewIds) {
+      return [];
+    }
+
+    const idArray = scheduledInterviewIds.map((row) => row.id);
+
+    const scheduledInterviews = await trx
+      .selectFrom('interview')
+      .where('interview.id', 'in', idArray)
+      .selectAll()
+      .execute();
+
+    return scheduledInterviews;
+  });
 }
 
 export async function createInterview(

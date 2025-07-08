@@ -1,17 +1,22 @@
 import { AppContext } from '../..';
 import { requireDb, useDb } from '../../middleware/useDb';
+import { requireUserEmail, useUserEmail } from '../../middleware/useUserEmail';
 import { zValidator } from '../../validator-wrapper';
-import { createInterview, deleteInterview, getAllInterviews } from './db-queries';
+import { createInterview, deleteInterview, getInterviews } from './db-queries';
 import { InterviewsDeleteRequest, InterviewsPostRequest } from './schema';
 import { Hono } from 'hono';
 
 const interviewsRoute = new Hono<AppContext>();
 
 interviewsRoute.use('*', useDb);
+interviewsRoute.use('/', useUserEmail);
 
 interviewsRoute.get('/', async (c) => {
   const db = requireDb(c);
-  const interviews = await getAllInterviews(db);
+  const userEmail = requireUserEmail(c);
+
+  const interviews = await getInterviews(db, c.var.clerkUserId, userEmail);
+
   return c.json({ interviews });
 });
 
