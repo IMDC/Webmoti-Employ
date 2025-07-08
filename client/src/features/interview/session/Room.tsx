@@ -6,6 +6,7 @@ import { useAppStore } from '@/stores/useAppStore';
 import { useDeviceStore } from '@/stores/useDeviceStore';
 import { GALLERY_VIEW_MARGIN } from '@/utils/constants';
 import { Chat } from '../chat/Chat';
+import { useChatStore } from '../chat/useChatStore';
 import { MenuBar } from '../components/MenuBar';
 import { VideoGrid } from './components/VideoGrid';
 
@@ -26,15 +27,14 @@ export function Room() {
   const stopVideo = useZoomSessionStore((s) => s.stopVideo);
   const startAudio = useZoomSessionStore((s) => s.startAudio);
   const stopAudio = useZoomSessionStore((s) => s.stopAudio);
-
   const leave = useZoomSessionStore((s) => s.leave);
-
   const switchCamera = useZoomSessionStore((s) => s.switchCamera);
   const switchMicrophone = useZoomSessionStore((s) => s.switchMicrophone);
+  const callState = useZoomSessionStore((s) => s.callState);
+
+  const isChatUnread = useChatStore((s) => s.isChatUnread);
 
   const navigate = useNavigate();
-
-  const callState = useZoomSessionStore((s) => s.callState);
 
   useEffect(() => {
     if (callState === 'left') {
@@ -123,6 +123,7 @@ export function Room() {
             setIsChatOpen(!isChatOpen);
           }}
           onLeave={leave}
+          isChatUnread={isChatUnread}
         />
       </AppShell.Footer>
     </AppShell>

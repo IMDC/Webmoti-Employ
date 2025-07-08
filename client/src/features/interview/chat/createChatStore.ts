@@ -5,6 +5,7 @@ export type ChatStore = {
   chatClient: typeof ChatClient;
   messages: Array<ChatMessage>;
   isChatUnread: boolean;
+  setChatRead: () => void;
 
   sendChat: (messageText: string) => Promise<void>;
 
@@ -22,13 +23,17 @@ export function createChatStore(zoomClient: typeof VideoClient) {
   const handleMessage = (message: ChatMessage) => {
     chatStore.setState((s) => ({
       messages: [...s.messages, message],
+      isChatUnread: true,
     }));
   };
 
-  const chatStore = createStore<ChatStore>(() => ({
+  const chatStore = createStore<ChatStore>((set) => ({
     chatClient,
     messages,
     isChatUnread: false,
+    setChatRead: () => {
+      set({ isChatUnread: false });
+    },
 
     sendChat: async (messageText) => {
       await chatClient.sendToAll(messageText);

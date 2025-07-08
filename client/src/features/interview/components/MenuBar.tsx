@@ -21,7 +21,7 @@ interface MenuBarProps {
   isPrejoin?: boolean;
   disableMediaButtons?: boolean;
   onLeave?: () => void;
-
+  isChatUnread?: boolean;
   onChangeVideoDevice?: (videoDeviceId: string) => Promise<void>;
   onChangeAudioInputDevice?: (audioInputDeviceId: string) => Promise<void>;
 }
@@ -32,9 +32,10 @@ export function MenuBar({
   onToggleChat,
   onChangeVideoDevice,
   onChangeAudioInputDevice,
+  onLeave,
   isPrejoin = false,
   disableMediaButtons = false,
-  onLeave,
+  isChatUnread = false,
 }: MenuBarProps) {
   const permissionState = useAppStore((state) => state.permissionState);
   const isAudioOn = useAppStore((state) => state.isAudioOn);
@@ -95,11 +96,9 @@ export function MenuBar({
             </Popover.Dropdown>
           </Popover>
 
-          {permissionState === 'denied' ? (
-            <Indicator color="orange">{MicButton}</Indicator>
-          ) : (
-            MicButton
-          )}
+          <Indicator color="orange" disabled={permissionState !== 'denied'}>
+            {MicButton}
+          </Indicator>
         </Button.Group>
 
         <Button.Group>
@@ -118,11 +117,9 @@ export function MenuBar({
             </Popover.Dropdown>
           </Popover>
 
-          {permissionState === 'denied' ? (
-            <Indicator color="orange">{VideoButton}</Indicator>
-          ) : (
-            VideoButton
-          )}
+          <Indicator color="orange" disabled={permissionState !== 'denied'}>
+            {VideoButton}
+          </Indicator>
         </Button.Group>
 
         {!isPrejoin && (
@@ -136,9 +133,12 @@ export function MenuBar({
       <Flex align="center" gap="md" style={{ flex: 1 }} justify="flex-end">
         {!isPrejoin && (
           <>
-            <Button variant="default" onClick={onToggleChat}>
-              <IconMessageFilled size={18} />
-            </Button>
+            <Indicator processing disabled={!isChatUnread}>
+              <Button variant="default" onClick={onToggleChat}>
+                <IconMessageFilled size={18} />
+              </Button>
+            </Indicator>
+
             <ControlsMenu onLayoutOpen={openLayoutModal} />
             <ChangeLayoutModal isOpen={isLayoutModalOpen} onClose={closeLayoutModal} />
           </>

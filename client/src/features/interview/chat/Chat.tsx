@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { IconMessages, IconSend, IconTool, IconUserFilled } from '@tabler/icons-react';
 import { ChatMessage, Participant } from '@zoom/videosdk';
 import Linkify from 'linkify-react';
@@ -63,18 +63,51 @@ function Message({ chatMessage, participants }: MessageProps) {
 
 export function Chat() {
   const [chatText, setChatText] = useState('');
+  const [isAtBottom, setIsAtBottom] = useState(true);
 
   const messages = useChatStore((s) => s.messages);
   const sendChat = useChatStore((s) => s.sendChat);
+  const setChatRead = useChatStore((s) => s.setChatRead);
 
   const participants = useZoomSessionStore((s) => s.participants);
 
-  const isChatTextValid = chatText !== '';
+  const scrollViewportRef = useRef<HTMLDivElement>(null);
+
+  const isChatTextValid = chatText.trim() !== '';
 
   function sendMessage() {
-    sendChat(chatText);
+    const trimmed = chatText.trim();
+    sendChat(trimmed);
     setChatText('');
   }
+
+  const handleScroll = ({ y }: { x: number; y: number }) => {
+    const el = scrollViewportRef.current;
+    if (!el) {
+      return;
+    }
+    const SCROLL_EPSILON = 5;
+    setIsAtBottom(y + el.clientHeight >= el.scrollHeight - SCROLL_EPSILON);
+  };
+
+  useEffect(() => {
+    const el = scrollViewportRef.current;
+    if (!el) {
+      return;
+    }
+    // scroll to bottom when you open the chat
+    el.scrollTo({ top: el.scrollHeight, behavior: 'instant' });
+  }, []);
+
+  useEffect(() => {
+    const el = scrollViewportRef.current;
+    if (!el || !isAtBottom) {
+      return;
+    }
+    // when you're at the bottom, mark as read and scroll down to the new message
+    setChatRead();
+    el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+  }, [messages, isAtBottom, setChatRead]);
 
   return (
     <Card
@@ -96,7 +129,11 @@ export function Chat() {
 
       {/* message list */}
       <Box style={{ flex: 1, overflow: 'hidden', margin: '12px 0' }}>
-        <ScrollArea style={{ height: '100%' }}>
+        <ScrollArea
+          style={{ height: '100%' }}
+          viewportRef={scrollViewportRef}
+          onScrollPositionChange={handleScroll}
+        >
           <Stack gap={5}>
             {messages.map((msg, i) => (
               <Message key={i} chatMessage={msg} participants={participants} />
@@ -114,6 +151,9 @@ export function Chat() {
         onKeyDown={(event) => {
           if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
+            if (!isChatTextValid) {
+              return;
+            }
             sendMessage();
           }
         }}
