@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Center, Skeleton, Stack, Text } from '@mantine/core';
+import { Center, Stack, Text } from '@mantine/core';
 import { useInterviews } from '../queries';
 import { InterviewCards } from './InterviewCards';
+import { InterviewCardSkeleton } from './InterviewCardSkeleton';
 import { TimeTabs } from './TimeTabs';
 
 export function InterviewList() {
@@ -16,11 +17,11 @@ export function InterviewList() {
 
   if (isPending) {
     return (
-      <>
-        <Skeleton height={60} />
-        <Skeleton height={60} />
-        <Skeleton height={60} />
-      </>
+      <Stack>
+        {Array.from({ length: 3 }).map((_, idx) => (
+          <InterviewCardSkeleton key={idx} />
+        ))}
+      </Stack>
     );
   }
 
