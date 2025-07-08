@@ -14,6 +14,7 @@ export type ChatStore = {
 
 export function createChatStore(zoomClient: typeof VideoClient) {
   const chatClient = zoomClient.getChatClient();
+  const currentUserId = zoomClient.getCurrentUserInfo().userId;
 
   // initialize messages
   // (this doesn't work since zoom sdk doesn't store/sync old chat messages)
@@ -23,7 +24,7 @@ export function createChatStore(zoomClient: typeof VideoClient) {
   const handleMessage = (message: ChatMessage) => {
     chatStore.setState((s) => ({
       messages: [...s.messages, message],
-      isChatUnread: true,
+      isChatUnread: message.sender.userId !== currentUserId,
     }));
   };
 
