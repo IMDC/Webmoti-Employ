@@ -1,7 +1,10 @@
 import { AppContext } from '../..';
+import { requireDb, useDb } from '../../middleware/useDb';
+import { requireUserEmail, useUserEmail } from '../../middleware/useUserEmail';
 import { zValidator } from '../../validator-wrapper';
+import { getInterviews } from '../interviews/db-queries';
 import { generateZoomApiJwt, generateZoomVideoJwt } from './jwt';
-import { Session, ZoomClient } from './ZoomClient';
+import { ZoomClient } from './ZoomClient';
 import { Hono } from 'hono';
 import { z } from 'zod/v4';
 
@@ -37,44 +40,67 @@ const SessionsJoinRequestParams = z.object({
 
 sessionsRoute.get(
   '/:sessionName',
+  useDb,
+  useUserEmail,
   zValidator('param', SessionsJoinRequestParams),
   zValidator('query', SessionsJoinRequestQuery),
   async (c) => {
     const { sessionName } = c.req.valid('param');
     const { userIdentity } = c.req.valid('query');
 
+    const db = requireDb(c);
+    const userEmail = requireUserEmail(c);
+
+    async function returnJoinToken() {
+      const token = await generateZoomVideoJwt({
+        zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
+        zoomVideoSdkSecret: c.env.ZOOM_VIDEO_SDK_SECRET,
+        sessionName,
+        userIdentity,
+        role: 0, // the person with role 1 is already in the session at this point
+      });
+
+      return c.json({ sessionName, token });
+    }
+
+    // ----------------------------------------------------
+    // First check if this session is a scheduled session
+    // ----------------------------------------------------
+
+    const foundScheduledInterviews = await getInterviews(
+      db,
+      c.var.clerkUserId,
+      userEmail,
+      sessionName,
+      true
+    );
+
+    if (foundScheduledInterviews.length > 0) {
+      return returnJoinToken();
+    }
+
+    // TODO fix bug here!!!
+
+    // ----------------------------------------------------
+    // If not scheduled, check if live
+    // ----------------------------------------------------
+
     const apiToken = await generateZoomApiJwt(c.env.ZOOM_API_KEY, c.env.ZOOM_API_SECRET);
 
-    let foundSession: Session | null = null;
     try {
       const client = new ZoomClient(apiToken);
       // this array should only be one session since we search using sessionName
       const liveSessions = await client.searchLiveSessions(sessionName);
-      for (const session of liveSessions) {
-        if (session.session_name === sessionName) {
-          foundSession = session;
-          break;
-        }
-      }
-
-      if (!foundSession) {
-        console.error('Unable to find session');
-        return c.json({ error: 'Unable to find session' }, 404);
+      const isLive = liveSessions.some((s) => s.session_name === sessionName);
+      if (isLive) {
+        return returnJoinToken();
       }
     } catch (error) {
-      console.error(error);
+      console.error('Zoom live session check failed:', error);
       return c.json({ error: 'Failed to query sessions' }, 500);
     }
 
-    const token = await generateZoomVideoJwt({
-      zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
-      zoomVideoSdkSecret: c.env.ZOOM_VIDEO_SDK_SECRET,
-      sessionName,
-      userIdentity,
-      role: 0, // the person with role 1 is already in the session at this point
-    });
-
-    return c.json({ sessionName, token, userCount: foundSession.user_count });
+    return c.json({ error: 'Unable to find session' }, 404);
   }
 );
 

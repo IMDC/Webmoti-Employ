@@ -1,19 +1,38 @@
 import { DB } from '../../db/schema';
 import { InterviewInvite } from './schema';
-import { Kysely } from 'kysely';
+import { Expression, Kysely, sql, SqlBool } from 'kysely';
 
-export async function getInterviews(db: Kysely<DB>, userId: string, userEmail: string) {
+export async function getInterviews(
+  db: Kysely<DB>,
+  userId: string,
+  userEmail: string,
+  sessionName?: string,
+  isUpcoming?: boolean
+) {
   return await db.transaction().execute(async (trx) => {
     // first find all interviews the user is a creator of or invited to
     const scheduledInterviewIds = await trx
       .selectFrom('interview')
       .leftJoin('interviewInvite', 'interviewInvite.interviewId', 'interview.id')
-      .where((expBuilder) =>
-        expBuilder.or([
-          expBuilder('interview.creatorId', '=', userId),
-          expBuilder('interviewInvite.email', '=', userEmail),
-        ])
-      )
+      .where((eb) => {
+        const filters: Expression<SqlBool>[] = [
+          eb.or([
+            eb('interview.creatorId', '=', userId),
+            eb('interviewInvite.email', '=', userEmail),
+          ]),
+        ];
+
+        if (isUpcoming) {
+          // filter using endTime since you could still join an interview after startTime
+          filters.push(eb('interview.endTime', '>=', sql<Date>`now()`));
+        }
+
+        if (sessionName) {
+          filters.push(eb('interview.sessionName', '=', sessionName));
+        }
+
+        return eb.and(filters);
+      })
       .select('interview.id')
       .distinct()
       .execute();

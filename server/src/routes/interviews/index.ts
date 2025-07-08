@@ -8,10 +8,7 @@ import { Hono } from 'hono';
 
 const interviewsRoute = new Hono<AppContext>();
 
-interviewsRoute.use('*', useDb);
-interviewsRoute.use('/', useUserEmail);
-
-interviewsRoute.get('/', async (c) => {
+interviewsRoute.get('/', useDb, useUserEmail, async (c) => {
   const db = requireDb(c);
   const userEmail = requireUserEmail(c);
 
