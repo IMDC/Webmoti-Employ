@@ -1,4 +1,5 @@
 import type { UserResource } from '@clerk/types';
+import { ExecutedFailure } from '@zoom/videosdk';
 import { AppError } from '@/stores/useAppStore';
 import { Json } from '@/types/Json';
 import { HttpError } from './HttpError';
@@ -19,12 +20,18 @@ export function getFittedSize(
   return [width, height];
 }
 
-export function handleServerError(
+function isExecutedFailure(error: unknown): error is ExecutedFailure {
+  return typeof error === 'object' && error !== null && 'reason' in error && 'errorCode' in error;
+}
+
+export function handleAppError(
   error: unknown,
   setError: (e: AppError) => void,
   defaultMessage: string
 ) {
-  if (error instanceof HttpError) {
+  if (isExecutedFailure(error)) {
+    setError({ message: defaultMessage, status: error.errorCode, details: error.reason });
+  } else if (error instanceof HttpError) {
     setError({ message: error.message, status: error.status, details: error.details });
   } else if (error instanceof Error) {
     setError({ message: defaultMessage, details: error.message });

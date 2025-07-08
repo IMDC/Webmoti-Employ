@@ -19,7 +19,7 @@ export function formatAppError(error: AppError): string {
     const detailsText = typeof details === 'string' ? details : jsonStringifyIndented(details);
 
     if (detailsText.length > 0) {
-      lines.push(`Details:\n${detailsText}`);
+      lines.push(`Details: ${detailsText}`);
     }
   }
 

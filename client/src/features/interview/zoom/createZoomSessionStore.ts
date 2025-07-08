@@ -3,6 +3,7 @@ import { createStore } from 'zustand';
 import { useAppStore } from '@/stores/useAppStore';
 import { useDeviceStore } from '@/stores/useDeviceStore';
 import { logger } from '@/utils/logger';
+import { handleAppError } from '@/utils/utils';
 
 export type ZoomSessionStore = {
   client: typeof VideoClient;
@@ -67,18 +68,21 @@ export function createZoomSessionStore() {
       join: async (name, roomName, token) => {
         set({ callState: 'joining' });
 
-        await client.join(roomName, token, name);
+        try {
+          await client.join(roomName, token, name);
 
-        const stream = client.getMediaStream();
+          const stream = client.getMediaStream();
+          if (useAppStore.getState().permissionState === 'granted') {
+            await stream.startVideo();
+            await stream.startAudio();
+          }
 
-        if (useAppStore.getState().permissionState === 'granted') {
-          await stream.startVideo();
-          await stream.startAudio();
+          set({ stream, callState: 'joined' });
+          updateParticipants();
+        } catch (error: unknown) {
+          set({ callState: 'prejoin', stream: null });
+          handleAppError(error, useAppStore.getState().setError, 'Failed to join Zoom session');
         }
-
-        set({ stream, callState: 'joined' });
-
-        updateParticipants();
       },
       leave: async () => {
         set({
