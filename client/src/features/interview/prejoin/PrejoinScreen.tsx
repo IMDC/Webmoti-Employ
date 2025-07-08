@@ -51,7 +51,7 @@ export function PrejoinScreen() {
     if (callState === 'joined' && interviewSession) {
       navigate({
         to: '/interview/$id',
-        params: { id: interviewSession.sessionName },
+        params: { id: interviewSession.sessionId },
       });
     }
   }, [callState, interviewSession, navigate]);
@@ -117,12 +117,12 @@ export function PrejoinScreen() {
           <Stack>
             <Title>{`${args.action === 'create' ? 'New' : 'Join'} Interview`}</Title>
             <Group>
-              <CopyButton copyText={interviewSession.sessionName} />
-              <Text ff="monospace">{interviewSession?.sessionName}</Text>
+              <CopyButton copyText={interviewSession.sessionId} />
+              <Text ff="monospace">{interviewSession?.sessionId}</Text>
             </Group>
             <Button
               onClick={async () =>
-                joinZoom(userIdentity, interviewSession.sessionName, interviewSession.token)
+                joinZoom(userIdentity, interviewSession.sessionId, interviewSession.token)
               }
             >{`${args.action === 'create' ? 'Start' : 'Join'}`}</Button>
           </Stack>

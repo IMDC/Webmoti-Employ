@@ -2,7 +2,8 @@ import { z } from 'zod/v4';
 
 const Session = z.object({
   id: z.string(),
-  session_name: z.string(),
+  session_name: z.uuidv4(),
+  session_key: z.uuidv4(),
   start_time: z.coerce.date(),
   // end_time will always be '' since we search for live sessions only
   end_time: z.literal(''),
@@ -37,13 +38,14 @@ export class ZoomClient {
     return res.json();
   }
 
-  async searchLiveSessions(sessionName: string) {
+  async searchLiveSessions(sessionId: string) {
     const today = new Date().toISOString().slice(0, 10);
     const params = new URLSearchParams({
       type: 'live',
       from: today,
       to: today,
-      session_name: sessionName,
+      session_name: sessionId,
+      session_key: sessionId,
     });
     const data = await this.request('/sessions', params);
     const parsed = SessionsGetRequest.safeParse(data);

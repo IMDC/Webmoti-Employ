@@ -14,19 +14,24 @@ import {
   Text,
   TextInput,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useValidatedState } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
 import { Corner } from '@/components/Corner';
 import { InterviewList } from './components/InterviewList';
 import { ScheduleForm } from './components/ScheduleForm';
+import { JoinCodeInput } from './schema';
 
 export function Dashboard() {
   const [isNewInterviewPopupOpen, setIsNewInterviewPopupOpen] = useState(false);
   const [isScheduleModalOpened, { open: openScheduleModal, close: closeScheduleModal }] =
     useDisclosure(false);
 
-  const [joinCodeInput, setJoinCodeInput] = useState('');
+  const [{ value: joinCode, valid: isJoinCodeValid }, setJoinCode] = useValidatedState(
+    '',
+    (val) => JoinCodeInput.safeParse(val).success,
+    false
+  );
 
   const navigate = useNavigate();
 
@@ -116,14 +121,13 @@ export function Dashboard() {
 
               <TextInput
                 placeholder="Enter interview code"
-                value={joinCodeInput}
-                onChange={(event) => setJoinCodeInput(event.currentTarget.value)}
+                value={joinCode}
+                onChange={(event) => setJoinCode(event.currentTarget.value)}
+                error={!isJoinCodeValid && joinCode.length > 0 ? 'Invalid interview code' : false}
               />
               <Button
-                disabled={!joinCodeInput}
-                onClick={() =>
-                  navigate({ to: '/interview/prejoin/$id', params: { id: joinCodeInput } })
-                }
+                disabled={!isJoinCodeValid}
+                onClick={() => navigate({ to: '/interview/prejoin/$id', params: { id: joinCode } })}
               >
                 Join
               </Button>

@@ -6,7 +6,7 @@ export async function getInterviews(
   db: Kysely<DB>,
   userId: string,
   userEmail: string,
-  sessionName?: string,
+  sessionId?: string,
   isUpcoming?: boolean
 ) {
   return await db.transaction().execute(async (trx) => {
@@ -27,8 +27,8 @@ export async function getInterviews(
           filters.push(eb('interview.endTime', '>=', sql<Date>`now()`));
         }
 
-        if (sessionName) {
-          filters.push(eb('interview.sessionName', '=', sessionName));
+        if (sessionId) {
+          filters.push(eb('interview.sessionId', '=', sessionId));
         }
 
         return eb.and(filters);
@@ -37,11 +37,11 @@ export async function getInterviews(
       .distinct()
       .execute();
 
-    if (!scheduledInterviewIds) {
+    const idArray = scheduledInterviewIds.map((row) => row.id);
+
+    if (idArray.length === 0) {
       return [];
     }
-
-    const idArray = scheduledInterviewIds.map((row) => row.id);
 
     const scheduledInterviews = await trx
       .selectFrom('interview')

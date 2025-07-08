@@ -17,17 +17,18 @@ const SessionsCreateRequestQuery = z.object({
 sessionsRoute.get('/', zValidator('query', SessionsCreateRequestQuery), async (c) => {
   const { userIdentity } = c.req.valid('query');
 
-  const sessionName = crypto.randomUUID();
+  const sessionId = crypto.randomUUID();
 
   const token = await generateZoomVideoJwt({
     zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
     zoomVideoSdkSecret: c.env.ZOOM_VIDEO_SDK_SECRET,
-    sessionName: sessionName,
+    sessionName: sessionId,
+    sessionKey: sessionId,
     userIdentity,
     role: 1,
   });
 
-  return c.json({ sessionName, token });
+  return c.json({ sessionId: sessionId, token });
 });
 
 const SessionsJoinRequestQuery = z.object({
@@ -35,17 +36,17 @@ const SessionsJoinRequestQuery = z.object({
 });
 
 const SessionsJoinRequestParams = z.object({
-  sessionName: z.string().min(1).max(199),
+  sessionId: z.uuidv4(),
 });
 
 sessionsRoute.get(
-  '/:sessionName',
+  '/:sessionId',
   useDb,
   useUserEmail,
   zValidator('param', SessionsJoinRequestParams),
   zValidator('query', SessionsJoinRequestQuery),
   async (c) => {
-    const { sessionName } = c.req.valid('param');
+    const { sessionId } = c.req.valid('param');
     const { userIdentity } = c.req.valid('query');
 
     const db = requireDb(c);
@@ -55,12 +56,13 @@ sessionsRoute.get(
       const token = await generateZoomVideoJwt({
         zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
         zoomVideoSdkSecret: c.env.ZOOM_VIDEO_SDK_SECRET,
-        sessionName,
+        sessionName: sessionId,
+        sessionKey: sessionId,
         userIdentity,
         role: 0, // the person with role 1 is already in the session at this point
       });
 
-      return c.json({ sessionName, token });
+      return c.json({ sessionId, token });
     }
 
     // ----------------------------------------------------
@@ -71,7 +73,7 @@ sessionsRoute.get(
       db,
       c.var.clerkUserId,
       userEmail,
-      sessionName,
+      sessionId,
       true
     );
 
@@ -89,9 +91,11 @@ sessionsRoute.get(
 
     try {
       const client = new ZoomClient(apiToken);
-      // this array should only be one session since we search using sessionName
-      const liveSessions = await client.searchLiveSessions(sessionName);
-      const isLive = liveSessions.some((s) => s.session_name === sessionName);
+      // this array should only be one session since we search using sessionId
+      const liveSessions = await client.searchLiveSessions(sessionId);
+      const isLive = liveSessions.some(
+        (s) => s.session_name === sessionId && s.session_key === sessionId
+      );
       if (isLive) {
         return returnJoinToken();
       }

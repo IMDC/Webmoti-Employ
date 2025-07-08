@@ -46,3 +46,8 @@ export const ScheduleInterviewForm = z.object({
 });
 
 export type ScheduleInterviewForm = z.infer<typeof ScheduleInterviewForm>;
+
+// ----------------------------------------------------------------
+// Join code schema:
+
+export const JoinCodeInput = z.uuidv4();

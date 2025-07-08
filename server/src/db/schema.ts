@@ -16,7 +16,7 @@ export interface Interview {
   creatorId: string;
   endTime: Timestamp;
   id: Generated<number>;
-  sessionName: Generated<string>;
+  sessionId: Generated<string>;
   startTime: Timestamp;
   updatedAt: Generated<Timestamp>;
 }
