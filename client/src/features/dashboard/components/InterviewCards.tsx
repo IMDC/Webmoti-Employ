@@ -1,4 +1,4 @@
-import { Center, ScrollArea, Stack, Text } from '@mantine/core';
+import { Center, Stack, Text } from '@mantine/core';
 import { Interview } from '../schema';
 import { InterviewCard } from './InterviewCard';
 
@@ -18,12 +18,10 @@ export function InterviewCards({ interviews }: InterviewCardsProps) {
   }
 
   return (
-    <ScrollArea>
-      <Stack>
-        {interviews.map((interview, index) => (
-          <InterviewCard interview={interview} key={index} />
-        ))}
-      </Stack>
-    </ScrollArea>
+    <Stack pb="xl">
+      {interviews.map((interview, index) => (
+        <InterviewCard interview={interview} key={index} />
+      ))}
+    </Stack>
   );
 }

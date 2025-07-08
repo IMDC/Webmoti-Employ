@@ -1,8 +1,15 @@
 import { useState } from 'react';
 import { UserButton } from '@clerk/clerk-react';
-import { IconCalendarPlus, IconSquareRoundedPlusFilled, IconVideoPlus } from '@tabler/icons-react';
+import {
+  IconArrowUp,
+  IconCalendarPlus,
+  IconSquareRoundedPlusFilled,
+  IconVideoPlus,
+} from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
 import {
+  ActionIcon,
+  Affix,
   AppShell,
   Button,
   Center,
@@ -13,8 +20,9 @@ import {
   Stack,
   Text,
   TextInput,
+  Transition,
 } from '@mantine/core';
-import { useDisclosure, useValidatedState } from '@mantine/hooks';
+import { useDisclosure, useValidatedState, useWindowScroll } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
 import { Corner } from '@/components/Corner';
@@ -26,6 +34,8 @@ export function Dashboard() {
   const [isNewInterviewPopupOpen, setIsNewInterviewPopupOpen] = useState(false);
   const [isScheduleModalOpened, { open: openScheduleModal, close: closeScheduleModal }] =
     useDisclosure(false);
+
+  const [scroll, scrollTo] = useWindowScroll();
 
   const [{ value: joinCode, valid: isJoinCodeValid }, setJoinCode] = useValidatedState(
     '',
@@ -86,7 +96,7 @@ export function Dashboard() {
         </Modal>
 
         <Flex justify="center" align="center" mt="lg">
-          <Flex direction="column" h={500} w={500} gap="md">
+          <Flex direction="column" gap="md">
             <Flex direction="row" gap="sm" justify="center">
               <Popover opened={isNewInterviewPopupOpen} onChange={setIsNewInterviewPopupOpen}>
                 <Popover.Target>
@@ -138,6 +148,16 @@ export function Dashboard() {
             <InterviewList />
           </Flex>
         </Flex>
+
+        <Affix position={{ bottom: 20, right: 20 }}>
+          <Transition transition="slide-up" mounted={scroll.y > 0}>
+            {(transitionStyles) => (
+              <ActionIcon style={transitionStyles} onClick={() => scrollTo({ y: 0 })}>
+                <IconArrowUp size={16} />
+              </ActionIcon>
+            )}
+          </Transition>
+        </Affix>
       </AppShell.Main>
     </AppShell>
   );
