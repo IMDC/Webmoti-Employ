@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { UserButton, useUser } from '@clerk/clerk-react';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { Button, Center, Group, Loader, Stack, Text, Title } from '@mantine/core';
-import { CopyButton } from '@/components/CopyButton';
 import { Corner } from '@/components/Corner';
+import { MyCopyButton } from '@/components/MyCopyButton';
 import { useAppStore } from '@/stores/useAppStore';
 import { useDeviceStore } from '@/stores/useDeviceStore';
 import { useZoomPreviewStore } from '@/stores/usePreviewStore';
@@ -117,8 +117,8 @@ export function PrejoinScreen() {
           <Stack>
             <Title>{`${args.action === 'create' ? 'New' : 'Join'} Interview`}</Title>
             <Group>
-              <CopyButton copyText={interviewSession.sessionId} />
-              <Text ff="monospace">{interviewSession?.sessionId}</Text>
+              <MyCopyButton copyText={interviewSession.sessionId} />
+              <Text ff="monospace">{interviewSession.sessionId}</Text>
             </Group>
             <Button
               onClick={async () =>

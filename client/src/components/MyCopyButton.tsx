@@ -1,11 +1,11 @@
 import { IconCheck, IconCopy } from '@tabler/icons-react';
 import { ActionIcon, CopyButton as MantineCopyButton, Tooltip } from '@mantine/core';
 
-interface CopyButtonProps {
+interface MyCopyButtonProps {
   copyText: string;
 }
 
-export function CopyButton({ copyText }: CopyButtonProps) {
+export function MyCopyButton({ copyText }: MyCopyButtonProps) {
   return (
     <MantineCopyButton value={copyText} timeout={2000}>
       {({ copied, copy }) => (

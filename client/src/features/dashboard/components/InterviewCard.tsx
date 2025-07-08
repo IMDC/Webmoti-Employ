@@ -1,5 +1,6 @@
 import { IconCalendarEventFilled, IconVideoFilled } from '@tabler/icons-react';
-import { Avatar, Badge, Button, Card, Group, Text } from '@mantine/core';
+import { Avatar, Badge, Button, Card, Divider, Group, Text } from '@mantine/core';
+import { MyCopyButton } from '@/components/MyCopyButton';
 import { Interview } from '../schema';
 
 interface InterviewCardProps {
@@ -26,6 +27,14 @@ export function InterviewCard({ interview }: InterviewCardProps) {
           <Text fw="bolder">Interview with Joe</Text>
         </Group>
         <Button leftSection={<IconVideoFilled />}>Join</Button>
+      </Group>
+
+      <Divider my="sm" />
+      <Group justify="space-between" align="center">
+        <Text size="xs" ff="monospace" c="dimmed">
+          Session: {interview.sessionId}
+        </Text>
+        <MyCopyButton copyText={interview.sessionId} />
       </Group>
     </Card>
   );

@@ -20,8 +20,8 @@ export function InterviewCards({ interviews }: InterviewCardsProps) {
   return (
     <ScrollArea>
       <Stack>
-        {interviews.map((interview) => (
-          <InterviewCard interview={interview} />
+        {interviews.map((interview, index) => (
+          <InterviewCard interview={interview} key={index} />
         ))}
       </Stack>
     </ScrollArea>

@@ -15,6 +15,7 @@ export const Interview = z.object({
   startTime: z.coerce.date(),
   endTime: z.coerce.date(),
   invites: z.array(InterviewInvite).optional(),
+  sessionId: z.uuidv4(),
 });
 
 export const InterviewsGetResponse = z.object({
