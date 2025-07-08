@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { IconMessages, IconSend, IconTool, IconUserFilled } from '@tabler/icons-react';
 import { ChatMessage, Participant } from '@zoom/videosdk';
+import Linkify from 'linkify-react';
 import {
   ActionIcon,
   Box,
@@ -8,7 +9,6 @@ import {
   Flex,
   Group,
   ScrollArea,
-  Space,
   Stack,
   Text,
   Textarea,
@@ -39,19 +39,24 @@ function Message({ chatMessage, participants }: MessageProps) {
   const isHost = senderParticipant?.isHost ?? false;
 
   return (
-    <Flex justify="flex-start" align="center" direction="row" wrap="wrap">
+    <Flex gap={5}>
       <Text c="dimmed" size="sm">
         {formatTo12HourTime(timestamp)}
       </Text>
-      <Space w="xs" />
 
-      <ThemeIcon size="sm" variant="light" mr={5}>
+      <ThemeIcon size="sm" variant="light">
         {isHost ? <IconTool size={14} /> : <IconUserFilled size={14} />}
       </ThemeIcon>
-      <Text fw="bolder" mr={5}>
-        {sender.name}:
+
+      <Text
+        lh="xs"
+        style={{
+          overflowWrap: 'anywhere',
+        }}
+      >
+        <strong style={{ marginRight: 5 }}>{sender.name}:</strong>
+        <Linkify>{message}</Linkify>
       </Text>
-      <Text style={{ wordBreak: 'break-word' }}>{message}</Text>
     </Flex>
   );
 }
@@ -92,7 +97,7 @@ export function Chat() {
       {/* message list */}
       <Box style={{ flex: 1, overflow: 'hidden', margin: '12px 0' }}>
         <ScrollArea style={{ height: '100%' }}>
-          <Stack gap={2}>
+          <Stack gap={5}>
             {messages.map((msg, i) => (
               <Message key={i} chatMessage={msg} participants={participants} />
             ))}
