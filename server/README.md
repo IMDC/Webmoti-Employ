@@ -10,14 +10,6 @@
     - [Neon](#neon)
     - [Cloudflare Hyperdrive](#cloudflare-hyperdrive)
 
-Todo or remove:
-
-[For generating/synchronizing types based on your Worker configuration run](https://developers.cloudflare.com/workers/wrangler/commands/#types):
-
-```bash
-npm run cf-typegen
-```
-
 ## Setup
 
 ### Install dependencies
@@ -31,6 +23,8 @@ pnpm install
 ### Set secrets
 
 Then rename `.dev.vars.example` to `.dev.vars`, edit the file contents to include your [Zoom Video SDK key and secret](https://developers.zoom.us/docs/video-sdk/get-credentials/), save the file contents, and close the file.
+
+Whenever you change any env variables in `.dev.vars`, run `pnpm run cf-typegen` ([more info here](https://developers.cloudflare.com/workers/wrangler/commands/#types))
 
 ## Running server locally
 
