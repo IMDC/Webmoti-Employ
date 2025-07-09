@@ -13,9 +13,48 @@ interviewsRoute.get('/', useUserEmail, async (c) => {
   const db = requireDb(c);
   const userEmail = requireUserEmail(c);
 
-  const interviews = await getInterviews(db, c.var.clerkUserId, userEmail);
+  const interviewRows = await getInterviews(db, c.var.clerkUserId, userEmail);
 
-  return c.json({ interviews });
+  function nestInterviews(rows: typeof interviewRows) {
+    const map = new Map<
+      number,
+      {
+        id: number;
+        creatorId: string;
+        startTime: Date;
+        endTime: Date;
+        sessionId: string;
+        invites: { id: number; interviewId: number; email: string }[];
+      }
+    >();
+
+    for (const row of rows) {
+      let interview = map.get(row.interviewId);
+      if (!interview) {
+        interview = {
+          id: row.interviewId,
+          creatorId: row.creatorId,
+          startTime: row.startTime,
+          endTime: row.endTime,
+          sessionId: row.sessionId,
+          invites: [],
+        };
+        map.set(row.interviewId, interview);
+      }
+
+      if (row.inviteId && row.inviteEmail) {
+        interview.invites.push({
+          id: row.inviteId,
+          interviewId: row.interviewId,
+          email: row.inviteEmail,
+        });
+      }
+    }
+
+    return Array.from(map.values());
+  }
+
+  return c.json({ interviews: nestInterviews(interviewRows) });
 });
 
 interviewsRoute.post('/', zValidator('json', InterviewsPostRequest), async (c) => {

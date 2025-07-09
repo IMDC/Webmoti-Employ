@@ -9,48 +9,52 @@ export async function getInterviews(
   sessionId?: string,
   isUpcoming?: boolean
 ) {
-  return await db.transaction().execute(async (trx) => {
-    // first find all interviews the user is a creator of or invited to
-    const scheduledInterviewIds = await trx
-      .selectFrom('interview')
-      .leftJoin('interviewInvite', 'interviewInvite.interviewId', 'interview.id')
-      .where((eb) => {
-        const filters: Expression<SqlBool>[] = [
-          eb.or([
-            eb('interview.creatorId', '=', userId),
-            eb('interviewInvite.email', '=', userEmail),
-          ]),
-        ];
+  return await db
+    .with('relevant_interviews', (db) =>
+      // -----------------------------------------------------------------
+      // first find all interviews the user is a creator of or invited to
+      // -----------------------------------------------------------------
+      db
+        .selectFrom('interview')
+        .leftJoin('interviewInvite', 'interviewInvite.interviewId', 'interview.id')
+        .where((eb) => {
+          const filters: Expression<SqlBool>[] = [
+            eb.or([
+              eb('interview.creatorId', '=', userId),
+              eb('interviewInvite.email', '=', userEmail),
+            ]),
+          ];
 
-        if (isUpcoming) {
-          // filter using endTime since you could still join an interview after startTime
-          filters.push(eb('interview.endTime', '>=', sql<Date>`now()`));
-        }
+          if (isUpcoming) {
+            // filter using endTime since you could still join an interview after startTime
+            filters.push(eb('interview.endTime', '>=', sql<Date>`now()`));
+          }
 
-        if (sessionId) {
-          filters.push(eb('interview.sessionId', '=', sessionId));
-        }
+          if (sessionId) {
+            filters.push(eb('interview.sessionId', '=', sessionId));
+          }
 
-        return eb.and(filters);
-      })
-      .select('interview.id')
-      .distinct()
-      .execute();
-
-    const idArray = scheduledInterviewIds.map((row) => row.id);
-
-    if (idArray.length === 0) {
-      return [];
-    }
-
-    const scheduledInterviews = await trx
-      .selectFrom('interview')
-      .where('interview.id', 'in', idArray)
-      .selectAll()
-      .execute();
-
-    return scheduledInterviews;
-  });
+          return eb.and(filters);
+        })
+        .select('interview.id')
+        .distinct()
+    )
+    // -----------------------------------------------------------------
+    // then get the interview data for the interviews found
+    // -----------------------------------------------------------------
+    .selectFrom('interview')
+    .leftJoin('interviewInvite', 'interviewInvite.interviewId', 'interview.id')
+    .where('interview.id', 'in', (db) => db.selectFrom('relevant_interviews').select('id'))
+    .select([
+      'interview.id as interviewId',
+      'interview.creatorId',
+      'interview.startTime',
+      'interview.endTime',
+      'interview.sessionId',
+      'interviewInvite.id as inviteId',
+      'interviewInvite.email as inviteEmail',
+    ])
+    .execute();
 }
 
 export async function createInterview(
