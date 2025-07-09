@@ -1,3 +1,4 @@
+import { useAuth } from '@clerk/clerk-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod/v4';
 import { HttpError } from '@/utils/HttpError';
@@ -10,8 +11,16 @@ const queryKeys = {
 // ----------------------------------------------------------------
 // GET from interviews
 
-async function getInterviews() {
-  const response = await fetch('/api/interviews');
+async function getInterviews(authToken: string | null) {
+  if (!authToken) {
+    throw new HttpError('Missing auth token', 401);
+  }
+
+  const response = await fetch('/api/interviews', {
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  });
   if (!response.ok) {
     throw new Error(`Failed to get interviews: ${response.status}`);
   }
@@ -26,13 +35,17 @@ async function getInterviews() {
 }
 
 export function useInterviews() {
+  const { getToken } = useAuth();
   const {
     data: interviews,
     isPending,
     error,
   } = useQuery({
     queryKey: queryKeys.interviews,
-    queryFn: getInterviews,
+    queryFn: async () => {
+      const token = await getToken();
+      return getInterviews(token);
+    },
   });
 
   return { interviews, isPending, error };
@@ -41,10 +54,14 @@ export function useInterviews() {
 // ----------------------------------------------------------------
 // POST to interviews
 
-async function scheduleInterview(interview: InterviewsPostRequest) {
+async function scheduleInterview(interview: InterviewsPostRequest, authToken: string | null) {
+  if (!authToken) {
+    throw new HttpError('Missing auth token', 401);
+  }
+
   const response = await fetch('/api/interviews', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
     body: JSON.stringify(interview),
   });
 
@@ -56,10 +73,14 @@ async function scheduleInterview(interview: InterviewsPostRequest) {
 
 export function useScheduleInterview() {
   const queryClient = useQueryClient();
+  const { getToken } = useAuth();
 
   const { mutateAsync: scheduleInterviewMutation, isPending: isScheduleInterviewPending } =
     useMutation({
-      mutationFn: scheduleInterview,
+      mutationFn: async (interview: InterviewsPostRequest) => {
+        const token = await getToken();
+        return scheduleInterview(interview, token);
+      },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.interviews });
       },
