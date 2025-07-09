@@ -1,7 +1,7 @@
 import ZoomVideo, { LocalAudioTrack, LocalVideoTrack, VideoPlayer } from '@zoom/videosdk';
 import { create } from 'zustand';
+import { useDeviceStore } from '../features/interview/zoom/useDeviceStore';
 import { useAppStore } from './useAppStore';
-import { useDeviceStore } from './useDeviceStore';
 
 type ZoomPreviewStore = {
   localVideoTrack: LocalVideoTrack | null;

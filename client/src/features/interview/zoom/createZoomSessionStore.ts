@@ -1,7 +1,7 @@
 import ZoomVideo, { Participant, VideoClient, VideoPlayer, VideoQuality } from '@zoom/videosdk';
 import { createStore } from 'zustand';
+import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore';
 import { useAppStore } from '@/stores/useAppStore';
-import { useDeviceStore } from '@/stores/useDeviceStore';
 import { logger } from '@/utils/logger';
 import { handleAppError } from '@/utils/utils';
 
