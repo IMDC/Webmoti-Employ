@@ -1,7 +1,6 @@
 # Web-Employ Server <!-- omit from toc -->
 
 - [Setup](#setup)
-  - [Install dependencies](#install-dependencies)
   - [Set secrets](#set-secrets)
 - [Running server locally](#running-server-locally)
 - [Deploying](#deploying)
@@ -11,14 +10,6 @@
     - [Cloudflare Hyperdrive](#cloudflare-hyperdrive)
 
 ## Setup
-
-### Install dependencies
-
-```bash
-cd server
-
-pnpm install
-```
 
 ### Set secrets
 
