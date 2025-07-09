@@ -13,5 +13,5 @@
 pnpm install
 
 # run both client and server
-pnpm start
+pnpm run dev
 ```
