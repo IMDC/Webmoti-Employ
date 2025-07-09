@@ -1,7 +1,7 @@
 import { IconMicrophone, IconVideo, IconVolume } from '@tabler/icons-react';
 import { Radio, Select, Stack, Text } from '@mantine/core';
 import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore';
-import { useAppStore } from '@/stores/useAppStore';
+import { useAppStore } from '@/useAppStore';
 
 type MediaType = 'audio' | 'video';
 type Variant = 'dropdown' | 'radio';

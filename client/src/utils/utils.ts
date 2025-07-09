@@ -1,7 +1,7 @@
 import type { UserResource } from '@clerk/types';
 import { ExecutedFailure } from '@zoom/videosdk';
-import { AppError } from '@/stores/useAppStore';
 import { Json } from '@/types/Json';
+import { AppError } from '@/useAppStore';
 import { HttpError } from './HttpError';
 
 export function getFittedSize(

@@ -4,9 +4,9 @@ import { useNavigate, useParams } from '@tanstack/react-router';
 import { Button, Center, Group, Loader, Stack, Text, Title } from '@mantine/core';
 import { Corner } from '@/components/Corner';
 import { MyCopyButton } from '@/components/MyCopyButton';
+import { usePreviewStore } from '@/features/interview/prejoin/hooks/usePreviewStore';
 import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore';
-import { useAppStore } from '@/stores/useAppStore';
-import { useZoomPreviewStore } from '@/stores/usePreviewStore';
+import { useAppStore } from '@/useAppStore';
 import { getUserIdentity } from '@/utils/utils';
 import { MenuBar } from '../components/MenuBar';
 import { useZoomSessionStore } from '../zoom/useZoomSessionStore';
@@ -17,10 +17,10 @@ import { InterviewSessionArgs, useInterviewSession } from './queries';
 
 export function PrejoinScreen() {
   const toggleIsVideoOn = useAppStore((s) => s.toggleIsVideoOn);
-  const toggleMuteMicrophone = useZoomPreviewStore((s) => s.toggleMuteMicrophone);
+  const toggleMuteMicrophone = usePreviewStore((s) => s.toggleMuteMicrophone);
 
-  const switchCamera = useZoomPreviewStore((s) => s.switchCamera);
-  const switchMicrophone = useZoomPreviewStore((s) => s.switchMicrophone);
+  const switchCamera = usePreviewStore((s) => s.switchCamera);
+  const switchMicrophone = usePreviewStore((s) => s.switchMicrophone);
 
   const permissionState = useAppStore((s) => s.permissionState);
 
@@ -43,9 +43,9 @@ export function PrejoinScreen() {
   useEffect(() => {
     // wait until the interview session query is successful before init devices
     if (interviewSession && !interviewSessionError) {
-      useDeviceStore.getState().initDevices();
+      initDevices();
     }
-  }, [interviewSession, interviewSessionError]);
+  }, [interviewSession, interviewSessionError, initDevices]);
 
   useEffect(() => {
     if (callState === 'joined' && interviewSession) {

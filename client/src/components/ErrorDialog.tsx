@@ -1,5 +1,5 @@
 import { Dialog, Text } from '@mantine/core';
-import { AppError, useAppStore } from '@/stores/useAppStore';
+import { AppError, useAppStore } from '@/useAppStore';
 import { jsonStringifyIndented } from '@/utils/utils';
 
 export function formatAppError(error: AppError): string {

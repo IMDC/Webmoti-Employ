@@ -1,6 +1,6 @@
 import ZoomVideo from '@zoom/videosdk';
 import { createStore } from 'zustand';
-import { useAppStore } from '../../../stores/useAppStore';
+import { useAppStore } from '../../../useAppStore';
 
 export type DeviceStore = {
   videoDevices: MediaDeviceInfo[];

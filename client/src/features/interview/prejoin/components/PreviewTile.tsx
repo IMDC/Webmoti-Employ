@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Corner } from '@/components/Corner';
-import { useAppStore } from '@/stores/useAppStore';
-import { useZoomPreviewStore } from '@/stores/usePreviewStore';
+import { usePreviewStore } from '@/features/interview/prejoin/hooks/usePreviewStore';
+import { useAppStore } from '@/useAppStore';
 import AudioLevelIndicator from '../../components/AudioLevelIndicator';
 import { ParticipantTile } from '../../components/ParticipantTile';
 import { VideoRenderer } from '../../session/components/VideoRenderer';
@@ -14,12 +14,12 @@ interface PreviewTileProps {
 
 export function PreviewTile({ height, width, name }: PreviewTileProps) {
   const permissionState = useAppStore((s) => s.permissionState);
-  const startCamera = useZoomPreviewStore((s) => s.startCamera);
-  const stopCamera = useZoomPreviewStore((s) => s.stopCamera);
+  const startCamera = usePreviewStore((s) => s.startCamera);
+  const stopCamera = usePreviewStore((s) => s.stopCamera);
 
-  const startMicrophone = useZoomPreviewStore((s) => s.startMicrophone);
+  const startMicrophone = usePreviewStore((s) => s.startMicrophone);
 
-  const localAudioTrack = useZoomPreviewStore((s) => s.localAudioTrack);
+  const localAudioTrack = usePreviewStore((s) => s.localAudioTrack);
 
   const isVideoOn = useAppStore((s) => s.isVideoOn);
   const isAudioOn = useAppStore((s) => s.isAudioOn);

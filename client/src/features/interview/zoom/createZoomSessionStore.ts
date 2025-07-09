@@ -1,9 +1,9 @@
 import ZoomVideo, { Participant, VideoClient, VideoPlayer, VideoQuality } from '@zoom/videosdk';
-import { createStore } from 'zustand';
-import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore';
-import { useAppStore } from '@/stores/useAppStore';
+import { createStore, StoreApi } from 'zustand';
+import { useAppStore } from '@/useAppStore';
 import { logger } from '@/utils/logger';
 import { handleAppError } from '@/utils/utils';
+import { DeviceStore } from './createDeviceStore';
 
 export type ZoomSessionStore = {
   client: typeof VideoClient;
@@ -34,7 +34,7 @@ export type ZoomSessionStore = {
   cleanup: () => Promise<void>;
 };
 
-export function createZoomSessionStore() {
+export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
   const client = ZoomVideo.createClient();
 
   const zoomSessionStore = createStore<ZoomSessionStore>((set, get) => {
@@ -107,7 +107,7 @@ export function createZoomSessionStore() {
       },
       switchCamera: async (deviceId) => {
         await stream().switchCamera(deviceId);
-        useDeviceStore.setState({ selectedVideoDevice: deviceId });
+        deviceStore.setState({ selectedVideoDevice: deviceId });
       },
 
       attachVideoPlayer: async (userId: number, element: VideoPlayer) => {
@@ -137,7 +137,7 @@ export function createZoomSessionStore() {
       },
       switchMicrophone: async (deviceId) => {
         stream().switchMicrophone(deviceId);
-        useDeviceStore.setState({ selectedAudioInputDevice: deviceId });
+        deviceStore.setState({ selectedAudioInputDevice: deviceId });
       },
 
       cleanup: async () => {

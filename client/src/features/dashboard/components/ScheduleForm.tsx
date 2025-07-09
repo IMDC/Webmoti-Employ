@@ -20,7 +20,7 @@ import {
 } from '@mantine/core';
 import { DatePickerInput, getTimeRange, TimeGrid } from '@mantine/dates';
 import { useForm } from '@mantine/form';
-import { useAppStore } from '@/stores/useAppStore';
+import { useAppStore } from '@/useAppStore';
 import { handleAppError } from '@/utils/utils';
 import { useScheduleInterview } from '../queries';
 import { ScheduleInterviewForm } from '../schema';

@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { AppShell, Box } from '@mantine/core';
 import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore';
 import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore';
-import { useAppStore } from '@/stores/useAppStore';
+import { useAppStore } from '@/useAppStore';
 import { GALLERY_VIEW_MARGIN } from '@/utils/constants';
 import { Chat } from '../chat/Chat';
 import { useChatStore } from '../chat/useChatStore';
