@@ -72,9 +72,13 @@ export function createZoomSessionStore() {
           await client.join(roomName, token, name);
 
           const stream = client.getMediaStream();
-          if (useAppStore.getState().permissionState === 'granted') {
-            await stream.startVideo();
-            await stream.startAudio();
+          try {
+            if (useAppStore.getState().permissionState === 'granted') {
+              await stream.startVideo();
+              await stream.startAudio();
+            }
+          } catch (error: unknown) {
+            handleAppError(error, useAppStore.getState().setError, 'Failed to start media');
           }
 
           set({ stream, callState: 'joined' });
