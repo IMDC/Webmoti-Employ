@@ -1,17 +1,31 @@
-# Web-Employ React Client
+# Web-Employ React Client <!-- omit from toc -->
+
+- [Setup](#setup)
+  - [Set environment variables](#set-environment-variables)
+- [Services](#services)
+  - [Clerk Setup](#clerk-setup)
+  - [Setup Allowlist](#setup-allowlist)
 
 ## Setup
 
-### Clerk
+### Set environment variables
+
+First rename `.env.example` to `.env`.
+
+Then add environment variables:
+
+1. Add `VITE_CLERK_PUBLISHABLE_KEY` ([more info](#clerk-setup))
+
+## Services
 
 We use clerk to manage authentication.
 
-#### Clerk Setup
+### Clerk Setup
 
 1. Get `VITE_CLERK_PUBLISHABLE_KEY` from clerk dashboard and add it to `.env`
 2. Run app and sign in yourself to finish clerk setup
 
-#### Setup Allowlist
+### Setup Allowlist
 
 This restricts the app to only people with a TMU Google account.
 

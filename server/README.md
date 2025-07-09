@@ -2,32 +2,38 @@
 
 - [Setup](#setup)
   - [Set secrets](#set-secrets)
-- [Running server locally](#running-server-locally)
+    - [.dev.vars](#devvars)
+    - [.env](#env)
 - [Deploying](#deploying)
 - [Services](#services)
+  - [Video Calling](#video-calling)
   - [Database](#database)
     - [Neon](#neon)
     - [Cloudflare Hyperdrive](#cloudflare-hyperdrive)
+  - [Authentication](#authentication)
 
 ## Setup
 
 ### Set secrets
 
-Then rename `.dev.vars.example` to `.dev.vars`, edit the file contents to include your [Zoom Video SDK key and secret](https://developers.zoom.us/docs/video-sdk/get-credentials/), save the file contents, and close the file.
+#### .dev.vars
+
+First rename `.dev.vars.example` to `.dev.vars`.
+
+Then add secrets:
+
+1. Add `ZOOM_VIDEO_SDK_KEY` and `ZOOM_VIDEO_SDK_SECRET` ([more info](#video-calling))
+2. Add `ZOOM_API_KEY` and `ZOOM_API_SECRET` ([more info](#video-calling))
+3. Add `CLERK_SECRET_KEY` and `CLERK_PUBLISHABLE_KEY` ([more info](#authentication))
+4. Add `DATABASE_URL` (This is for kysely-codegen only (to generate types for the Neon database). Set this to the [Neon database connection string](#neon))
 
 Whenever you change any env variables in `.dev.vars`, run `pnpm run cf-typegen` ([more info here](https://developers.cloudflare.com/workers/wrangler/commands/#types))
 
-## Running server locally
+#### .env
 
-```bash
-# start just this server:
-cd server
-pnpm run dev
+Rename `.env.example` to `.env`. This hyperdrive variable doesn't get detected in `.dev.vars`, so we need to make a `.env` just for this.
 
-# start both react app and this server:
-cd client
-pnpm start
-```
+1. Add `WRANGLER_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` ([more info](#cloudflare-hyperdrive))
 
 ## Deploying
 
@@ -37,7 +43,13 @@ npm run deploy
 
 ## Services
 
-We use services for hosting, the database, and authentication.
+We use services for hosting, the database, authentication, and video calling.
+
+### Video Calling
+
+We use the Zoom Video SDK for video calling.
+
+Get your [Zoom Video SDK key and secret](https://developers.zoom.us/docs/video-sdk/get-credentials/) from the zoom website. You can also access the API key and API secret right under the SDK values. Note that this is different from the SDK key and is only used for the Zoom Video REST API.
 
 ### Database
 
@@ -79,6 +91,7 @@ The database is postgres deployed with the Neon service. We also use Cloudflare 
 
 1. Login to cloudflare: `npx wrangler login`
 2. `npx wrangler hyperdrive create <YOUR_CONFIG_NAME> --connection-string="<MY_CONNECTION_STRING>"` (You get this connection string from the Neon dashboard. Make sure you turn off Connection pooling before copying it: <https://neon.com/blog/hyperdrive-neon-faq#so-should-i-use-hyperdrive-together-with-neons-pooling>) (If you already initialized it, you can update it like this: `npx wrangler hyperdrive update <MY_HYPERDRIVE_ID> --connection-string "<MY_CONNECTION_STRING_WITHOUT_POOLING>"`)
+3. Set `WRANGLER_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` in `.env` as your local postgres db connection string. You can also set this to the Neon db connection string, but then you need to run the server with `wrangler dev --remote` (note: this env variable ends with `_HYPERDRIVE` since that's what the `hyperdrive` binding is set to in `wrangler.jsonc`)
 
 Disable caching to prevent stale reads:
 <https://developers.cloudflare.com/hyperdrive/configuration/query-caching/>
@@ -86,3 +99,9 @@ Disable caching to prevent stale reads:
 ```bash
 npx wrangler hyperdrive update my-hyperdrive-id --origin-password my-db-password --caching-disabled true
 ```
+
+### Authentication
+
+Authentication is done using Clerk.
+
+Get your secret key and publishable key from the clerk dashboard in `Configure` > `API keys`
