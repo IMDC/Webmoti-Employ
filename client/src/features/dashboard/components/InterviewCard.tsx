@@ -1,6 +1,7 @@
 import { IconCalendarEventFilled, IconVideoFilled } from '@tabler/icons-react';
 import { Avatar, Badge, Button, Card, Divider, Group, Text } from '@mantine/core';
 import { MyCopyButton } from '@/components/MyCopyButton';
+import { UserList } from '@/components/UserList';
 import { Interview } from '../schema';
 
 interface InterviewCardProps {
@@ -10,15 +11,18 @@ interface InterviewCardProps {
 export function InterviewCard({ interview }: InterviewCardProps) {
   return (
     <Card key={interview.id} shadow="sm" padding="sm" withBorder>
-      <Group>
-        <Badge
-          variant="gradient"
-          gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
-          leftSection={<IconCalendarEventFilled size={12} />}
-        >
-          {formatInterviewTime(interview.startTime)}
-        </Badge>
-        <Badge>Interviewer</Badge>
+      <Group justify="space-between">
+        <Group>
+          <Badge
+            variant="gradient"
+            gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
+            leftSection={<IconCalendarEventFilled size={12} />}
+          >
+            {formatInterviewTime(interview.startTime)}
+          </Badge>
+          <Badge>Interviewer</Badge>
+        </Group>
+        <UserList users={interview.invites ?? []} />
       </Group>
 
       <Group justify="space-between" mt="sm">

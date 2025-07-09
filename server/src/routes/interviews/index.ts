@@ -7,8 +7,9 @@ import { InterviewsDeleteRequest, InterviewsPostRequest } from './schema';
 import { Hono } from 'hono';
 
 const interviewsRoute = new Hono<AppContext>();
+interviewsRoute.use('*', useDb);
 
-interviewsRoute.get('/', useDb, useUserEmail, async (c) => {
+interviewsRoute.get('/', useUserEmail, async (c) => {
   const db = requireDb(c);
   const userEmail = requireUserEmail(c);
 

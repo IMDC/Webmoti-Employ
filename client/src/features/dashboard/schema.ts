@@ -9,6 +9,8 @@ const InterviewInvite = z.object({
   email: z.email(),
 });
 
+export type InterviewInvite = z.infer<typeof InterviewInvite>;
+
 export const Interview = z.object({
   id: z.number(),
   creatorId: z.string(),
