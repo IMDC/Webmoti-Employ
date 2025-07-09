@@ -11,6 +11,7 @@
     - [Neon](#neon)
     - [Cloudflare Hyperdrive](#cloudflare-hyperdrive)
   - [Authentication](#authentication)
+    - [Setup Allowlist](#setup-allowlist)
 
 ## Setup
 
@@ -105,3 +106,14 @@ npx wrangler hyperdrive update my-hyperdrive-id --origin-password my-db-password
 Authentication is done using Clerk.
 
 Get your secret key and publishable key from the clerk dashboard in `Configure` > `API keys`
+
+#### Setup Allowlist
+
+This restricts the app to only people with a TMU Google account.
+
+Note: This is a paid feature and will only work in Clerk developement mode. For production, use [Better Auth](https://www.better-auth.com/) instead of Clerk. In production, you'll also need to make a Google OAuth client and publish it.
+
+1. Go to <https://dashboard.clerk.com/last-active?path=user-authentication/restrictions>
+2. In the Allowlist section, toggle on Enable allowlist.
+3. Add `torontomu.ca` to the allowlist
+4. Save changes
