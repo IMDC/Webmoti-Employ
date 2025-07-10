@@ -19,8 +19,8 @@ export function InterviewCards({ interviews }: InterviewCardsProps) {
 
   return (
     <Stack pb="xl">
-      {interviews.map((interview, index) => (
-        <InterviewCard interview={interview} key={index} />
+      {interviews.map(interview => (
+        <InterviewCard interview={interview} key={interview.id} />
       ))}
     </Stack>
   )

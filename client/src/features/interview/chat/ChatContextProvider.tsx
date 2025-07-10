@@ -20,6 +20,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
     }
 
     const chatStore = createChatStore(zoomClient)
+    // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
     setStore(chatStore)
 
     return () => {

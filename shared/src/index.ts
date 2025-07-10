@@ -22,6 +22,8 @@ export const Interview = z.object({
 export const NewInterview = Interview.omit({
   id: true,
   sessionId: true,
+}).extend({
+  invites: z.array(NewInterviewInvite).optional(),
 })
 
 export type Interview = z.infer<typeof Interview>

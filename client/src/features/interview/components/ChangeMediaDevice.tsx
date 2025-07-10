@@ -6,6 +6,53 @@ import { useAppStore } from '@/useAppStore'
 type MediaType = 'audio' | 'video'
 type Variant = 'dropdown' | 'radio'
 
+interface DeviceSelectProps {
+  label: string
+  icon: React.ReactNode
+  devices: MediaDeviceInfo[]
+  selected: string | null
+  onChange: (val: string) => void
+  variant: Variant
+}
+
+function DeviceSelect({
+  label,
+  icon,
+  devices,
+  selected,
+  onChange,
+  variant,
+}: DeviceSelectProps) {
+  return variant === 'dropdown'
+    ? (
+        <Select
+          label={label}
+          data={devices.map(d => ({
+            value: d.deviceId,
+            label: d.label || `${label}: ${d.deviceId.slice(0, 4)}`,
+          }))}
+          value={selected}
+          onChange={val => val && onChange(val)}
+          leftSection={icon}
+          leftSectionPointerEvents="none"
+          comboboxProps={{ withinPortal: false }}
+        />
+      )
+    : (
+        <Radio.Group label={label} value={selected || ''} onChange={onChange}>
+          <Stack gap="xs">
+            {devices.map(d => (
+              <Radio
+                key={d.deviceId}
+                value={d.deviceId}
+                label={d.label || `${label}: ${d.deviceId.slice(0, 4)}`}
+              />
+            ))}
+          </Stack>
+        </Radio.Group>
+      )
+}
+
 interface ChangeMediaDeviceProps {
   mediaType: MediaType
   variant?: Variant
@@ -31,48 +78,6 @@ export function ChangeMediaDevice({
     return <Text>Media permissions denied</Text>
   }
 
-  const DeviceSelect = ({
-    label,
-    icon,
-    devices,
-    selected,
-    onChange,
-  }: {
-    label: string
-    icon: React.ReactNode
-    devices: MediaDeviceInfo[]
-    selected: string | null
-    onChange: (val: string) => void
-  }) =>
-    variant === 'dropdown'
-      ? (
-          <Select
-            label={label}
-            data={devices.map(d => ({
-              value: d.deviceId,
-              label: d.label || `${label}: ${d.deviceId.slice(0, 4)}`,
-            }))}
-            value={selected}
-            onChange={val => val && onChange(val)}
-            leftSection={icon}
-            leftSectionPointerEvents="none"
-            comboboxProps={{ withinPortal: false }}
-          />
-        )
-      : (
-          <Radio.Group label={label} value={selected || ''} onChange={onChange}>
-            <Stack gap="xs">
-              {devices.map(d => (
-                <Radio
-                  key={d.deviceId}
-                  value={d.deviceId}
-                  label={d.label || `${label}: ${d.deviceId.slice(0, 4)}`}
-                />
-              ))}
-            </Stack>
-          </Radio.Group>
-        )
-
   if (mediaType === 'audio') {
     return (
       <Stack>
@@ -82,6 +87,7 @@ export function ChangeMediaDevice({
           devices={audioInputDevices}
           selected={selectedAudioInputDevice}
           onChange={onSwitchMicrophone ?? (() => {})}
+          variant={variant}
         />
         <DeviceSelect
           label="Audio Output"
@@ -89,6 +95,7 @@ export function ChangeMediaDevice({
           devices={audioOutputDevices}
           selected={selectedAudioOutputDevice}
           onChange={() => {}}
+          variant={variant}
         />
       </Stack>
     )
@@ -101,6 +108,7 @@ export function ChangeMediaDevice({
       devices={videoDevices}
       selected={selectedVideoDevice}
       onChange={onSwitchCamera ?? (() => {})}
+      variant={variant}
     />
   )
 }

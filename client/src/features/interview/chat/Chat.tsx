@@ -138,8 +138,8 @@ export function Chat() {
           onScrollPositionChange={handleScroll}
         >
           <Stack gap={5}>
-            {messages.map((msg, i) => (
-              <Message key={i} chatMessage={msg} participants={participants} />
+            {messages.map(msg => (
+              <Message key={msg.id} chatMessage={msg} participants={participants} />
             ))}
           </Stack>
         </ScrollArea>

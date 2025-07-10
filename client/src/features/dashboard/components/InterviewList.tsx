@@ -19,6 +19,7 @@ export function InterviewList() {
     return (
       <Stack>
         {Array.from({ length: 3 }).map((_, idx) => (
+          // eslint-disable-next-line react/no-array-index-key
           <InterviewCardSkeleton key={idx} />
         ))}
       </Stack>

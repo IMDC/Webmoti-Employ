@@ -1,4 +1,5 @@
-import { Interview } from '@web-employ/shared'
+/* eslint-disable ts/no-redeclare */
+import { Interview, NewInterviewInvite } from '@web-employ/shared'
 import { z } from 'zod/v4'
 
 // ----------------------------------------------------------------
@@ -14,7 +15,7 @@ export const InterviewsGetResponse = z.object({
 export const ScheduleInterviewForm = z.object({
   date: z.coerce.date(),
   startTime: z.string().regex(/^\d{2}:\d{2}$/), // ex: "09:00"
-  invites: z.array(z.object({ email: z.email() })),
+  invites: z.array(NewInterviewInvite),
   openGoogleCalendar: z.boolean(),
 })
 

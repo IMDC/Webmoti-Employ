@@ -56,7 +56,7 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
 
   const setError = useAppStore(s => s.setError)
 
-  const form = useForm({
+  const form = useForm<ScheduleInterviewForm>({
     mode: 'uncontrolled',
     initialValues: {
       // default is tomorrow
@@ -101,6 +101,7 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
   }
 
   const invites = form.getValues().invites.map((_, index) => (
+    // eslint-disable-next-line react/no-array-index-key
     <Group key={index}>
       <TextInput
         placeholder="Email address"

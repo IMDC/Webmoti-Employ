@@ -157,7 +157,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
   // All zoom event listeners to keep state updated:
   // --------------------------------------------------
 
-  const updateParticipants = () => {
+  function updateParticipants() {
     zoomSessionStore.setState({
       participants: new Map(client.getAllUser().map(user => [user.userId, user])),
     })

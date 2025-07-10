@@ -21,13 +21,6 @@ export function createChatStore(zoomClient: typeof VideoClient) {
   // https://developers.zoom.us/docs/video-sdk/web/chat/#get-chat-history
   const messages = chatClient.getHistory()
 
-  const handleMessage = (message: ChatMessage) => {
-    chatStore.setState(s => ({
-      messages: [...s.messages, message],
-      isChatUnread: message.sender.userId !== currentUserId,
-    }))
-  }
-
   const chatStore = createStore<ChatStore>(set => ({
     chatClient,
     messages,
@@ -43,6 +36,13 @@ export function createChatStore(zoomClient: typeof VideoClient) {
       zoomClient.off('chat-on-message', handleMessage)
     },
   }))
+
+  function handleMessage(message: ChatMessage) {
+    chatStore.setState(s => ({
+      messages: [...s.messages, message],
+      isChatUnread: message.sender.userId !== currentUserId,
+    }))
+  }
 
   zoomClient.on('chat-on-message', handleMessage)
 

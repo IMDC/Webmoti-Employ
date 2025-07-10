@@ -29,6 +29,7 @@ declare module '@tanstack/react-router' {
 
 const queryClient = new QueryClient()
 
+// eslint-disable-next-line react-refresh/only-export-components
 function App() {
   return (
     <StrictMode>

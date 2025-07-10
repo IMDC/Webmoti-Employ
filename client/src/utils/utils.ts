@@ -50,3 +50,27 @@ export function jsonStringifyIndented(json: Json) {
 export function getUserIdentity(user: UserResource) {
   return `${user.firstName} ${user.lastName}`
 }
+
+export function formatAppError(error: AppError): string {
+  const { status, message, details } = error
+
+  const lines = []
+
+  if (status !== undefined) {
+    lines.push(`Status: ${status}`)
+  }
+
+  if (message && message.length > 0) {
+    lines.push(`Message: ${message}`)
+  }
+
+  if (details !== undefined) {
+    const detailsText = typeof details === 'string' ? details : jsonStringifyIndented(details)
+
+    if (detailsText.length > 0) {
+      lines.push(`Details: ${detailsText}`)
+    }
+  }
+
+  return lines.join('\n')
+}

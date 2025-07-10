@@ -1,3 +1,4 @@
+/* eslint-disable ts/no-redeclare */
 import { z } from 'zod/v4'
 
 export const SessionsGetResponse = z.object({
