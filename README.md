@@ -58,7 +58,7 @@ pnpm run dev
 
 2. Add the following settings to your `.vscode/settings.json`:
 
-```json
+```jsonc
 {
   // Disable the default formatter, use eslint instead
   "prettier.enable": false,
