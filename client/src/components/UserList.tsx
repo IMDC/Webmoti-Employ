@@ -1,4 +1,4 @@
-import type { InterviewInvite } from '@web-employ/shared'
+import type { DbInterviewInvite } from '@web-employ/shared'
 import { useUser } from '@clerk/clerk-react'
 import { ActionIcon, Avatar, Group, Popover, Stack, Text } from '@mantine/core'
 import { IconUser } from '@tabler/icons-react'
@@ -22,7 +22,7 @@ function DisplayUser({ name, avatarUrl }: DisplayUserProps) {
 }
 
 interface UserListProps {
-  users: InterviewInvite[]
+  users: DbInterviewInvite[]
 }
 
 export function UserList({ users }: UserListProps) {

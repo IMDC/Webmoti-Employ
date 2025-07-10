@@ -1,12 +1,12 @@
 /* eslint-disable ts/no-redeclare */
-import { Interview, NewInterviewInvite } from '@web-employ/shared'
+import { DbInterview, NewInterviewInvite } from '@web-employ/shared'
 import { z } from 'zod/v4'
 
 // ----------------------------------------------------------------
 // GET /interviews
 
 export const InterviewsGetResponse = z.object({
-  interviews: z.array(Interview),
+  interviews: z.array(DbInterview),
 })
 
 // ----------------------------------------------------------------

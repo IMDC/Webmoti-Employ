@@ -1,9 +1,9 @@
-import type { Interview } from '@web-employ/shared'
+import type { DbInterview } from '@web-employ/shared'
 import { Center, Stack, Text } from '@mantine/core'
 import { InterviewCard } from './InterviewCard'
 
 interface InterviewCardsProps {
-  interviews: Interview[]
+  interviews: DbInterview[]
 }
 
 export function InterviewCards({ interviews }: InterviewCardsProps) {

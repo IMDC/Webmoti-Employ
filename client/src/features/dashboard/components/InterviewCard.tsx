@@ -1,11 +1,11 @@
-import type { Interview } from '@web-employ/shared'
+import type { DbInterview } from '@web-employ/shared'
 import { Avatar, Badge, Button, Card, Divider, Group, Text } from '@mantine/core'
 import { IconCalendarEventFilled, IconVideoFilled } from '@tabler/icons-react'
 import { MyCopyButton } from '@/components/MyCopyButton'
 import { UserList } from '@/components/UserList'
 
 interface InterviewCardProps {
-  interview: Interview
+  interview: DbInterview
 }
 
 export function InterviewCard({ interview }: InterviewCardProps) {

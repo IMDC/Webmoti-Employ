@@ -8,5 +8,8 @@
       "@/*": ["./src/*"],
       "@web-employ/shared": ["../shared/src/index.ts"]
     }
-  }
+  },
+  "references": [
+    { "path": "../shared" }
+  ]
 }

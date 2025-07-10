@@ -1,32 +1,32 @@
 /* eslint-disable ts/no-redeclare */
 import { z } from 'zod/v4'
 
-export const InterviewInvite = z.object({
+export const DbInterviewInvite = z.object({
   id: z.number(),
   interviewId: z.number(),
   email: z.email(),
 })
-export const NewInterviewInvite = InterviewInvite.omit({
+export const NewInterviewInvite = DbInterviewInvite.omit({
   id: true,
   interviewId: true,
 })
 
-export const Interview = z.object({
+export const DbInterview = z.object({
   id: z.number(),
   creatorId: z.string(),
   startTime: z.coerce.date(),
   endTime: z.coerce.date(),
-  invites: z.array(InterviewInvite).optional(),
+  invites: z.array(DbInterviewInvite).optional(),
   sessionId: z.uuidv4(),
 })
-export const NewInterview = Interview.omit({
+export const NewInterview = DbInterview.omit({
   id: true,
   sessionId: true,
 }).extend({
   invites: z.array(NewInterviewInvite).optional(),
 })
 
-export type Interview = z.infer<typeof Interview>
+export type DbInterview = z.infer<typeof DbInterview>
 export type NewInterview = z.infer<typeof NewInterview>
-export type InterviewInvite = z.infer<typeof InterviewInvite>
+export type DbInterviewInvite = z.infer<typeof DbInterviewInvite>
 export type NewInterviewInvite = z.infer<typeof NewInterviewInvite>
