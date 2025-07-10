@@ -2,6 +2,7 @@
   "name": "web-employ",
   "version": "0.0.0",
   "private": true,
+  "packageManager": "pnpm@10.12.1",
   "scripts": {
     "start": "pnpm run dev",
     "dev": "pnpm run -r --parallel --aggregate-output dev",
@@ -10,5 +11,8 @@
     "lint:fix": "pnpm run -r --parallel lint:fix",
     "deploy": "pnpm build && pnpm run -r deploy"
   },
-  "packageManager": "pnpm@10.12.1"
+  "devDependencies": {
+    "@antfu/eslint-config": "catalog:dev",
+    "eslint": "catalog:dev"
+  }
 }
