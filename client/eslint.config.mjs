@@ -1,5 +1,11 @@
 import antfu from '@antfu/eslint-config'
 
-export default antfu({ react: true, formatters: {
-  css: true,
-} })
+export default antfu({
+  react: true,
+  formatters: {
+    css: true,
+  },
+  ignores: [
+    '**/routeTree.gen.ts',
+  ],
+})

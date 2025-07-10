@@ -10,7 +10,8 @@
     "cf-typegen": "wrangler types src/worker-configuration.d.ts --env-interface CloudflareBindings",
     "db-typegen": "kysely-codegen",
     "postinstall": "pnpm run cf-typegen",
-    "lint": "eslint . --cache"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@hono/clerk-auth": "^3.0.1",

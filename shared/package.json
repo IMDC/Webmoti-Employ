@@ -4,7 +4,10 @@
   "version": "0.0.0",
   "private": true,
   "packageManager": "pnpm@10.12.1",
-  "scripts": {},
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
   "dependencies": {
     "zod": "catalog:deps"
   },
