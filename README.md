@@ -1,4 +1,38 @@
-# Web-Employ
+# Web-Employ <!-- omit from toc -->
+
+- [Stack](#stack)
+- [Setup](#setup)
+- [VSCode Auto Formatting Code](#vscode-auto-formatting-code)
+- [Dependabot](#dependabot)
+
+## Stack
+
+- PNPM - package manager
+- TypeScript
+- Zod - validation
+- Eslint – formatting and linting (@antfu/eslint-config)
+
+Client:
+
+- React
+- Vite
+- Mantine - UI components
+- Tanstack router - routing
+- Tanstack query - server state
+- Zustand - client state
+- Clerk - auth
+- Zoom Video
+
+Server:
+
+- Hono
+- Kysely - SQL query builder
+
+Hosting:
+
+- Neon - database
+- Cloudflare workers - server hosting
+- Vercel - client hosting
 
 ## Setup
 
@@ -76,3 +110,7 @@ pnpm run dev
   ]
 }
 ```
+
+## Dependabot
+
+<https://docs.github.com/en/code-security/getting-started/dependabot-quickstart-guide#enabling-dependabot-for-your-repository>
