@@ -1,9 +1,9 @@
-import { Modal, Text } from '@mantine/core';
-import { useAppStore } from '@/useAppStore';
+import { Modal, Text } from '@mantine/core'
+import { useAppStore } from '@/useAppStore'
 
 export function SettingsMenu() {
-  const isSettingsOpened = useAppStore((state) => state.isSettingsOpen);
-  const setIsSettingsOpened = useAppStore((state) => state.setIsSettingsOpen);
+  const isSettingsOpened = useAppStore(state => state.isSettingsOpen)
+  const setIsSettingsOpened = useAppStore(state => state.setIsSettingsOpen)
 
   return (
     <Modal
@@ -17,5 +17,5 @@ export function SettingsMenu() {
     >
       <Text>Menu</Text>
     </Modal>
-  );
+  )
 }

@@ -1,19 +1,19 @@
-import { useRef, useState } from 'react';
-import { FloatingIndicator, Tabs } from '@mantine/core';
-import classes from './TimeTabs.module.css';
+import { FloatingIndicator, Tabs } from '@mantine/core'
+import { useRef, useState } from 'react'
+import classes from './TimeTabs.module.css'
 
 interface TimeTabsProps {
-  value: string;
-  onChange: (val: string | null) => void;
+  value: string
+  onChange: (val: string | null) => void
 }
 
 export function TimeTabs({ value, onChange }: TimeTabsProps) {
-  const [rootRef, setRootRef] = useState<HTMLDivElement | null>(null);
-  const controlRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [rootRef, setRootRef] = useState<HTMLDivElement | null>(null)
+  const controlRefs = useRef<Record<string, HTMLButtonElement | null>>({})
 
   const setControlRef = (key: string) => (el: HTMLButtonElement | null) => {
-    controlRefs.current[key] = el;
-  };
+    controlRefs.current[key] = el
+  }
 
   return (
     <Tabs variant="none" value={value} onChange={onChange}>
@@ -32,5 +32,5 @@ export function TimeTabs({ value, onChange }: TimeTabsProps) {
         />
       </Tabs.List>
     </Tabs>
-  );
+  )
 }

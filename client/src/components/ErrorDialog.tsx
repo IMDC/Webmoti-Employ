@@ -1,40 +1,41 @@
-import { Dialog, Text } from '@mantine/core';
-import { AppError, useAppStore } from '@/useAppStore';
-import { jsonStringifyIndented } from '@/utils/utils';
+import type { AppError } from '@/useAppStore'
+import { Dialog, Text } from '@mantine/core'
+import { useAppStore } from '@/useAppStore'
+import { jsonStringifyIndented } from '@/utils/utils'
 
 export function formatAppError(error: AppError): string {
-  const { status, message, details } = error;
+  const { status, message, details } = error
 
-  const lines = [];
+  const lines = []
 
   if (status !== undefined) {
-    lines.push(`Status: ${status}`);
+    lines.push(`Status: ${status}`)
   }
 
   if (message && message.length > 0) {
-    lines.push(`Message: ${message}`);
+    lines.push(`Message: ${message}`)
   }
 
   if (details !== undefined) {
-    const detailsText = typeof details === 'string' ? details : jsonStringifyIndented(details);
+    const detailsText = typeof details === 'string' ? details : jsonStringifyIndented(details)
 
     if (detailsText.length > 0) {
-      lines.push(`Details: ${detailsText}`);
+      lines.push(`Details: ${detailsText}`)
     }
   }
 
-  return lines.join('\n');
+  return lines.join('\n')
 }
 
 export function ErrorDialog() {
-  const error = useAppStore((state) => state.error);
-  const clearError = useAppStore((state) => state.clearError);
+  const error = useAppStore(state => state.error)
+  const clearError = useAppStore(state => state.clearError)
 
   if (!error) {
-    return null;
+    return null
   }
 
-  const formatted = formatAppError(error);
+  const formatted = formatAppError(error)
 
   return (
     <Dialog
@@ -54,5 +55,5 @@ export function ErrorDialog() {
       <Text fw="bolder">Error</Text>
       <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{formatted}</pre>
     </Dialog>
-  );
+  )
 }

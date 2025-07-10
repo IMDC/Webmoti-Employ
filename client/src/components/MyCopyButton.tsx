@@ -1,8 +1,8 @@
-import { IconCheck, IconCopy } from '@tabler/icons-react';
-import { ActionIcon, CopyButton as MantineCopyButton, Tooltip } from '@mantine/core';
+import { ActionIcon, CopyButton as MantineCopyButton, Tooltip } from '@mantine/core'
+import { IconCheck, IconCopy } from '@tabler/icons-react'
 
 interface MyCopyButtonProps {
-  copyText: string;
+  copyText: string
 }
 
 export function MyCopyButton({ copyText }: MyCopyButtonProps) {
@@ -16,5 +16,5 @@ export function MyCopyButton({ copyText }: MyCopyButtonProps) {
         </Tooltip>
       )}
     </MantineCopyButton>
-  );
+  )
 }

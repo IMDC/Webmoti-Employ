@@ -1,13 +1,14 @@
-import { createContext, useContext } from 'react';
-import { useStore, type StoreApi } from 'zustand';
-import { PreviewStore } from '../createPreviewStore';
+import type { StoreApi } from 'zustand'
+import type { PreviewStore } from '../createPreviewStore'
+import { createContext, use } from 'react'
+import { useStore } from 'zustand'
 
-export const PreviewContext = createContext<StoreApi<PreviewStore> | null>(null);
+export const PreviewContext = createContext<StoreApi<PreviewStore> | null>(null)
 
 export function usePreviewStore<T>(selector: (state: PreviewStore) => T): T {
-  const store = useContext(PreviewContext);
+  const store = use(PreviewContext)
   if (!store) {
-    throw new Error('usePreviewStore must be used within a PreviewContextProvider');
+    throw new Error('usePreviewStore must be used within a PreviewContextProvider')
   }
-  return useStore(store, selector);
+  return useStore(store, selector)
 }

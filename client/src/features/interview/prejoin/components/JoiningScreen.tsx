@@ -1,7 +1,7 @@
-import { Center, Group, Loader, Text, Transition } from '@mantine/core';
+import { Center, Group, Loader, Text, Transition } from '@mantine/core'
 
 interface JoiningScreenProps {
-  visible: boolean;
+  visible: boolean
 }
 
 export function JoiningScreen({ visible }: JoiningScreenProps) {
@@ -13,7 +13,7 @@ export function JoiningScreen({ visible }: JoiningScreenProps) {
       timingFunction="ease"
       exitDuration={0}
     >
-      {(styles) => (
+      {styles => (
         <Center
           style={{
             ...styles,
@@ -30,5 +30,5 @@ export function JoiningScreen({ visible }: JoiningScreenProps) {
         </Center>
       )}
     </Transition>
-  );
+  )
 }

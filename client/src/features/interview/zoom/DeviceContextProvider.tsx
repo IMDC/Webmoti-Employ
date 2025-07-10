@@ -1,14 +1,16 @@
-import { ReactNode, useState } from 'react';
-import { StoreApi } from 'zustand';
-import { createDeviceStore, DeviceStore } from './createDeviceStore';
-import { DeviceContext } from './useDeviceStore';
+import type { ReactNode } from 'react'
+import type { StoreApi } from 'zustand'
+import type { DeviceStore } from './createDeviceStore'
+import { useState } from 'react'
+import { createDeviceStore } from './createDeviceStore'
+import { DeviceContext } from './useDeviceStore'
 
 interface DeviceContextProviderProps {
-  children: ReactNode;
+  children: ReactNode
 }
 
 export function DeviceContextProvider({ children }: DeviceContextProviderProps) {
-  const [store] = useState<StoreApi<DeviceStore>>(() => createDeviceStore());
+  const [store] = useState<StoreApi<DeviceStore>>(() => createDeviceStore())
 
-  return <DeviceContext.Provider value={store}>{children}</DeviceContext.Provider>;
+  return <DeviceContext value={store}>{children}</DeviceContext>
 }

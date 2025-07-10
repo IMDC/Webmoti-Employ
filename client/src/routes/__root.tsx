@@ -1,12 +1,12 @@
-import { createRootRoute, Outlet } from '@tanstack/react-router';
-import { Center, Divider, Group, Title } from '@mantine/core';
-import { Notifications } from '@mantine/notifications';
-import { ErrorDialog } from '@/components/ErrorDialog';
+import { Center, Divider, Group, Title } from '@mantine/core'
+import { Notifications } from '@mantine/notifications'
+import { createRootRoute, Outlet } from '@tanstack/react-router'
+import { ErrorDialog } from '@/components/ErrorDialog'
 
 export const Route = createRootRoute({
   component: RootRoute,
   notFoundComponent: NotFound,
-});
+})
 
 function NotFound() {
   return (
@@ -17,7 +17,7 @@ function NotFound() {
         <Title>Page Not Found</Title>
       </Group>
     </Center>
-  );
+  )
 }
 
 function RootRoute() {
@@ -27,5 +27,5 @@ function RootRoute() {
       <ErrorDialog />
       <Notifications />
     </>
-  );
+  )
 }

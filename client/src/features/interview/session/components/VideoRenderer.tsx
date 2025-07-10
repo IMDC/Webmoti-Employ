@@ -1,30 +1,30 @@
-import { useEffect, useRef } from 'react';
-import type { VideoPlayer } from '@zoom/videosdk';
+import type { VideoPlayer } from '@zoom/videosdk'
+import { useEffect, useRef } from 'react'
 
 interface VideoRendererProps {
-  attach: (el: VideoPlayer) => Promise<void>;
-  detach: () => void;
+  attach: (el: VideoPlayer) => Promise<void>
+  detach: () => void
 }
 
 export function VideoRenderer({ attach, detach }: VideoRendererProps) {
-  const ref = useRef<VideoPlayer>(null);
+  const ref = useRef<VideoPlayer>(null)
 
   useEffect(() => {
-    const el = ref.current;
+    const el = ref.current
     if (!el) {
-      return;
+      return
     }
 
-    attach(el);
+    attach(el)
 
     return () => {
-      detach();
-    };
-  }, [attach, detach]);
+      detach()
+    }
+  }, [attach, detach])
 
   return (
     <video-player-container>
       <video-player ref={ref} />
     </video-player-container>
-  );
+  )
 }

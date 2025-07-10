@@ -1,7 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
-import { IconMessages, IconSend, IconTool, IconUserFilled } from '@tabler/icons-react';
-import { ChatMessage, Participant } from '@zoom/videosdk';
-import Linkify from 'linkify-react';
+import type { ChatMessage, Participant } from '@zoom/videosdk'
 import {
   ActionIcon,
   Box,
@@ -13,30 +10,33 @@ import {
   Text,
   Textarea,
   ThemeIcon,
-} from '@mantine/core';
-import { useZoomSessionStore } from '../zoom/useZoomSessionStore';
-import { useChatStore } from './useChatStore';
+} from '@mantine/core'
+import { IconMessages, IconSend, IconTool, IconUserFilled } from '@tabler/icons-react'
+import Linkify from 'linkify-react'
+import { useEffect, useRef, useState } from 'react'
+import { useZoomSessionStore } from '../zoom/useZoomSessionStore'
+import { useChatStore } from './useChatStore'
 
 function formatTo12HourTime(timestamp: number): string {
-  const date = new Date(timestamp);
-  let hours = date.getHours();
-  const minutes = date.getMinutes();
+  const date = new Date(timestamp)
+  let hours = date.getHours()
+  const minutes = date.getMinutes()
 
-  hours = hours % 12 || 12;
-  const mins = minutes.toString().padStart(2, '0');
+  hours = hours % 12 || 12
+  const mins = minutes.toString().padStart(2, '0')
 
-  return `${hours}:${mins}`;
+  return `${hours}:${mins}`
 }
 
-type MessageProps = {
-  chatMessage: ChatMessage;
-  participants: Map<number, Participant>;
-};
+interface MessageProps {
+  chatMessage: ChatMessage
+  participants: Map<number, Participant>
+}
 
 function Message({ chatMessage, participants }: MessageProps) {
-  const { message, sender, timestamp } = chatMessage;
-  const senderParticipant = participants.get(sender.userId);
-  const isHost = senderParticipant?.isHost ?? false;
+  const { message, sender, timestamp } = chatMessage
+  const senderParticipant = participants.get(sender.userId)
+  const isHost = senderParticipant?.isHost ?? false
 
   return (
     <Flex gap={5}>
@@ -54,60 +54,63 @@ function Message({ chatMessage, participants }: MessageProps) {
           overflowWrap: 'anywhere',
         }}
       >
-        <strong style={{ marginRight: 5 }}>{sender.name}:</strong>
+        <strong style={{ marginRight: 5 }}>
+          {sender.name}
+          :
+        </strong>
         <Linkify>{message}</Linkify>
       </Text>
     </Flex>
-  );
+  )
 }
 
 export function Chat() {
-  const [chatText, setChatText] = useState('');
-  const [isAtBottom, setIsAtBottom] = useState(true);
+  const [chatText, setChatText] = useState('')
+  const [isAtBottom, setIsAtBottom] = useState(true)
 
-  const messages = useChatStore((s) => s.messages);
-  const sendChat = useChatStore((s) => s.sendChat);
-  const setChatRead = useChatStore((s) => s.setChatRead);
+  const messages = useChatStore(s => s.messages)
+  const sendChat = useChatStore(s => s.sendChat)
+  const setChatRead = useChatStore(s => s.setChatRead)
 
-  const participants = useZoomSessionStore((s) => s.participants);
+  const participants = useZoomSessionStore(s => s.participants)
 
-  const scrollViewportRef = useRef<HTMLDivElement>(null);
+  const scrollViewportRef = useRef<HTMLDivElement>(null)
 
-  const isChatTextValid = chatText.trim() !== '';
+  const isChatTextValid = chatText.trim() !== ''
 
   function sendMessage() {
-    const trimmed = chatText.trim();
-    sendChat(trimmed);
-    setChatText('');
+    const trimmed = chatText.trim()
+    sendChat(trimmed)
+    setChatText('')
   }
 
-  const handleScroll = ({ y }: { x: number; y: number }) => {
-    const el = scrollViewportRef.current;
+  const handleScroll = ({ y }: { x: number, y: number }) => {
+    const el = scrollViewportRef.current
     if (!el) {
-      return;
+      return
     }
-    const SCROLL_EPSILON = 5;
-    setIsAtBottom(y + el.clientHeight >= el.scrollHeight - SCROLL_EPSILON);
-  };
+    const SCROLL_EPSILON = 5
+    setIsAtBottom(y + el.clientHeight >= el.scrollHeight - SCROLL_EPSILON)
+  }
 
   useEffect(() => {
-    const el = scrollViewportRef.current;
+    const el = scrollViewportRef.current
     if (!el) {
-      return;
+      return
     }
     // scroll to bottom when you open the chat
-    el.scrollTo({ top: el.scrollHeight, behavior: 'instant' });
-  }, []);
+    el.scrollTo({ top: el.scrollHeight, behavior: 'instant' })
+  }, [])
 
   useEffect(() => {
-    const el = scrollViewportRef.current;
+    const el = scrollViewportRef.current
     if (!el || !isAtBottom) {
-      return;
+      return
     }
     // when you're at the bottom, mark as read and scroll down to the new message
-    setChatRead();
-    el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
-  }, [messages, isAtBottom, setChatRead]);
+    setChatRead()
+    el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+  }, [messages, isAtBottom, setChatRead])
 
   return (
     <Card
@@ -146,23 +149,23 @@ export function Chat() {
       <Textarea
         placeholder="Type a message..."
         value={chatText}
-        onChange={(event) => setChatText(event.currentTarget.value)}
+        onChange={event => setChatText(event.currentTarget.value)}
         minRows={2}
         onKeyDown={(event) => {
           if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
+            event.preventDefault()
             if (!isChatTextValid) {
-              return;
+              return
             }
-            sendMessage();
+            sendMessage()
           }
         }}
-        rightSection={
+        rightSection={(
           <ActionIcon variant="subtle" onClick={sendMessage} disabled={!isChatTextValid}>
             <IconSend stroke={1.5} />
           </ActionIcon>
-        }
+        )}
       />
     </Card>
-  );
+  )
 }

@@ -1,16 +1,16 @@
-import { useState } from 'react';
+import { Group, Modal, Radio, Stack, Text } from '@mantine/core'
 import {
   IconLayoutDashboard,
   IconLayoutGrid,
   IconLayoutSidebarRight,
   IconSquare,
-} from '@tabler/icons-react';
-import { Group, Modal, Radio, Stack, Text } from '@mantine/core';
-import classes from './ChangeLayoutModal.module.css';
+} from '@tabler/icons-react'
+import { useState } from 'react'
+import classes from './ChangeLayoutModal.module.css'
 
 interface ChangeLayoutModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
 }
 
 const layouts = [
@@ -38,12 +38,12 @@ const layouts = [
     description: 'Main view with participants in a side panel.',
     icon: IconLayoutSidebarRight,
   },
-];
+]
 
 export function ChangeLayoutModal({ isOpen, onClose }: ChangeLayoutModalProps) {
-  const [value, setValue] = useState<string | null>('auto');
+  const [value, setValue] = useState<string | null>('auto')
 
-  const cards = layouts.map((layout) => (
+  const cards = layouts.map(layout => (
     <Radio.Card key={layout.value} value={layout.value} radius="md" className={classes.root}>
       <Group wrap="nowrap" align="flex-start">
         <Radio.Indicator />
@@ -54,7 +54,7 @@ export function ChangeLayoutModal({ isOpen, onClose }: ChangeLayoutModalProps) {
         </div>
       </Group>
     </Radio.Card>
-  ));
+  ))
 
   return (
     <Modal
@@ -69,5 +69,5 @@ export function ChangeLayoutModal({ isOpen, onClose }: ChangeLayoutModalProps) {
         </Stack>
       </Radio.Group>
     </Modal>
-  );
+  )
 }

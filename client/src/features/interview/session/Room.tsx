@@ -1,46 +1,46 @@
-import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { AppShell, Box } from '@mantine/core';
-import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore';
-import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore';
-import { useAppStore } from '@/useAppStore';
-import { GALLERY_VIEW_MARGIN } from '@/utils/constants';
-import { Chat } from '../chat/Chat';
-import { useChatStore } from '../chat/useChatStore';
-import { MenuBar } from '../components/MenuBar';
-import { VideoGrid } from './components/VideoGrid';
+import { AppShell, Box } from '@mantine/core'
+import { useNavigate } from '@tanstack/react-router'
+import { useEffect, useRef, useState } from 'react'
+import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
+import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore'
+import { useAppStore } from '@/useAppStore'
+import { GALLERY_VIEW_MARGIN } from '@/utils/constants'
+import { Chat } from '../chat/Chat'
+import { useChatStore } from '../chat/useChatStore'
+import { MenuBar } from '../components/MenuBar'
+import { VideoGrid } from './components/VideoGrid'
 
 export function Room() {
-  const participantStageRef = useRef<HTMLDivElement>(null);
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const participantStageRef = useRef<HTMLDivElement>(null)
+  const [isChatOpen, setIsChatOpen] = useState(false)
 
-  const permissionState = useAppStore((s) => s.permissionState);
-  const isVideoOn = useAppStore((s) => s.isVideoOn);
-  const setIsVideoOn = useAppStore((s) => s.setIsVideoOn);
-  const isAudioOn = useAppStore((s) => s.isAudioOn);
-  const setIsAudioOn = useAppStore((s) => s.setIsAudioOn);
+  const permissionState = useAppStore(s => s.permissionState)
+  const isVideoOn = useAppStore(s => s.isVideoOn)
+  const setIsVideoOn = useAppStore(s => s.setIsVideoOn)
+  const isAudioOn = useAppStore(s => s.isAudioOn)
+  const setIsAudioOn = useAppStore(s => s.setIsAudioOn)
 
   // TODO maybe remove this in favour of startVideo permission check
-  const initDevices = useDeviceStore((s) => s.initDevices);
+  const initDevices = useDeviceStore(s => s.initDevices)
 
-  const startVideo = useZoomSessionStore((s) => s.startVideo);
-  const stopVideo = useZoomSessionStore((s) => s.stopVideo);
-  const startAudio = useZoomSessionStore((s) => s.startAudio);
-  const stopAudio = useZoomSessionStore((s) => s.stopAudio);
-  const leave = useZoomSessionStore((s) => s.leave);
-  const switchCamera = useZoomSessionStore((s) => s.switchCamera);
-  const switchMicrophone = useZoomSessionStore((s) => s.switchMicrophone);
-  const callState = useZoomSessionStore((s) => s.callState);
+  const startVideo = useZoomSessionStore(s => s.startVideo)
+  const stopVideo = useZoomSessionStore(s => s.stopVideo)
+  const startAudio = useZoomSessionStore(s => s.startAudio)
+  const stopAudio = useZoomSessionStore(s => s.stopAudio)
+  const leave = useZoomSessionStore(s => s.leave)
+  const switchCamera = useZoomSessionStore(s => s.switchCamera)
+  const switchMicrophone = useZoomSessionStore(s => s.switchMicrophone)
+  const callState = useZoomSessionStore(s => s.callState)
 
-  const isChatUnread = useChatStore((s) => s.isChatUnread);
+  const isChatUnread = useChatStore(s => s.isChatUnread)
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (callState === 'left') {
-      navigate({ to: '/end' });
+      navigate({ to: '/end' })
     }
-  }, [callState, navigate]);
+  }, [callState, navigate])
 
   return (
     <AppShell
@@ -91,41 +91,43 @@ export function Room() {
         <MenuBar
           onToggleMic={async () => {
             if (permissionState !== 'granted') {
-              await initDevices();
-              return;
+              await initDevices()
+              return
             }
 
             if (isAudioOn) {
-              setIsAudioOn(false);
-              await stopAudio();
-            } else {
-              setIsAudioOn(true);
-              await startAudio();
+              setIsAudioOn(false)
+              await stopAudio()
+            }
+            else {
+              setIsAudioOn(true)
+              await startAudio()
             }
           }}
           onToggleVideo={async () => {
             if (permissionState !== 'granted') {
-              await initDevices();
-              return;
+              await initDevices()
+              return
             }
 
             if (isVideoOn) {
-              setIsVideoOn(false);
-              await stopVideo();
-            } else {
-              setIsVideoOn(true);
-              await startVideo();
+              setIsVideoOn(false)
+              await stopVideo()
+            }
+            else {
+              setIsVideoOn(true)
+              await startVideo()
             }
           }}
           onChangeAudioInputDevice={switchMicrophone}
           onChangeVideoDevice={switchCamera}
           onToggleChat={() => {
-            setIsChatOpen(!isChatOpen);
+            setIsChatOpen(!isChatOpen)
           }}
           onLeave={leave}
           isChatUnread={isChatUnread}
         />
       </AppShell.Footer>
     </AppShell>
-  );
+  )
 }

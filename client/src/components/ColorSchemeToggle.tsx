@@ -1,9 +1,9 @@
-import { IconMoon, IconSun } from '@tabler/icons-react';
-import { ActionIcon, useMantineColorScheme } from '@mantine/core';
+import { ActionIcon, useMantineColorScheme } from '@mantine/core'
+import { IconMoon, IconSun } from '@tabler/icons-react'
 
 export function ColorSchemeToggle() {
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-  const isDark = colorScheme === 'dark';
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme()
+  const isDark = colorScheme === 'dark'
 
   return (
     <ActionIcon
@@ -14,5 +14,5 @@ export function ColorSchemeToggle() {
     >
       {isDark ? <IconSun size={18} /> : <IconMoon size={18} />}
     </ActionIcon>
-  );
+  )
 }

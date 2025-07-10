@@ -1,13 +1,13 @@
-import { IconLayoutGrid, IconMenu2, IconScreenShare, IconSettings } from '@tabler/icons-react';
-import { Button, Menu } from '@mantine/core';
-import { useAppStore } from '@/useAppStore';
+import { Button, Menu } from '@mantine/core'
+import { IconLayoutGrid, IconMenu2, IconScreenShare, IconSettings } from '@tabler/icons-react'
+import { useAppStore } from '@/useAppStore'
 
 interface ControlsMenuProps {
-  onLayoutOpen?: () => void;
+  onLayoutOpen?: () => void
 }
 
 export function ControlsMenu({ onLayoutOpen }: ControlsMenuProps) {
-  const setIsSettingsOpen = useAppStore((state) => state.setIsSettingsOpen);
+  const setIsSettingsOpen = useAppStore(state => state.setIsSettingsOpen)
 
   return (
     <Menu shadow="md" position="top-end">
@@ -31,5 +31,5 @@ export function ControlsMenu({ onLayoutOpen }: ControlsMenuProps) {
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>
-  );
+  )
 }

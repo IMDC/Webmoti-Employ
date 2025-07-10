@@ -1,9 +1,9 @@
-import { useUser } from '@clerk/clerk-react';
-import { Avatar, Box, Center } from '@mantine/core';
+import { useUser } from '@clerk/clerk-react'
+import { Avatar, Box, Center } from '@mantine/core'
 
 export function NoVideoBackground() {
-  const user = useUser();
-  const imageUrl = user.user?.imageUrl;
+  const user = useUser()
+  const imageUrl = user.user?.imageUrl
 
   return (
     <>
@@ -29,5 +29,5 @@ export function NoVideoBackground() {
         />
       </Center>
     </>
-  );
+  )
 }

@@ -1,5 +1,5 @@
-import { Box } from '@mantine/core';
-import { GALLERY_VIEW_MARGIN } from '@/utils/constants';
+import { Box } from '@mantine/core'
+import { GALLERY_VIEW_MARGIN } from '@/utils/constants'
 
 export function SpotlightView() {
   return (
@@ -27,5 +27,5 @@ export function SpotlightView() {
         </AspectRatio> */}
       </Box>
     </>
-  );
+  )
 }

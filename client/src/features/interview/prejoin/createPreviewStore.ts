@@ -1,23 +1,25 @@
-import ZoomVideo, { LocalAudioTrack, LocalVideoTrack, VideoPlayer } from '@zoom/videosdk';
-import { createStore, StoreApi } from 'zustand';
-import { DeviceStore } from '@/features/interview/zoom/createDeviceStore';
-import { useAppStore } from '../../../useAppStore';
+import type { LocalAudioTrack, LocalVideoTrack, VideoPlayer } from '@zoom/videosdk'
+import type { StoreApi } from 'zustand'
+import type { DeviceStore } from '@/features/interview/zoom/createDeviceStore'
+import ZoomVideo from '@zoom/videosdk'
+import { createStore } from 'zustand'
+import { useAppStore } from '../../../useAppStore'
 
-export type PreviewStore = {
-  localVideoTrack: LocalVideoTrack | null;
-  localAudioTrack: LocalAudioTrack | null;
+export interface PreviewStore {
+  localVideoTrack: LocalVideoTrack | null
+  localAudioTrack: LocalAudioTrack | null
 
-  startCamera: (element: VideoPlayer) => Promise<void>;
-  stopCamera: () => Promise<void>;
-  switchCamera: (cameraId: string) => Promise<void>;
+  startCamera: (element: VideoPlayer) => Promise<void>
+  stopCamera: () => Promise<void>
+  switchCamera: (cameraId: string) => Promise<void>
 
-  startMicrophone: () => Promise<void>;
-  stopMicrophone: () => Promise<void>;
-  unmuteMicrophone: () => Promise<void>;
-  muteMicrophone: () => Promise<void>;
-  toggleMuteMicrophone: () => Promise<void>;
-  switchMicrophone: (microphoneId: string) => Promise<void>;
-};
+  startMicrophone: () => Promise<void>
+  stopMicrophone: () => Promise<void>
+  unmuteMicrophone: () => Promise<void>
+  muteMicrophone: () => Promise<void>
+  toggleMuteMicrophone: () => Promise<void>
+  switchMicrophone: (microphoneId: string) => Promise<void>
+}
 
 export function createPreviewStore(deviceStore: StoreApi<DeviceStore>) {
   return createStore<PreviewStore>((set, get) => ({
@@ -25,79 +27,80 @@ export function createPreviewStore(deviceStore: StoreApi<DeviceStore>) {
     localAudioTrack: null,
 
     startCamera: async (element) => {
-      const selectedVideoDevice = deviceStore.getState().selectedVideoDevice;
+      const selectedVideoDevice = deviceStore.getState().selectedVideoDevice
       if (!selectedVideoDevice) {
-        throw new Error('No video device found');
+        throw new Error('No video device found')
       }
 
-      const track = ZoomVideo.createLocalVideoTrack(selectedVideoDevice);
-      await track.start(element);
-      set({ localVideoTrack: track });
+      const track = ZoomVideo.createLocalVideoTrack(selectedVideoDevice)
+      await track.start(element)
+      set({ localVideoTrack: track })
     },
 
     stopCamera: async () => {
-      const localVideoTrack = get().localVideoTrack;
+      const localVideoTrack = get().localVideoTrack
       if (localVideoTrack) {
-        await localVideoTrack.stop();
-        set({ localVideoTrack: null });
+        await localVideoTrack.stop()
+        set({ localVideoTrack: null })
       }
     },
 
     switchCamera: async (deviceId) => {
-      const localVideoTrack = get().localVideoTrack;
-      localVideoTrack?.switchCamera(deviceId);
-      deviceStore.setState({ selectedVideoDevice: deviceId });
+      const localVideoTrack = get().localVideoTrack
+      localVideoTrack?.switchCamera(deviceId)
+      deviceStore.setState({ selectedVideoDevice: deviceId })
     },
 
     startMicrophone: async () => {
-      const selectedAudioInputDevice = deviceStore.getState().selectedAudioInputDevice;
+      const selectedAudioInputDevice = deviceStore.getState().selectedAudioInputDevice
       if (!selectedAudioInputDevice) {
-        throw new Error('No audio device found');
+        throw new Error('No audio device found')
       }
 
-      const track = ZoomVideo.createLocalAudioTrack(selectedAudioInputDevice);
-      await track.start();
-      await track?.unmute();
+      const track = ZoomVideo.createLocalAudioTrack(selectedAudioInputDevice)
+      await track.start()
+      await track?.unmute()
 
-      set({ localAudioTrack: track });
+      set({ localAudioTrack: track })
     },
 
     stopMicrophone: async () => {
-      const localAudioTrack = get().localAudioTrack;
+      const localAudioTrack = get().localAudioTrack
       if (localAudioTrack) {
-        await localAudioTrack.stop();
-        set({ localAudioTrack: null });
+        await localAudioTrack.stop()
+        set({ localAudioTrack: null })
       }
     },
 
     unmuteMicrophone: async () => {
-      const localAudioTrack = get().localAudioTrack;
-      await localAudioTrack?.unmute();
+      const localAudioTrack = get().localAudioTrack
+      await localAudioTrack?.unmute()
     },
 
     muteMicrophone: async () => {
-      const localAudioTrack = get().localAudioTrack;
-      await localAudioTrack?.mute();
+      const localAudioTrack = get().localAudioTrack
+      await localAudioTrack?.mute()
     },
     toggleMuteMicrophone: async () => {
-      const localAudioTrack = get().localAudioTrack;
-      const isAudioOn = useAppStore.getState().isAudioOn;
+      const localAudioTrack = get().localAudioTrack
+      const isAudioOn = useAppStore.getState().isAudioOn
       if (isAudioOn) {
-        await localAudioTrack?.mute();
-      } else {
-        await localAudioTrack?.unmute();
+        await localAudioTrack?.mute()
       }
-      useAppStore.getState().toggleIsAudioOn();
+      else {
+        await localAudioTrack?.unmute()
+      }
+      useAppStore.getState().toggleIsAudioOn()
     },
     switchMicrophone: async (microphoneId) => {
-      const localAudioTrack = get().localAudioTrack;
-      await localAudioTrack?.stop();
+      const localAudioTrack = get().localAudioTrack
+      await localAudioTrack?.stop()
 
-      const newLocalAudioTrack = ZoomVideo.createLocalAudioTrack(microphoneId);
-      await newLocalAudioTrack.start();
-      newLocalAudioTrack.unmute();
-      set({ localAudioTrack: newLocalAudioTrack });
-      deviceStore.setState({ selectedAudioInputDevice: microphoneId });
+      const newLocalAudioTrack = ZoomVideo.createLocalAudioTrack(microphoneId)
+      await newLocalAudioTrack.start()
+      newLocalAudioTrack.unmute()
+      set({ localAudioTrack: newLocalAudioTrack })
+      deviceStore.setState({ selectedAudioInputDevice: microphoneId })
     },
-  }));
+  }))
 }

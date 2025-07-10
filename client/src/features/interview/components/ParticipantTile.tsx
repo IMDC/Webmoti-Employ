@@ -1,13 +1,13 @@
-import { Card, Text } from '@mantine/core';
-import { Corner } from '@/components/Corner';
-import { NoVideoBackground } from './NoVideoBackground';
+import { Card, Text } from '@mantine/core'
+import { Corner } from '@/components/Corner'
+import { NoVideoBackground } from './NoVideoBackground'
 
 interface ParticipantTileProps {
-  height: number | string;
-  width: number | string;
-  name: string;
-  isVideoOn: boolean;
-  children: React.ReactNode;
+  height: number | string
+  width: number | string
+  name: string
+  isVideoOn: boolean
+  children: React.ReactNode
 }
 
 export function ParticipantTile({
@@ -40,5 +40,5 @@ export function ParticipantTile({
         </Corner>
       )}
     </Card>
-  );
+  )
 }

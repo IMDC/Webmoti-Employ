@@ -1,12 +1,4 @@
-import { useUser } from '@clerk/clerk-react';
-import {
-  IconAt,
-  IconCalendarFilled,
-  IconCalendarPlus,
-  IconMailFast,
-  IconTrash,
-} from '@tabler/icons-react';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
+import { useUser } from '@clerk/clerk-react'
 import {
   ActionIcon,
   Button,
@@ -17,44 +9,52 @@ import {
   Text,
   TextInput,
   Tooltip,
-} from '@mantine/core';
-import { DatePickerInput, getTimeRange, TimeGrid } from '@mantine/dates';
-import { useForm } from '@mantine/form';
-import { useAppStore } from '@/useAppStore';
-import { handleAppError } from '@/utils/utils';
-import { useScheduleInterview } from '../queries';
-import { ScheduleInterviewForm } from '../schema';
+} from '@mantine/core'
+import { DatePickerInput, getTimeRange, TimeGrid } from '@mantine/dates'
+import { useForm } from '@mantine/form'
+import {
+  IconAt,
+  IconCalendarFilled,
+  IconCalendarPlus,
+  IconMailFast,
+  IconTrash,
+} from '@tabler/icons-react'
+import { zod4Resolver } from 'mantine-form-zod-resolver'
+import { useAppStore } from '@/useAppStore'
+import { handleAppError } from '@/utils/utils'
+import { useScheduleInterview } from '../queries'
+import { ScheduleInterviewForm } from '../schema'
 
 function openGoogleCalendarTab(startTime: Date, endTime: Date, invites: string[]) {
   const formatDate = (d: Date) =>
     `${d
       .toISOString()
       .replace(/[-:]|\.\d{3}/g, '')
-      .slice(0, 15)}Z`;
+      .slice(0, 15)}Z`
 
-  const title = encodeURIComponent('Interview');
-  const description = encodeURIComponent('Virtual interview on the WebMoti-Employ platform');
-  const location = encodeURIComponent('WebMoti-Employ');
-  const startDateTime = formatDate(startTime);
-  const endDateTime = formatDate(endTime);
-  const guests = encodeURIComponent(invites.join(','));
+  const title = encodeURIComponent('Interview')
+  const description = encodeURIComponent('Virtual interview on the WebMoti-Employ platform')
+  const location = encodeURIComponent('WebMoti-Employ')
+  const startDateTime = formatDate(startTime)
+  const endDateTime = formatDate(endTime)
+  const guests = encodeURIComponent(invites.join(','))
 
   // TODO add link to description and location maybe
 
-  const url = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}&details=${description}&location=${location}&dates=${startDateTime}/${endDateTime}&add=${guests}`;
+  const url = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}&details=${description}&location=${location}&dates=${startDateTime}/${endDateTime}&add=${guests}`
 
-  window.open(url, '_blank');
+  window.open(url, '_blank')
 }
 
 interface ScheduleFormProps {
-  onSuccess: () => void;
+  onSuccess: () => void
 }
 
 export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
-  const { scheduleInterviewMutation, isScheduleInterviewPending } = useScheduleInterview();
-  const { user } = useUser();
+  const { scheduleInterviewMutation, isScheduleInterviewPending } = useScheduleInterview()
+  const { user } = useUser()
 
-  const setError = useAppStore((s) => s.setError);
+  const setError = useAppStore(s => s.setError)
 
   const form = useForm({
     mode: 'uncontrolled',
@@ -67,17 +67,17 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
     },
 
     validate: zod4Resolver(ScheduleInterviewForm),
-  });
+  })
 
   async function handleSubmit(values: ScheduleInterviewForm) {
-    const [hours, minutes] = values.startTime.split(':').map(Number);
-    const startTime = new Date(values.date);
-    startTime.setHours(hours, minutes, 0, 0);
-    const endTime = new Date(startTime.getTime() + 60 * 60 * 1000);
+    const [hours, minutes] = values.startTime.split(':').map(Number)
+    const startTime = new Date(values.date)
+    startTime.setHours(hours, minutes, 0, 0)
+    const endTime = new Date(startTime.getTime() + 60 * 60 * 1000)
 
     if (!user) {
-      setError({ message: 'User is not set' });
-      return;
+      setError({ message: 'User is not set' })
+      return
     }
 
     try {
@@ -86,16 +86,17 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
         startTime,
         endTime,
         invites: values.invites,
-      });
+      })
 
       if (values.openGoogleCalendar) {
-        const inviteEmails = values.invites.map((i) => i.email);
-        openGoogleCalendarTab(startTime, endTime, inviteEmails);
+        const inviteEmails = values.invites.map(i => i.email)
+        openGoogleCalendarTab(startTime, endTime, inviteEmails)
       }
 
-      onSuccess();
-    } catch (error: unknown) {
-      handleAppError(error, setError, 'Failed to schedule interview');
+      onSuccess()
+    }
+    catch (error: unknown) {
+      handleAppError(error, setError, 'Failed to schedule interview')
     }
   }
 
@@ -118,7 +119,7 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
         <IconTrash size={16} />
       </ActionIcon>
     </Group>
-  ));
+  ))
 
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -158,7 +159,7 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
           </Button>
         </Group>
 
-        {/* the empty group is so the tooltip only appears when hovering the checkbox label*/}
+        {/* the empty group is so the tooltip only appears when hovering the checkbox label */}
         <Group>
           <Tooltip
             multiline
@@ -183,5 +184,5 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
         </Button>
       </Stack>
     </form>
-  );
+  )
 }

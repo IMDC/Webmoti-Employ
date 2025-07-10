@@ -1,3 +1,5 @@
+import { Button, Flex, Indicator, Popover } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
 import {
   IconChevronUp,
   IconMessageFilled,
@@ -6,24 +8,22 @@ import {
   IconPhoneOff,
   IconVideoFilled,
   IconVideoOff,
-} from '@tabler/icons-react';
-import { Button, Flex, Indicator, Popover } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import { useAppStore } from '@/useAppStore';
-import { ChangeLayoutModal } from '../session/components/ChangeLayoutModal/ChangeLayoutModal';
-import { ControlsMenu } from '../session/components/ControlsMenu';
-import { ChangeMediaDevice } from './ChangeMediaDevice';
+} from '@tabler/icons-react'
+import { useAppStore } from '@/useAppStore'
+import { ChangeLayoutModal } from '../session/components/ChangeLayoutModal/ChangeLayoutModal'
+import { ControlsMenu } from '../session/components/ControlsMenu'
+import { ChangeMediaDevice } from './ChangeMediaDevice'
 
 interface MenuBarProps {
-  onToggleMic: () => void;
-  onToggleVideo: () => void;
-  onToggleChat?: () => void;
-  isPrejoin?: boolean;
-  disableMediaButtons?: boolean;
-  onLeave?: () => void;
-  isChatUnread?: boolean;
-  onChangeVideoDevice?: (videoDeviceId: string) => Promise<void>;
-  onChangeAudioInputDevice?: (audioInputDeviceId: string) => Promise<void>;
+  onToggleMic: () => void
+  onToggleVideo: () => void
+  onToggleChat?: () => void
+  isPrejoin?: boolean
+  disableMediaButtons?: boolean
+  onLeave?: () => void
+  isChatUnread?: boolean
+  onChangeVideoDevice?: (videoDeviceId: string) => Promise<void>
+  onChangeAudioInputDevice?: (audioInputDeviceId: string) => Promise<void>
 }
 
 export function MenuBar({
@@ -37,12 +37,12 @@ export function MenuBar({
   disableMediaButtons = false,
   isChatUnread = false,
 }: MenuBarProps) {
-  const permissionState = useAppStore((state) => state.permissionState);
-  const isAudioOn = useAppStore((state) => state.isAudioOn);
-  const isVideoOn = useAppStore((state) => state.isVideoOn);
+  const permissionState = useAppStore(state => state.permissionState)
+  const isAudioOn = useAppStore(state => state.isAudioOn)
+  const isVideoOn = useAppStore(state => state.isVideoOn)
 
-  const [isLayoutModalOpen, { open: openLayoutModal, close: closeLayoutModal }] =
-    useDisclosure(false);
+  const [isLayoutModalOpen, { open: openLayoutModal, close: closeLayoutModal }]
+    = useDisclosure(false)
 
   const MicButton = (
     <Button
@@ -51,13 +51,15 @@ export function MenuBar({
       onClick={onToggleMic}
       disabled={disableMediaButtons}
     >
-      {isAudioOn ? (
-        <IconMicrophoneFilled size={18} />
-      ) : (
-        <IconMicrophoneOff size={18} style={{ fill: 'white' }} />
-      )}
+      {isAudioOn
+        ? (
+            <IconMicrophoneFilled size={18} />
+          )
+        : (
+            <IconMicrophoneOff size={18} style={{ fill: 'white' }} />
+          )}
     </Button>
-  );
+  )
 
   const VideoButton = (
     <Button
@@ -66,13 +68,15 @@ export function MenuBar({
       onClick={onToggleVideo}
       disabled={disableMediaButtons}
     >
-      {isVideoOn ? (
-        <IconVideoFilled size={18} />
-      ) : (
-        <IconVideoOff style={{ fill: 'white' }} size={18} />
-      )}
+      {isVideoOn
+        ? (
+            <IconVideoFilled size={18} />
+          )
+        : (
+            <IconVideoOff style={{ fill: 'white' }} size={18} />
+          )}
     </Button>
-  );
+  )
 
   return (
     <Flex justify="center" align="center" h="100%" px="md">
@@ -145,5 +149,5 @@ export function MenuBar({
         )}
       </Flex>
     </Flex>
-  );
+  )
 }

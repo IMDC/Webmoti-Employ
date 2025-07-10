@@ -1,11 +1,11 @@
-import { ReactNode } from 'react';
-import { Box } from '@mantine/core';
+import type { ReactNode } from 'react'
+import { Box } from '@mantine/core'
 
 interface CornerProps {
-  children: ReactNode;
-  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-  xOffset?: number;
-  yOffset?: number;
+  children: ReactNode
+  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+  xOffset?: number
+  yOffset?: number
 }
 
 export function Corner({
@@ -19,7 +19,7 @@ export function Corner({
     'top-right': { top: yOffset, right: xOffset },
     'bottom-left': { bottom: yOffset, left: xOffset },
     'bottom-right': { bottom: yOffset, right: xOffset },
-  };
+  }
 
   return (
     <Box
@@ -30,5 +30,5 @@ export function Corner({
     >
       {children}
     </Box>
-  );
+  )
 }

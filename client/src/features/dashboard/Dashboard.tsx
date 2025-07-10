@@ -1,12 +1,4 @@
-import { useState } from 'react';
-import { UserButton } from '@clerk/clerk-react';
-import {
-  IconArrowUp,
-  IconCalendarPlus,
-  IconSquareRoundedPlusFilled,
-  IconVideoPlus,
-} from '@tabler/icons-react';
-import { useNavigate } from '@tanstack/react-router';
+import { UserButton } from '@clerk/clerk-react'
 import {
   ActionIcon,
   Affix,
@@ -21,29 +13,37 @@ import {
   Text,
   TextInput,
   Transition,
-} from '@mantine/core';
-import { useDisclosure, useValidatedState, useWindowScroll } from '@mantine/hooks';
-import { notifications } from '@mantine/notifications';
-import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
-import { Corner } from '@/components/Corner';
-import { InterviewList } from './components/InterviewList';
-import { ScheduleForm } from './components/ScheduleForm';
-import { JoinCodeInput } from './schema';
+} from '@mantine/core'
+import { useDisclosure, useValidatedState, useWindowScroll } from '@mantine/hooks'
+import { notifications } from '@mantine/notifications'
+import {
+  IconArrowUp,
+  IconCalendarPlus,
+  IconSquareRoundedPlusFilled,
+  IconVideoPlus,
+} from '@tabler/icons-react'
+import { useNavigate } from '@tanstack/react-router'
+import { useState } from 'react'
+import { ColorSchemeToggle } from '@/components/ColorSchemeToggle'
+import { Corner } from '@/components/Corner'
+import { InterviewList } from './components/InterviewList'
+import { ScheduleForm } from './components/ScheduleForm'
+import { JoinCodeInput } from './schema'
 
 export function Dashboard() {
-  const [isNewInterviewPopupOpen, setIsNewInterviewPopupOpen] = useState(false);
-  const [isScheduleModalOpened, { open: openScheduleModal, close: closeScheduleModal }] =
-    useDisclosure(false);
+  const [isNewInterviewPopupOpen, setIsNewInterviewPopupOpen] = useState(false)
+  const [isScheduleModalOpened, { open: openScheduleModal, close: closeScheduleModal }]
+    = useDisclosure(false)
 
-  const [scroll, scrollTo] = useWindowScroll();
+  const [scroll, scrollTo] = useWindowScroll()
 
   const [{ value: joinCode, valid: isJoinCodeValid }, setJoinCode] = useValidatedState(
     '',
-    (val) => JoinCodeInput.safeParse(val).success,
-    false
-  );
+    val => JoinCodeInput.safeParse(val).success,
+    false,
+  )
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   return (
     <AppShell
@@ -86,11 +86,11 @@ export function Dashboard() {
         >
           <ScheduleForm
             onSuccess={() => {
-              closeScheduleModal();
+              closeScheduleModal()
               notifications.show({
                 title: 'Interview scheduled',
                 message: 'Your interview has been successfully scheduled.',
-              });
+              })
             }}
           />
         </Modal>
@@ -101,7 +101,7 @@ export function Dashboard() {
               <Popover opened={isNewInterviewPopupOpen} onChange={setIsNewInterviewPopupOpen}>
                 <Popover.Target>
                   <Button
-                    onClick={() => setIsNewInterviewPopupOpen((o) => !o)}
+                    onClick={() => setIsNewInterviewPopupOpen(o => !o)}
                     leftSection={<IconSquareRoundedPlusFilled />}
                   >
                     New interview
@@ -119,8 +119,8 @@ export function Dashboard() {
                     <Button
                       leftSection={<IconCalendarPlus />}
                       onClick={() => {
-                        setIsNewInterviewPopupOpen(false);
-                        openScheduleModal();
+                        setIsNewInterviewPopupOpen(false)
+                        openScheduleModal()
                       }}
                     >
                       Schedule interview
@@ -132,7 +132,7 @@ export function Dashboard() {
               <TextInput
                 placeholder="Enter interview code"
                 value={joinCode}
-                onChange={(event) => setJoinCode(event.currentTarget.value)}
+                onChange={event => setJoinCode(event.currentTarget.value)}
                 error={!isJoinCodeValid && joinCode.length > 0 ? 'Invalid interview code' : false}
               />
               <Button
@@ -151,7 +151,7 @@ export function Dashboard() {
 
         <Affix position={{ bottom: 20, right: 20 }}>
           <Transition transition="slide-up" mounted={scroll.y > 0}>
-            {(transitionStyles) => (
+            {transitionStyles => (
               <ActionIcon style={transitionStyles} onClick={() => scrollTo({ y: 0 })}>
                 <IconArrowUp size={16} />
               </ActionIcon>
@@ -160,5 +160,5 @@ export function Dashboard() {
         </Affix>
       </AppShell.Main>
     </AppShell>
-  );
+  )
 }

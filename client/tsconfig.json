@@ -1,22 +1,22 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "types": ["node", "@testing-library/jest-dom", "vitest/globals"],
-    "useDefineForClassFields": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "allowJs": false,
-    "esModuleInterop": false,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
+    "useDefineForClassFields": true,
     "baseUrl": "./",
     "paths": {
       "@web-employ/shared": ["../shared/src/index.ts"],
       "@/*": ["./src/*"],
       "@test-utils": ["./test-utils"]
-    }
+    },
+    "resolveJsonModule": true,
+    "types": ["node", "@testing-library/jest-dom", "vitest/globals"],
+    "allowJs": false,
+    "noEmit": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": false,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true
   },
   "include": ["src", "test-utils"]
 }

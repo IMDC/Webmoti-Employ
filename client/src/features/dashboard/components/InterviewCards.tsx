@@ -1,9 +1,9 @@
-import { Interview } from '@web-employ/shared';
-import { Center, Stack, Text } from '@mantine/core';
-import { InterviewCard } from './InterviewCard';
+import type { Interview } from '@web-employ/shared'
+import { Center, Stack, Text } from '@mantine/core'
+import { InterviewCard } from './InterviewCard'
 
 interface InterviewCardsProps {
-  interviews: Interview[];
+  interviews: Interview[]
 }
 
 export function InterviewCards({ interviews }: InterviewCardsProps) {
@@ -14,7 +14,7 @@ export function InterviewCards({ interviews }: InterviewCardsProps) {
           <Text fw="bolder">No interviews to show</Text>
         </Stack>
       </Center>
-    );
+    )
   }
 
   return (
@@ -23,5 +23,5 @@ export function InterviewCards({ interviews }: InterviewCardsProps) {
         <InterviewCard interview={interview} key={index} />
       ))}
     </Stack>
-  );
+  )
 }

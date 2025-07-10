@@ -1,19 +1,19 @@
-import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore';
-import { GALLERY_VIEW_ASPECT_RATIO } from '../../../../utils/constants';
-import useGalleryViewLayout from '../hooks/useGalleryViewLayout';
-import { SessionTile } from './SessionTile';
+import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore'
+import { GALLERY_VIEW_ASPECT_RATIO } from '../../../../utils/constants'
+import useGalleryViewLayout from '../hooks/useGalleryViewLayout'
+import { SessionTile } from './SessionTile'
 
 interface VideoGridProps {
-  containerRef: React.RefObject<HTMLDivElement | null>;
+  containerRef: React.RefObject<HTMLDivElement | null>
 }
 
 export function VideoGrid({ containerRef }: VideoGridProps) {
-  const participants = useZoomSessionStore((store) => store.participants);
+  const participants = useZoomSessionStore(store => store.participants)
 
-  const participantCount = participants.size;
-  const { participantVideoWidth } = useGalleryViewLayout(participantCount, containerRef);
+  const participantCount = participants.size
+  const { participantVideoWidth } = useGalleryViewLayout(participantCount, containerRef)
 
-  const participantHeight = participantVideoWidth * GALLERY_VIEW_ASPECT_RATIO;
+  const participantHeight = participantVideoWidth * GALLERY_VIEW_ASPECT_RATIO
 
   return (
     <>
@@ -25,8 +25,8 @@ export function VideoGrid({ containerRef }: VideoGridProps) {
             width={participantVideoWidth}
             participant={participant}
           />
-        );
+        )
       })}
     </>
-  );
+  )
 }

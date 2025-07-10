@@ -1,8 +1,8 @@
-import { useNavigate } from '@tanstack/react-router';
-import { Button, Center, Group, Stack, Title } from '@mantine/core';
+import { Button, Center, Group, Stack, Title } from '@mantine/core'
+import { useNavigate } from '@tanstack/react-router'
 
 export function EndScreen() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   return (
     <Center h="100vh">
@@ -14,5 +14,5 @@ export function EndScreen() {
         </Group>
       </Stack>
     </Center>
-  );
+  )
 }

@@ -1,30 +1,30 @@
-import { useCallback } from 'react';
-import { Participant, VideoPlayer } from '@zoom/videosdk';
-import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore';
-import { useAppStore } from '@/useAppStore';
-import { Corner } from '../../../../components/Corner';
-import AudioLevelIndicator from '../../components/AudioLevelIndicator';
-import { ParticipantTile } from '../../components/ParticipantTile';
-import { VideoRenderer } from './VideoRenderer';
+import type { Participant, VideoPlayer } from '@zoom/videosdk'
+import { useCallback } from 'react'
+import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore'
+import { useAppStore } from '@/useAppStore'
+import { Corner } from '../../../../components/Corner'
+import AudioLevelIndicator from '../../components/AudioLevelIndicator'
+import { ParticipantTile } from '../../components/ParticipantTile'
+import { VideoRenderer } from './VideoRenderer'
 
 interface SessionTileProps {
-  height: number;
-  width: number;
-  participant: Participant;
+  height: number
+  width: number
+  participant: Participant
 }
 
 export function SessionTile({ height, width, participant }: SessionTileProps) {
-  const attach = useZoomSessionStore((s) => s.attachVideoPlayer);
-  const detach = useZoomSessionStore((s) => s.detachVideoPlayer);
+  const attach = useZoomSessionStore(s => s.attachVideoPlayer)
+  const detach = useZoomSessionStore(s => s.detachVideoPlayer)
 
-  const isVideoOn = useAppStore((s) => s.isVideoOn);
+  const isVideoOn = useAppStore(s => s.isVideoOn)
 
   const attachStable = useCallback(
     (el: VideoPlayer) => attach(participant.userId, el),
-    [attach, participant.userId]
-  );
+    [attach, participant.userId],
+  )
 
-  const detachStable = useCallback(() => detach(participant.userId), [detach, participant.userId]);
+  const detachStable = useCallback(() => detach(participant.userId), [detach, participant.userId])
 
   return (
     <ParticipantTile
@@ -42,5 +42,5 @@ export function SessionTile({ height, width, participant }: SessionTileProps) {
         />
       </Corner>
     </ParticipantTile>
-  );
+  )
 }

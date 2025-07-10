@@ -1,20 +1,22 @@
-import { ReactNode, useContext, useState } from 'react';
-import { StoreApi } from 'zustand';
-import { DeviceContext } from '@/features/interview/zoom/useDeviceStore';
-import { createPreviewStore, PreviewStore } from '../createPreviewStore';
-import { PreviewContext } from '../hooks/usePreviewStore';
+import type { ReactNode } from 'react'
+import type { StoreApi } from 'zustand'
+import type { PreviewStore } from '../createPreviewStore'
+import { use, useState } from 'react'
+import { DeviceContext } from '@/features/interview/zoom/useDeviceStore'
+import { createPreviewStore } from '../createPreviewStore'
+import { PreviewContext } from '../hooks/usePreviewStore'
 
 interface PreviewContextProviderProps {
-  children: ReactNode;
+  children: ReactNode
 }
 
 export function PreviewContextProvider({ children }: PreviewContextProviderProps) {
-  const deviceStore = useContext(DeviceContext);
+  const deviceStore = use(DeviceContext)
   if (!deviceStore) {
-    throw new Error('PreviewContextProvider must be used within a DeviceContextProvider');
+    throw new Error('PreviewContextProvider must be used within a DeviceContextProvider')
   }
 
-  const [store] = useState<StoreApi<PreviewStore>>(() => createPreviewStore(deviceStore));
+  const [store] = useState<StoreApi<PreviewStore>>(() => createPreviewStore(deviceStore))
 
-  return <PreviewContext.Provider value={store}>{children}</PreviewContext.Provider>;
+  return <PreviewContext value={store}>{children}</PreviewContext>
 }
