@@ -2,7 +2,7 @@ import { IconCalendarEventFilled, IconVideoFilled } from '@tabler/icons-react';
 import { Avatar, Badge, Button, Card, Divider, Group, Text } from '@mantine/core';
 import { MyCopyButton } from '@/components/MyCopyButton';
 import { UserList } from '@/components/UserList';
-import { Interview } from '../schema';
+import { Interview } from '@web-employ/shared';
 
 interface InterviewCardProps {
   interview: Interview;

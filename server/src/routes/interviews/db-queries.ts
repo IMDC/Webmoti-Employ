@@ -1,5 +1,5 @@
 import { DB } from '../../db/schema';
-import { InterviewInvite } from './schema';
+import { NewInterviewInvite } from '@web-employ/shared';
 import { Expression, Kysely, sql, SqlBool } from 'kysely';
 
 export async function getInterviews(
@@ -62,7 +62,7 @@ export async function createInterview(
   creatorId: string,
   startTime: Date,
   endTime: Date,
-  invites: Array<InterviewInvite> = []
+  invites: Array<NewInterviewInvite> = []
 ) {
   await db.transaction().execute(async (trx) => {
     // first add the interview to the table

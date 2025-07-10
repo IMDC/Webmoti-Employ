@@ -6,6 +6,7 @@
     "start": "pnpm run dev",
     "dev": "pnpm run -r --parallel --aggregate-output dev",
     "build": "pnpm run -r build",
+    "lint": "pnpm run -r --parallel lint",
     "deploy": "pnpm build && pnpm run -r deploy"
   },
   "packageManager": "pnpm@10.12.1"

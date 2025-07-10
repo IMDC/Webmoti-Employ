@@ -3,7 +3,8 @@ import { requireDb, useDb } from '../../middleware/useDb';
 import { requireUserEmail, useUserEmail } from '../../middleware/useUserEmail';
 import { zValidator } from '../../validator-wrapper';
 import { createInterview, deleteInterview, getInterviews } from './db-queries';
-import { InterviewsDeleteRequest, InterviewsPostRequest } from './schema';
+import { InterviewsDeleteRequest } from './schema';
+import { NewInterview } from '@web-employ/shared';
 import { Hono } from 'hono';
 
 const interviewsRoute = new Hono<AppContext>();
@@ -57,7 +58,7 @@ interviewsRoute.get('/', useUserEmail, async (c) => {
   return c.json({ interviews: nestInterviews(interviewRows) });
 });
 
-interviewsRoute.post('/', zValidator('json', InterviewsPostRequest), async (c) => {
+interviewsRoute.post('/', zValidator('json', NewInterview), async (c) => {
   const db = requireDb(c);
   const data = c.req.valid('json');
 

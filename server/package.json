@@ -9,7 +9,8 @@
     "cf-typegen": "wrangler types src/worker-configuration.d.ts --env-interface CloudflareBindings",
     "db-typegen": "kysely-codegen",
     "postinstall": "pnpm run cf-typegen",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "lint": "eslint . --cache"
   },
   "dependencies": {
     "@hono/clerk-auth": "^3.0.1",
@@ -19,12 +20,13 @@
     "jose": "^6.0.11",
     "kysely": "^0.28.2",
     "pg": "^8.16.3",
-    "zod": "^3.25.67"
+    "zod": "catalog:deps",
+    "@web-employ/shared": "workspace:^"
   },
   "devDependencies": {
-    "@eslint/js": "^9.30.0",
+    "@eslint/js": "catalog:dev",
     "@ianvs/prettier-plugin-sort-imports": "^4.4.2",
-    "eslint": "^9.30.0",
+    "eslint": "catalog:dev",
     "eslint-config-prettier": "^10.1.5",
     "globals": "^16.2.0",
     "kysely-codegen": "^0.18.5",

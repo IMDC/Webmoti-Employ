@@ -1,5 +1,5 @@
+import { Interview } from '@web-employ/shared';
 import { Center, Stack, Text } from '@mantine/core';
-import { Interview } from '../schema';
 import { InterviewCard } from './InterviewCard';
 
 interface InterviewCardsProps {

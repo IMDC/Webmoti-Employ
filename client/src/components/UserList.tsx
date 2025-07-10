@@ -1,7 +1,7 @@
 import { useUser } from '@clerk/clerk-react';
 import { IconUser } from '@tabler/icons-react';
 import { ActionIcon, Avatar, Group, Popover, Stack, Text } from '@mantine/core';
-import { InterviewInvite } from '@/features/dashboard/schema';
+import { InterviewInvite } from '@web-employ/shared';
 import { getUserIdentity } from '@/utils/utils';
 
 interface DisplayUserProps {

@@ -1,8 +1,9 @@
 import { useAuth } from '@clerk/clerk-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { NewInterview } from '@web-employ/shared';
 import { z } from 'zod/v4';
 import { HttpError } from '@/utils/HttpError';
-import { InterviewsGetResponse, InterviewsPostRequest } from './schema';
+import { InterviewsGetResponse } from './schema';
 
 const queryKeys = {
   interviews: ['interviews'] as const,
@@ -54,7 +55,7 @@ export function useInterviews() {
 // ----------------------------------------------------------------
 // POST to interviews
 
-async function scheduleInterview(interview: InterviewsPostRequest, authToken: string | null) {
+async function scheduleInterview(interview: NewInterview, authToken: string | null) {
   if (!authToken) {
     throw new HttpError('Missing auth token', 401);
   }
@@ -77,7 +78,7 @@ export function useScheduleInterview() {
 
   const { mutateAsync: scheduleInterviewMutation, isPending: isScheduleInterviewPending } =
     useMutation({
-      mutationFn: async (interview: InterviewsPostRequest) => {
+      mutationFn: async (interview: NewInterview) => {
         const token = await getToken();
         return scheduleInterview(interview, token);
       },

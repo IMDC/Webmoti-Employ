@@ -3,6 +3,14 @@ packages:
   - server
   - shared
 
+catalogs:
+  dev:
+    typescript: ^5.8.3
+    eslint: ^9.30.0
+    "@eslint/js": ^9.30.0
+  deps:
+    zod: ^3.25.76
+
 onlyBuiltDependencies:
   - "@clerk/shared"
   - esbuild
