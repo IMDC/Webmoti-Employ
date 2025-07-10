@@ -4,23 +4,28 @@ updates:
     directory: /shared
     schedule:
       interval: weekly
+    groups:
+      non-breaking:
+        update-types:
+          - patch
+          - minor
 
   - package-ecosystem: npm
     directory: /client
     schedule:
       interval: weekly
     groups:
-      prod:
-        dependency-type: production
-      dev:
-        dependency-type: development
+      non-breaking:
+        update-types:
+          - patch
+          - minor
 
   - package-ecosystem: npm
     directory: /server
     schedule:
       interval: weekly
     groups:
-      prod:
-        dependency-type: production
-      dev:
-        dependency-type: development
+      non-breaking:
+        update-types:
+          - patch
+          - minor
