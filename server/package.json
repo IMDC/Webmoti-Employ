@@ -13,7 +13,7 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "@hono/clerk-auth": "^3.0.1",
+    "@hono/clerk-auth": "^3.0.2",
     "@hono/zod-validator": "^0.7.0",
     "@types/pg": "^8.15.4",
     "@web-employ/shared": "workspace:^",
@@ -29,6 +29,6 @@
     "globals": "^16.2.0",
     "kysely-codegen": "^0.18.5",
     "typescript-eslint": "^8.35.1",
-    "wrangler": "^4.4.0"
+    "wrangler": "^4.24.3"
   }
 }
