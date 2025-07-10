@@ -7,9 +7,9 @@
   "hyperdrive": [
     {
       "binding": "HYPERDRIVE",
-      "id": "0699657a53e04e64bf61be912ba70c66",
-    },
-  ],
+      "id": "0699657a53e04e64bf61be912ba70c66"
+    }
+  ]
   // "vars": {
   //   "MY_VAR": "my-variable"
   // },
