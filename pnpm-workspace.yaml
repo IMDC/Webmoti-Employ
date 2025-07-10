@@ -1,9 +1,10 @@
 packages:
   - client
   - server
+  - shared
 
 onlyBuiltDependencies:
-  - '@clerk/shared'
+  - "@clerk/shared"
   - esbuild
   - sharp
   - workerd

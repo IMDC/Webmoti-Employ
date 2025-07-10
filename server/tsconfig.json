@@ -1,9 +1,9 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "moduleResolution": "Bundler",
     "lib": ["ESNext", "WebWorker"],
     "jsxImportSource": "hono/jsx",
+    "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"]
     }

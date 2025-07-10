@@ -2,6 +2,15 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
+    "lib": ["ESNext"],
+    "moduleResolution": "Bundler",
+    "moduleDetection": "force",
+    "useDefineForClassFields": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noUncheckedSideEffectImports": true,
+    "isolatedModules": true,
     "strict": true,
     "skipLibCheck": true,
     "jsx": "react-jsx"

@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm run -r --parallel --aggregate-output dev"
+    "start": "pnpm run dev",
+    "dev": "pnpm run -r --parallel --aggregate-output dev",
+    "build": "pnpm run -r build",
+    "deploy": "pnpm build && pnpm run -r deploy"
   },
   "packageManager": "pnpm@10.12.1"
 }
