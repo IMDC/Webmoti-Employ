@@ -1,38 +1,34 @@
 {
   "name": "@web-employ/server",
+  "type": "module",
   "version": "0.0.0",
   "private": true,
-  "type": "module",
+  "packageManager": "pnpm@10.12.1",
   "scripts": {
     "dev": "wrangler dev --remote",
     "deploy": "wrangler deploy --minify",
     "cf-typegen": "wrangler types src/worker-configuration.d.ts --env-interface CloudflareBindings",
     "db-typegen": "kysely-codegen",
     "postinstall": "pnpm run cf-typegen",
-    "format": "prettier --write .",
     "lint": "eslint . --cache"
   },
   "dependencies": {
     "@hono/clerk-auth": "^3.0.1",
     "@hono/zod-validator": "^0.7.0",
     "@types/pg": "^8.15.4",
+    "@web-employ/shared": "workspace:^",
     "hono": "^4.8.3",
     "jose": "^6.0.11",
     "kysely": "^0.28.2",
     "pg": "^8.16.3",
-    "zod": "catalog:deps",
-    "@web-employ/shared": "workspace:^"
+    "zod": "catalog:deps"
   },
   "devDependencies": {
-    "@eslint/js": "catalog:dev",
-    "@ianvs/prettier-plugin-sort-imports": "^4.4.2",
+    "@antfu/eslint-config": "catalog:dev",
     "eslint": "catalog:dev",
-    "eslint-config-prettier": "^10.1.5",
     "globals": "^16.2.0",
     "kysely-codegen": "^0.18.5",
-    "prettier": "^3.6.2",
     "typescript-eslint": "^8.35.1",
     "wrangler": "^4.4.0"
-  },
-  "packageManager": "pnpm@10.12.1"
+  }
 }
