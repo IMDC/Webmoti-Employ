@@ -1,6 +1,6 @@
 import type { StoreApi } from 'zustand'
 import type { ChatStore } from './createChatStore'
-import { createContext } from 'react'
+import { createContext, use } from 'react'
 import { useStore } from 'zustand'
 
 export const ChatStoreContext = createContext<StoreApi<ChatStore> | null>(null)
