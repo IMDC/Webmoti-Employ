@@ -1,7 +1,7 @@
 import type { NewInterview } from '@web-employ/shared'
 import { useAuth } from '@clerk/clerk-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { HttpError } from '@/utils/HttpError'
 import { InterviewsGetResponse } from './schema'
 

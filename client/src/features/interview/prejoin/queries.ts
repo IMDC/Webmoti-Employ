@@ -1,6 +1,6 @@
 import { useAuth } from '@clerk/clerk-react'
 import { useQuery } from '@tanstack/react-query'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { HttpError } from '@/utils/HttpError'
 import { SessionsGetResponse } from './schema'
 

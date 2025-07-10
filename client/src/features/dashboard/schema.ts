@@ -1,6 +1,6 @@
 /* eslint-disable ts/no-redeclare */
 import { DbInterview, NewInterviewInvite } from '@web-employ/shared'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 // ----------------------------------------------------------------
 // GET /interviews

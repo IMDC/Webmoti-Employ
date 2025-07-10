@@ -1,5 +1,5 @@
 /* eslint-disable ts/no-redeclare */
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 export const DbInterviewInvite = z.object({
   id: z.number(),

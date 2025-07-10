@@ -6,7 +6,7 @@ import { getInterviews } from '../interviews/db-queries';
 import { generateZoomApiJwt, generateZoomVideoJwt } from './jwt';
 import { ZoomClient } from './ZoomClient';
 import { Hono } from 'hono';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 const sessionsRoute = new Hono<AppContext>();
 
