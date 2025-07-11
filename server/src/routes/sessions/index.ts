@@ -69,19 +69,27 @@ sessionsRoute.get(
     // First check if this session is a scheduled session
     // ----------------------------------------------------
 
-    const foundScheduledInterviews = await getInterviews(
+    const hasScheduledAccess = await getInterviews(
       db,
       c.var.clerkUserId,
       userEmail,
       sessionId,
       true,
     )
-
-    if (foundScheduledInterviews.length > 0) {
+    if (hasScheduledAccess.length > 0)
       return returnJoinToken()
-    }
 
-    // TODO fix bug here!!!
+    // check if user is unauthorized
+
+    const scheduledButNotYou = await getInterviews(
+      db,
+      undefined,
+      undefined,
+      sessionId,
+      true,
+    )
+    if (scheduledButNotYou.length)
+      return c.json({ error: 'Unauthorized' }, 401)
 
     // ----------------------------------------------------
     // If not scheduled, check if live

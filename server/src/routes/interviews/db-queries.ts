@@ -5,8 +5,8 @@ import { sql } from 'kysely'
 
 export async function getInterviews(
   db: Kysely<DB>,
-  userId: string,
-  userEmail: string,
+  userId?: string,
+  userEmail?: string,
   sessionId?: string,
   isUpcoming?: boolean,
 ) {
@@ -19,12 +19,18 @@ export async function getInterviews(
         .selectFrom('interview')
         .leftJoin('interviewInvite', 'interviewInvite.interviewId', 'interview.id')
         .where((eb) => {
-          const filters: Expression<SqlBool>[] = [
-            eb.or([
-              eb('interview.creatorId', '=', userId),
-              eb('interviewInvite.email', '=', userEmail),
-            ]),
-          ]
+          const filters: Expression<SqlBool>[] = []
+
+          if (userId || userEmail) {
+            const orConditions: Expression<SqlBool>[] = []
+            if (userId) {
+              orConditions.push(eb('interview.creatorId', '=', userId))
+            }
+            if (userEmail) {
+              orConditions.push(eb('interviewInvite.email', '=', userEmail))
+            }
+            filters.push(eb.or(orConditions))
+          }
 
           if (isUpcoming) {
             // filter using endTime since you could still join an interview after startTime
