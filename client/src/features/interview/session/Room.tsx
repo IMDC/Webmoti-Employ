@@ -1,4 +1,5 @@
-import { AppShell, Box } from '@mantine/core'
+import { AppShell, Box, em, useMantineTheme } from '@mantine/core'
+import { useMediaQuery } from '@mantine/hooks'
 import { useBlocker, useNavigate } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
@@ -36,6 +37,9 @@ export function Room() {
 
   const navigate = useNavigate()
 
+  const theme = useMantineTheme()
+  const isMobile = useMediaQuery(`(max-width: ${em(theme.breakpoints.sm)})`)
+
   useEffect(() => {
     if (callState === 'left') {
       navigate({ to: '/end', state: prev => ({ ...prev, stage: 'interview' }) })
@@ -65,26 +69,29 @@ export function Room() {
             height: '100%',
           }}
         >
-          <Box
-            ref={participantStageRef}
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-              alignContent: 'center',
-              gap: GALLERY_VIEW_MARGIN,
-              padding: GALLERY_VIEW_MARGIN,
-              flex: 1,
-              minWidth: 0,
-            }}
-          >
-            <VideoGrid containerRef={participantStageRef} />
-          </Box>
+          {/* chat takes up full width when open on mobile */}
+          {!(isMobile && isChatOpen) && (
+            <Box
+              ref={participantStageRef}
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                alignContent: 'center',
+                gap: GALLERY_VIEW_MARGIN,
+                padding: GALLERY_VIEW_MARGIN,
+                flex: 1,
+                minWidth: 0,
+              }}
+            >
+              <VideoGrid containerRef={participantStageRef} />
+            </Box>
+          )}
 
           {isChatOpen && (
             <Box
               style={{
-                width: '30%',
+                width: isMobile ? '100%' : '30%',
                 height: '100%',
               }}
               p="lg"

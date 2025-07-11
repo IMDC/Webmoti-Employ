@@ -4,7 +4,6 @@ import {
   Affix,
   AppShell,
   Button,
-  Center,
   Divider,
   Flex,
   Modal,
@@ -25,7 +24,6 @@ import {
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle'
-import { Corner } from '@/components/Corner'
 import { InterviewList } from './components/InterviewList'
 import { ScheduleForm } from './components/ScheduleForm'
 import { JoinCodeInput } from './schema'
@@ -47,31 +45,27 @@ export function Dashboard() {
 
   return (
     <AppShell
-      header={{ height: 100 }}
+      header={{ height: 80 }}
       styles={{
         header: { border: 'none' },
         main: { height: 'calc(100vh - 100px)' },
       }}
     >
       <AppShell.Header>
-        <Corner>
+        <Flex justify="space-between" align="center" w="100%" h="100%" p="lg">
           <ColorSchemeToggle />
-        </Corner>
 
-        <Center>
           <Text
-            fz={50}
+            fz={{ base: 30, sm: 40, lg: 50 }}
             fw={900}
             variant="gradient"
             gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
           >
             WebMoti-Employ
           </Text>
-        </Center>
 
-        <Corner position="top-right">
           <UserButton />
-        </Corner>
+        </Flex>
       </AppShell.Header>
 
       <AppShell.Main>

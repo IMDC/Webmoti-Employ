@@ -90,7 +90,7 @@ export function PrejoinScreen() {
       </Corner>
 
       <Center mih="100vh">
-        <Group>
+        <Group justify="center" p="xl" m="xl">
           <Stack>
             <PreviewTile height={196.875} width={350} name={userIdentity} />
 
