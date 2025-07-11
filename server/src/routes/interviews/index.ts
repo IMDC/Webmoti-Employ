@@ -1,3 +1,4 @@
+import type { DbInterview } from '@web-employ/shared'
 import type { AppContext } from '../..'
 import { NewInterview } from '@web-employ/shared'
 import { Hono } from 'hono'
@@ -17,42 +18,25 @@ interviewsRoute.get('/', useUserEmail, async (c) => {
   const interviewRows = await getInterviews(db, c.var.clerkUserId, userEmail)
 
   function nestInterviews(rows: typeof interviewRows) {
-    const map = new Map<
-      number,
-      {
-        id: number
-        creatorId: string
-        startTime: Date
-        endTime: Date
-        sessionId: string
-        invites: { id: number, interviewId: number, email: string }[]
-      }
-    >()
+    const interviewMap = new Map<number, DbInterview>()
 
     for (const row of rows) {
-      let interview = map.get(row.interviewId)
+      let interview = interviewMap.get(row.id)
+      // if this interview hasn't been added to the map yet
       if (!interview) {
-        interview = {
-          id: row.interviewId,
-          creatorId: row.creatorId,
-          startTime: row.startTime,
-          endTime: row.endTime,
-          sessionId: row.sessionId,
-          invites: [],
-        }
-        map.set(row.interviewId, interview)
+        const { id, creatorId, startTime, endTime, sessionId } = row
+        interview = { id, creatorId, startTime, endTime, sessionId, invites: [] }
+        interviewMap.set(row.id, interview)
       }
 
+      // then add the invite to the interview in the map
       if (row.inviteId && row.inviteEmail) {
-        interview.invites.push({
-          id: row.inviteId,
-          interviewId: row.interviewId,
-          email: row.inviteEmail,
-        })
+        // interview either has an empty or non empty invites array at this point, so assert with !
+        interview.invites!.push({ id: row.inviteId, interviewId: row.id, email: row.inviteEmail })
       }
     }
 
-    return Array.from(map.values())
+    return Array.from(interviewMap.values())
   }
 
   return c.json({ interviews: nestInterviews(interviewRows) })

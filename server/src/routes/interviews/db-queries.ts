@@ -46,7 +46,7 @@ export async function getInterviews(
     .leftJoin('interviewInvite', 'interviewInvite.interviewId', 'interview.id')
     .where('interview.id', 'in', db => db.selectFrom('relevant_interviews').select('id'))
     .select([
-      'interview.id as interviewId',
+      'interview.id',
       'interview.creatorId',
       'interview.startTime',
       'interview.endTime',
