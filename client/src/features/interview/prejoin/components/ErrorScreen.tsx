@@ -36,12 +36,12 @@ export function ErrorScreen({ error }: ErrorScreenProps) {
           <>
             {status && (
               <Text fw="bolder">
-                Status:
+                {'Status: '}
                 {status}
               </Text>
             )}
             <Text>
-              Message:
+              {'Message: '}
               {message}
             </Text>
             {details && <pre>{jsonStringifyIndented(details)}</pre>}

@@ -53,6 +53,7 @@ export function PrejoinScreen() {
       navigate({
         to: '/interview/$id',
         params: { id: interviewSession.sessionId },
+        state: prev => ({ ...prev, stage: 'prejoin' }),
       })
     }
   }, [callState, interviewSession, navigate])

@@ -1,11 +1,11 @@
 import { ClerkProvider } from '@clerk/clerk-react'
 import { MantineProvider } from '@mantine/core'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createRouter, RouterProvider } from '@tanstack/react-router'
+import { RouterProvider } from '@tanstack/react-router'
 
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
-import { routeTree } from './routeTree.gen'
+import { router } from './router'
 import { theme } from './theme'
 import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
@@ -16,15 +16,6 @@ const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
 if (!CLERK_PUBLISHABLE_KEY) {
   throw new Error('Missing Clerk Publishable Key')
-}
-
-const router = createRouter({ routeTree, notFoundMode: 'root' })
-
-// Register the router instance for type safety
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router
-  }
 }
 
 const queryClient = new QueryClient()

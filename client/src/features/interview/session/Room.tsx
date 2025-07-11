@@ -1,5 +1,5 @@
 import { AppShell, Box } from '@mantine/core'
-import { useNavigate } from '@tanstack/react-router'
+import { useBlocker, useNavigate } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
 import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore'
@@ -38,9 +38,17 @@ export function Room() {
 
   useEffect(() => {
     if (callState === 'left') {
-      navigate({ to: '/end' })
+      navigate({ to: '/end', state: prev => ({ ...prev, stage: 'interview' }) })
     }
   }, [callState, navigate])
+
+  useBlocker({
+    shouldBlockFn: () => {
+      // eslint-disable-next-line no-alert
+      const shouldLeave = window.confirm('Are you sure you want to leave?')
+      return !shouldLeave
+    },
+  })
 
   return (
     <AppShell
