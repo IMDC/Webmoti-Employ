@@ -1,16 +1,17 @@
-import { DB } from '../../db/schema';
-import { NewInterviewInvite } from '@web-employ/shared';
-import { Expression, Kysely, sql, SqlBool } from 'kysely';
+import type { NewInterviewInvite } from '@web-employ/shared'
+import type { Expression, Kysely, SqlBool } from 'kysely'
+import type { DB } from '../../db/schema'
+import { sql } from 'kysely'
 
 export async function getInterviews(
   db: Kysely<DB>,
   userId: string,
   userEmail: string,
   sessionId?: string,
-  isUpcoming?: boolean
+  isUpcoming?: boolean,
 ) {
   return await db
-    .with('relevant_interviews', (db) =>
+    .with('relevant_interviews', db =>
       // -----------------------------------------------------------------
       // first find all interviews the user is a creator of or invited to
       // -----------------------------------------------------------------
@@ -23,28 +24,27 @@ export async function getInterviews(
               eb('interview.creatorId', '=', userId),
               eb('interviewInvite.email', '=', userEmail),
             ]),
-          ];
+          ]
 
           if (isUpcoming) {
             // filter using endTime since you could still join an interview after startTime
-            filters.push(eb('interview.endTime', '>=', sql<Date>`now()`));
+            filters.push(eb('interview.endTime', '>=', sql<Date>`now()`))
           }
 
           if (sessionId) {
-            filters.push(eb('interview.sessionId', '=', sessionId));
+            filters.push(eb('interview.sessionId', '=', sessionId))
           }
 
-          return eb.and(filters);
+          return eb.and(filters)
         })
         .select('interview.id')
-        .distinct()
-    )
+        .distinct())
     // -----------------------------------------------------------------
     // then get the interview data for the interviews found
     // -----------------------------------------------------------------
     .selectFrom('interview')
     .leftJoin('interviewInvite', 'interviewInvite.interviewId', 'interview.id')
-    .where('interview.id', 'in', (db) => db.selectFrom('relevant_interviews').select('id'))
+    .where('interview.id', 'in', db => db.selectFrom('relevant_interviews').select('id'))
     .select([
       'interview.id as interviewId',
       'interview.creatorId',
@@ -54,7 +54,7 @@ export async function getInterviews(
       'interviewInvite.id as inviteId',
       'interviewInvite.email as inviteEmail',
     ])
-    .execute();
+    .execute()
 }
 
 export async function createInterview(
@@ -62,7 +62,7 @@ export async function createInterview(
   creatorId: string,
   startTime: Date,
   endTime: Date,
-  invites: Array<NewInterviewInvite> = []
+  invites: Array<NewInterviewInvite> = [],
 ) {
   await db.transaction().execute(async (trx) => {
     // first add the interview to the table
@@ -70,39 +70,42 @@ export async function createInterview(
       .insertInto('interview')
       .values({ creatorId, startTime, endTime })
       .returning('interview.id')
-      .executeTakeFirstOrThrow();
+      .executeTakeFirstOrThrow()
 
     // then add all invites to the interview_invite table
     for (const invite of invites) {
       await trx
         .insertInto('interviewInvite')
         .values({ email: invite.email, interviewId: newInterview.id })
-        .executeTakeFirstOrThrow();
+        .executeTakeFirstOrThrow()
     }
-  });
+  })
 }
 
 export async function deleteInterview(db: Kysely<DB>, interviewId: number) {
   return await db
     .deleteFrom('interview')
     .where('interview.id', '=', interviewId)
-    .executeTakeFirstOrThrow();
+    .executeTakeFirstOrThrow()
 }
 
 export async function modifyInterview(
   db: Kysely<DB>,
   interviewId: number,
   startTime?: Date,
-  endTime?: Date
+  endTime?: Date,
 ) {
-  const updates: Record<string, Date> = {};
-  if (startTime !== undefined) updates.startTime = startTime;
-  if (endTime !== undefined) updates.endTime = endTime;
-  if (Object.keys(updates).length === 0) return;
+  const updates: Record<string, Date> = {}
+  if (startTime !== undefined)
+    updates.startTime = startTime
+  if (endTime !== undefined)
+    updates.endTime = endTime
+  if (Object.keys(updates).length === 0)
+    return
 
   return await db
     .updateTable('interview')
     .set(updates)
     .where('interview.id', '=', interviewId)
-    .executeTakeFirstOrThrow();
+    .executeTakeFirstOrThrow()
 }

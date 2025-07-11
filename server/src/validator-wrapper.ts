@@ -1,13 +1,12 @@
-import { zValidator as zv } from '@hono/zod-validator';
-import type { ValidationTargets } from 'hono';
-import { z, ZodType } from 'zod';
+import type { ValidationTargets } from 'hono'
+import type { ZodType } from 'zod'
+import { zValidator as zv } from '@hono/zod-validator'
+import { z } from 'zod'
 
-export const zValidator = <T extends ZodType, Target extends keyof ValidationTargets>(
-  target: Target,
-  schema: T
-) =>
-  zv(target, schema, (result, c) => {
+export function zValidator<T extends ZodType, Target extends keyof ValidationTargets>(target: Target, schema: T) {
+  return zv(target, schema, (result, c) => {
     if (!result.success) {
-      return c.json({ error: z.flattenError(result.error) }, 400);
+      return c.json({ error: z.flattenError(result.error) }, 400)
     }
-  });
+  })
+}

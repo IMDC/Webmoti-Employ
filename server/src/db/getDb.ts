@@ -1,6 +1,6 @@
-import { DB } from './schema';
-import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely';
-import { Pool } from 'pg';
+import type { DB } from './schema'
+import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely'
+import { Pool } from 'pg'
 
 export function getDb(dbUrl: string) {
   const db = new Kysely<DB>({
@@ -11,6 +11,6 @@ export function getDb(dbUrl: string) {
     }),
     // this plugin makes it so when you get data from the db, it uses camelcase
     plugins: [new CamelCasePlugin()],
-  });
-  return db;
+  })
+  return db
 }

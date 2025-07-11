@@ -1,37 +1,37 @@
-import { DB } from './db/schema';
-import { useAuth } from './middleware/useAuth';
-import interviewsRoute from './routes/interviews';
-import sessionsRoute from './routes/sessions';
-import { clerkMiddleware } from '@hono/clerk-auth';
-import { Hono } from 'hono';
-import { Kysely } from 'kysely';
+import type { Kysely } from 'kysely'
+import type { DB } from './db/schema'
+import { clerkMiddleware } from '@hono/clerk-auth'
+import { Hono } from 'hono'
+import { useAuth } from './middleware/useAuth'
+import interviewsRoute from './routes/interviews'
+import sessionsRoute from './routes/sessions'
 
-export type AppContext = {
-  Bindings: CloudflareBindings;
+export interface AppContext {
+  Bindings: CloudflareBindings
   Variables: {
-    clerkUserId: string;
-    db?: Kysely<DB>;
-    userEmail?: string;
-  };
-};
+    clerkUserId: string
+    db?: Kysely<DB>
+    userEmail?: string
+  }
+}
 
-const app = new Hono<AppContext>();
+const app = new Hono<AppContext>()
 
-app.use('*', clerkMiddleware());
+app.use('*', clerkMiddleware())
 
 // all routes require authentication
-app.use('*', useAuth);
+app.use('*', useAuth)
 
 app.onError((err, c) => {
-  console.error(err);
-  return c.json({ error: 'Internal Server Error' }, 500);
-});
+  console.error(err)
+  return c.json({ error: 'Internal Server Error' }, 500)
+})
 
 app.notFound((c) => {
-  return c.json({ error: `Route not found: ${c.req.method} ${c.req.path}` }, 404);
-});
+  return c.json({ error: `Route not found: ${c.req.method} ${c.req.path}` }, 404)
+})
 
-app.route('/sessions', sessionsRoute);
-app.route('/interviews', interviewsRoute);
+app.route('/sessions', sessionsRoute)
+app.route('/interviews', interviewsRoute)
 
-export default app;
+export default app

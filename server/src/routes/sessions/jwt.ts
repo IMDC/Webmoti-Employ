@@ -1,38 +1,39 @@
-import { ZoomToken } from './schema';
-import { JWTPayload, SignJWT } from 'jose';
+import type { JWTPayload } from 'jose'
+import type { ZoomToken } from './schema'
+import { SignJWT } from 'jose'
 
 export type ZoomJwtInput = ZoomToken & {
-  zoomVideoSdkKey: string;
-  zoomVideoSdkSecret: string;
-};
+  zoomVideoSdkKey: string
+  zoomVideoSdkSecret: string
+}
 
 async function generateJwt(payload: JWTPayload, secret: string, iat: number, exp: number) {
-  const header = { alg: 'HS256', typ: 'JWT' };
-  const encodedSecret = new TextEncoder().encode(secret);
+  const header = { alg: 'HS256', typ: 'JWT' }
+  const encodedSecret = new TextEncoder().encode(secret)
 
   const jwt = await new SignJWT(payload)
     .setProtectedHeader(header)
     .setIssuedAt(iat)
     .setExpirationTime(exp)
-    .sign(encodedSecret);
+    .sign(encodedSecret)
 
-  return jwt;
+  return jwt
 }
 
 export async function generateZoomApiJwt(zoomApiKey: string, zoomApiSecret: string) {
-  const iat = Math.floor(Date.now() / 1000);
-  const expirationSeconds = 300; // 5 min
-  const exp = iat + expirationSeconds;
+  const iat = Math.floor(Date.now() / 1000)
+  const expirationSeconds = 300 // 5 min
+  const exp = iat + expirationSeconds
 
   const payload = {
     iss: zoomApiKey,
     iat,
     exp,
-  };
+  }
 
-  const jwt = await generateJwt(payload, zoomApiSecret, iat, exp);
+  const jwt = await generateJwt(payload, zoomApiSecret, iat, exp)
 
-  return jwt;
+  return jwt
 }
 
 export async function generateZoomVideoJwt({
@@ -50,8 +51,8 @@ export async function generateZoomVideoJwt({
   videoWebRtcMode,
   audioWebRtcMode,
 }: ZoomJwtInput) {
-  const iat = Math.floor(Date.now() / 1000);
-  const exp = expirationSeconds ? iat + expirationSeconds : iat + 60 * 60 * 2;
+  const iat = Math.floor(Date.now() / 1000)
+  const exp = expirationSeconds ? iat + expirationSeconds : iat + 60 * 60 * 2
 
   // https://developers.zoom.us/docs/video-sdk/auth/#payload
   const payload = {
@@ -69,9 +70,9 @@ export async function generateZoomVideoJwt({
     telemetry_tracking_id: telemetryTrackingId,
     video_webrtc_mode: videoWebRtcMode,
     audio_webrtc_mode: audioWebRtcMode,
-  };
+  }
 
-  const jwt = await generateJwt(payload, zoomVideoSdkSecret, iat, exp);
+  const jwt = await generateJwt(payload, zoomVideoSdkSecret, iat, exp)
 
-  return jwt;
+  return jwt
 }

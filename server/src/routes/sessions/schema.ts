@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 // const allowedRegions = [
 //   "AU",
@@ -22,7 +22,7 @@ export const ZoomToken = z.object({
   expirationSeconds: z.coerce
     .number()
     .optional()
-    .refine((v) => v === undefined || (v >= 1800 && v <= 172800), {
+    .refine(v => v === undefined || (v >= 1800 && v <= 172800), {
       message: 'Must be between 1800 and 172800',
     }),
   userIdentity: z.string().max(34).optional(),
@@ -33,6 +33,7 @@ export const ZoomToken = z.object({
   telemetryTrackingId: z.string().optional(),
   videoWebRtcMode: z.union([z.literal(0), z.literal(1)]).optional(),
   audioWebRtcMode: z.union([z.literal(0), z.literal(1)]).optional(),
-});
+})
 
-export type ZoomToken = z.infer<typeof ZoomToken>;
+// eslint-disable-next-line ts/no-redeclare
+export type ZoomToken = z.infer<typeof ZoomToken>
