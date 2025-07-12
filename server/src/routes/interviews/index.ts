@@ -1,7 +1,9 @@
 import type { DbInterview } from '@web-employ/shared'
 import type { AppContext } from '../..'
-import { NewInterview } from '@web-employ/shared'
+import { NewInterview, NewInterviewInvite } from '@web-employ/shared'
+
 import { Hono } from 'hono'
+import z from 'zod'
 import { requireDb, useDb } from '../../middleware/useDb'
 import { requireUserEmail, useUserEmail } from '../../middleware/useUserEmail'
 import { zValidator } from '../../validator-wrapper'
@@ -36,6 +38,7 @@ interviewsRoute.get('/', useUserEmail, async (c) => {
           interviewId: row.id,
           email: row.inviteEmail,
           isInterviewer: row.inviteIsInterviewer ?? false,
+          isInterviewCreator: row.inviteIsInterviewCreator ?? false,
         })
       }
     }
@@ -46,11 +49,43 @@ interviewsRoute.get('/', useUserEmail, async (c) => {
   return c.json({ interviews: nestInterviews(interviewRows) })
 })
 
-interviewsRoute.post('/', zValidator('json', NewInterview), async (c) => {
+export const PostNewInterviewInvite = NewInterviewInvite.omit({
+  isInterviewCreator: true,
+})
+export const PostNewInterview = NewInterview.extend({
+  invites: z.array(PostNewInterviewInvite).optional(),
+})
+
+interviewsRoute.post('/', zValidator('json', PostNewInterview), useUserEmail, async (c) => {
   const db = requireDb(c)
   const data = c.req.valid('json')
 
-  await createInterview(db, data.creatorId, data.startTime, data.endTime, data.invites)
+  const userEmail = requireUserEmail(c)
+  const invitedSelf = (data.invites || []).some(
+    invite => invite.email.toLowerCase() === userEmail.toLowerCase(),
+  )
+  if (invitedSelf) {
+    return c.json({ error: 'You cannot invite yourself' }, 400)
+  }
+
+  // add creator as participant
+  const invites: NewInterviewInvite[] = [
+    ...data.invites || [],
+    {
+      email: userEmail,
+      isInterviewer: true,
+      isInterviewCreator: true,
+    },
+  ]
+
+  // no duplicate invites allowed
+  const emails = invites.map(i => i.email.toLowerCase())
+  const uniqueEmails = new Set(emails)
+  if (emails.length !== uniqueEmails.size) {
+    return c.json({ error: 'Invite emails must be unique' }, 400)
+  }
+
+  await createInterview(db, data.creatorId, data.startTime, data.endTime, invites)
 
   return c.json({ message: 'Interview created' }, 201)
 })

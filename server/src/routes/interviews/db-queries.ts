@@ -62,6 +62,8 @@ export async function getInterviews(
       'interviewInvite.id as inviteId',
       'interviewInvite.email as inviteEmail',
       'interviewInvite.isInterviewer as inviteIsInterviewer',
+      'interviewInvite.isInterviewCreator as inviteIsInterviewCreator',
+
     ])
     .execute()
 }
@@ -89,6 +91,7 @@ export async function createInterview(
           email: invite.email,
           interviewId: newInterview.id,
           isInterviewer: invite.isInterviewer,
+          isInterviewCreator: invite.isInterviewCreator,
         })
         .executeTakeFirstOrThrow()
     }

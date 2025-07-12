@@ -26,6 +26,7 @@ export interface InterviewInvite {
   email: string;
   id: Generated<number>;
   interviewId: number;
+  isInterviewCreator: Generated<boolean>;
   isInterviewer: Generated<boolean>;
 }
 

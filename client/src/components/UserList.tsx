@@ -1,10 +1,8 @@
 import type { DbInterviewInvite } from '@web-employ/shared'
-import { useUser } from '@clerk/clerk-react'
 import { ActionIcon, Avatar, Group, Popover, Skeleton, Stack, Text } from '@mantine/core'
 import { IconUser } from '@tabler/icons-react'
 import { useState } from 'react'
 import { useInviteProfiles } from '@/features/interview/profiles/useInviteProfiles'
-import { getUserIdentity } from '@/utils/utils'
 
 interface DisplayUserProps {
   name: string
@@ -31,9 +29,6 @@ interface UserListProps {
 }
 
 export function UserList({ users }: UserListProps) {
-  const { user } = useUser()
-  const userIdentity = getUserIdentity(user!)
-
   const emailArray = [...new Set(users.map(user => user.email))]
 
   const [isPopoverOpened, setIsPopoverOpened] = useState(false)
@@ -57,8 +52,6 @@ export function UserList({ users }: UserListProps) {
 
       <Popover.Dropdown>
         <Stack gap="sm">
-          <DisplayUser name={userIdentity} avatarUrl={user?.imageUrl} isLoading={false} />
-
           {users.length > 0
             ? (
                 <>

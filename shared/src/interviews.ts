@@ -6,6 +6,7 @@ export const DbInterviewInvite = z.object({
   interviewId: z.number(),
   email: z.email(),
   isInterviewer: z.boolean().default(false),
+  isInterviewCreator: z.boolean().optional(), // server sets this, not client
 })
 export const NewInterviewInvite = DbInterviewInvite.omit({
   id: true,

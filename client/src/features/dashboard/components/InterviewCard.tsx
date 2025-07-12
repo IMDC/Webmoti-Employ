@@ -1,6 +1,7 @@
 import type { DbInterview } from '@web-employ/shared'
 import { Avatar, Badge, Button, Card, Divider, Group, Text } from '@mantine/core'
 import { IconCalendarEventFilled, IconVideoFilled } from '@tabler/icons-react'
+import { useNavigate } from '@tanstack/react-router'
 import { MyCopyButton } from '@/components/MyCopyButton'
 import { UserList } from '@/components/UserList'
 
@@ -9,6 +10,10 @@ interface InterviewCardProps {
 }
 
 export function InterviewCard({ interview }: InterviewCardProps) {
+  const navigate = useNavigate()
+
+  const isEnded = interview.endTime < new Date()
+
   return (
     <Card key={interview.id} shadow="sm" padding="sm" withBorder>
       <Group justify="space-between">
@@ -30,7 +35,13 @@ export function InterviewCard({ interview }: InterviewCardProps) {
           <Avatar />
           <Text fw="bolder">Interview with Joe</Text>
         </Group>
-        <Button leftSection={<IconVideoFilled />}>Join</Button>
+        <Button
+          onClick={() => navigate({ to: '/interview/prejoin/$id', params: { id: interview.sessionId } })}
+          disabled={isEnded}
+          leftSection={<IconVideoFilled />}
+        >
+          Join
+        </Button>
       </Group>
 
       <Divider my="sm" />
