@@ -5,6 +5,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { MyCopyButton } from '@/components/MyCopyButton'
 import { UserList } from '@/components/UserList'
 import { useInviteProfiles } from '@/features/interview/profiles/useInviteProfiles'
+import { getInterviewLink } from '@/utils/utils'
 
 function counterpartInfo(
   interview: InterviewResponse,
@@ -130,7 +131,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
           {interview.sessionId}
         </Text>
         <MyCopyButton
-          copyText={`${window.location.origin}/interview/${interview.sessionId}`}
+          copyText={getInterviewLink(interview.sessionId)}
           copyTooltip="Copy interview link"
         />
       </Group>

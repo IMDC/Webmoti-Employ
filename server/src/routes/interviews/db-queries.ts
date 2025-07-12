@@ -74,13 +74,13 @@ export async function createInterview(
   startTime: Date,
   endTime: Date,
   invites: Array<NewInterviewInvite> = [],
-) {
-  await db.transaction().execute(async (trx) => {
+): Promise<string> {
+  return await db.transaction().execute(async (trx) => {
     // first add the interview to the table
     const newInterview = await trx
       .insertInto('interview')
       .values({ creatorId, startTime, endTime })
-      .returning('interview.id')
+      .returning(['interview.id', 'interview.sessionId'])
       .executeTakeFirstOrThrow()
 
     // then add all invites to the interview_invite table
@@ -95,6 +95,9 @@ export async function createInterview(
         })
         .executeTakeFirstOrThrow()
     }
+
+    // return generated uuid sessionId
+    return newInterview.sessionId
   })
 }
 

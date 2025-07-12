@@ -73,3 +73,7 @@ export function formatAppError(error: AppError): string {
 
   return lines.join('\n')
 }
+
+export function getInterviewLink(sessionId: string) {
+  return `${window.location.origin}/interview/${sessionId}`
+}

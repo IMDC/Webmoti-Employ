@@ -22,25 +22,31 @@ import {
 } from '@tabler/icons-react'
 import { zod4Resolver } from 'mantine-form-zod-resolver'
 import { useAppStore } from '@/useAppStore'
-import { handleAppError } from '@/utils/utils'
+import { getInterviewLink, handleAppError } from '@/utils/utils'
 import { useScheduleInterview } from '../queries'
 import { ScheduleInterviewForm } from '../schema'
 
-function openGoogleCalendarTab(startTime: Date, endTime: Date, invites: string[]) {
+function openGoogleCalendarTab(
+  startTime: Date,
+  endTime: Date,
+  invites: string[],
+  sessionId: string,
+) {
   const formatDate = (d: Date) =>
     `${d
       .toISOString()
       .replace(/[-:]|\.\d{3}/g, '')
       .slice(0, 15)}Z`
 
-  const title = encodeURIComponent('Interview')
-  const description = encodeURIComponent('Virtual interview on the WebMoti-Employ platform')
-  const location = encodeURIComponent('WebMoti-Employ')
+  const title = encodeURIComponent('WebMoti-Employ Interview')
+  const description = encodeURIComponent(
+    'You are invited to a virtual interview on the WebMoti-Employ platform.'
+    + `\nJoin link: ${getInterviewLink(sessionId)}`,
+  )
+  const location = encodeURIComponent(window.location.origin)
   const startDateTime = formatDate(startTime)
   const endDateTime = formatDate(endTime)
   const guests = encodeURIComponent(invites.join(','))
-
-  // TODO add link to description and location maybe
 
   const url = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}&details=${description}&location=${location}&dates=${startDateTime}/${endDateTime}&add=${guests}`
 
@@ -82,7 +88,7 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
     }
 
     try {
-      await scheduleInterviewMutation({
+      const sessionId = await scheduleInterviewMutation({
         creatorId: user.id,
         startTime,
         endTime,
@@ -91,7 +97,7 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
 
       if (values.openGoogleCalendar) {
         const inviteEmails = values.invites.map(i => i.email)
-        openGoogleCalendarTab(startTime, endTime, inviteEmails)
+        openGoogleCalendarTab(startTime, endTime, inviteEmails, sessionId)
       }
 
       onSuccess()

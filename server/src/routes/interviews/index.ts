@@ -97,9 +97,15 @@ interviewsRoute.post('/', zValidator('json', PostNewInterview), useUserEmail, as
     return c.json({ error: 'Invite emails must be unique' }, 400)
   }
 
-  await createInterview(db, data.creatorId, data.startTime, data.endTime, invites)
+  const sessionId = await createInterview(
+    db,
+    data.creatorId,
+    data.startTime,
+    data.endTime,
+    invites,
+  )
 
-  return c.json({ message: 'Interview created' }, 201)
+  return c.json({ sessionId }, 201)
 })
 
 export default interviewsRoute

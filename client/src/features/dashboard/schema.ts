@@ -22,6 +22,13 @@ export const ScheduleInterviewForm = z.object({
 export type ScheduleInterviewForm = z.infer<typeof ScheduleInterviewForm>
 
 // ----------------------------------------------------------------
+// Interview post response:
+
+export const InterviewsPostResponse = z.object({
+  sessionId: z.uuidv4(),
+})
+
+// ----------------------------------------------------------------
 // Join code schema:
 
 export const JoinCodeInput = z.uuidv4()

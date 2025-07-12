@@ -3,7 +3,7 @@ import { useAuth } from '@clerk/clerk-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
 import { HttpError } from '@/utils/HttpError'
-import { InterviewsGetResponse } from './schema'
+import { InterviewsGetResponse, InterviewsPostResponse } from './schema'
 
 const queryKeys = {
   interviews: ['interviews'] as const,
@@ -74,6 +74,14 @@ async function scheduleInterview(interview: NewInterview, authToken: string | nu
     const data = await response.json()
     throw new HttpError('Failed to schedule interview', response.status, data)
   }
+
+  const json = await response.json()
+  const result = InterviewsPostResponse.safeParse(json)
+  if (!result.success) {
+    throw new Error(z.prettifyError(result.error))
+  }
+
+  return result.data.sessionId
 }
 
 export function useScheduleInterview() {
