@@ -5,8 +5,7 @@ import { Hono } from 'hono'
 import { requireDb, useDb } from '../../middleware/useDb'
 import { requireUserEmail, useUserEmail } from '../../middleware/useUserEmail'
 import { zValidator } from '../../validator-wrapper'
-import { createInterview, deleteInterview, getInterviews } from './db-queries'
-import { InterviewsDeleteRequest } from './schema'
+import { createInterview, getInterviews } from './db-queries'
 
 const interviewsRoute = new Hono<AppContext>()
 interviewsRoute.use('*', useDb)
@@ -24,15 +23,20 @@ interviewsRoute.get('/', useUserEmail, async (c) => {
       let interview = interviewMap.get(row.id)
       // if this interview hasn't been added to the map yet
       if (!interview) {
-        const { id, creatorId, startTime, endTime, sessionId } = row
-        interview = { id, creatorId, startTime, endTime, sessionId, invites: [] }
+        const { id, creatorId, startTime, endTime, sessionId, createdAt, updatedAt } = row
+        interview = { id, creatorId, startTime, endTime, sessionId, invites: [], createdAt, updatedAt }
         interviewMap.set(row.id, interview)
       }
 
       // then add the invite to the interview in the map
       if (row.inviteId && row.inviteEmail) {
         // interview either has an empty or non empty invites array at this point, so assert with !
-        interview.invites!.push({ id: row.inviteId, interviewId: row.id, email: row.inviteEmail })
+        interview.invites!.push({
+          id: row.inviteId,
+          interviewId: row.id,
+          email: row.inviteEmail,
+          isInterviewer: row.inviteIsInterviewer ?? false,
+        })
       }
     }
 
@@ -50,18 +54,5 @@ interviewsRoute.post('/', zValidator('json', NewInterview), async (c) => {
 
   return c.json({ message: 'Interview created' }, 201)
 })
-
-interviewsRoute.delete('/:id', zValidator('param', InterviewsDeleteRequest), async (c) => {
-  const db = requireDb(c)
-  const { id } = c.req.valid('param')
-
-  await deleteInterview(db, id)
-
-  return c.body(null, 204)
-})
-
-// interviewsRoute.patch("/", (c) => {
-//   return c.text("Hello Hono!");
-// });
 
 export default interviewsRoute

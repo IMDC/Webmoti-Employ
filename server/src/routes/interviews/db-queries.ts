@@ -57,8 +57,11 @@ export async function getInterviews(
       'interview.startTime',
       'interview.endTime',
       'interview.sessionId',
+      'interview.createdAt',
+      'interview.updatedAt',
       'interviewInvite.id as inviteId',
       'interviewInvite.email as inviteEmail',
+      'interviewInvite.isInterviewer as inviteIsInterviewer',
     ])
     .execute()
 }
@@ -82,7 +85,11 @@ export async function createInterview(
     for (const invite of invites) {
       await trx
         .insertInto('interviewInvite')
-        .values({ email: invite.email, interviewId: newInterview.id })
+        .values({
+          email: invite.email,
+          interviewId: newInterview.id,
+          isInterviewer: invite.isInterviewer,
+        })
         .executeTakeFirstOrThrow()
     }
   })
@@ -91,27 +98,6 @@ export async function createInterview(
 export async function deleteInterview(db: Kysely<DB>, interviewId: number) {
   return await db
     .deleteFrom('interview')
-    .where('interview.id', '=', interviewId)
-    .executeTakeFirstOrThrow()
-}
-
-export async function modifyInterview(
-  db: Kysely<DB>,
-  interviewId: number,
-  startTime?: Date,
-  endTime?: Date,
-) {
-  const updates: Record<string, Date> = {}
-  if (startTime !== undefined)
-    updates.startTime = startTime
-  if (endTime !== undefined)
-    updates.endTime = endTime
-  if (Object.keys(updates).length === 0)
-    return
-
-  return await db
-    .updateTable('interview')
-    .set(updates)
     .where('interview.id', '=', interviewId)
     .executeTakeFirstOrThrow()
 }

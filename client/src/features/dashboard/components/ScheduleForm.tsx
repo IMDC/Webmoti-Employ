@@ -6,6 +6,7 @@ import {
   Group,
   Input,
   Stack,
+  Switch,
   Text,
   TextInput,
   Tooltip,
@@ -111,11 +112,11 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
         key={form.key(`invites.${index}.email`)}
         {...form.getInputProps(`invites.${index}.email`)}
       />
-      {/* <Switch
+      <Switch
         label="Interviewer"
-        key={form.key(`invites.${index}.interviewer`)}
-        {...form.getInputProps(`invites.${index}.interviewer`, { type: 'checkbox' })}
-      /> */}
+        key={form.key(`invites.${index}.isInterviewer`)}
+        {...form.getInputProps(`invites.${index}.isInterviewer`, { type: 'checkbox' })}
+      />
       <ActionIcon color="red" onClick={() => form.removeListItem('invites', index)}>
         <IconTrash size={16} />
       </ActionIcon>

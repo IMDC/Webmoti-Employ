@@ -22,9 +22,11 @@ export interface Interview {
 }
 
 export interface InterviewInvite {
+  createdAt: Generated<Timestamp>;
   email: string;
   id: Generated<number>;
   interviewId: number;
+  isInterviewer: Generated<boolean>;
 }
 
 export interface DB {
