@@ -36,6 +36,8 @@ export function PrejoinScreen() {
   const { id: sessionId } = useParams({ strict: false })
 
   const userIdentity = getUserIdentity(user!)
+  const userId = user!.id
+  const userProfileUrl = user!.imageUrl
   const args = buildInterviewSessionArgs(sessionId, userIdentity)
 
   const { interviewSession, isInterviewSessionPending, interviewSessionError }
@@ -92,7 +94,7 @@ export function PrejoinScreen() {
       <Center mih="100vh">
         <Group justify="center" p="xl" m="xl">
           <Stack>
-            <PreviewTile height={196.875} width={350} name={userIdentity} />
+            <PreviewTile height={196.875} width={350} name={userIdentity} profileUrl={userProfileUrl} />
 
             <MenuBar
               onToggleMic={async () => {
@@ -124,7 +126,7 @@ export function PrejoinScreen() {
             </Group>
             <Button
               onClick={async () =>
-                joinZoom(userIdentity, interviewSession.sessionId, interviewSession.token)}
+                joinZoom(userId, interviewSession.sessionId, interviewSession.token)}
             >
               {`${args.action === 'create' ? 'Start' : 'Join'}`}
             </Button>

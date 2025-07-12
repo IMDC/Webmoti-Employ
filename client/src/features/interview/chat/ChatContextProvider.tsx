@@ -39,7 +39,6 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
   }, [zoomClient, setError])
 
   if (!store) {
-    console.error('Chat store is missing')
     return null
   }
 

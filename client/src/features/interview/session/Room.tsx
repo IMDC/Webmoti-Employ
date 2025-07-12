@@ -9,6 +9,7 @@ import { GALLERY_VIEW_MARGIN } from '@/utils/constants'
 import { Chat } from '../chat/Chat'
 import { useChatStore } from '../chat/useChatStore'
 import { MenuBar } from '../components/MenuBar'
+import { useParticipantProfiles } from '../profiles/useParticipantProfiles'
 import { VideoGrid } from './components/VideoGrid'
 
 export function Room() {
@@ -39,6 +40,9 @@ export function Room() {
 
   const theme = useMantineTheme()
   const isMobile = useMediaQuery(`(max-width: ${em(theme.breakpoints.sm)})`)
+
+  const participants = useZoomSessionStore(store => store.participants)
+  const { profiles, isPending, error } = useParticipantProfiles(participants)
 
   useEffect(() => {
     if (callState === 'left') {
@@ -84,7 +88,11 @@ export function Room() {
                 minWidth: 0,
               }}
             >
-              <VideoGrid containerRef={participantStageRef} />
+              <VideoGrid
+                containerRef={participantStageRef}
+                participants={participants}
+                profiles={profiles}
+              />
             </Box>
           )}
 

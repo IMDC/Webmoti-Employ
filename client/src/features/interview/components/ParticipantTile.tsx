@@ -5,17 +5,17 @@ import { NoVideoBackground } from './NoVideoBackground'
 interface ParticipantTileProps {
   height: number | string
   width: number | string
-  name: string
-  isVideoOn: boolean
   children: React.ReactNode
+  name: string
+  profileUrl: string
 }
 
 export function ParticipantTile({
   height,
   width,
   name,
-  isVideoOn,
   children,
+  profileUrl,
 }: ParticipantTileProps) {
   return (
     <Card
@@ -28,7 +28,7 @@ export function ParticipantTile({
         overflow: 'hidden',
       }}
     >
-      {!isVideoOn && <NoVideoBackground />}
+      <NoVideoBackground profileUrl={profileUrl} />
 
       {children}
 

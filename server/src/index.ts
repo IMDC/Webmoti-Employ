@@ -4,6 +4,7 @@ import { clerkMiddleware } from '@hono/clerk-auth'
 import { Hono } from 'hono'
 import { useAuth } from './middleware/useAuth'
 import interviewsRoute from './routes/interviews'
+import profilesRoute from './routes/profiles'
 import sessionsRoute from './routes/sessions'
 
 export interface AppContext {
@@ -33,5 +34,6 @@ app.notFound((c) => {
 
 app.route('/sessions', sessionsRoute)
 app.route('/interviews', interviewsRoute)
+app.route('/profiles', profilesRoute)
 
 export default app

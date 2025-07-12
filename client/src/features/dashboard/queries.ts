@@ -19,7 +19,8 @@ async function getInterviews(authToken: string | null) {
 
   const response = await fetch('/api/interviews', {
     headers: {
-      Authorization: `Bearer ${authToken}`,
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${authToken}`,
     },
   })
   if (!response.ok) {
@@ -62,7 +63,10 @@ async function scheduleInterview(interview: NewInterview, authToken: string | nu
 
   const response = await fetch('/api/interviews', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${authToken}`,
+    },
     body: JSON.stringify(interview),
   })
 

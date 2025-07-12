@@ -52,6 +52,8 @@ pnpm run dev
 
 ## VSCode Auto Formatting Code
 
+> **_NOTE:_**  After the eslint extension server runs for a while, it gets slower when formatting code. To fix this, run `ctrl + shift + p` > `ESLint: Restart ESLint Server`
+
 <https://github.com/antfu/eslint-config?tab=readme-ov-file#ide-support-auto-fix-on-save>
 
 1. Install [VS Code ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)

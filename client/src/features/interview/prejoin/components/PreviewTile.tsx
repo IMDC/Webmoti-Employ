@@ -10,9 +10,10 @@ interface PreviewTileProps {
   height: number
   width: number
   name: string
+  profileUrl: string
 }
 
-export function PreviewTile({ height, width, name }: PreviewTileProps) {
+export function PreviewTile({ height, width, name, profileUrl }: PreviewTileProps) {
   const permissionState = useAppStore(s => s.permissionState)
   const startCamera = usePreviewStore(s => s.startCamera)
   const stopCamera = usePreviewStore(s => s.stopCamera)
@@ -51,7 +52,7 @@ export function PreviewTile({ height, width, name }: PreviewTileProps) {
   }, [localAudioTrack])
 
   return (
-    <ParticipantTile height={height} width={width} name={name} isVideoOn={isVideoOn}>
+    <ParticipantTile height={height} width={width} name={name} profileUrl={profileUrl}>
       {permissionState === 'granted' && isVideoOn && (
         <VideoRenderer attach={startCamera} detach={stopCamera} />
       )}
