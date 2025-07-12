@@ -48,7 +48,7 @@ export function MenuBar({
   const MicButton = (
     <Button
       variant={isAudioOn ? 'default' : 'filled'}
-      color="red"
+      color="purple"
       onClick={onToggleMic}
       disabled={disableMediaButtons}
     >
@@ -61,7 +61,7 @@ export function MenuBar({
   const VideoButton = (
     <Button
       variant={isVideoOn ? 'default' : 'filled'}
-      color="red"
+      color="purple"
       onClick={onToggleVideo}
       disabled={disableMediaButtons}
     >
@@ -136,7 +136,7 @@ export function MenuBar({
             )}
 
         {!isPrejoin && (
-          <Button color="red" onClick={onLeave}>
+          <Button color="black" onClick={onLeave}>
             <IconPhoneOff size={18} style={{ fill: 'white' }} />
           </Button>
         )}
