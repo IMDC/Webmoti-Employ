@@ -52,7 +52,7 @@ export function PreviewTile({ height, width, name, profileUrl }: PreviewTileProp
   }, [localAudioTrack])
 
   return (
-    <ParticipantTile height={height} width={width} name={name} profileUrl={profileUrl}>
+    <ParticipantTile height={height} width={width} name={name} profileUrl={profileUrl} isLoadingProfiles={false}>
       {permissionState === 'granted' && isVideoOn && (
         <VideoRenderer attach={startCamera} detach={stopCamera} />
       )}

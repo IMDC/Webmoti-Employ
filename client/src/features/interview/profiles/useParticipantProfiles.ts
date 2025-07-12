@@ -13,8 +13,8 @@ export function useParticipantProfiles(participants: Map<number, Participant>) {
 
   const {
     data: profiles,
-    isPending,
-    error,
+    isPending: isLoadingProfiles,
+    error: profilesError,
   } = useQuery({
     queryKey: ['profiles', userIds],
     queryFn: async () => {
@@ -24,5 +24,5 @@ export function useParticipantProfiles(participants: Map<number, Participant>) {
     enabled: userIds.length > 0,
   })
 
-  return { profiles, isPending, error }
+  return { profiles, isLoadingProfiles, profilesError }
 }

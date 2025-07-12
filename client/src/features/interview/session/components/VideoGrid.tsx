@@ -7,10 +7,11 @@ import { SessionTile } from './SessionTile'
 interface VideoGridProps {
   containerRef: React.RefObject<HTMLDivElement | null>
   participants: Map<number, Participant>
+  isLoadingProfiles: boolean
   profiles?: ProfilesResponse
 }
 
-export function VideoGrid({ containerRef, participants, profiles }: VideoGridProps) {
+export function VideoGrid({ containerRef, participants, profiles, isLoadingProfiles }: VideoGridProps) {
   const participantCount = participants.size
   const { participantVideoWidth } = useGalleryViewLayout(participantCount, containerRef)
 
@@ -26,7 +27,9 @@ export function VideoGrid({ containerRef, participants, profiles }: VideoGridPro
             height={participantHeight}
             width={participantVideoWidth}
             participant={participant}
+            name={profile?.displayName || participant.displayName}
             profileUrl={profile?.profilePic || ''}
+            isLoadingProfiles={isLoadingProfiles}
           />
         )
       })}

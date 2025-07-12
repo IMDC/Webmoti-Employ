@@ -10,10 +10,12 @@ interface SessionTileProps {
   height: number
   width: number
   participant: Participant
+  name: string
   profileUrl: string
+  isLoadingProfiles: boolean
 }
 
-export function SessionTile({ height, width, participant, profileUrl }: SessionTileProps) {
+export function SessionTile({ height, width, participant, profileUrl, isLoadingProfiles, name }: SessionTileProps) {
   const attach = useZoomSessionStore(s => s.attachVideoPlayer)
   const detach = useZoomSessionStore(s => s.detachVideoPlayer)
 
@@ -28,8 +30,9 @@ export function SessionTile({ height, width, participant, profileUrl }: SessionT
     <ParticipantTile
       height={height}
       width={width}
-      name={participant.displayName}
+      name={name}
       profileUrl={profileUrl}
+      isLoadingProfiles={isLoadingProfiles}
     >
       {participant.bVideoOn && <VideoRenderer attach={attachStable} detach={detachStable} />}
 

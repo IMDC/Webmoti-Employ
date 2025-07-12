@@ -1,4 +1,4 @@
-import { Card, Text } from '@mantine/core'
+import { Card, Skeleton, Text } from '@mantine/core'
 import { Corner } from '@/components/Corner'
 import { NoVideoBackground } from './NoVideoBackground'
 
@@ -8,6 +8,7 @@ interface ParticipantTileProps {
   children: React.ReactNode
   name: string
   profileUrl: string
+  isLoadingProfiles: boolean
 }
 
 export function ParticipantTile({
@@ -16,6 +17,7 @@ export function ParticipantTile({
   name,
   children,
   profileUrl,
+  isLoadingProfiles,
 }: ParticipantTileProps) {
   return (
     <Card
@@ -28,15 +30,20 @@ export function ParticipantTile({
         overflow: 'hidden',
       }}
     >
-      <NoVideoBackground profileUrl={profileUrl} />
+      <NoVideoBackground
+        profileUrl={profileUrl}
+        isLoadingProfiles={isLoadingProfiles}
+      />
 
       {children}
 
       {name && (
         <Corner position="bottom-left" yOffset={15} xOffset={15}>
-          <Text size="sm" c="white" style={{ userSelect: 'none' }}>
-            {name}
-          </Text>
+          <Skeleton visible={isLoadingProfiles}>
+            <Text size="sm" c="white" style={{ userSelect: 'none' }}>
+              {name}
+            </Text>
+          </Skeleton>
         </Corner>
       )}
     </Card>

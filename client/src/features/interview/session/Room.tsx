@@ -42,7 +42,7 @@ export function Room() {
   const isMobile = useMediaQuery(`(max-width: ${em(theme.breakpoints.sm)})`)
 
   const participants = useZoomSessionStore(store => store.participants)
-  const { profiles, isPending, error } = useParticipantProfiles(participants)
+  const { profiles, isLoadingProfiles, profilesError } = useParticipantProfiles(participants)
 
   useEffect(() => {
     if (callState === 'left') {
@@ -92,6 +92,7 @@ export function Room() {
                 containerRef={participantStageRef}
                 participants={participants}
                 profiles={profiles}
+                isLoadingProfiles={isLoadingProfiles}
               />
             </Box>
           )}
