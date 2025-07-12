@@ -52,10 +52,10 @@ export function PrejoinScreen() {
 
   useEffect(() => {
     if (callState === 'joined' && interviewSession) {
+      sessionStorage.setItem('fromPrejoin', '1')
       navigate({
         to: '/interview/$id',
         params: { id: interviewSession.sessionId },
-        state: prev => ({ ...prev, stage: 'prejoin' }),
       })
     }
   }, [callState, interviewSession, navigate])

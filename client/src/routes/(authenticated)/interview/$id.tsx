@@ -3,17 +3,21 @@ import { ChatContextProvider } from '@/features/interview/chat/ChatContextProvid
 import { Room } from '@/features/interview/session/Room'
 
 export const Route = createFileRoute('/(authenticated)/interview/$id')({
-  beforeLoad: ({ params, location }) => {
-    const { id } = params
+  beforeLoad: ({ params }) => {
+    const allowed = sessionStorage.getItem('fromPrejoin') === '1'
 
     // if you didn't come from prejoin, then redirect to prejoin
-    if (location.state?.stage !== 'prejoin') {
+    if (!allowed) {
       throw redirect({
         to: '/interview/prejoin/$id',
-        params: { id },
+        params: { id: params.id },
         replace: true,
       })
     }
+
+    // you're allowed, so reset this flag.
+    // now when you refresh, this flag will be gone and you'll navigate to prejoin
+    sessionStorage.removeItem('fromPrejoin')
   },
   component: RouteComponent,
 })
