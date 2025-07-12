@@ -1,4 +1,4 @@
-import type { DbInterview } from '@web-employ/shared'
+import type { InterviewResponse } from '@web-employ/shared'
 import type { AppContext } from '../..'
 import { NewInterview, NewInterviewInvite } from '@web-employ/shared'
 
@@ -14,12 +14,12 @@ interviewsRoute.use('*', useDb)
 
 interviewsRoute.get('/', useUserEmail, async (c) => {
   const db = requireDb(c)
-  const userEmail = requireUserEmail(c)
+  const userEmail = requireUserEmail(c).toLowerCase()
 
   const interviewRows = await getInterviews(db, c.var.clerkUserId, userEmail)
 
-  function nestInterviews(rows: typeof interviewRows) {
-    const interviewMap = new Map<number, DbInterview>()
+  function nestInterviews(rows: typeof interviewRows, userEmail: string) {
+    const interviewMap = new Map<number, Partial<InterviewResponse>>()
 
     for (const row of rows) {
       let interview = interviewMap.get(row.id)
@@ -32,6 +32,8 @@ interviewsRoute.get('/', useUserEmail, async (c) => {
 
       // then add the invite to the interview in the map
       if (row.inviteId && row.inviteEmail) {
+        const isYou = row.inviteEmail.toLowerCase() === userEmail
+
         // interview either has an empty or non empty invites array at this point, so assert with !
         interview.invites!.push({
           id: row.inviteId,
@@ -39,14 +41,24 @@ interviewsRoute.get('/', useUserEmail, async (c) => {
           email: row.inviteEmail,
           isInterviewer: row.inviteIsInterviewer ?? false,
           isInterviewCreator: row.inviteIsInterviewCreator ?? false,
+          isYou: isYou ? true : undefined,
         })
+
+        if (isYou) {
+          interview.yourRole
+          = row.inviteIsInterviewCreator
+              ? 'creator'
+              : row.inviteIsInterviewer
+                ? 'interviewer'
+                : 'interviewee'
+        }
       }
     }
 
-    return Array.from(interviewMap.values())
+    return Array.from(interviewMap.values()) as InterviewResponse[]
   }
 
-  return c.json({ interviews: nestInterviews(interviewRows) })
+  return c.json({ interviews: nestInterviews(interviewRows, userEmail) })
 })
 
 export const PostNewInterviewInvite = NewInterviewInvite.omit({

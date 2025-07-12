@@ -1,9 +1,9 @@
-import type { DbInterview } from '@web-employ/shared'
+import type { InterviewResponse } from '@web-employ/shared'
 import { Center, Stack, Text } from '@mantine/core'
 import { InterviewCard } from './InterviewCard'
 
 interface InterviewCardsProps {
-  interviews: DbInterview[]
+  interviews: InterviewResponse[]
 }
 
 export function InterviewCards({ interviews }: InterviewCardsProps) {
@@ -18,7 +18,7 @@ export function InterviewCards({ interviews }: InterviewCardsProps) {
   }
 
   return (
-    <Stack pb="xl">
+    <Stack pb="xl" w={{ base: 400, sm: 500, lg: 700 }} mx="auto">
       {interviews.map(interview => (
         <InterviewCard interview={interview} key={interview.id} />
       ))}

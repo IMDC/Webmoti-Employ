@@ -32,7 +32,19 @@ export const NewInterview = DbInterview.omit({
   invites: z.array(NewInterviewInvite).optional(),
 })
 
+export const InterviewRole = z.enum(['creator', 'interviewer', 'interviewee'])
+export const InterviewInviteResponse = DbInterviewInvite.extend({
+  isYou: z.boolean().optional(),
+})
+export const InterviewResponse = DbInterview.extend({
+  invites: z.array(InterviewInviteResponse),
+  yourRole: InterviewRole,
+})
+
 export type DbInterview = z.infer<typeof DbInterview>
 export type NewInterview = z.infer<typeof NewInterview>
 export type DbInterviewInvite = z.infer<typeof DbInterviewInvite>
 export type NewInterviewInvite = z.infer<typeof NewInterviewInvite>
+export type InterviewResponse = z.infer<typeof InterviewResponse>
+export type InterviewInviteResponse = z.infer<typeof InterviewInviteResponse>
+export type InterviewRole = z.infer<typeof InterviewRole>

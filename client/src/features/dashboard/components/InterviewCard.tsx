@@ -1,16 +1,54 @@
-import type { DbInterview } from '@web-employ/shared'
-import { Avatar, Badge, Button, Card, Divider, Group, Text } from '@mantine/core'
-import { IconCalendarEventFilled, IconVideoFilled } from '@tabler/icons-react'
+import type { InterviewResponse } from '@web-employ/shared'
+import { ActionIcon, Avatar, Badge, Button, Card, Divider, Group, Text } from '@mantine/core'
+import { IconCalendarEventFilled, IconPlus, IconVideoFilled } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
 import { MyCopyButton } from '@/components/MyCopyButton'
 import { UserList } from '@/components/UserList'
+import { useInviteProfiles } from '@/features/interview/profiles/useInviteProfiles'
+
+function counterpartInfo(
+  interview: InterviewResponse,
+  profiles: Record<string, { displayName: string, profilePic: string } | null> | undefined,
+) {
+  const youAreInterviewer
+    = interview.yourRole === 'creator' || interview.yourRole === 'interviewer'
+
+  const others = interview.invites.filter(i =>
+    youAreInterviewer
+      ? !i.isInterviewer && !i.isInterviewCreator
+      : i.isInterviewer || i.isInterviewCreator,
+  )
+
+  const names: string[] = []
+  const pics: string[] = []
+
+  for (const { email } of others) {
+    const profile = profiles?.[email] ?? null
+    const name = profile?.displayName ?? email.split('@')[0]
+    const pic = profile?.profilePic ?? ''
+
+    names.push(name)
+    pics.push(pic)
+  }
+
+  return {
+    displayLine: names.length ? `Interview with ${names.join(', ')}` : 'Interview',
+    pics,
+    youAreInterviewer,
+  }
+}
 
 interface InterviewCardProps {
-  interview: DbInterview
+  interview: InterviewResponse
 }
 
 export function InterviewCard({ interview }: InterviewCardProps) {
   const navigate = useNavigate()
+
+  const emailArray = [...new Set((interview.invites ?? []).map(user => user.email))]
+  const { profiles, isLoadingProfiles } = useInviteProfiles(emailArray)
+
+  const { displayLine, pics, youAreInterviewer } = counterpartInfo(interview, profiles)
 
   const isEnded = interview.endTime < new Date()
 
@@ -25,18 +63,58 @@ export function InterviewCard({ interview }: InterviewCardProps) {
           >
             {formatInterviewTime(interview.startTime)}
           </Badge>
-          <Badge>Interviewer</Badge>
+          <Badge>
+            { youAreInterviewer ? 'Interviewer' : 'Interviewee' }
+          </Badge>
         </Group>
-        <UserList users={interview.invites ?? []} />
+        <UserList
+          users={interview.invites ?? []}
+          profiles={profiles}
+          isLoadingProfiles={isLoadingProfiles}
+        />
       </Group>
 
-      <Group justify="space-between" mt="sm">
-        <Group>
-          <Avatar />
-          <Text fw="bolder">Interview with Joe</Text>
+      <Group justify="space-between" wrap="wrap" mt="sm" align="flex-start">
+        <Group
+          wrap="wrap"
+          align="center"
+          style={{ flex: 1, minWidth: 0 }}
+        >
+          {interview.invites.length > 1
+            ? (
+                <Avatar.Group spacing="sm">
+                  {pics.slice(0, 3).map((src, i) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <Avatar key={i} src={src} radius="xl" />
+                  ))}
+                  {pics.length > 3 && (
+                    <Avatar radius="xl">
+                      +
+                      {pics.length - 3}
+                    </Avatar>
+                  )}
+                </Avatar.Group>
+              )
+            : (
+                <ActionIcon variant="default">
+                  <IconPlus size={16} />
+                </ActionIcon>
+              )}
+          <Text
+            fw="bolder"
+            style={{
+              flex: 1,
+              minWidth: 0,
+              wordBreak: 'break-word',
+            }}
+          >
+            {interview.invites.length < 2 ? 'Add a guest to this interview' : displayLine}
+          </Text>
         </Group>
+
         <Button
-          onClick={() => navigate({ to: '/interview/prejoin/$id', params: { id: interview.sessionId } })}
+          onClick={() =>
+            navigate({ to: '/interview/prejoin/$id', params: { id: interview.sessionId } })}
           disabled={isEnded}
           leftSection={<IconVideoFilled />}
         >
@@ -51,7 +129,10 @@ export function InterviewCard({ interview }: InterviewCardProps) {
           {' '}
           {interview.sessionId}
         </Text>
-        <MyCopyButton copyText={interview.sessionId} />
+        <MyCopyButton
+          copyText={`${window.location.origin}/interview/${interview.sessionId}`}
+          copyTooltip="Copy interview link"
+        />
       </Group>
     </Card>
   )
