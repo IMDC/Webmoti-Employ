@@ -1,6 +1,5 @@
 import type { UserResource } from '@clerk/types'
 import type { ExecutedFailure } from '@zoom/videosdk'
-import type { Json } from '@/types/Json'
 import type { AppError } from '@/useAppStore'
 import { HttpError } from './HttpError'
 
@@ -43,7 +42,7 @@ export function handleAppError(
   }
 }
 
-export function jsonStringifyIndented(json: Json) {
+export function jsonStringifyIndented(json: unknown) {
   return JSON.stringify(json, null, 2)
 }
 

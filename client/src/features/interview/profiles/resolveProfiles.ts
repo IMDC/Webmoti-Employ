@@ -21,13 +21,17 @@ export async function resolveProfiles(
     },
     body: JSON.stringify(input),
   })
-  if (!response.ok)
-    throw new Error(`Failed to resolve profiles: : ${response.status}`)
+  if (!response.ok) {
+    const body = await response.json().catch(() => null)
+    throw new HttpError('Failed to resolve profiles', response.status, {
+      responseBody: body,
+    })
+  }
 
   const json = await response.json()
   const result = ProfilesResponse.safeParse(json)
   if (!result.success) {
-    throw new Error(z.prettifyError(result.error))
+    throw new HttpError('Invalid profile response', 500, z.flattenError(result.error))
   }
 
   return result.data

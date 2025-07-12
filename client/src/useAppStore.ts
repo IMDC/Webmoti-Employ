@@ -1,4 +1,3 @@
-import type { Json } from '@/types/Json'
 import { create } from 'zustand'
 
 type PermissionState = 'idle' | 'acquiring' | 'granted' | 'denied'
@@ -6,7 +5,7 @@ type PermissionState = 'idle' | 'acquiring' | 'granted' | 'denied'
 export interface AppError {
   message: string
   status?: number
-  details?: Json
+  details?: unknown
 }
 
 interface AppStore {

@@ -1,10 +1,11 @@
 import { ClerkProvider } from '@clerk/clerk-react'
 import { MantineProvider } from '@mantine/core'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider } from '@tanstack/react-router'
 
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
+import { queryClient } from './query-client'
 import { router } from './router'
 import { theme } from './theme'
 import '@mantine/core/styles.css'
@@ -17,8 +18,6 @@ const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 if (!CLERK_PUBLISHABLE_KEY) {
   throw new Error('Missing Clerk Publishable Key')
 }
-
-const queryClient = new QueryClient()
 
 // eslint-disable-next-line react-refresh/only-export-components
 function App() {

@@ -1,11 +1,10 @@
-import type { Json } from '@/types/Json'
-
 export class HttpError extends Error {
   status: number
-  details?: Json
+  details?: unknown
 
-  constructor(message: string, status: number, details?: Json) {
+  constructor(message: string, status: number, details?: unknown) {
     super(message)
+    this.name = 'HttpError'
     this.status = status
     this.details = details
   }
