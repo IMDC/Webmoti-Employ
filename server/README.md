@@ -38,9 +38,21 @@ Rename `.env.example` to `.env`. This hyperdrive variable doesn't get detected i
 
 ## Deploying
 
-```bash
-npm run deploy
-```
+The server is deployed using Cloudflare workers. This also integrates with GitHub.
+
+Steps:
+
+1. Go to cloudflare dashboard
+2. Click `Add` > `Workers`
+3. Click `Import a repository`
+4. Connect to GitHub
+5. Set `Root directory` to `/server`
+6. Create new API token
+7. Deploy
+8. In `Settings` > `Variables and Secrets`, add everything in `.dev.vars` except `DATABASE_URL`
+ (it's not needed since it's only used for `db-typegen`)
+9. Enable Workers Logs (optional)
+10. Get the deployed server url and set it in Vercel for client as `VITE_API_BASE_URL`
 
 ## Services
 

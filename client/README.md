@@ -23,3 +23,4 @@ Steps:
 5. Set root to `client`
 6. Add environment variables from `.env`
 7. Click Deploy
+8. [Deploy server](../server/README.md#deploying), get deployed url, and set new environment variable (`VITE_API_BASE_URL`) in `Settings` > `Environment Variables`

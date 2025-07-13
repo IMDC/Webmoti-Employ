@@ -56,6 +56,7 @@ pnpm run dev
 The client and server are deployed separately.
 
 1. [Deploy the client](client/README.md#deploying)
+2. [Deploy the server](server/README.md#deploying)
 
 ## VSCode Auto Formatting Code
 
