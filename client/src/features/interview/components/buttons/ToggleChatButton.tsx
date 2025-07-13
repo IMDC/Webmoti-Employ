@@ -11,7 +11,7 @@ export function ToggleChatButton({ onToggleChat }: ToggleChatButtonProps) {
 
   return (
     <Indicator processing disabled={!isChatUnread}>
-      <Button variant="default" onClick={onToggleChat}>
+      <Button variant="default" onClick={onToggleChat} px={{ base: 'sm', sm: 'md' }}>
         <IconMessageFilled size={18} />
       </Button>
     </Indicator>

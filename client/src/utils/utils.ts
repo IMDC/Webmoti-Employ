@@ -77,3 +77,7 @@ export function formatAppError(error: AppError): string {
 export function getInterviewLink(sessionId: string) {
   return `${window.location.origin}/interview/${sessionId}`
 }
+
+export function getHighlightColor(isColorblindModeOn: boolean) {
+  return isColorblindModeOn ? 'black' : 'red'
+}

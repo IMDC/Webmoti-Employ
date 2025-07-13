@@ -26,9 +26,11 @@ interface AppStore {
 
   isSettingsOpen: boolean
   setIsSettingsOpen: (value: boolean) => void
+  isColorblindModeOn: boolean
+  setIsColorblindModeOn: (value: boolean) => void
 }
 
-export const useAppStore = create<AppStore>((set, get) => ({
+export const useAppStore = create<AppStore>(set => ({
   error: null,
   setError: error => set({ error }),
   clearError: () => set({ error: null }),
@@ -37,12 +39,14 @@ export const useAppStore = create<AppStore>((set, get) => ({
   isVideoOn: true,
   setIsAudioOn: value => set({ isAudioOn: value }),
   setIsVideoOn: value => set({ isVideoOn: value }),
-  toggleIsAudioOn: () => set({ isAudioOn: !get().isAudioOn }),
-  toggleIsVideoOn: () => set({ isVideoOn: !get().isVideoOn }),
+  toggleIsAudioOn: () => set(state => ({ isAudioOn: !state.isAudioOn })),
+  toggleIsVideoOn: () => set(state => ({ isVideoOn: !state.isVideoOn })),
 
   permissionState: 'idle',
   setPermissionState: value => set({ permissionState: value }),
 
   isSettingsOpen: false,
   setIsSettingsOpen: value => set({ isSettingsOpen: value }),
+  isColorblindModeOn: false,
+  setIsColorblindModeOn: value => set({ isColorblindModeOn: value }),
 }))

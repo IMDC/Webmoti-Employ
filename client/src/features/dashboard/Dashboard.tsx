@@ -1,4 +1,4 @@
-import { UserButton } from '@clerk/clerk-react'
+import { UserButton, useUser } from '@clerk/clerk-react'
 import {
   ActionIcon,
   Affix,
@@ -12,6 +12,7 @@ import {
   Stack,
   Text,
   TextInput,
+  Title,
   Transition,
 } from '@mantine/core'
 import { useDisclosure, useValidatedState, useWindowScroll } from '@mantine/hooks'
@@ -24,7 +25,7 @@ import {
 } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { ColorSchemeToggle } from '@/components/ColorSchemeToggle'
+import { SettingsButton } from '@/components/SettingsButton'
 import { InterviewList } from './components/InterviewList'
 import { ScheduleForm } from './components/ScheduleForm'
 import { JoinCodeInput } from './schema'
@@ -33,6 +34,8 @@ export function Dashboard() {
   const [isNewInterviewPopupOpen, setIsNewInterviewPopupOpen] = useState(false)
   const [isScheduleModalOpened, { open: openScheduleModal, close: closeScheduleModal }]
     = useDisclosure(false)
+
+  const { user } = useUser()
 
   const [scroll, scrollTo] = useWindowScroll()
 
@@ -46,7 +49,7 @@ export function Dashboard() {
 
   return (
     <AppShell
-      header={{ height: 80 }}
+      header={{ height: 60 }}
       styles={{
         header: { border: 'none' },
         // hide horizontal scrollbar
@@ -56,10 +59,9 @@ export function Dashboard() {
       <AppShell.Header>
         {/* 100vw makes it so the scrollbar doesn't shift the layout */}
         <Flex justify="space-between" align="center" w="100vw" h="100%" p="lg">
-          <ColorSchemeToggle />
 
           <Text
-            fz={{ base: 20, sm: 40, lg: 50 }}
+            fz={{ base: 15, sm: 25 }}
             fw={900}
             variant="gradient"
             gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
@@ -67,7 +69,10 @@ export function Dashboard() {
             WebMoti-Employ
           </Text>
 
-          <UserButton />
+          <Group>
+            <SettingsButton />
+            <UserButton />
+          </Group>
         </Flex>
       </AppShell.Header>
 
@@ -92,14 +97,23 @@ export function Dashboard() {
           />
         </Modal>
 
-        <Flex justify="center" align="center" mt="lg" w="100vw">
+        <Flex justify="center" align="center"direction="column" w="100vw">
+          <Stack align="center" gap="xs">
+            <Title ta="center" mt={{ base: 25, sm: 50 }} fz={{ base: 25, sm: 35, md: 45 }} px="lg">
+              {`Welcome ${user!.firstName}!`}
+            </Title>
+            <Text c="dimmed">
+              Your interview schedule is below.
+            </Text>
+          </Stack>
+
           <Flex
             direction="column"
             gap="md"
             px="md"
             w={{ base: 300, sm: 500, lg: 700 }}
           >
-            <Flex direction="row" gap="lg" justify="center" wrap="wrap">
+            <Flex direction="row" gap="lg" justify="center" wrap="wrap" mt={{ base: 25, sm: 50 }}>
               <Popover opened={isNewInterviewPopupOpen} onChange={setIsNewInterviewPopupOpen}>
                 <Popover.Target>
                   <Button
@@ -147,7 +161,7 @@ export function Dashboard() {
               </Group>
             </Flex>
 
-            <Divider size="md" mt="md" mb="md" />
+            <Divider size="md" />
 
             <InterviewList />
           </Flex>

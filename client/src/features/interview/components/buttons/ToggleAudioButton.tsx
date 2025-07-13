@@ -1,6 +1,7 @@
 import { Button, Indicator } from '@mantine/core'
 import { IconMicrophoneFilled, IconMicrophoneOff } from '@tabler/icons-react'
 import { useAppStore } from '@/useAppStore'
+import { getHighlightColor } from '@/utils/utils'
 
 interface ToggleAudioButtonProps {
   onToggleMic: () => Promise<void>
@@ -9,12 +10,14 @@ interface ToggleAudioButtonProps {
 export function ToggleAudioButton({ onToggleMic }: ToggleAudioButtonProps) {
   const permissionState = useAppStore(state => state.permissionState)
   const isAudioOn = useAppStore(state => state.isAudioOn)
+  const isColorblindModeOn = useAppStore(s => s.isColorblindModeOn)
 
   return (
     <Indicator color="orange" disabled={permissionState !== 'denied'}>
       <Button
         variant={isAudioOn ? 'default' : 'filled'}
-        color="red"
+        color={getHighlightColor(isColorblindModeOn)}
+        px={{ base: 'sm', sm: 'md' }}
         onClick={onToggleMic}
         disabled={permissionState === 'idle' || permissionState === 'acquiring'}
       >

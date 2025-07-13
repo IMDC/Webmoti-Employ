@@ -1,6 +1,7 @@
 import { Button, Flex, Popover } from '@mantine/core'
 import { IconChevronUp } from '@tabler/icons-react'
 import { useAppStore } from '@/useAppStore'
+import { ControlsMenu } from '../session/components/ControlsMenu'
 import { EndCallButton } from './buttons/EndCallButton'
 import { ToggleAudioButton } from './buttons/ToggleAudioButton'
 import { ToggleChatButton } from './buttons/ToggleChatButton'
@@ -82,12 +83,12 @@ export function MenuBar({
           <>
             <ToggleChatButton onToggleChat={onToggleChat} />
 
+            <ControlsMenu />
+
             {!isPrejoin && (
               <EndCallButton />
             )}
-
-            {/* <ControlsMenu onLayoutOpen={openLayoutModal} />
-            <ChangeLayoutModal isOpen={isLayoutModalOpen} onClose={closeLayoutModal} /> */}
+            {/* <ChangeLayoutModal isOpen={isLayoutModalOpen} onClose={closeLayoutModal} /> */}
           </>
         )}
       </Flex>

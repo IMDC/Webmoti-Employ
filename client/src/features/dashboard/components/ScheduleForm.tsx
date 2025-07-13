@@ -22,7 +22,7 @@ import {
 } from '@tabler/icons-react'
 import { zod4Resolver } from 'mantine-form-zod-resolver'
 import { useAppStore } from '@/useAppStore'
-import { getInterviewLink, handleAppError } from '@/utils/utils'
+import { getHighlightColor, getInterviewLink, handleAppError } from '@/utils/utils'
 import { useScheduleInterview } from '../queries'
 import { ScheduleInterviewForm } from '../schema'
 
@@ -62,6 +62,7 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
   const { user } = useUser()
 
   const setError = useAppStore(s => s.setError)
+  const isColorblindModeOn = useAppStore(s => s.isColorblindModeOn)
 
   const form = useForm<ScheduleInterviewForm>({
     mode: 'uncontrolled',
@@ -123,7 +124,10 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
         key={form.key(`invites.${index}.isInterviewer`)}
         {...form.getInputProps(`invites.${index}.isInterviewer`, { type: 'checkbox' })}
       />
-      <ActionIcon color="red" onClick={() => form.removeListItem('invites', index)}>
+      <ActionIcon
+        color={getHighlightColor(isColorblindModeOn)}
+        onClick={() => form.removeListItem('invites', index)}
+      >
         <IconTrash size={16} />
       </ActionIcon>
     </Group>

@@ -87,7 +87,8 @@ export function PrejoinScreen() {
         </Button>
       </Corner>
 
-      <Corner position="top-right">
+      {/* TODO: make this be in header of appshell */}
+      <Corner position="top-right" yOffset={16}>
         <UserButton />
       </Corner>
 
