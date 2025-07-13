@@ -53,9 +53,8 @@ Steps:
 9. Create new API token
 10. Deploy
 11. In `Settings` > `Variables and Secrets`, add everything in `.dev.vars` except `DATABASE_URL` (it's not needed since it's only used for `db-typegen`)
-12. Enable Workers Logs
-13. Get the deployed server url and set it in Vercel for client as `VITE_API_BASE_URL`
-14. [Deploy client](../client/README.md#deploying), get the url, and set `CORS_ORIGIN` secret in Cloudflare
+12. Get the deployed server url and set it in Vercel for client as `VITE_API_BASE_URL`
+13. [Deploy client](../client/README.md#deploying), get the url, and set `CORS_ORIGIN` secret in Cloudflare
 
 ## Services
 

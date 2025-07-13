@@ -9,5 +9,9 @@
       "binding": "HYPERDRIVE",
       "id": "0699657a53e04e64bf61be912ba70c66"
     }
-  ]
+  ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
 }
