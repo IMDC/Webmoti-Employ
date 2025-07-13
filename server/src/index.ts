@@ -19,14 +19,14 @@ export interface AppContext {
 
 const app = new Hono<AppContext>()
 
-app.use('*', cors())
-
-// app.use('*', async (c, next) => {
-//   const corsMiddleware = cors({
-//     origin: c.env.CORS_ORIGIN,
-//   })
-//   return corsMiddleware(c, next)
-// })
+app.use('*', async (c, next) => {
+  const corsMiddleware = cors({
+    origin: c.env.CORS_ORIGIN,
+    allowMethods: ['GET', 'POST'],
+    allowHeaders: ['Content-Type', 'Authorization'],
+  })
+  return corsMiddleware(c, next)
+})
 
 // all routes require authentication
 app.use('*', clerkMiddleware())
