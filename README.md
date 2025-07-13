@@ -2,6 +2,7 @@
 
 - [Stack](#stack)
 - [Setup](#setup)
+- [Deploying](#deploying)
 - [VSCode Auto Formatting Code](#vscode-auto-formatting-code)
 - [Dependabot](#dependabot)
 
@@ -49,6 +50,12 @@ pnpm install
 # run both client and server
 pnpm run dev
 ```
+
+## Deploying
+
+The client and server are deployed separately.
+
+1. [Deploy the client](client/README.md#deploying)
 
 ## VSCode Auto Formatting Code
 
