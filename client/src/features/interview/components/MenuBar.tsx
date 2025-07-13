@@ -1,25 +1,17 @@
-import { Button, em, Flex, Indicator, Popover, useMantineTheme } from '@mantine/core'
-import { useMediaQuery } from '@mantine/hooks'
-import {
-  IconChevronUp,
-  IconMessageFilled,
-  IconMicrophoneFilled,
-  IconMicrophoneOff,
-  IconPhoneOff,
-  IconVideoFilled,
-  IconVideoOff,
-} from '@tabler/icons-react'
+import { Button, Flex, Popover } from '@mantine/core'
+import { IconChevronUp } from '@tabler/icons-react'
 import { useAppStore } from '@/useAppStore'
+import { EndCallButton } from './buttons/EndCallButton'
+import { ToggleAudioButton } from './buttons/ToggleAudioButton'
+import { ToggleChatButton } from './buttons/ToggleChatButton'
+import { ToggleVideoButton } from './buttons/ToggleVideoButton'
 import { ChangeMediaDevice } from './ChangeMediaDevice'
 
 interface MenuBarProps {
-  onToggleMic: () => void
-  onToggleVideo: () => void
+  onToggleMic: () => Promise<void>
+  onToggleVideo: () => Promise<void>
   onToggleChat?: () => void
   isPrejoin?: boolean
-  disableMediaButtons?: boolean
-  onLeave?: () => void
-  isChatUnread?: boolean
   onChangeVideoDevice?: (videoDeviceId: string) => Promise<void>
   onChangeAudioInputDevice?: (audioInputDeviceId: string) => Promise<void>
 }
@@ -30,127 +22,69 @@ export function MenuBar({
   onToggleChat,
   onChangeVideoDevice,
   onChangeAudioInputDevice,
-  onLeave,
   isPrejoin = false,
-  disableMediaButtons = false,
-  isChatUnread = false,
 }: MenuBarProps) {
-  const permissionState = useAppStore(state => state.permissionState)
-  const isAudioOn = useAppStore(state => state.isAudioOn)
-  const isVideoOn = useAppStore(state => state.isVideoOn)
-
-  const theme = useMantineTheme()
-  const isMobile = useMediaQuery(`(max-width: ${em(theme.breakpoints.sm)})`)
-
   // const [isLayoutModalOpen, { open: openLayoutModal, close: closeLayoutModal }]
   //   = useDisclosure(false)
 
-  const MicButton = (
-    <Button
-      variant={isAudioOn ? 'default' : 'filled'}
-      color="purple"
-      onClick={onToggleMic}
-      disabled={disableMediaButtons}
-    >
-      {isAudioOn
-        ? (<IconMicrophoneFilled size={18} />)
-        : (<IconMicrophoneOff size={18} style={{ fill: 'white' }} />)}
-    </Button>
-  )
-
-  const VideoButton = (
-    <Button
-      variant={isVideoOn ? 'default' : 'filled'}
-      color="purple"
-      onClick={onToggleVideo}
-      disabled={disableMediaButtons}
-    >
-      {isVideoOn
-        ? (<IconVideoFilled size={18} />)
-        : (<IconVideoOff style={{ fill: 'white' }} size={18} />)}
-    </Button>
-  )
+  const permissionState = useAppStore(s => s.permissionState)
+  const disableMediaButtons = permissionState === 'idle' || permissionState === 'acquiring'
 
   return (
     <Flex justify="center" align="center" h="100%" px="md">
+      {/* left section */}
       <div style={{ flex: 1 }} />
 
       {/* center section */}
       <Flex align="center" gap="md">
-        {!isMobile
-          ? (
-              <Button.Group>
-                <Popover>
-                  <Popover.Target>
-                    <Button variant="default" disabled={disableMediaButtons} px="xs">
-                      <IconChevronUp size={18} />
-                    </Button>
-                  </Popover.Target>
-                  <Popover.Dropdown>
-                    <ChangeMediaDevice
-                      mediaType="audio"
-                      variant="radio"
-                      onSwitchMicrophone={onChangeAudioInputDevice}
-                    />
-                  </Popover.Dropdown>
-                </Popover>
+        <Button.Group>
+          <Popover>
+            <Popover.Target>
+              <Button variant="default" disabled={disableMediaButtons} px="xs">
+                <IconChevronUp size={18} />
+              </Button>
+            </Popover.Target>
+            <Popover.Dropdown>
+              <ChangeMediaDevice
+                mediaType="audio"
+                variant="radio"
+                onSwitchMicrophone={onChangeAudioInputDevice}
+              />
+            </Popover.Dropdown>
+          </Popover>
 
-                <Indicator color="orange" disabled={permissionState !== 'denied'}>
-                  {MicButton}
-                </Indicator>
-              </Button.Group>
-            )
-          : (
-              <Indicator color="orange" disabled={permissionState !== 'denied'}>
-                {MicButton}
-              </Indicator>
-            )}
+          <ToggleAudioButton onToggleMic={onToggleMic} />
+        </Button.Group>
 
-        {!isMobile
-          ? (
-              <Button.Group>
-                <Popover>
-                  <Popover.Target>
-                    <Button variant="default" disabled={disableMediaButtons} px="xs">
-                      <IconChevronUp size={18} />
-                    </Button>
-                  </Popover.Target>
-                  <Popover.Dropdown>
-                    <ChangeMediaDevice
-                      mediaType="video"
-                      variant="radio"
-                      onSwitchCamera={onChangeVideoDevice}
-                    />
-                  </Popover.Dropdown>
-                </Popover>
+        <Button.Group>
+          <Popover>
+            <Popover.Target>
+              <Button variant="default" disabled={disableMediaButtons} px="xs">
+                <IconChevronUp size={18} />
+              </Button>
+            </Popover.Target>
+            <Popover.Dropdown>
+              <ChangeMediaDevice
+                mediaType="video"
+                variant="radio"
+                onSwitchCamera={onChangeVideoDevice}
+              />
+            </Popover.Dropdown>
+          </Popover>
 
-                <Indicator color="orange" disabled={permissionState !== 'denied'}>
-                  {VideoButton}
-                </Indicator>
-              </Button.Group>
-            )
-          : (
-              <Indicator color="orange" disabled={permissionState !== 'denied'}>
-                {VideoButton}
-              </Indicator>
-            )}
-
-        {!isPrejoin && (
-          <Button color="black" onClick={onLeave}>
-            <IconPhoneOff size={18} style={{ fill: 'white' }} />
-          </Button>
-        )}
+          <ToggleVideoButton onToggleVideo={onToggleVideo} />
+        </Button.Group>
       </Flex>
 
       {/* right section */}
       <Flex align="center" gap="md" style={{ flex: 1 }} justify="flex-end">
         {!isPrejoin && (
           <>
-            <Indicator processing disabled={!isChatUnread}>
-              <Button variant="default" onClick={onToggleChat}>
-                <IconMessageFilled size={18} />
-              </Button>
-            </Indicator>
+            <ToggleChatButton onToggleChat={onToggleChat} />
+
+            {!isPrejoin && (
+              <EndCallButton />
+            )}
 
             {/* <ControlsMenu onLayoutOpen={openLayoutModal} />
             <ChangeLayoutModal isOpen={isLayoutModalOpen} onClose={closeLayoutModal} /> */}

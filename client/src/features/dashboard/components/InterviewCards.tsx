@@ -18,7 +18,7 @@ export function InterviewCards({ interviews }: InterviewCardsProps) {
   }
 
   return (
-    <Stack pb="xl" w={{ base: 400, sm: 500, lg: 700 }} mx="auto">
+    <Stack pb="xl" w="100%">
       {interviews.map(interview => (
         <InterviewCard interview={interview} key={interview.id} />
       ))}

@@ -1,6 +1,6 @@
 import type { InterviewResponse } from '@web-employ/shared'
-import { ActionIcon, Avatar, Badge, Button, Card, Divider, Group, Text } from '@mantine/core'
-import { IconCalendarEventFilled, IconPlus, IconVideoFilled } from '@tabler/icons-react'
+import { ActionIcon, Avatar, Badge, Button, Card, Divider, Flex, Group, Stack, Text } from '@mantine/core'
+import { IconPlus, IconReport, IconTie, IconVideoFilled } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
 import { MyCopyButton } from '@/components/MyCopyButton'
 import { UserList } from '@/components/UserList'
@@ -60,11 +60,8 @@ export function InterviewCard({ interview }: InterviewCardProps) {
           <Badge
             variant="gradient"
             gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
-            leftSection={<IconCalendarEventFilled size={12} />}
+            leftSection={youAreInterviewer ? <IconReport size={12} /> : <IconTie size={12} />}
           >
-            {formatInterviewTime(interview.startTime)}
-          </Badge>
-          <Badge>
             { youAreInterviewer ? 'Interviewer' : 'Interviewee' }
           </Badge>
         </Group>
@@ -75,45 +72,47 @@ export function InterviewCard({ interview }: InterviewCardProps) {
         />
       </Group>
 
-      <Group justify="space-between" wrap="wrap" mt="sm" align="flex-start">
-        <Group
-          wrap="wrap"
+      <Stack justify="center" align="center" flex="grow" mt="sm">
+        <Text fw="bolder"ff="monospace">
+          {formatInterviewTime(interview.startTime)}
+        </Text>
+
+        <Flex
+          direction={{ base: 'column', sm: 'row' }}
           align="center"
-          style={{ flex: 1, minWidth: 0 }}
+          gap="xs"
         >
           {interview.invites.length > 1
+            && (
+              <Avatar.Group spacing="sm">
+                {pics.slice(0, 3).map((src, i) => (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <Avatar key={i} src={src} radius="xl" />
+                ))}
+                {pics.length > 3 && (
+                  <Avatar radius="xl">
+                    +
+                    {pics.length - 3}
+                  </Avatar>
+                )}
+              </Avatar.Group>
+            )}
+
+          {interview.invites.length < 2
             ? (
-                <Avatar.Group spacing="sm">
-                  {pics.slice(0, 3).map((src, i) => (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <Avatar key={i} src={src} radius="xl" />
-                  ))}
-                  {pics.length > 3 && (
-                    <Avatar radius="xl">
-                      +
-                      {pics.length - 3}
-                    </Avatar>
-                  )}
-                </Avatar.Group>
+                <Group gap="xs">
+                  <ActionIcon variant="default">
+                    <IconPlus size={16} />
+                  </ActionIcon>
+                  <Text fw="bold">Invite a guest</Text>
+                </Group>
               )
-            : (
-                <ActionIcon variant="default">
-                  <IconPlus size={16} />
-                </ActionIcon>
-              )}
-          <Text
-            fw="bolder"
-            style={{
-              flex: 1,
-              minWidth: 0,
-              wordBreak: 'break-word',
-            }}
-          >
-            {interview.invites.length < 2 ? 'Add a guest to this interview' : displayLine}
-          </Text>
-        </Group>
+            : <Text fw="bold">{displayLine}</Text>}
+        </Flex>
 
         <Button
+          w="100%"
+          maw={250}
           onClick={() =>
             navigate({ to: '/interview/prejoin/$id', params: { id: interview.sessionId } })}
           disabled={isEnded}
@@ -121,13 +120,11 @@ export function InterviewCard({ interview }: InterviewCardProps) {
         >
           Join
         </Button>
-      </Group>
+      </Stack>
 
       <Divider my="sm" />
-      <Group justify="space-between" align="center">
-        <Text size="xs" ff="monospace" c="dimmed">
-          Session:
-          {' '}
+      <Group justify="center" align="center" gap={5}>
+        <Text fz={{ base: 10, sm: 'sm' }} ff="monospace" c="dimmed">
           {interview.sessionId}
         </Text>
         <MyCopyButton

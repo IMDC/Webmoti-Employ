@@ -111,7 +111,7 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
     // eslint-disable-next-line react/no-array-index-key
     <Group key={index}>
       <TextInput
-        placeholder="Email address"
+        placeholder="Email"
         leftSection={<IconAt size={16} />}
         withAsterisk
         style={{ flex: 1 }}

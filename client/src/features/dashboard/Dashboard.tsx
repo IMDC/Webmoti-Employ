@@ -6,6 +6,7 @@ import {
   Button,
   Divider,
   Flex,
+  Group,
   Modal,
   Popover,
   Stack,
@@ -48,15 +49,17 @@ export function Dashboard() {
       header={{ height: 80 }}
       styles={{
         header: { border: 'none' },
-        main: { height: 'calc(100vh - 100px)' },
+        // hide horizontal scrollbar
+        main: { overflowX: 'hidden' },
       }}
     >
       <AppShell.Header>
-        <Flex justify="space-between" align="center" w="100%" h="100%" p="lg">
+        {/* 100vw makes it so the scrollbar doesn't shift the layout */}
+        <Flex justify="space-between" align="center" w="100vw" h="100%" p="lg">
           <ColorSchemeToggle />
 
           <Text
-            fz={{ base: 30, sm: 40, lg: 50 }}
+            fz={{ base: 20, sm: 40, lg: 50 }}
             fw={900}
             variant="gradient"
             gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
@@ -89,9 +92,14 @@ export function Dashboard() {
           />
         </Modal>
 
-        <Flex justify="center" align="center" mt="lg">
-          <Flex direction="column" gap="md">
-            <Flex direction="row" gap="sm" justify="center">
+        <Flex justify="center" align="center" mt="lg" w="100vw">
+          <Flex
+            direction="column"
+            gap="md"
+            px="md"
+            w={{ base: 300, sm: 500, lg: 700 }}
+          >
+            <Flex direction="row" gap="lg" justify="center" wrap="wrap">
               <Popover opened={isNewInterviewPopupOpen} onChange={setIsNewInterviewPopupOpen}>
                 <Popover.Target>
                   <Button
@@ -123,18 +131,20 @@ export function Dashboard() {
                 </Popover.Dropdown>
               </Popover>
 
-              <TextInput
-                placeholder="Enter interview code"
-                value={joinCode}
-                onChange={event => setJoinCode(event.currentTarget.value)}
-                error={!isJoinCodeValid && joinCode.length > 0 ? 'Invalid interview code' : false}
-              />
-              <Button
-                disabled={!isJoinCodeValid}
-                onClick={() => navigate({ to: '/interview/prejoin/$id', params: { id: joinCode } })}
-              >
-                Join
-              </Button>
+              <Group>
+                <TextInput
+                  placeholder="Enter interview code"
+                  value={joinCode}
+                  onChange={event => setJoinCode(event.currentTarget.value)}
+                  error={!isJoinCodeValid && joinCode.length > 0 ? 'Invalid interview code' : false}
+                />
+                <Button
+                  disabled={!isJoinCodeValid}
+                  onClick={() => navigate({ to: '/interview/prejoin/$id', params: { id: joinCode } })}
+                >
+                  Join
+                </Button>
+              </Group>
             </Flex>
 
             <Divider size="md" mt="md" mb="md" />

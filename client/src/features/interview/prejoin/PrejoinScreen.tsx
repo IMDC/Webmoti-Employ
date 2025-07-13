@@ -114,15 +114,16 @@ export function PrejoinScreen() {
               onChangeAudioInputDevice={switchMicrophone}
               onChangeVideoDevice={switchCamera}
               isPrejoin
-              disableMediaButtons={permissionState === 'idle' || permissionState === 'acquiring'}
             />
           </Stack>
 
           <Stack>
-            <Title>{`${args.action === 'create' ? 'New' : 'Join'} Interview`}</Title>
+            <Title ta={{ base: 'center', sm: 'start' }}>
+              {`${args.action === 'create' ? 'New' : 'Join'} Interview`}
+            </Title>
             <Group>
               <MyCopyButton copyText={interviewSession.sessionId} />
-              <Text ff="monospace">{interviewSession.sessionId}</Text>
+              <Text ff="monospace" fz={{ base: 'xs', sm: 'sm', lg: 'lg' }}>{interviewSession.sessionId}</Text>
             </Group>
             <Button
               onClick={async () =>

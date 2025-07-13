@@ -1,6 +1,6 @@
 import type { InterviewInviteResponse, ProfilesResponse } from '@web-employ/shared'
 import { ActionIcon, Avatar, Group, Popover, Skeleton, Stack, Text } from '@mantine/core'
-import { IconUser } from '@tabler/icons-react'
+import { IconUserFilled } from '@tabler/icons-react'
 
 interface DisplayUserProps {
   name: string
@@ -38,7 +38,7 @@ export function UserList({ users, profiles, isLoadingProfiles }: UserListProps) 
     >
       <Popover.Target>
         <ActionIcon variant="default">
-          <IconUser size={16} />
+          <IconUserFilled size={16} />
         </ActionIcon>
       </Popover.Target>
 

@@ -7,8 +7,8 @@ import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionSto
 import { useAppStore } from '@/useAppStore'
 import { GALLERY_VIEW_MARGIN } from '@/utils/constants'
 import { Chat } from '../chat/Chat'
-import { useChatStore } from '../chat/useChatStore'
 import { MenuBar } from '../components/MenuBar'
+import { MobileMenuBar } from '../components/MobileMenuBar'
 import { useParticipantProfiles } from '../profiles/useParticipantProfiles'
 import { VideoGrid } from './components/VideoGrid'
 
@@ -29,12 +29,9 @@ export function Room() {
   const stopVideo = useZoomSessionStore(s => s.stopVideo)
   const startAudio = useZoomSessionStore(s => s.startAudio)
   const stopAudio = useZoomSessionStore(s => s.stopAudio)
-  const leave = useZoomSessionStore(s => s.leave)
   const switchCamera = useZoomSessionStore(s => s.switchCamera)
   const switchMicrophone = useZoomSessionStore(s => s.switchMicrophone)
   const callState = useZoomSessionStore(s => s.callState)
-
-  const isChatUnread = useChatStore(s => s.isChatUnread)
 
   const navigate = useNavigate()
 
@@ -43,6 +40,38 @@ export function Room() {
 
   const participants = useZoomSessionStore(store => store.participants)
   const { profiles, isLoadingProfiles } = useParticipantProfiles(participants)
+
+  async function onToggleMic() {
+    if (permissionState !== 'granted') {
+      await initDevices()
+      return
+    }
+
+    if (isAudioOn) {
+      setIsAudioOn(false)
+      await stopAudio()
+    }
+    else {
+      setIsAudioOn(true)
+      await startAudio()
+    }
+  }
+
+  async function onToggleVideo() {
+    if (permissionState !== 'granted') {
+      await initDevices()
+      return
+    }
+
+    if (isVideoOn) {
+      setIsVideoOn(false)
+      await stopVideo()
+    }
+    else {
+      setIsVideoOn(true)
+      await startVideo()
+    }
+  }
 
   useEffect(() => {
     if (callState === 'left') {
@@ -60,25 +89,20 @@ export function Room() {
       }}
     >
       <AppShell.Main>
-        <Box
-          style={{
-            display: 'flex',
-            height: '100%',
-          }}
-        >
+        <Box display="flex" h="100%">
           {/* chat takes up full width when open on mobile */}
           {!(isMobile && isChatOpen) && (
             <Box
               ref={participantStageRef}
+              flex={1}
+              miw={0}
+              p={GALLERY_VIEW_MARGIN}
+              display="flex"
               style={{
-                display: 'flex',
                 flexWrap: 'wrap',
                 justifyContent: 'center',
                 alignContent: 'center',
                 gap: GALLERY_VIEW_MARGIN,
-                padding: GALLERY_VIEW_MARGIN,
-                flex: 1,
-                minWidth: 0,
               }}
             >
               <VideoGrid
@@ -92,10 +116,8 @@ export function Room() {
 
           {isChatOpen && (
             <Box
-              style={{
-                width: isMobile ? '100%' : '30%',
-                height: '100%',
-              }}
+              h="100%"
+              w={{ base: '100%', sm: '35%', lg: '30%' }}
               p="lg"
             >
               <Chat />
@@ -105,45 +127,27 @@ export function Room() {
       </AppShell.Main>
 
       <AppShell.Footer>
-        <MenuBar
-          onToggleMic={async () => {
-            if (permissionState !== 'granted') {
-              await initDevices()
-              return
-            }
-
-            if (isAudioOn) {
-              setIsAudioOn(false)
-              await stopAudio()
-            }
-            else {
-              setIsAudioOn(true)
-              await startAudio()
-            }
-          }}
-          onToggleVideo={async () => {
-            if (permissionState !== 'granted') {
-              await initDevices()
-              return
-            }
-
-            if (isVideoOn) {
-              setIsVideoOn(false)
-              await stopVideo()
-            }
-            else {
-              setIsVideoOn(true)
-              await startVideo()
-            }
-          }}
-          onChangeAudioInputDevice={switchMicrophone}
-          onChangeVideoDevice={switchCamera}
-          onToggleChat={() => {
-            setIsChatOpen(!isChatOpen)
-          }}
-          onLeave={leave}
-          isChatUnread={isChatUnread}
-        />
+        {!isMobile
+          ? (
+              <MenuBar
+                onToggleMic={onToggleMic}
+                onToggleVideo={onToggleVideo}
+                onChangeAudioInputDevice={switchMicrophone}
+                onChangeVideoDevice={switchCamera}
+                onToggleChat={() => {
+                  setIsChatOpen(!isChatOpen)
+                }}
+              />
+            )
+          : (
+              <MobileMenuBar
+                onToggleMic={onToggleMic}
+                onToggleVideo={onToggleVideo}
+                onToggleChat={() => {
+                  setIsChatOpen(!isChatOpen)
+                }}
+              />
+            )}
       </AppShell.Footer>
     </AppShell>
   )
