@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "wrangler dev --remote",
     "deploy": "wrangler deploy --minify",
+    "install:deploy": "pnpm install --filter @web-employ/server... --filter @web-employ/shared...",
     "cf-typegen": "wrangler types src/worker-configuration.d.ts --env-interface CloudflareBindings",
     "db-typegen": "kysely-codegen",
     "postinstall": "node scripts/postinstall.js",
