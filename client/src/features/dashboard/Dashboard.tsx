@@ -53,7 +53,7 @@ export function Dashboard() {
       styles={{
         header: { border: 'none' },
         // hide horizontal scrollbar
-        main: { overflowX: 'hidden' },
+        main: { overflowX: 'hidden', height: 'calc(100vh - 60px)' },
       }}
     >
       <AppShell.Header>
@@ -145,9 +145,9 @@ export function Dashboard() {
                 </Popover.Dropdown>
               </Popover>
 
-              <Group>
+              <Group wrap="nowrap">
                 <TextInput
-                  placeholder="Enter interview code"
+                  placeholder="Interview code"
                   value={joinCode}
                   onChange={event => setJoinCode(event.currentTarget.value)}
                   error={!isJoinCodeValid && joinCode.length > 0 ? 'Invalid interview code' : false}

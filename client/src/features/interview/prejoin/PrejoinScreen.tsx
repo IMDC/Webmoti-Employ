@@ -1,10 +1,10 @@
 import type { InterviewSessionArgs } from './queries'
 import { UserButton, useUser } from '@clerk/clerk-react'
-import { Button, Center, Group, Loader, Stack, Text, Title } from '@mantine/core'
+import { AppShell, Button, Center, Flex, Group, Loader, Stack, Text, Title } from '@mantine/core'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect } from 'react'
-import { Corner } from '@/components/Corner'
 import { MyCopyButton } from '@/components/MyCopyButton'
+import { SettingsButton } from '@/components/SettingsButton'
 import { usePreviewStore } from '@/features/interview/prejoin/hooks/usePreviewStore'
 import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
 import { useAppStore } from '@/useAppStore'
@@ -77,65 +77,75 @@ export function PrejoinScreen() {
   }
 
   return (
-    <>
-      {/* stay visible when joined to avoid hiding while navigating */}
-      <JoiningScreen visible={callState === 'joining' || callState === 'joined'} />
+    <AppShell
+      header={{ height: 60 }}
+      styles={{
+        header: { border: 'none' },
+        main: { height: 'calc(100vh - 60px)' },
+      }}
+    >
+      <AppShell.Header>
+        <Flex justify="space-between" align="center" w="100vw" h="100%" p="lg">
+          <Button variant="subtle" onClick={() => navigate({ to: '/' })}>
+            ← Back to Dashboard
+          </Button>
 
-      <Corner>
-        <Button variant="subtle" onClick={() => navigate({ to: '/' })}>
-          ← Back to Dashboard
-        </Button>
-      </Corner>
+          <Group>
+            <SettingsButton />
+            <UserButton />
+          </Group>
+        </Flex>
+      </AppShell.Header>
 
-      {/* TODO: make this be in header of appshell */}
-      <Corner position="top-right" yOffset={16}>
-        <UserButton />
-      </Corner>
+      <AppShell.Main>
+        {/* stay visible when joined to avoid hiding while navigating */}
+        <JoiningScreen visible={callState === 'joining' || callState === 'joined'} />
 
-      <Center mih="100vh">
-        <Group justify="center" p="xl" m="xl">
-          <Stack>
-            <PreviewTile height={196.875} width={350} name={userIdentity} profileUrl={userProfileUrl} />
+        <Flex justify="center" align="center" h="100%">
+          <Group justify="center" p="xl" m="xl">
+            <Stack>
+              <PreviewTile height={196.875} width={350} name={userIdentity} profileUrl={userProfileUrl} />
 
-            <MenuBar
-              onToggleMic={async () => {
-                if (permissionState !== 'granted') {
-                  await initDevices()
-                  return
-                }
-                toggleMuteMicrophone()
-              }}
-              onToggleVideo={async () => {
-                if (permissionState !== 'granted') {
-                  await initDevices()
-                  return
-                }
-                toggleIsVideoOn()
-              }}
-              onChangeAudioInputDevice={switchMicrophone}
-              onChangeVideoDevice={switchCamera}
-              isPrejoin
-            />
-          </Stack>
+              <MenuBar
+                onToggleMic={async () => {
+                  if (permissionState !== 'granted') {
+                    await initDevices()
+                    return
+                  }
+                  toggleMuteMicrophone()
+                }}
+                onToggleVideo={async () => {
+                  if (permissionState !== 'granted') {
+                    await initDevices()
+                    return
+                  }
+                  toggleIsVideoOn()
+                }}
+                onChangeAudioInputDevice={switchMicrophone}
+                onChangeVideoDevice={switchCamera}
+                isPrejoin
+              />
+            </Stack>
 
-          <Stack>
-            <Title ta={{ base: 'center', sm: 'start' }}>
-              {`${args.action === 'create' ? 'New' : 'Join'} Interview`}
-            </Title>
-            <Group>
-              <MyCopyButton copyText={interviewSession.sessionId} />
-              <Text ff="monospace" fz={{ base: 'xs', sm: 'sm', lg: 'lg' }}>{interviewSession.sessionId}</Text>
-            </Group>
-            <Button
-              onClick={async () =>
-                joinZoom(userId, interviewSession.sessionId, interviewSession.token)}
-            >
-              {`${args.action === 'create' ? 'Start' : 'Join'}`}
-            </Button>
-          </Stack>
-        </Group>
-      </Center>
-    </>
+            <Stack>
+              <Title ta={{ base: 'center', sm: 'start' }}>
+                {`${args.action === 'create' ? 'New' : 'Join'} Interview`}
+              </Title>
+              <Group>
+                <MyCopyButton copyText={interviewSession.sessionId} />
+                <Text ff="monospace" fz={{ base: 'xs', sm: 'sm', lg: 'lg' }}>{interviewSession.sessionId}</Text>
+              </Group>
+              <Button
+                onClick={async () =>
+                  joinZoom(userId, interviewSession.sessionId, interviewSession.token)}
+              >
+                {`${args.action === 'create' ? 'Start' : 'Join'}`}
+              </Button>
+            </Stack>
+          </Group>
+        </Flex>
+      </AppShell.Main>
+    </AppShell>
   )
 }
 

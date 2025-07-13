@@ -7,7 +7,7 @@ export function EndScreen() {
   return (
     <Center h="100vh">
       <Stack align="center" gap="xl">
-        <Title ta="center">Thanks for attending the interview</Title>
+        <Title ta="center" px="lg">Thanks for attending the interview</Title>
         <Group>
           <Button>Rejoin</Button>
           <Button onClick={() => navigate({ to: '/' })}>Go to Dashboard</Button>
