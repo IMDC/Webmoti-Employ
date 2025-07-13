@@ -33,11 +33,11 @@ async function fetchInterviewSession(
   const params = new URLSearchParams({ userIdentity })
   let endpoint: string
   if (action === 'create') {
-    endpoint = `/api/sessions?${params.toString()}`
+    endpoint = `${import.meta.env.VITE_API_BASE_URL}/sessions?${params.toString()}`
   }
   else {
     const { sessionId } = args
-    endpoint = `/api/sessions/${sessionId}?${params.toString()}`
+    endpoint = `${import.meta.env.VITE_API_BASE_URL}/sessions/${sessionId}?${params.toString()}`
   }
 
   const response = await fetch(endpoint, {

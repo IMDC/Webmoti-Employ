@@ -17,7 +17,7 @@ async function getInterviews(authToken: string | null) {
     throw new HttpError('Missing auth token', 401)
   }
 
-  const response = await fetch('/api/interviews', {
+  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/interviews`, {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${authToken}`,
@@ -61,7 +61,7 @@ async function scheduleInterview(interview: NewInterview, authToken: string | nu
     throw new HttpError('Missing auth token', 401)
   }
 
-  const response = await fetch('/api/interviews', {
+  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/interviews`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
