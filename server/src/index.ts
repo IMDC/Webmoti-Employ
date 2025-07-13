@@ -2,6 +2,7 @@ import type { Kysely } from 'kysely'
 import type { DB } from './db/schema'
 import { clerkMiddleware } from '@hono/clerk-auth'
 import { Hono } from 'hono'
+import { cors } from 'hono/cors'
 import { useAuth } from './middleware/useAuth'
 import interviewsRoute from './routes/interviews'
 import profilesRoute from './routes/profiles'
@@ -19,6 +20,12 @@ export interface AppContext {
 const app = new Hono<AppContext>()
 
 app.use('*', clerkMiddleware())
+app.use('*', async (c, next) => {
+  const corsMiddleware = cors({
+    origin: c.env.CORS_ORIGIN,
+  })
+  return corsMiddleware(c, next)
+})
 
 // all routes require authentication
 app.use('*', useAuth)

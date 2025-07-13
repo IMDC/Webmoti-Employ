@@ -53,6 +53,7 @@ Steps:
  (it's not needed since it's only used for `db-typegen`)
 9. Enable Workers Logs (optional)
 10. Get the deployed server url and set it in Vercel for client as `VITE_API_BASE_URL`
+11. [Deploy client](../client/README.md#deploying), get the url, and set `CORS_ORIGIN` secret in Cloudflare
 
 ## Services
 
