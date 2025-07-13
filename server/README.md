@@ -47,13 +47,15 @@ Steps:
 3. Click `Import a repository`
 4. Connect to GitHub
 5. Set `Root directory` to `/server`
-6. Create new API token
-7. Deploy
-8. In `Settings` > `Variables and Secrets`, add everything in `.dev.vars` except `DATABASE_URL`
- (it's not needed since it's only used for `db-typegen`)
-9. Enable Workers Logs (optional)
-10. Get the deployed server url and set it in Vercel for client as `VITE_API_BASE_URL`
-11. [Deploy client](../client/README.md#deploying), get the url, and set `CORS_ORIGIN` secret in Cloudflare
+6. Set `Deploy command` to `pnpm run deploy`
+7. Set `Build command` to `pnpm run install:deploy`
+8. Add `SKIP_DEPENDENCY_INSTALL` Build variable and set to `1` (this skips a full project `pnpm install` and later runs the custom install command above)
+9. Create new API token
+10. Deploy
+11. In `Settings` > `Variables and Secrets`, add everything in `.dev.vars` except `DATABASE_URL` (it's not needed since it's only used for `db-typegen`)
+12. Enable Workers Logs
+13. Get the deployed server url and set it in Vercel for client as `VITE_API_BASE_URL`
+14. [Deploy client](../client/README.md#deploying), get the url, and set `CORS_ORIGIN` secret in Cloudflare
 
 ## Services
 
