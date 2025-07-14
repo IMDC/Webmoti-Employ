@@ -16,8 +16,8 @@ export const InterviewsGetResponse = z.object({
 export const ScheduleInterviewForm = z.object({
   // since date is from datepicker, don't coerce date.
   // the time is set to midnight so it becomes the wrong day.
-  date: z.string(),
-  startTime: z.string().regex(/^\d{2}:\d{2}:\d{2}$/), // ex: "09:00:00"
+  date: z.iso.date(),
+  startTime: z.iso.time(),
   invites: z.array(NewInterviewInvite),
   openGoogleCalendar: z.boolean(),
 })
