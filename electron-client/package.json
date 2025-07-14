@@ -1,8 +1,7 @@
 {
-  "name": "electron-client",
-  "productName": "electron-client",
-  "version": "1.0.0",
-  "description": "My Electron application description",
+  "name": "@web-employ/electron-client",
+  "productName": "WebMoti-Employ",
+  "version": "0.0.0",
   "main": ".vite/build/main.js",
   "scripts": {
     "start": "electron-forge start",
@@ -10,18 +9,6 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint --ext .ts,.tsx ."
-  },
-  "keywords": [],
-  "author": {
-    "name": "DanielBoxer",
-    "email": "65575771+DanielBoxer@users.noreply.github.com"
-  },
-  "license": "MIT",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "electron",
-      "electron-winstaller"
-    ]
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.8.1",
