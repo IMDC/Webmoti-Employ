@@ -1,15 +1,12 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "commonjs",
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "noImplicitAny": true,
-    "sourceMap": true,
     "baseUrl": ".",
-    "outDir": "dist",
+    "module": "commonjs",
     "moduleResolution": "node",
-    "resolveJsonModule": true
+    "noImplicitAny": true,
+    "outDir": "dist",
+    "sourceMap": true,
+    "esModuleInterop": true
   }
 }
