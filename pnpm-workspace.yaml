@@ -1,0 +1,18 @@
+packages:
+  - client
+  - server
+  - shared
+
+catalogs:
+  deps:
+    zod: ^4.0.4
+  dev:
+    '@antfu/eslint-config': 4.16.2
+    eslint: ^9.30.0
+    typescript: ^5.8.3
+
+onlyBuiltDependencies:
+  - '@clerk/shared'
+  - esbuild
+  - sharp
+  - workerd

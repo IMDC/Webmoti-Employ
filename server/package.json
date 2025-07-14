@@ -1,39 +1,35 @@
 {
+  "name": "@web-employ/server",
   "type": "module",
-  "name": "videosdk-auth-endpoint-sample",
-  "version": "1.0.0",
-  "description": "Generate a Video SDK JWT to join Zoom Video SDK sessions with the Video SDK.",
-  "main": "src/index.js",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "format": "prettier --write src/*.js",
-    "prepare": "husky",
-    "start": "node src/index.js"
+    "dev": "wrangler dev --remote",
+    "deploy": "wrangler deploy --minify",
+    "install:deploy": "pnpm install --filter @web-employ/server... --filter @web-employ/shared...",
+    "cf-typegen": "wrangler types src/worker-configuration.d.ts --env-interface CloudflareBindings",
+    "db-typegen": "kysely-codegen",
+    "postinstall": "node scripts/postinstall.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
-  "author": "Zoom Video Communications, Inc.",
-  "contributors": [
-    {
-      "name": "Tommy Gaessler"
-    },
-    {
-      "name": "James Coon"
-    },
-    {
-      "name": "EkaanshArora"
-    },
-    {
-      "name": "Jose Sarmiento"
-    }
-  ],
-  "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "jsrsasign": "^11.1.0"
+    "@hono/clerk-auth": "^3.0.2",
+    "@hono/zod-validator": "^0.7.0",
+    "@types/pg": "^8.15.4",
+    "@web-employ/shared": "workspace:^",
+    "hono": "^4.8.3",
+    "jose": "^6.0.11",
+    "kysely": "^0.28.2",
+    "pg": "^8.16.3",
+    "zod": "catalog:deps"
   },
   "devDependencies": {
-    "husky": "^9.1.7",
-    "prettier": "^3.5.3"
-  },
-  "packageManager": "pnpm@10.12.1"
+    "@antfu/eslint-config": "catalog:dev",
+    "eslint": "catalog:dev",
+    "globals": "^16.2.0",
+    "kysely-codegen": "^0.18.5",
+    "typescript-eslint": "^8.35.1",
+    "wrangler": "^4.24.3"
+  }
 }

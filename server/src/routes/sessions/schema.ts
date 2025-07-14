@@ -1,0 +1,39 @@
+import { z } from 'zod'
+
+// const allowedRegions = [
+//   "AU",
+//   "BR",
+//   "CA",
+//   "CN",
+//   "DE",
+//   "HK",
+//   "IN",
+//   "JP",
+//   "MX",
+//   "NL",
+//   "SG",
+//   "US",
+// ];
+
+// https://developers.zoom.us/docs/video-sdk/auth/#payload
+export const ZoomToken = z.object({
+  sessionName: z.string().min(1).max(199),
+  role: z.union([z.literal(0), z.literal(1)]),
+  expirationSeconds: z.coerce
+    .number()
+    .optional()
+    .refine(v => v === undefined || (v >= 1800 && v <= 172800), {
+      message: 'Must be between 1800 and 172800',
+    }),
+  userIdentity: z.string().max(34).optional(),
+  sessionKey: z.string().max(35).optional(),
+  geoRegions: z.string().optional(),
+  cloudRecordingOption: z.union([z.literal(0), z.literal(1)]).optional(),
+  cloudRecordingElection: z.union([z.literal(0), z.literal(1)]).optional(),
+  telemetryTrackingId: z.string().optional(),
+  videoWebRtcMode: z.union([z.literal(0), z.literal(1)]).optional(),
+  audioWebRtcMode: z.union([z.literal(0), z.literal(1)]).optional(),
+})
+
+// eslint-disable-next-line ts/no-redeclare
+export type ZoomToken = z.infer<typeof ZoomToken>

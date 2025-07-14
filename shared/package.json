@@ -1,0 +1,19 @@
+{
+  "name": "@web-employ/shared",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "zod": "catalog:deps"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "catalog:dev",
+    "eslint": "catalog:dev",
+    "typescript": "catalog:dev"
+  }
+}

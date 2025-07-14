@@ -1,0 +1,10 @@
+# use this file to see api responses in vscode.
+# you need to install the REST Client extension:
+# https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+@host = http://127.0.0.1:8787
+
+
+### Get all interviews
+GET {{host}}/interviews HTTP/1.1
+### 

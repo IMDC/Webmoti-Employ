@@ -1,28 +1,34 @@
-import { ReactNode } from 'react';
-import { Box } from '@mantine/core';
+import type { ReactNode } from 'react'
+import { Box } from '@mantine/core'
 
 interface CornerProps {
-  children: ReactNode;
-  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  children: ReactNode
+  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+  xOffset?: number
+  yOffset?: number
 }
 
-export function Corner({ children, position = 'bottom-left' }: CornerProps) {
+export function Corner({
+  children,
+  position = 'top-left',
+  xOffset = 20,
+  yOffset = 20,
+}: CornerProps) {
   const styleMap = {
-    'top-left': { top: 6, left: 8 },
-    'top-right': { top: 6, right: 8 },
-    'bottom-left': { bottom: 6, left: 8 },
-    'bottom-right': { bottom: 6, right: 8 },
-  };
+    'top-left': { top: yOffset, left: xOffset },
+    'top-right': { top: yOffset, right: xOffset },
+    'bottom-left': { bottom: yOffset, left: xOffset },
+    'bottom-right': { bottom: yOffset, right: xOffset },
+  }
 
   return (
     <Box
       style={{
         position: 'absolute',
-        zIndex: 1,
         ...styleMap[position],
       }}
     >
       {children}
     </Box>
-  );
+  )
 }

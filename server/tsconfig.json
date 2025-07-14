@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "jsxImportSource": "hono/jsx",
+    "lib": ["ESNext", "WebWorker"],
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@web-employ/shared": ["../shared/src/index.ts"]
+    }
+  },
+  "references": [
+    { "path": "../shared" }
+  ],
+  "include": ["src"]
+}

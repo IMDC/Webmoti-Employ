@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "installCommand": "pnpm run install:deploy",
+  "buildCommand": "pnpm run build:deploy",
+  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+}
