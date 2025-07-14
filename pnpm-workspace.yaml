@@ -2,9 +2,12 @@ packages:
   - client
   - server
   - shared
+  - electron-client
 
 onlyBuiltDependencies:
   - '@clerk/shared'
+  - electron
+  - electron-winstaller
   - esbuild
   - sharp
   - workerd
