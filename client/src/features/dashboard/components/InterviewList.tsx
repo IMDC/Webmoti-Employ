@@ -5,15 +5,29 @@ import { InterviewCards } from './InterviewCards'
 import { InterviewCardSkeleton } from './InterviewCardSkeleton'
 import { TimeTabs } from './TimeTabs'
 
+function isSameDay(a: Date, b: Date) {
+  return a.getFullYear() === b.getFullYear()
+    && a.getMonth() === b.getMonth()
+    && a.getDate() === b.getDate()
+}
+
 export function InterviewList() {
-  const [tab, setTab] = useState<'upcoming' | 'past'>('upcoming')
+  const [tab, setTab] = useState<'upcoming' | 'today' | 'past'>('today')
+
   const { interviews, isPending, error } = useInterviews()
 
   const now = new Date()
   const filtered
-    = interviews?.filter(i =>
-      tab === 'upcoming' ? new Date(i.endTime) > now : new Date(i.endTime) <= now,
-    ) || []
+    = interviews?.filter((i) => {
+      const start = new Date(i.startTime)
+      const end = new Date(i.endTime)
+
+      if (tab === 'today')
+        return isSameDay(start, now)
+      if (tab === 'upcoming')
+        return end > now && !isSameDay(start, now)
+      return end <= now && !isSameDay(start, now)
+    }) || []
 
   if (isPending) {
     return (

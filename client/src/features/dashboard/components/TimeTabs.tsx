@@ -18,6 +18,9 @@ export function TimeTabs({ value, onChange }: TimeTabsProps) {
   return (
     <Tabs variant="none" value={value} onChange={onChange}>
       <Tabs.List ref={setRootRef} className={classes.list}>
+        <Tabs.Tab value="today" ref={setControlRef('today')} className={classes.tab}>
+          Today
+        </Tabs.Tab>
         <Tabs.Tab value="upcoming" ref={setControlRef('upcoming')} className={classes.tab}>
           Upcoming
         </Tabs.Tab>
