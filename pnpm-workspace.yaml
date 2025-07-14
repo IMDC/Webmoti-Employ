@@ -2,7 +2,7 @@ packages:
   - client
   - server
   - shared
-  - electron-client
+  - electron
 
 onlyBuiltDependencies:
   - '@clerk/shared'
