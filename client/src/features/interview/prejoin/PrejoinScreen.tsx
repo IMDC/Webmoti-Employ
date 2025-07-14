@@ -81,11 +81,11 @@ export function PrejoinScreen() {
       header={{ height: 60 }}
       styles={{
         header: { border: 'none' },
-        main: { height: 'calc(100vh - 60px)' },
+        main: { overflowX: 'hidden', height: 'calc(100vh - 60px)' },
       }}
     >
       <AppShell.Header>
-        <Flex justify="space-between" align="center" w="100vw" h="100%" p="lg">
+        <Flex justify="space-between" align="center" w="100vw" h="100%" p="lg" pl="xs">
           <Button variant="subtle" onClick={() => navigate({ to: '/' })}>
             ← Back to Dashboard
           </Button>

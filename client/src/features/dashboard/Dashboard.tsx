@@ -23,7 +23,7 @@ import {
   IconSquareRoundedPlusFilled,
   IconVideoPlus,
 } from '@tabler/icons-react'
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { SettingsButton } from '@/components/SettingsButton'
 import { InterviewList } from './components/InterviewList'
@@ -59,12 +59,15 @@ export function Dashboard() {
       <AppShell.Header>
         {/* 100vw makes it so the scrollbar doesn't shift the layout */}
         <Flex justify="space-between" align="center" w="100vw" h="100%" p="lg">
-
           <Text
+            component={Link}
+            to="/"
             fz={{ base: 15, sm: 25 }}
             fw={900}
             variant="gradient"
             gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
+            draggable={false}
+            style={{ userSelect: 'none' }}
           >
             WebMoti-Employ
           </Text>
@@ -151,6 +154,8 @@ export function Dashboard() {
                   value={joinCode}
                   onChange={event => setJoinCode(event.currentTarget.value)}
                   error={!isJoinCodeValid && joinCode.length > 0 ? 'Invalid interview code' : false}
+                  flex={1}
+                  miw={0}
                 />
                 <Button
                   disabled={!isJoinCodeValid}
