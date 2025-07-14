@@ -9,6 +9,7 @@
   "scripts": {
     "start": "pnpm run dev",
     "dev": "pnpm run -r --parallel --aggregate-output dev",
+    "dev:electron": "pnpm run -r --parallel --aggregate-output dev:electron",
     "build": "pnpm run -r build",
     "lint": "pnpm run -r --parallel lint",
     "lint:fix": "pnpm run -r --parallel lint:fix",

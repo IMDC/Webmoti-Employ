@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
+    "dev:electron": "pnpm run dev",
     "build": "pnpm run typecheck && vite build",
     "install:deploy": "pnpm install --filter @web-employ/client... --filter @web-employ/shared...",
     "build:deploy": "pnpm -r --filter @web-employ/shared... build && pnpm run build",

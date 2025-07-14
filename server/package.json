@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "wrangler dev --remote",
+    "dev:electron": "pnpm run dev",
     "deploy": "wrangler deploy --minify",
     "install:deploy": "pnpm install --filter @web-employ/server... --filter @web-employ/shared...",
     "cf-typegen": "wrangler types src/worker-configuration.d.ts --env-interface CloudflareBindings",
