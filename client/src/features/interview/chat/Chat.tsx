@@ -13,20 +13,10 @@ import {
 } from '@mantine/core'
 import { IconMessages, IconSend, IconTool, IconUserFilled } from '@tabler/icons-react'
 import Linkify from 'linkify-react'
+import { DateTime } from 'luxon'
 import { useEffect, useRef, useState } from 'react'
 import { useZoomSessionStore } from '../zoom/useZoomSessionStore'
 import { useChatStore } from './useChatStore'
-
-function formatTo12HourTime(timestamp: number): string {
-  const date = new Date(timestamp)
-  let hours = date.getHours()
-  const minutes = date.getMinutes()
-
-  hours = hours % 12 || 12
-  const mins = minutes.toString().padStart(2, '0')
-
-  return `${hours}:${mins}`
-}
 
 interface MessageProps {
   chatMessage: ChatMessage
@@ -41,7 +31,7 @@ function Message({ chatMessage, participants }: MessageProps) {
   return (
     <Flex gap={5}>
       <Text c="dimmed" size="sm">
-        {formatTo12HourTime(timestamp)}
+        {DateTime.fromMillis(timestamp).toFormat('h:mm')}
       </Text>
 
       <ThemeIcon size="sm" variant="light">

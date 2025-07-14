@@ -20,7 +20,9 @@ import {
   IconMailFast,
   IconTrash,
 } from '@tabler/icons-react'
+import { DateTime } from 'luxon'
 import { zod4Resolver } from 'mantine-form-zod-resolver'
+import z from 'zod'
 import { useAppStore } from '@/useAppStore'
 import { getHighlightColor, getInterviewLink, handleAppError } from '@/utils/utils'
 import { useScheduleInterview } from '../queries'
@@ -32,11 +34,14 @@ function openGoogleCalendarTab(
   invites: string[],
   sessionId: string,
 ) {
-  const formatDate = (d: Date) =>
-    `${d
-      .toISOString()
-      .replace(/[-:]|\.\d{3}/g, '')
-      .slice(0, 15)}Z`
+  const formatDate = (dt: DateTime) =>
+    dt.toUTC().toFormat('yyyyLLdd\'T\'HHmmss\'Z\'')
+
+  const start = DateTime.fromJSDate(startTime)
+  const end = DateTime.fromJSDate(endTime)
+
+  const startDateTime = formatDate(start)
+  const endDateTime = formatDate(end)
 
   const title = encodeURIComponent('WebMoti-Employ Interview')
   const description = encodeURIComponent(
@@ -44,8 +49,6 @@ function openGoogleCalendarTab(
     + `\nJoin link: ${getInterviewLink(sessionId)}`,
   )
   const location = encodeURIComponent(window.location.origin)
-  const startDateTime = formatDate(startTime)
-  const endDateTime = formatDate(endTime)
   const guests = encodeURIComponent(invites.join(','))
 
   const url = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}&details=${description}&location=${location}&dates=${startDateTime}/${endDateTime}&add=${guests}`
@@ -64,12 +67,14 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
   const setError = useAppStore(s => s.setError)
   const isColorblindModeOn = useAppStore(s => s.isColorblindModeOn)
 
+  const interviewTimeRange = getTimeRange({ startTime: '09:00', endTime: '16:00', interval: '00:30' })
+
   const form = useForm<ScheduleInterviewForm>({
     mode: 'uncontrolled',
     initialValues: {
       // default is tomorrow
-      date: new Date(Date.now() + 86400000),
-      startTime: '09:00',
+      date: DateTime.local().plus({ days: 1 }).toISODate(),
+      startTime: '09:00:00',
       invites: [],
       openGoogleCalendar: false,
     },
@@ -78,10 +83,18 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
   })
 
   async function handleSubmit(values: ScheduleInterviewForm) {
-    const [hours, minutes] = values.startTime.split(':').map(Number)
-    const startTime = new Date(values.date)
-    startTime.setHours(hours, minutes, 0, 0)
-    const endTime = new Date(startTime.getTime() + 60 * 60 * 1000)
+    // zod4Resolver doesn't actually return the parsed values, so we need to parse again
+    const parsed = ScheduleInterviewForm.safeParse(values)
+    if (!parsed.success) {
+      setError({ message: 'Invalid form data', details: z.flattenError(parsed.error) })
+      return
+    }
+    const { date, startTime, invites, openGoogleCalendar } = parsed.data
+
+    const [hour, minute] = startTime.split(':').map(Number)
+    const localDate = DateTime.fromISO(date, { zone: 'local' }).set({ hour, minute })
+    const startTimeDate = localDate.toUTC().toJSDate()
+    const endTimeDate = localDate.plus({ hours: 1 }).toUTC().toJSDate()
 
     if (!user) {
       setError({ message: 'User is not set' })
@@ -91,14 +104,14 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
     try {
       const sessionId = await scheduleInterviewMutation({
         creatorId: user.id,
-        startTime,
-        endTime,
-        invites: values.invites,
+        startTime: startTimeDate,
+        endTime: endTimeDate,
+        invites,
       })
 
-      if (values.openGoogleCalendar) {
-        const inviteEmails = values.invites.map(i => i.email)
-        openGoogleCalendarTab(startTime, endTime, inviteEmails, sessionId)
+      if (openGoogleCalendar) {
+        const inviteEmails = invites.map(i => i.email)
+        openGoogleCalendarTab(startTimeDate, endTimeDate, inviteEmails, sessionId)
       }
 
       onSuccess()
@@ -108,7 +121,23 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
     }
   }
 
-  const invites = form.getValues().invites.map((_, index) => (
+  function getDisabledTimesForToday(selectedDate: string): string[] {
+    const now = DateTime.local()
+    const selected = DateTime.fromISO(selectedDate, { zone: 'local' })
+
+    if (!now.hasSame(selected, 'day'))
+      return []
+
+    return interviewTimeRange
+      .map((time) => {
+        const [hour, minute] = time.split(':').map(Number)
+        return selected.set({ hour, minute, second: 0, millisecond: 0 })
+      })
+      .filter(dt => dt < now)
+      .map(dt => dt.toFormat('HH:mm'))
+  }
+
+  const invites = form.values.invites.map((_, index) => (
     // eslint-disable-next-line react/no-array-index-key
     <Group key={index}>
       <TextInput
@@ -138,8 +167,8 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
       <Stack pl="md" pr="md" pb="sm">
         <DatePickerInput
           withAsterisk
-          minDate={new Date()}
-          defaultDate={new Date(Date.now() + 86400000)}
+          minDate={DateTime.local().toJSDate()}
+          defaultDate={DateTime.local().plus({ days: 1 }).toJSDate()}
           leftSection={<IconCalendarFilled size={16} />}
           label="Interview date"
           key={form.key('date')}
@@ -148,10 +177,13 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
 
         <Input.Wrapper label="Interview time" withAsterisk {...form.getInputProps('startTime')}>
           <TimeGrid
-            defaultValue="09:00"
-            data={getTimeRange({ startTime: '09:00', endTime: '16:00', interval: '00:30' })}
+            defaultValue="09:00:00"
+            data={interviewTimeRange}
+            disableTime={getDisabledTimesForToday(form.values.date)}
             format="12h"
             key={form.key('startTime')}
+            value={form.getInputProps('startTime').value}
+            onChange={form.getInputProps('startTime').onChange}
           />
         </Input.Wrapper>
 

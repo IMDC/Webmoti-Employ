@@ -1,33 +1,30 @@
 import { Center, Stack, Text } from '@mantine/core'
+import { DateTime } from 'luxon'
 import { useState } from 'react'
 import { useInterviews } from '../queries'
 import { InterviewCards } from './InterviewCards'
 import { InterviewCardSkeleton } from './InterviewCardSkeleton'
 import { TimeTabs } from './TimeTabs'
 
-function isSameDay(a: Date, b: Date) {
-  return a.getFullYear() === b.getFullYear()
-    && a.getMonth() === b.getMonth()
-    && a.getDate() === b.getDate()
-}
-
 export function InterviewList() {
   const [tab, setTab] = useState<'upcoming' | 'today' | 'past'>('today')
 
   const { interviews, isPending, error } = useInterviews()
 
-  const now = new Date()
-  const filtered
-    = interviews?.filter((i) => {
-      const start = new Date(i.startTime)
-      const end = new Date(i.endTime)
+  const now = DateTime.local()
 
-      if (tab === 'today')
-        return isSameDay(start, now)
-      if (tab === 'upcoming')
-        return end > now && !isSameDay(start, now)
-      return end <= now && !isSameDay(start, now)
-    }) || []
+  const filtered = interviews?.filter((i) => {
+    const start = DateTime.fromJSDate(i.startTime).setZone('local')
+    const end = DateTime.fromJSDate(i.endTime).setZone('local')
+
+    if (tab === 'today') {
+      return start.hasSame(now, 'day')
+    }
+    if (tab === 'upcoming') {
+      return end > now && !start.hasSame(now, 'day')
+    }
+    return end <= now && !start.hasSame(now, 'day')
+  }) || []
 
   if (isPending) {
     return (

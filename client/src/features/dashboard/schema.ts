@@ -12,9 +12,12 @@ export const InterviewsGetResponse = z.object({
 // ----------------------------------------------------------------
 // Interview form schema:
 
+// ! Note: zod4Resolver doesn't transform or coerce values
 export const ScheduleInterviewForm = z.object({
-  date: z.coerce.date(),
-  startTime: z.string().regex(/^\d{2}:\d{2}$/), // ex: "09:00"
+  // since date is from datepicker, don't coerce date.
+  // the time is set to midnight so it becomes the wrong day.
+  date: z.string(),
+  startTime: z.string().regex(/^\d{2}:\d{2}:\d{2}$/), // ex: "09:00:00"
   invites: z.array(NewInterviewInvite),
   openGoogleCalendar: z.boolean(),
 })

@@ -2,6 +2,7 @@ import type { InterviewResponse } from '@web-employ/shared'
 import { ActionIcon, Avatar, Badge, Button, Card, Divider, Flex, Group, Stack, Text } from '@mantine/core'
 import { IconPlus, IconReport, IconTie, IconVideoFilled } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
+import { DateTime } from 'luxon'
 import { MyCopyButton } from '@/components/MyCopyButton'
 import { UserList } from '@/components/UserList'
 import { useInviteProfiles } from '@/features/interview/profiles/useInviteProfiles'
@@ -51,7 +52,11 @@ export function InterviewCard({ interview }: InterviewCardProps) {
 
   const { displayLine, pics, youAreInterviewer } = counterpartInfo(interview, profiles)
 
-  const isEnded = interview.endTime < new Date()
+  const isEnded = interview.endTime < DateTime.local().toJSDate()
+
+  const formattedInterviewTime = DateTime.fromJSDate(interview.startTime)
+    .setZone('local')
+    .toLocaleString(DateTime.DATETIME_MED)
 
   return (
     <Card key={interview.id} shadow="sm" padding="sm" withBorder>
@@ -74,7 +79,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
 
       <Stack justify="center" align="center" flex="grow" mt="sm">
         <Text fw="bolder"ff="monospace">
-          {formatInterviewTime(interview.startTime)}
+          {formattedInterviewTime}
         </Text>
 
         <Flex
@@ -134,11 +139,4 @@ export function InterviewCard({ interview }: InterviewCardProps) {
       </Group>
     </Card>
   )
-}
-
-function formatInterviewTime(startTime: Date) {
-  const start = new Date(startTime)
-  const date = start.toLocaleDateString('en-US', { dateStyle: 'medium' })
-  const time = start.toLocaleTimeString('en-US', { timeStyle: 'short' })
-  return `${date} | ${time}`
 }
