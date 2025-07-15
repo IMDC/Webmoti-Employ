@@ -13,6 +13,7 @@
     "build": "pnpm run -r build",
     "lint": "pnpm run -r --parallel lint",
     "lint:fix": "pnpm run -r --parallel lint:fix",
+    "lint:root": "eslint tsconfig.json README.md .github",
     "deploy": "pnpm build && pnpm run -r deploy"
   },
   "devDependencies": {
