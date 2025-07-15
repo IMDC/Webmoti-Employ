@@ -2,4 +2,4 @@
 
 ## Creating distributable file
 
-- On Windows, you need to run as admin before running `pnpm run dist:win`
+- On Windows, you need to run as admin before running `pnpm run dist:win` the first time you run this command.
