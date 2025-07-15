@@ -6,7 +6,7 @@
   "main": "dist/main.js",
   "scripts": {
     "dev:electron": "tsc && electron .",
-    "build-client": "pnpm --filter @web-employ/client... run build:deploy",
+    "build-client": "pnpm --filter @web-employ/client build:deploy",
     "dist:base": "tsc && pnpm run build-client",
     "dist:win": "pnpm run dist:base && electron-builder --win --x64",
     "dist:linux": "pnpm run dist:base && electron-builder --linux --arm64",
