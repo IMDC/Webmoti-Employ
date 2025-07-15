@@ -1,8 +1,8 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "useDefineForClassFields": true,
     "baseUrl": "./",
     "paths": {
       "@web-employ/shared": ["../shared/src/index.ts"],
@@ -13,8 +13,7 @@
     "types": ["node", "@testing-library/jest-dom", "vitest/globals"],
     "allowJs": false,
     "noEmit": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true
   },

@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "jsx": "react-jsx",
     "lib": ["ESNext"],
     "moduleDetection": "force",
     "useDefineForClassFields": true,
@@ -11,7 +10,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noUncheckedSideEffectImports": true,
     "isolatedModules": true,
     "skipLibCheck": true
   },
@@ -19,6 +17,5 @@
     { "path": "client" },
     { "path": "server" },
     { "path": "shared" }
-  ],
-  "files": []
+  ]
 }
