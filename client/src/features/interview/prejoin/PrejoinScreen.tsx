@@ -5,26 +5,16 @@ import { useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { MyCopyButton } from '@/components/MyCopyButton'
 import { SettingsButton } from '@/components/SettingsButton'
-import { usePreviewStore } from '@/features/interview/prejoin/hooks/usePreviewStore'
 import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
-import { useAppStore } from '@/useAppStore'
 import { getUserIdentity } from '@/utils/utils'
-import { MenuBar } from '../components/MenuBar'
 import { useZoomSessionStore } from '../zoom/useZoomSessionStore'
 import { ErrorScreen } from './components/ErrorScreen'
 import { JoiningScreen } from './components/JoiningScreen'
+import { PrejoinMenuBar } from './components/PrejoinMenuBar'
 import { PreviewTile } from './components/PreviewTile'
 import { useInterviewSession } from './queries'
 
 export function PrejoinScreen() {
-  const toggleIsVideoOn = useAppStore(s => s.toggleIsVideoOn)
-  const toggleMuteMicrophone = usePreviewStore(s => s.toggleMuteMicrophone)
-
-  const switchCamera = usePreviewStore(s => s.switchCamera)
-  const switchMicrophone = usePreviewStore(s => s.switchMicrophone)
-
-  const permissionState = useAppStore(s => s.permissionState)
-
   const navigate = useNavigate()
 
   const initDevices = useDeviceStore(s => s.initDevices)
@@ -106,25 +96,7 @@ export function PrejoinScreen() {
             <Stack>
               <PreviewTile height={196.875} width={350} name={userIdentity} profileUrl={userProfileUrl} />
 
-              <MenuBar
-                onToggleMic={async () => {
-                  if (permissionState !== 'granted') {
-                    await initDevices()
-                    return
-                  }
-                  toggleMuteMicrophone()
-                }}
-                onToggleVideo={async () => {
-                  if (permissionState !== 'granted') {
-                    await initDevices()
-                    return
-                  }
-                  toggleIsVideoOn()
-                }}
-                onChangeAudioInputDevice={switchMicrophone}
-                onChangeVideoDevice={switchCamera}
-                isPrejoin
-              />
+              <PrejoinMenuBar />
             </Stack>
 
             <Stack>

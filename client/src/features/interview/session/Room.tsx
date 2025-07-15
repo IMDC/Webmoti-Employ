@@ -29,8 +29,7 @@ export function Room() {
   const stopVideo = useZoomSessionStore(s => s.stopVideo)
   const startAudio = useZoomSessionStore(s => s.startAudio)
   const stopAudio = useZoomSessionStore(s => s.stopAudio)
-  const switchCamera = useZoomSessionStore(s => s.switchCamera)
-  const switchMicrophone = useZoomSessionStore(s => s.switchMicrophone)
+
   const callState = useZoomSessionStore(s => s.callState)
 
   const navigate = useNavigate()
@@ -132,8 +131,6 @@ export function Room() {
               <MenuBar
                 onToggleMic={onToggleMic}
                 onToggleVideo={onToggleVideo}
-                onChangeAudioInputDevice={switchMicrophone}
-                onChangeVideoDevice={switchCamera}
                 onToggleChat={() => {
                   setIsChatOpen(!isChatOpen)
                 }}

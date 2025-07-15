@@ -2,6 +2,7 @@ import { Button, Flex, Popover } from '@mantine/core'
 import { IconChevronUp } from '@tabler/icons-react'
 import { useAppStore } from '@/useAppStore'
 import { ControlsMenu } from '../session/components/ControlsMenu'
+import { useZoomSessionStore } from '../zoom/useZoomSessionStore'
 import { EndCallButton } from './buttons/EndCallButton'
 import { ToggleAudioButton } from './buttons/ToggleAudioButton'
 import { ToggleChatButton } from './buttons/ToggleChatButton'
@@ -12,21 +13,18 @@ interface MenuBarProps {
   onToggleMic: () => Promise<void>
   onToggleVideo: () => Promise<void>
   onToggleChat?: () => void
-  isPrejoin?: boolean
-  onChangeVideoDevice?: (videoDeviceId: string) => Promise<void>
-  onChangeAudioInputDevice?: (audioInputDeviceId: string) => Promise<void>
 }
 
 export function MenuBar({
   onToggleMic,
   onToggleVideo,
   onToggleChat,
-  onChangeVideoDevice,
-  onChangeAudioInputDevice,
-  isPrejoin = false,
 }: MenuBarProps) {
   // const [isLayoutModalOpen, { open: openLayoutModal, close: closeLayoutModal }]
   //   = useDisclosure(false)
+
+  const switchCamera = useZoomSessionStore(s => s.switchCamera)
+  const switchMicrophone = useZoomSessionStore(s => s.switchMicrophone)
 
   const permissionState = useAppStore(s => s.permissionState)
   const disableMediaButtons = permissionState === 'idle' || permissionState === 'acquiring'
@@ -49,7 +47,7 @@ export function MenuBar({
               <ChangeMediaDevice
                 mediaType="audio"
                 variant="radio"
-                onSwitchMicrophone={onChangeAudioInputDevice}
+                onSwitchMicrophone={switchMicrophone}
               />
             </Popover.Dropdown>
           </Popover>
@@ -68,7 +66,7 @@ export function MenuBar({
               <ChangeMediaDevice
                 mediaType="video"
                 variant="radio"
-                onSwitchCamera={onChangeVideoDevice}
+                onSwitchCamera={switchCamera}
               />
             </Popover.Dropdown>
           </Popover>
@@ -79,18 +77,14 @@ export function MenuBar({
 
       {/* right section */}
       <Flex align="center" gap="md" style={{ flex: 1 }} justify="flex-end">
-        {!isPrejoin && (
-          <>
-            <ToggleChatButton onToggleChat={onToggleChat} />
+        <>
+          <ToggleChatButton onToggleChat={onToggleChat} />
 
-            <ControlsMenu />
+          <ControlsMenu />
 
-            {!isPrejoin && (
-              <EndCallButton />
-            )}
-            {/* <ChangeLayoutModal isOpen={isLayoutModalOpen} onClose={closeLayoutModal} /> */}
-          </>
-        )}
+          <EndCallButton />
+          {/* <ChangeLayoutModal isOpen={isLayoutModalOpen} onClose={closeLayoutModal} /> */}
+        </>
       </Flex>
     </Flex>
   )
