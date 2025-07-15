@@ -2,9 +2,9 @@
 
 - [Stack](#stack)
 - [Setup](#setup)
+- [Desktop App](#desktop-app)
 - [Deploying](#deploying)
 - [VSCode Auto Formatting Code](#vscode-auto-formatting-code)
-- [Dependabot](#dependabot)
 
 ## Stack
 
@@ -29,6 +29,11 @@ Server:
 - Hono
 - Kysely - SQL query builder
 
+Desktop App:
+
+- Electron
+- Electron-Builder
+
 Hosting:
 
 - Neon - database
@@ -50,6 +55,21 @@ pnpm install
 # run both client and server
 pnpm run dev
 ```
+
+## Desktop App
+
+```bash
+# run the app locally
+pnpm run dev:electron
+
+# create a distributable app file
+# (run the one for your operating system)
+pnpm run dist:win
+pnpm run dist:linux
+pnpm run dist:mac
+```
+
+[More info about desktop app here](electron/README.md)
 
 ## Deploying
 
@@ -120,7 +140,3 @@ The client and server are deployed separately.
   ]
 }
 ```
-
-## Dependabot
-
-<https://docs.github.com/en/code-security/getting-started/dependabot-quickstart-guide#enabling-dependabot-for-your-repository>

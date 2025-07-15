@@ -6,11 +6,11 @@
   "scripts": {
     "dev": "vite",
     "dev:electron": "pnpm run dev",
+    "typecheck": "tsc --noEmit",
     "build": "pnpm run typecheck && vite build",
     "install:deploy": "pnpm install --filter @web-employ/shared --filter @web-employ/client",
     "build:deploy": "pnpm -r --filter @web-employ/shared --filter @web-employ/client build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "stylelint": "stylelint '**/*.css' --cache",
