@@ -1,6 +1,7 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "composite": true,
     "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "baseUrl": "./",
@@ -12,7 +13,6 @@
     "resolveJsonModule": true,
     "types": ["node", "@testing-library/jest-dom", "vitest/globals"],
     "allowJs": false,
-    "noEmit": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true
