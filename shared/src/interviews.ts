@@ -1,4 +1,3 @@
-/* eslint-disable ts/no-redeclare */
 import { z } from 'zod'
 
 export const DbInterviewInvite = z.object({
