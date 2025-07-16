@@ -1,4 +1,12 @@
-# Web-Employ <!-- omit from toc -->
+<p align="center">
+  <img src="client/src/favicon.svg" alt="Icon" height="150"/>
+</p>
+
+<h1 align="center">WebMoti-Employ</h1>
+
+<p align="center"> Eyetracking interviews built for neurodivergent job seekers </p>
+
+[![Build](https://github.com/DanielBoxer/web-employ/actions/workflows/build.yml/badge.svg)](https://github.com/DanielBoxer/web-employ/actions/workflows/build.yml)
 
 - [Stack](#stack)
 - [Setup](#setup)
