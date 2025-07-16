@@ -17,7 +17,7 @@ function createWindow() {
   }
   else {
     // load built app from /client
-    const distPath = path.join(app.getAppPath(), '../client/dist/index.html')
+    const distPath = path.join(app.getAppPath(), 'client', 'dist', 'index.html')
     mainWindow.loadFile(distPath)
   }
 }

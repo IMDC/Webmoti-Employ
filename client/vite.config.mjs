@@ -3,7 +3,12 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
+// eslint-disable-next-line node/prefer-global/process
+const isElectron = process.env.VITE_IS_ELECTRON === 'true'
+
 export default defineConfig({
+  // electron needs relative paths, but web needs absolute
+  base: isElectron ? './' : '/',
   plugins: [
     // '@tanstack/router-plugin' needs to be passed before '@vitejs/plugin-react'
     tanstackRouter({
