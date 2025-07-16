@@ -7,13 +7,11 @@
     "package.json",
     {
       "from": "../client/dist",
-      "to": "client/dist",
-      "filter": ["**/*"]
+      "to": "client/dist"
     },
     {
       "from": "dist",
-      "to": "dist",
-      "filter": ["**/*"]
+      "to": "dist"
     }
   ],
   "mac": { "target": "dmg" },
