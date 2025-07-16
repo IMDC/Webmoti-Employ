@@ -2,11 +2,13 @@ import { UserButton, useUser } from '@clerk/clerk-react'
 import {
   ActionIcon,
   Affix,
+  Anchor,
   AppShell,
   Button,
   Divider,
   Flex,
   Group,
+  Image,
   Modal,
   Popover,
   Stack,
@@ -59,18 +61,26 @@ export function Dashboard() {
       <AppShell.Header>
         {/* 100vw makes it so the scrollbar doesn't shift the layout */}
         <Flex justify="space-between" align="center" w="100vw" h="100%" p="lg">
-          <Text
-            component={Link}
-            to="/"
-            fz={{ base: 15, sm: 25 }}
-            fw={900}
-            variant="gradient"
-            gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
-            draggable={false}
-            style={{ userSelect: 'none' }}
-          >
-            WebMoti-Employ
-          </Text>
+          <Anchor component={Link} to="/" underline="never">
+            <Group gap="xs">
+              <Image
+                src="/src/favicon.svg"
+                h={{ base: 15, sm: 25 }}
+                w="auto"
+                fit="contain"
+              />
+              <Text
+                fz={{ base: 15, sm: 25 }}
+                fw={900}
+                variant="gradient"
+                gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
+                draggable={false}
+                style={{ userSelect: 'none' }}
+              >
+                WebMoti-Employ
+              </Text>
+            </Group>
+          </Anchor>
 
           <Group>
             <SettingsButton />
