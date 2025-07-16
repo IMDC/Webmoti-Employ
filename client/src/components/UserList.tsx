@@ -1,4 +1,4 @@
-import type { InterviewInviteResponse, ProfilesResponse } from '@web-employ/shared'
+import type { InterviewInviteResponse, ProfilesResponse } from '@webmoti-employ/shared'
 import { ActionIcon, Avatar, Group, Popover, Skeleton, Stack, Text } from '@mantine/core'
 import { IconUserFilled } from '@tabler/icons-react'
 

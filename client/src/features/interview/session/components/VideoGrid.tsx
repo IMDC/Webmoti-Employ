@@ -1,4 +1,4 @@
-import type { ProfilesResponse } from '@web-employ/shared'
+import type { ProfilesResponse } from '@webmoti-employ/shared'
 import type { Participant } from '@zoom/videosdk'
 import { GALLERY_VIEW_ASPECT_RATIO } from '../../../../utils/constants'
 import useGalleryViewLayout from '../hooks/useGalleryViewLayout'

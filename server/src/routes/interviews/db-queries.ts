@@ -1,4 +1,4 @@
-import type { NewInterviewInvite } from '@web-employ/shared'
+import type { NewInterviewInvite } from '@webmoti-employ/shared'
 import type { Expression, Kysely, SqlBool } from 'kysely'
 import type { DB } from '../../db/schema'
 import { sql } from 'kysely'

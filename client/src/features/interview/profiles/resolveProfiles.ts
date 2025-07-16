@@ -1,4 +1,4 @@
-import { ProfilesResponse } from '@web-employ/shared'
+import { ProfilesResponse } from '@webmoti-employ/shared'
 import z from 'zod'
 import { HttpError } from '@/utils/HttpError'
 

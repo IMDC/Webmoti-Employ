@@ -1,4 +1,4 @@
-import type { NewInterview } from '@web-employ/shared'
+import type { NewInterview } from '@webmoti-employ/shared'
 import { useAuth } from '@clerk/clerk-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { z } from 'zod'

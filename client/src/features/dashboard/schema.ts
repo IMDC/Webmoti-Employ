@@ -1,5 +1,5 @@
 /* eslint-disable ts/no-redeclare */
-import { InterviewResponse, NewInterviewInvite } from '@web-employ/shared'
+import { InterviewResponse, NewInterviewInvite } from '@webmoti-employ/shared'
 import { z } from 'zod'
 
 // ----------------------------------------------------------------

@@ -6,7 +6,7 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "baseUrl": "./",
     "paths": {
-      "@web-employ/shared": ["../shared/src/index.ts"],
+      "@webmoti-employ/shared": ["../shared/src/index.ts"],
       "@/*": ["./src/*"],
       "@test-utils": ["./test-utils"]
     },

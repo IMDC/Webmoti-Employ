@@ -1,4 +1,4 @@
-import type { ProfilesResponse } from '@web-employ/shared'
+import type { ProfilesResponse } from '@webmoti-employ/shared'
 import type { AppContext } from '@/index'
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'

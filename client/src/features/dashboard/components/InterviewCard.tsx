@@ -1,4 +1,4 @@
-import type { InterviewResponse } from '@web-employ/shared'
+import type { InterviewResponse } from '@webmoti-employ/shared'
 import { ActionIcon, Avatar, Badge, Button, Card, Divider, Flex, Group, Stack, Text } from '@mantine/core'
 import { IconPlus, IconReport, IconTie, IconVideoFilled } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'

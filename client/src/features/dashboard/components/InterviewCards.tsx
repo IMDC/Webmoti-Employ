@@ -1,4 +1,4 @@
-import type { InterviewResponse } from '@web-employ/shared'
+import type { InterviewResponse } from '@webmoti-employ/shared'
 import { Center, Stack, Text } from '@mantine/core'
 import { InterviewCard } from './InterviewCard'
 

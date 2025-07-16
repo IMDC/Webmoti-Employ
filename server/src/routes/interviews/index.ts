@@ -1,6 +1,6 @@
-import type { InterviewResponse } from '@web-employ/shared'
+import type { InterviewResponse } from '@webmoti-employ/shared'
 import type { AppContext } from '../..'
-import { NewInterview, NewInterviewInvite } from '@web-employ/shared'
+import { NewInterview, NewInterviewInvite } from '@webmoti-employ/shared'
 
 import { Hono } from 'hono'
 import z from 'zod'

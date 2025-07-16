@@ -1,4 +1,4 @@
-# Web-Employ Server <!-- omit from toc -->
+# WebMoti-Employ Server <!-- omit from toc -->
 
 - [Setup](#setup)
   - [Set secrets](#set-secrets)

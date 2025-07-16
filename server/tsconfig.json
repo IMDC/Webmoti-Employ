@@ -8,7 +8,7 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"],
-      "@web-employ/shared": ["../shared/src/index.ts"]
+      "@webmoti-employ/shared": ["../shared/src/index.ts"]
     }
   },
   "references": [
