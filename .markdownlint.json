@@ -3,7 +3,8 @@
     "allowed_elements": [
       "p",
       "img",
-      "h1"
+      "h1",
+      "strong"
     ]
   },
   "MD041": false,

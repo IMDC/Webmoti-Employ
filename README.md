@@ -4,7 +4,13 @@
 
 <h1 align="center">WebMoti-Employ</h1>
 
-<p align="center"> Eyetracking interviews built for neurodivergent job seekers </p>
+<p align="center">
+  <strong>Interviews built for neurodivergent job seekers</strong>
+</p>
+
+<p align="center">
+  WebMoti-Employ is an app that uses eyetracking to deliver real-time feedback during virtual interviews, helping neurodivergent candidates stay focused.
+</p>
 
 [![Build](https://github.com/DanielBoxer/web-employ/actions/workflows/build.yml/badge.svg)](https://github.com/DanielBoxer/web-employ/actions/workflows/build.yml)
 
