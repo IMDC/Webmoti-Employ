@@ -121,7 +121,11 @@ export function Room() {
               w={{ base: '100%', sm: '35%', lg: '30%' }}
               p="lg"
             >
-              <Chat onClose={() => setIsChatOpen(false)} />
+              <Chat
+                onClose={() => setIsChatOpen(false)}
+                profiles={profiles}
+                isLoadingProfiles={isLoadingProfiles}
+              />
             </Box>
           )}
         </Box>

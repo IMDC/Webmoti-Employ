@@ -1,3 +1,4 @@
+import type { ProfilesResponse } from '@webmoti-employ/shared'
 import type { ChatMessage, Participant } from '@zoom/videosdk'
 import {
   ActionIcon,
@@ -6,6 +7,7 @@ import {
   Flex,
   Group,
   ScrollArea,
+  Skeleton,
   Stack,
   Text,
   Textarea,
@@ -21,12 +23,16 @@ import { useChatStore } from './useChatStore'
 interface MessageProps {
   chatMessage: ChatMessage
   participants: Map<number, Participant>
+  isLoadingProfiles: boolean
+  profiles?: ProfilesResponse
 }
 
-function Message({ chatMessage, participants }: MessageProps) {
+function Message({ chatMessage, participants, profiles, isLoadingProfiles }: MessageProps) {
   const { message, sender, timestamp } = chatMessage
   const senderParticipant = participants.get(sender.userId)
   const isHost = senderParticipant?.isHost ?? false
+
+  const displayName = (profiles && profiles[sender.name]?.displayName) || sender.name
 
   return (
     <Flex gap={5}>
@@ -38,27 +44,30 @@ function Message({ chatMessage, participants }: MessageProps) {
         {isHost ? <IconTool size={14} /> : <IconUserFilled size={14} />}
       </ThemeIcon>
 
-      <Text
-        lh="xs"
-        style={{
-          overflowWrap: 'anywhere',
-        }}
-      >
-        <strong style={{ marginRight: 5 }}>
-          {sender.name}
-          :
-        </strong>
-        <Linkify>{message}</Linkify>
-      </Text>
+      <Skeleton visible={isLoadingProfiles}>
+        <Text
+          lh="xs"
+          style={{
+            overflowWrap: 'anywhere',
+          }}
+        >
+          <strong style={{ marginRight: 5 }}>
+            {displayName}
+          </strong>
+          <Linkify>{message}</Linkify>
+        </Text>
+      </Skeleton>
     </Flex>
   )
 }
 
 interface ChatProps {
   onClose: () => void
+  isLoadingProfiles: boolean
+  profiles?: ProfilesResponse
 }
 
-export function Chat({ onClose }: ChatProps) {
+export function Chat({ onClose, profiles, isLoadingProfiles }: ChatProps) {
   const [chatText, setChatText] = useState('')
   const [isAtBottom, setIsAtBottom] = useState(true)
 
@@ -139,7 +148,13 @@ export function Chat({ onClose }: ChatProps) {
         >
           <Stack gap={5}>
             {messages.map(msg => (
-              <Message key={msg.id} chatMessage={msg} participants={participants} />
+              <Message
+                key={msg.id}
+                chatMessage={msg}
+                participants={participants}
+                profiles={profiles}
+                isLoadingProfiles={isLoadingProfiles}
+              />
             ))}
           </Stack>
         </ScrollArea>
