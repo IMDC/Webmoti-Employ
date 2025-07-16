@@ -1,7 +1,7 @@
 import type { InterviewSessionArgs } from './queries'
 import { UserButton, useUser } from '@clerk/clerk-react'
 import { AppShell, Button, Center, Flex, Group, Loader, Stack, Text, Title } from '@mantine/core'
-import { useNavigate, useParams } from '@tanstack/react-router'
+import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { MyCopyButton } from '@/components/MyCopyButton'
 import { SettingsButton } from '@/components/SettingsButton'
@@ -76,9 +76,11 @@ export function PrejoinScreen() {
     >
       <AppShell.Header>
         <Flex justify="space-between" align="center" w="100vw" h="100%" p="lg" pl="xs">
-          <Button variant="subtle" onClick={() => navigate({ to: '/' })}>
-            ← Back to Dashboard
-          </Button>
+          <Link to="/">
+            <Button variant="subtle">
+              ← Back to Dashboard
+            </Button>
+          </Link>
 
           <Group>
             <SettingsButton />

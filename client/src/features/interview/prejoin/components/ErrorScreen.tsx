@@ -1,5 +1,5 @@
 import { Button, Center, Stack, Text, Title } from '@mantine/core'
-import { useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { isHttpError } from '@/utils/HttpError'
 import { jsonStringifyIndented } from '@/utils/utils'
 
@@ -21,8 +21,6 @@ function getFriendlyTitle(status?: number) {
 }
 
 export function ErrorScreen({ error }: ErrorScreenProps) {
-  const navigate = useNavigate()
-
   const isHttp = isHttpError(error)
   const status = isHttp ? error.status : undefined
   const message = error.message
@@ -47,7 +45,9 @@ export function ErrorScreen({ error }: ErrorScreenProps) {
             {details && <pre>{jsonStringifyIndented(details)}</pre>}
           </>
         )}
-        <Button onClick={() => navigate({ to: '/' })}>Go to Dashboard</Button>
+        <Link to="/">
+          <Button>Go to Dashboard</Button>
+        </Link>
       </Stack>
     </Center>
   )

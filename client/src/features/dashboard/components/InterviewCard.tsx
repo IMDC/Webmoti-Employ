@@ -1,7 +1,7 @@
 import type { InterviewResponse } from '@web-employ/shared'
 import { ActionIcon, Avatar, Badge, Button, Card, Divider, Flex, Group, Stack, Text } from '@mantine/core'
 import { IconPlus, IconReport, IconTie, IconVideoFilled } from '@tabler/icons-react'
-import { useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
 import { MyCopyButton } from '@/components/MyCopyButton'
 import { UserList } from '@/components/UserList'
@@ -45,8 +45,6 @@ interface InterviewCardProps {
 }
 
 export function InterviewCard({ interview }: InterviewCardProps) {
-  const navigate = useNavigate()
-
   const emailArray = [...new Set((interview.invites ?? []).map(user => user.email))]
   const { profiles, isLoadingProfiles } = useInviteProfiles(emailArray)
 
@@ -115,16 +113,16 @@ export function InterviewCard({ interview }: InterviewCardProps) {
             : <Text fw="bold">{displayLine}</Text>}
         </Flex>
 
-        <Button
-          w="100%"
-          maw={250}
-          onClick={() =>
-            navigate({ to: '/interview/prejoin/$id', params: { id: interview.sessionId } })}
-          disabled={isEnded}
-          leftSection={<IconVideoFilled />}
-        >
-          Join
-        </Button>
+        <Link to="/interview/prejoin/$id" params={{ id: interview.sessionId }}>
+          <Button
+            w="100%"
+            maw={250}
+            disabled={isEnded}
+            leftSection={<IconVideoFilled />}
+          >
+            Join
+          </Button>
+        </Link>
       </Stack>
 
       <Divider my="sm" />

@@ -25,7 +25,7 @@ import {
   IconSquareRoundedPlusFilled,
   IconVideoPlus,
 } from '@tabler/icons-react'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { SettingsButton } from '@/components/SettingsButton'
 import { InterviewList } from './components/InterviewList'
@@ -46,8 +46,6 @@ export function Dashboard() {
     val => JoinCodeInput.safeParse(val).success,
     false,
   )
-
-  const navigate = useNavigate()
 
   return (
     <AppShell
@@ -139,12 +137,11 @@ export function Dashboard() {
 
                 <Popover.Dropdown>
                   <Stack>
-                    <Button
-                      leftSection={<IconVideoPlus />}
-                      onClick={() => navigate({ to: '/interview/prejoin' })}
-                    >
-                      Start interview now
-                    </Button>
+                    <Link to="/interview/prejoin">
+                      <Button leftSection={<IconVideoPlus />}>
+                        Start interview now
+                      </Button>
+                    </Link>
                     <Button
                       leftSection={<IconCalendarPlus />}
                       onClick={() => {
@@ -167,12 +164,11 @@ export function Dashboard() {
                   flex={1}
                   miw={0}
                 />
-                <Button
-                  disabled={!isJoinCodeValid}
-                  onClick={() => navigate({ to: '/interview/prejoin/$id', params: { id: joinCode } })}
-                >
-                  Join
-                </Button>
+                <Link to="/interview/prejoin/$id" params={{ id: joinCode }}>
+                  <Button disabled={!isJoinCodeValid}>
+                    Join
+                  </Button>
+                </Link>
               </Group>
             </Flex>
 
