@@ -1,6 +1,6 @@
 import { AppShell, Box, em, useMantineTheme } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
 import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore'
@@ -33,6 +33,8 @@ export function Room() {
   const callState = useZoomSessionStore(s => s.callState)
 
   const navigate = useNavigate()
+
+  const { id } = useParams({ from: '/(authenticated)/interview/$id' })
 
   const theme = useMantineTheme()
   const isMobile = useMediaQuery(`(max-width: ${em(theme.breakpoints.sm)})`)
@@ -75,9 +77,9 @@ export function Room() {
   useEffect(() => {
     if (callState === 'left') {
       sessionStorage.setItem('fromInterview', '1')
-      navigate({ to: '/end' })
+      navigate({ to: '/end/$id', params: { id } })
     }
-  }, [callState, navigate])
+  }, [callState, navigate, id])
 
   return (
     <AppShell
