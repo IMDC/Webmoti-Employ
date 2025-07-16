@@ -12,6 +12,7 @@ function createWindow() {
 
   if (isDev) {
     // load vite dev server running in /client
+    mainWindow.setIcon(path.join(__dirname, '..', 'icon.png'))
     mainWindow.loadURL('http://localhost:5173')
     mainWindow.webContents.openDevTools()
   }
