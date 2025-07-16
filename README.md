@@ -17,6 +17,7 @@ WebMoti-Employ is an app that uses eyetracking to deliver real-time feedback dur
 - [Desktop App](#desktop-app)
 - [Deploying](#deploying)
 - [VSCode Auto Formatting Code](#vscode-auto-formatting-code)
+- [Firefox Dev WebRTC error](#firefox-dev-webrtc-error)
 
 ## Stack
 
@@ -92,7 +93,8 @@ The client and server are deployed separately.
 
 ## VSCode Auto Formatting Code
 
-> **_NOTE:_**  After the eslint extension server runs for a while, it gets slower when formatting code. To fix this, run `ctrl + shift + p` > `ESLint: Restart ESLint Server`
+> [!NOTE]
+> After the eslint extension server runs for a while, it gets slower when formatting code. To fix this, run `ctrl + shift + p` > `ESLint: Restart ESLint Server`
 
 <https://github.com/antfu/eslint-config?tab=readme-ov-file#ide-support-auto-fix-on-save>
 
@@ -152,3 +154,13 @@ The client and server are deployed separately.
   ]
 }
 ```
+
+## Firefox Dev WebRTC error
+
+When you run the Vite dev server in Firefox and you join an interview, it will fail with this error in the console:
+
+```text
+WebRTC: ICE failed, add a STUN server and see about:webrtc for more details
+```
+
+Use Chrome instead for developing.
