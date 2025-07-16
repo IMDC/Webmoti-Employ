@@ -1,9 +1,9 @@
 import type { LocalAudioTrack, LocalVideoTrack, VideoPlayer } from '@zoom/videosdk'
 import type { StoreApi } from 'zustand'
+import type { ZoomSessionStore } from '../zoom/createZoomSessionStore'
 import type { DeviceStore } from '@/features/interview/zoom/createDeviceStore'
 import ZoomVideo from '@zoom/videosdk'
 import { createStore } from 'zustand'
-import { useAppStore } from '../../../useAppStore'
 
 export interface PreviewStore {
   localVideoTrack: LocalVideoTrack | null
@@ -21,7 +21,10 @@ export interface PreviewStore {
   switchMicrophone: (microphoneId: string) => Promise<void>
 }
 
-export function createPreviewStore(deviceStore: StoreApi<DeviceStore>) {
+export function createPreviewStore(
+  deviceStore: StoreApi<DeviceStore>,
+  zoomSessionStore: StoreApi<ZoomSessionStore>,
+) {
   return createStore<PreviewStore>((set, get) => ({
     localVideoTrack: null,
     localAudioTrack: null,
@@ -83,14 +86,14 @@ export function createPreviewStore(deviceStore: StoreApi<DeviceStore>) {
     },
     toggleMuteMicrophone: async () => {
       const localAudioTrack = get().localAudioTrack
-      const isAudioOn = useAppStore.getState().isAudioOn
+      const isAudioOn = zoomSessionStore.getState().isAudioOn
       if (isAudioOn) {
         await localAudioTrack?.mute()
       }
       else {
         await localAudioTrack?.unmute()
       }
-      useAppStore.getState().toggleIsAudioOn()
+      zoomSessionStore.getState().toggleIsAudioOn()
     },
     switchMicrophone: async (microphoneId) => {
       const localAudioTrack = get().localAudioTrack

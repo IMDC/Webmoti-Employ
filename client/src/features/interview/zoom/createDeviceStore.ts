@@ -11,7 +11,7 @@ export interface DeviceStore {
   selectedAudioInputDevice: string | null
   selectedAudioOutputDevice: string | null
 
-  initDevices: () => Promise<void>
+  initDevices: () => Promise<PermissionState | 'skipped'>
 }
 
 export function createDeviceStore() {
@@ -27,7 +27,7 @@ export function createDeviceStore() {
     initDevices: async () => {
       const appState = useAppStore.getState()
       if (appState.permissionState === 'acquiring' || appState.permissionState === 'granted') {
-        return
+        return 'skipped'
       }
       appState.setPermissionState('acquiring')
 
@@ -45,9 +45,7 @@ export function createDeviceStore() {
       if (!hasPermission) {
         appState.setError({ message: 'Could not access media devices' })
         appState.setPermissionState('denied')
-        appState.setIsVideoOn(false)
-        appState.setIsAudioOn(false)
-        return
+        return 'denied'
       }
 
       set({
@@ -59,6 +57,7 @@ export function createDeviceStore() {
         selectedAudioOutputDevice: audioOutputDevices[0]?.deviceId ?? null,
       })
       appState.setPermissionState('granted')
+      return 'granted'
     },
   }))
 }

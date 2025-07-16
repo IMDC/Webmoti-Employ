@@ -11,10 +11,15 @@ export interface ZoomSessionStore {
   client: typeof VideoClient
   stream: ReturnType<typeof VideoClient.getMediaStream> | null
   callState: 'prejoin' | 'joining' | 'joined' | 'left'
-
   participants: Map<number, Participant>
 
-  initialized: boolean
+  isAudioOn: boolean
+  isVideoOn: boolean
+  setIsAudioOn: (value: boolean) => void
+  setIsVideoOn: (value: boolean) => void
+  toggleIsAudioOn: () => void
+  toggleIsVideoOn: () => void
+
   initClient: () => Promise<void>
 
   join: (name: string, roomName: string, token: string) => Promise<void>
@@ -54,7 +59,13 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       callState: 'prejoin',
       participants: new Map(),
 
-      initialized: false,
+      isAudioOn: true,
+      isVideoOn: true,
+      setIsAudioOn: value => set({ isAudioOn: value }),
+      setIsVideoOn: value => set({ isVideoOn: value }),
+      toggleIsAudioOn: () => set(state => ({ isAudioOn: !state.isAudioOn })),
+      toggleIsVideoOn: () => set(state => ({ isVideoOn: !state.isVideoOn })),
+
       initClient: async () => {
         logger.log('Initializing zoom client...')
 
@@ -64,7 +75,6 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         })
 
         ZoomVideo.preloadDependentAssets()
-        set({ initialized: true })
       },
 
       join: async (name, roomName, token) => {

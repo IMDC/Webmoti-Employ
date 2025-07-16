@@ -5,10 +5,11 @@ import { ToggleAudioButton } from '../../components/buttons/ToggleAudioButton'
 import { ToggleVideoButton } from '../../components/buttons/ToggleVideoButton'
 import { ChangeMediaDevice } from '../../components/ChangeMediaDevice'
 import { useDeviceStore } from '../../zoom/useDeviceStore'
+import { useZoomSessionStore } from '../../zoom/useZoomSessionStore'
 import { usePreviewStore } from '../hooks/usePreviewStore'
 
 export function PrejoinMenuBar() {
-  const toggleIsVideoOn = useAppStore(s => s.toggleIsVideoOn)
+  const toggleIsVideoOn = useZoomSessionStore(s => s.toggleIsVideoOn)
   const permissionState = useAppStore(s => s.permissionState)
   const disableMediaButtons = permissionState === 'idle' || permissionState === 'acquiring'
 

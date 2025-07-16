@@ -21,6 +21,8 @@ export function PrejoinScreen() {
 
   const callState = useZoomSessionStore(s => s.callState)
   const joinZoom = useZoomSessionStore(s => s.join)
+  const setIsVideoOn = useZoomSessionStore(s => s.setIsVideoOn)
+  const setIsAudioOn = useZoomSessionStore(s => s.setIsAudioOn)
 
   const { user } = useUser()
   const { id: sessionId } = useParams({ strict: false })
@@ -35,10 +37,25 @@ export function PrejoinScreen() {
 
   useEffect(() => {
     // wait until the interview session query is successful before init devices
-    if (interviewSession && !interviewSessionError) {
-      initDevices()
+    if (!interviewSession || interviewSessionError)
+      return
+
+    const handleInitDevices = async () => {
+      const permission = await initDevices()
+      if (permission === 'denied') {
+        setIsVideoOn(false)
+        setIsAudioOn(false)
+      }
     }
-  }, [interviewSession, interviewSessionError, initDevices])
+
+    handleInitDevices()
+  }, [
+    interviewSession,
+    interviewSessionError,
+    initDevices,
+    setIsAudioOn,
+    setIsVideoOn,
+  ])
 
   useEffect(() => {
     if (callState === 'joined' && interviewSession) {

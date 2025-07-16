@@ -17,10 +17,10 @@ export function Room() {
   const [isChatOpen, setIsChatOpen] = useState(false)
 
   const permissionState = useAppStore(s => s.permissionState)
-  const isVideoOn = useAppStore(s => s.isVideoOn)
-  const setIsVideoOn = useAppStore(s => s.setIsVideoOn)
-  const isAudioOn = useAppStore(s => s.isAudioOn)
-  const setIsAudioOn = useAppStore(s => s.setIsAudioOn)
+  const isVideoOn = useZoomSessionStore(s => s.isVideoOn)
+  const setIsVideoOn = useZoomSessionStore(s => s.setIsVideoOn)
+  const isAudioOn = useZoomSessionStore(s => s.isAudioOn)
+  const setIsAudioOn = useZoomSessionStore(s => s.setIsAudioOn)
 
   // TODO maybe remove this in favour of startVideo permission check
   const initDevices = useDeviceStore(s => s.initDevices)
