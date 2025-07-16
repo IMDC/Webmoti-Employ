@@ -1,5 +1,5 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
-import { EndScreen } from '@/features/interview/end/EndScreen'
+import { Button, Center, Group, Stack, Title } from '@mantine/core'
+import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/(authenticated)/end')({
   beforeLoad: () => {
@@ -13,3 +13,19 @@ export const Route = createFileRoute('/(authenticated)/end')({
   },
   component: EndScreen,
 })
+
+function EndScreen() {
+  return (
+    <Center h="100vh">
+      <Stack align="center" gap="xl">
+        <Title ta="center" px="lg">Thanks for attending the interview</Title>
+        <Group>
+          <Button>Rejoin</Button>
+          <Button component={Link} to="/">
+            Go to Dashboard
+          </Button>
+        </Group>
+      </Stack>
+    </Center>
+  )
+}
