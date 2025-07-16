@@ -6,6 +6,7 @@ export function SettingsMenu() {
   const isSettingsOpened = useAppStore(state => state.isSettingsOpen)
   const setIsSettingsOpened = useAppStore(state => state.setIsSettingsOpen)
   const setIsColorblindModeOn = useAppStore(state => state.setIsColorblindModeOn)
+  const isColorblindModeOn = useAppStore(state => state.isColorblindModeOn)
 
   return (
     <Modal
@@ -19,7 +20,8 @@ export function SettingsMenu() {
     >
       <Stack>
         <Switch
-          label="Color blind mode"
+          label="Colour blind mode"
+          checked={isColorblindModeOn}
           onChange={event => setIsColorblindModeOn(event.currentTarget.checked)}
         />
         <Group>

@@ -11,7 +11,7 @@ import {
   Textarea,
   ThemeIcon,
 } from '@mantine/core'
-import { IconMessages, IconSend, IconTool, IconUserFilled } from '@tabler/icons-react'
+import { IconMessages, IconSend, IconTool, IconUserFilled, IconX } from '@tabler/icons-react'
 import Linkify from 'linkify-react'
 import { DateTime } from 'luxon'
 import { useEffect, useRef, useState } from 'react'
@@ -54,7 +54,11 @@ function Message({ chatMessage, participants }: MessageProps) {
   )
 }
 
-export function Chat() {
+interface ChatProps {
+  onClose: () => void
+}
+
+export function Chat({ onClose }: ChatProps) {
   const [chatText, setChatText] = useState('')
   const [isAtBottom, setIsAtBottom] = useState(true)
 
@@ -113,11 +117,17 @@ export function Chat() {
       withBorder
     >
       {/* header */}
-      <Group>
-        <IconMessages />
-        <Text size="lg" fw={600}>
-          Chat
-        </Text>
+      <Group justify="space-between">
+        <Group>
+          <IconMessages />
+          <Text size="lg" fw={600}>
+            Chat
+          </Text>
+        </Group>
+
+        <ActionIcon variant="subtle" onClick={onClose}>
+          <IconX />
+        </ActionIcon>
       </Group>
 
       {/* message list */}
