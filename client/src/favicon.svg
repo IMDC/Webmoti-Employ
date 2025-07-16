@@ -3,8 +3,8 @@
 
 <svg
    width="512"
-   height="512"
-   viewBox="0 0 512 512"
+   height="373.63205"
+   viewBox="0 0 512 373.63205"
    version="1.1"
    id="svg1"
    xmlns="http://www.w3.org/2000/svg"
@@ -24,32 +24,33 @@
     </clipPath>
   </defs>
   <g
-     id="layer1">
+     id="layer1"
+     transform="translate(2.9912268e-5,-69.977737)">
     <path
        id="rect6"
-       style="fill:#b08968;fill-opacity:1;fill-rule:evenodd;stroke-width:1.14324"
+       style="fill:#006494;fill-opacity:1;fill-rule:evenodd;stroke-width:1.14324"
        d="m 370.23959,222.83411 71.00624,-31.8209 a 6.4768222,6.4768222 32.930412 0 1 9.12555,5.91045 v 147.2514 a 6.4768222,6.4768222 147.06959 0 1 -9.12555,5.91045 l -71.00624,-31.8209 a 15.43967,15.43967 57.069588 0 1 -9.12555,-14.08955 v -67.2514 a 15.43967,15.43967 122.93041 0 1 9.12555,-14.08955 z"
-       transform="matrix(1.1709319,0,0,1.1709319,-42.710612,-43.75857)" />
+       transform="matrix(1.3048223,0,0,1.3048223,-75.65462,-77.240716)" />
     <g
        id="g10"
-       transform="translate(-9.0163522)">
+       transform="matrix(1.1143451,0,0,1.1143451,-38.107586,-28.478568)">
       <path
-         style="baseline-shift:baseline;display:inline;overflow:visible;opacity:1;vector-effect:none;fill:#7f5539;fill-rule:evenodd;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+         style="baseline-shift:baseline;display:inline;overflow:visible;opacity:1;vector-effect:none;fill:#0582ca;fill-opacity:1;fill-rule:evenodd;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
          d="m 199.9704,141.24652 c -38.37768,0 -69.74169,31.36402 -69.74169,69.7417 v 41.7559 h 29.99947 v -41.7559 c 0,-22.2766 17.46563,-39.74223 39.74222,-39.74223 h 32.20166 c 22.2766,0 39.74223,17.46564 39.74223,39.74223 v 41.7559 h 29.99947 v -41.7559 c 0,-38.37768 -31.36401,-69.7417 -69.7417,-69.7417 z"
          transform="matrix(1.3676023,0,0,1.3676023,-96.599125,-104.81555)"
          id="rect2" />
       <path
-         style="display:inline;fill:#b08968;fill-opacity:1;fill-rule:evenodd;stroke-width:0.911653"
+         style="display:inline;fill:#006494;fill-opacity:1;fill-rule:evenodd;stroke-width:0.911653"
          d="m 150.37973,209.30863 c -26.44878,0 -48.40021,18.56898 -53.582313,43.43509 H 335.34423 c -5.1821,-24.86611 -27.1352,-43.43509 -53.58398,-43.43509 z"
          id="rect1"
          transform="matrix(1.3676023,0,0,1.3676023,-96.599125,-104.81555)" />
       <path
          id="path7"
-         style="display:inline;fill:#ddb892;fill-opacity:1;fill-rule:evenodd;stroke-width:0.911653"
+         style="display:inline;fill:#0582ca;fill-opacity:1;fill-rule:evenodd;stroke-width:0.911653"
          d="m 95.639201,276.28841 v 55.38462 c 0,30.32714 24.413389,54.74196 54.740539,54.74196 h 131.38014 c 30.32715,0 54.74339,-24.41482 54.74339,-54.74196 v -55.38462 h -87.30209 v 43.14691 c 0,4.10364 -3.3041,7.40775 -7.40775,7.40775 h -51.52008 c -4.10366,0 -7.40633,-3.30411 -7.40633,-7.40775 v -43.14691 z"
          transform="matrix(1.3676023,0,0,1.3676023,-96.599125,-104.81555)" />
       <path
-         style="baseline-shift:baseline;display:inline;overflow:visible;opacity:1;vector-effect:none;fill:#ddb892;fill-opacity:1;fill-rule:evenodd;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+         style="baseline-shift:baseline;display:inline;overflow:visible;opacity:1;vector-effect:none;fill:#006494;fill-opacity:1;fill-rule:evenodd;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
          d="m 199.9704,141.24652 c -38.37768,0 -69.74169,31.36402 -69.74169,69.7417 v 41.7559 h 29.99947 v -41.7559 c 0,-22.2766 17.46563,-39.74223 39.74222,-39.74223 h 32.20166 c 22.2766,0 39.74223,17.46564 39.74223,39.74223 v 41.7559 h 29.99947 v -41.7559 c 0,-38.37768 -31.36401,-69.7417 -69.7417,-69.7417 z"
          transform="matrix(1.3676023,0,0,1.3676023,-96.599125,-104.81555)"
          id="path4"
