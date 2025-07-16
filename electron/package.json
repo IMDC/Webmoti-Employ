@@ -7,7 +7,7 @@
   "main": "dist/main.js",
   "scripts": {
     "dev:electron": "tsc && electron .",
-    "build:electron": "tsc && cross-env VITE_IS_ELECTRON=true pnpm --filter @web-employ/client build:deploy",
+    "build:electron": "rimraf dist && tsc && cross-env VITE_IS_ELECTRON=true pnpm --filter @web-employ/client build:deploy",
     "dist:win": "pnpm run build:electron && electron-builder --win --x64",
     "dist:linux": "pnpm run build:electron && electron-builder --linux --arm64",
     "dist:mac": "pnpm run build:electron && electron-builder --mac --x64"
@@ -18,6 +18,7 @@
     "electron": "37.2.1",
     "electron-builder": "^26.0.12",
     "eslint": "^9.31.0",
+    "rimraf": "^6.0.1",
     "typescript": "~5.8.3"
   }
 }
