@@ -9,3 +9,13 @@ updates:
         update-types:
           - patch
           - minor
+
+  - package-ecosystem: uv
+    directory: /electron/python/
+    schedule:
+      interval: weekly
+    groups:
+      non-breaking:
+        update-types:
+          - patch
+          - minor
