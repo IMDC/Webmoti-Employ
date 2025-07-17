@@ -1,15 +1,15 @@
 # Ensure Python 3.8 compatibility
-import tobii_research as tr
-import mediapipe as mp
-import numpy as np
-import mss
-import cv2
-import time
 import csv
-from collections import deque
 import math
 import random
+import time
+from collections import deque
 
+import cv2
+import mediapipe as mp
+import mss
+import numpy as np
+import tobii_research as tr
 
 # Test Mode Configuration
 TEST_MODE = False  # Auto-set later if no tracker is found
@@ -17,6 +17,7 @@ TEST_MODE = False  # Auto-set later if no tracker is found
 # Eye movement classification setup
 gaze_history = deque(maxlen=5)
 FIXATION_VELOCITY_THRESHOLD = 100  # pixels per second
+
 
 def classify_eye_movement(new_point, timestamp):
     gaze_history.append((timestamp, new_point))
@@ -32,21 +33,36 @@ def classify_eye_movement(new_point, timestamp):
     velocity = dist / delta_t
     return "Fixation" if velocity < FIXATION_VELOCITY_THRESHOLD else "Saccade"
 
+
 # Setup
-mp_face_detection = mp.solutions.face_detection.FaceDetection(min_detection_confidence=0.7)
+mp_face_detection = mp.solutions.face_detection.FaceDetection(
+    min_detection_confidence=0.7
+)
 sct = mss.mss()
 monitor = sct.monitors[1]
 current_aoi_bbox = None
 start_timestamp = None
 
 # CSV setup
-csv_file = open('gaze_data.csv', mode='w', newline='')
+csv_file = open("gaze_data.csv", mode="w", newline="")
 csv_writer = csv.writer(csv_file)
-csv_writer.writerow([
-    'Elapsed_Time_s', 'Gaze_X_Left', 'Gaze_Y_Left', 'Gaze_X_Right', 'Gaze_Y_Right',
-    'Gaze_X_Average', 'Gaze_Y_Average', 'Pupil_Diameter_Left', 'Pupil_Diameter_Right',
-    'Validity_Left', 'Validity_Right', 'Looking_At_Interviewer', 'Eye_Movement_Type'
-])
+csv_writer.writerow(
+    [
+        "Elapsed_Time_s",
+        "Gaze_X_Left",
+        "Gaze_Y_Left",
+        "Gaze_X_Right",
+        "Gaze_Y_Right",
+        "Gaze_X_Average",
+        "Gaze_Y_Average",
+        "Pupil_Diameter_Left",
+        "Pupil_Diameter_Right",
+        "Validity_Left",
+        "Validity_Right",
+        "Looking_At_Interviewer",
+        "Eye_Movement_Type",
+    ]
+)
 
 # Connect to Tobii
 trackers = tr.find_all_eyetrackers()
@@ -63,6 +79,7 @@ def get_screen_frame():
     img = np.array(sct.grab(monitor))
     return cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
 
+
 def detect_interviewer(frame):
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = mp_face_detection.process(rgb_frame)
@@ -70,9 +87,19 @@ def detect_interviewer(frame):
         return results.detections[0].location_data.relative_bounding_box
     return None
 
+
 # Real or Simulated Gaze Callback
-def handle_gaze_data(timestamp, gaze_x_left, gaze_y_left, gaze_x_right, gaze_y_right,
-                     pupil_left, pupil_right, validity_left, validity_right):
+def handle_gaze_data(
+    timestamp,
+    gaze_x_left,
+    gaze_y_left,
+    gaze_x_right,
+    gaze_y_right,
+    pupil_left,
+    pupil_right,
+    validity_left,
+    validity_right,
+):
     global current_aoi_bbox, start_timestamp
 
     # Check for valid gaze points explicitly
@@ -96,38 +123,66 @@ def handle_gaze_data(timestamp, gaze_x_left, gaze_y_left, gaze_x_right, gaze_y_r
     looking_at_interviewer = False
     if current_aoi_bbox:
         xmin, ymin, width, height = (
-            current_aoi_bbox.xmin, current_aoi_bbox.ymin,
-            current_aoi_bbox.width, current_aoi_bbox.height
+            current_aoi_bbox.xmin,
+            current_aoi_bbox.ymin,
+            current_aoi_bbox.width,
+            current_aoi_bbox.height,
         )
-        looking_at_interviewer = (xmin <= gaze_x_avg <= xmin + width and
-                                  ymin <= gaze_y_avg <= ymin + height)
+        looking_at_interviewer = (
+            xmin <= gaze_x_avg <= xmin + width and ymin <= gaze_y_avg <= ymin + height
+        )
 
     movement_type = classify_eye_movement((gaze_x_avg, gaze_y_avg), timestamp)
 
     # Now write only valid data points to CSV
-    csv_writer.writerow([
-        f"{elapsed_seconds:.3f}", gaze_x_left, gaze_y_left, gaze_x_right, gaze_y_right,
-        gaze_x_avg, gaze_y_avg, pupil_left, pupil_right,
-        validity_left, validity_right, looking_at_interviewer, movement_type
-    ])
+    csv_writer.writerow(
+        [
+            f"{elapsed_seconds:.3f}",
+            gaze_x_left,
+            gaze_y_left,
+            gaze_x_right,
+            gaze_y_right,
+            gaze_x_avg,
+            gaze_y_avg,
+            pupil_left,
+            pupil_right,
+            validity_left,
+            validity_right,
+            looking_at_interviewer,
+            movement_type,
+        ]
+    )
 
-    print(f"{elapsed_seconds:.2f}s {'✅' if looking_at_interviewer else '⚠️'} | Movement: {movement_type}")
+    print(
+        f"{elapsed_seconds:.2f}s {'✅' if looking_at_interviewer else '⚠️'} | Movement: {movement_type}"
+    )
+
 
 # Tobii Callback Function
 def gaze_callback(gaze_data):
-    timestamp = gaze_data['device_time_stamp']
-    left_eye = gaze_data['left_gaze_point_on_display_area']
-    right_eye = gaze_data['right_gaze_point_on_display_area']
-    pupil_left = gaze_data['left_pupil_diameter']
-    pupil_right = gaze_data['right_pupil_diameter']
-    validity_left = gaze_data['left_gaze_point_validity']
-    validity_right = gaze_data['right_gaze_point_validity']
+    timestamp = gaze_data["device_time_stamp"]
+    left_eye = gaze_data["left_gaze_point_on_display_area"]
+    right_eye = gaze_data["right_gaze_point_on_display_area"]
+    pupil_left = gaze_data["left_pupil_diameter"]
+    pupil_right = gaze_data["right_pupil_diameter"]
+    validity_left = gaze_data["left_gaze_point_validity"]
+    validity_right = gaze_data["right_gaze_point_validity"]
 
     gaze_x_left, gaze_y_left = left_eye
     gaze_x_right, gaze_y_right = right_eye
 
-    handle_gaze_data(timestamp, gaze_x_left, gaze_y_left, gaze_x_right, gaze_y_right,
-                     pupil_left, pupil_right, validity_left, validity_right)
+    handle_gaze_data(
+        timestamp,
+        gaze_x_left,
+        gaze_y_left,
+        gaze_x_right,
+        gaze_y_right,
+        pupil_left,
+        pupil_right,
+        validity_left,
+        validity_right,
+    )
+
 
 # Main Loop
 if not TEST_MODE:
@@ -140,8 +195,12 @@ try:
 
         if current_aoi_bbox:
             h, w, _ = frame.shape
-            x, y, box_w, box_h = (int(current_aoi_bbox.xmin * w), int(current_aoi_bbox.ymin * h),
-                                  int(current_aoi_bbox.width * w), int(current_aoi_bbox.height * h))
+            x, y, box_w, box_h = (
+                int(current_aoi_bbox.xmin * w),
+                int(current_aoi_bbox.ymin * h),
+                int(current_aoi_bbox.width * w),
+                int(current_aoi_bbox.height * h),
+            )
             cv2.rectangle(frame, (x, y), (x + box_w, y + box_h), (0, 255, 0), 2)
 
         if TEST_MODE:
@@ -154,11 +213,20 @@ try:
             pupil_right = random.uniform(2.5, 3.5)
             validity_left = 1
             validity_right = 1
-            handle_gaze_data(timestamp, gaze_x_left, gaze_y_left, gaze_x_right, gaze_y_right,
-                             pupil_left, pupil_right, validity_left, validity_right)
+            handle_gaze_data(
+                timestamp,
+                gaze_x_left,
+                gaze_y_left,
+                gaze_x_right,
+                gaze_y_right,
+                pupil_left,
+                pupil_right,
+                validity_left,
+                validity_right,
+            )
 
         cv2.imshow("Interviewer AOI Tracking", frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(1) & 0xFF == ord("q"):
             break
 
 except KeyboardInterrupt:
