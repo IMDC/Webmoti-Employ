@@ -10,3 +10,9 @@ dependencies = [
   "opencv-python>=4.11.0.86",
   "tobii-research>=2.1.0",
 ]
+
+[dependency-groups]
+dev = [ "ruff>=0.12.4", ]
+
+[tool.ruff.lint]
+select = [ "ALL" ]

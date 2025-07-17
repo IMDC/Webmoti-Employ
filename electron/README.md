@@ -38,8 +38,11 @@ uv sync
 
 ### Ruff
 
-Install this for linting and formatting Python code.
-Also if using VSCode, install the [extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff).
+Ruff is used for linting and formatting.
+
+If using VSCode, install the Ruff [extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff).
+
+You can also install Ruff globally with `uv`:
 
 ```bash
 uv tool install ruff@latest
