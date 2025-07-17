@@ -2,7 +2,7 @@
 name = "eyetracking-script"
 version = "0.1.0"
 description = "@webmoti-employ/electron eyetracking script"
-requires-python = ">=3.10"
+requires-python = "==3.10.*"
 dependencies = [
   "mediapipe>=0.10.21",
   "mss>=10.0.0",

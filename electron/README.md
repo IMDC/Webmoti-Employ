@@ -4,7 +4,7 @@ This Electron app bundles the built React client so it can be run locally.
 
 - [Setup](#setup)
   - [uv](#uv)
-  - [Dependencies](#dependencies)
+  - [Install Dependencies](#install-dependencies)
   - [Ruff](#ruff)
 - [Running the eyetracking script locally](#running-the-eyetracking-script-locally)
 - [Creating distributable file](#creating-distributable-file)
@@ -27,10 +27,13 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-### Dependencies
+### Install Dependencies
 
 ```bash
 cd electron/python
+
+# install python 3.10
+uv python install 3.10
 
 # create .venv and install deps
 uv sync
