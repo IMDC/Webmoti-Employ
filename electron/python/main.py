@@ -1,9 +1,15 @@
-# Ensure Python 3.8 compatibility
+"""The main eyetracking script.
+
+This is run from the Electron main process and communicates with it to send feedback.
+"""
+
 import csv
 import math
 import random
 import time
 from collections import deque
+from pathlib import Path
+from typing import Literal, TypedDict
 
 import cv2
 import mediapipe as mp
@@ -17,11 +23,16 @@ TEST_MODE = False  # Auto-set later if no tracker is found
 # Eye movement classification setup
 gaze_history = deque(maxlen=5)
 FIXATION_VELOCITY_THRESHOLD = 100  # pixels per second
+MIN_GAZE_POINTS = 2
 
 
-def classify_eye_movement(new_point, timestamp):
+def classify_eye_movement(
+    new_point: tuple[float, float],
+    timestamp: int,
+) -> Literal["Unknown", "Fixation", "Saccade"]:
+    """Classify eye movement as fixation or saccade."""
     gaze_history.append((timestamp, new_point))
-    if len(gaze_history) < 2:
+    if len(gaze_history) < MIN_GAZE_POINTS:
         return "Unknown"
     (t1, (x1, y1)), (t2, (x2, y2)) = gaze_history[-2], gaze_history[-1]
     if None in [x1, y1, x2, y2] or t1 == t2:
@@ -36,7 +47,7 @@ def classify_eye_movement(new_point, timestamp):
 
 # Setup
 mp_face_detection = mp.solutions.face_detection.FaceDetection(
-    min_detection_confidence=0.7
+    min_detection_confidence=0.7,
 )
 sct = mss.mss()
 monitor = sct.monitors[1]
@@ -44,7 +55,7 @@ current_aoi_bbox = None
 start_timestamp = None
 
 # CSV setup
-csv_file = open("gaze_data.csv", mode="w", newline="")
+csv_file = Path("gaze_data.csv").open(mode="w", newline="")
 csv_writer = csv.writer(csv_file)
 csv_writer.writerow(
     [
@@ -61,7 +72,7 @@ csv_writer.writerow(
         "Validity_Right",
         "Looking_At_Interviewer",
         "Eye_Movement_Type",
-    ]
+    ],
 )
 
 # Connect to Tobii
@@ -75,12 +86,13 @@ else:
 
 
 # Screen and AOI functions
-def get_screen_frame():
+def get_screen_frame() -> np.ndarray:  # noqa: D103
     img = np.array(sct.grab(monitor))
     return cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
 
 
-def detect_interviewer(frame):
+def detect_interviewer(frame: np.ndarray):
+    """Detect the interviewer's face and return the bounding box, or None."""
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = mp_face_detection.process(rgb_frame)
     if results.detections:
@@ -90,16 +102,17 @@ def detect_interviewer(frame):
 
 # Real or Simulated Gaze Callback
 def handle_gaze_data(
-    timestamp,
-    gaze_x_left,
-    gaze_y_left,
-    gaze_x_right,
-    gaze_y_right,
-    pupil_left,
-    pupil_right,
-    validity_left,
-    validity_right,
-):
+    timestamp: int,
+    gaze_x_left: float,
+    gaze_y_left: float,
+    gaze_x_right: float,
+    gaze_y_right: float,
+    pupil_left: float,
+    pupil_right: float,
+    validity_left: int,
+    validity_right: int,
+) -> None:
+    """Process gaze data, classify movement, and log to CSV."""
     global current_aoi_bbox, start_timestamp
 
     # Check for valid gaze points explicitly
@@ -150,16 +163,31 @@ def handle_gaze_data(
             validity_right,
             looking_at_interviewer,
             movement_type,
-        ]
+        ],
     )
 
     print(
-        f"{elapsed_seconds:.2f}s {'✅' if looking_at_interviewer else '⚠️'} | Movement: {movement_type}"
+        f"{elapsed_seconds:.2f}s "
+        f"{'✅' if looking_at_interviewer else '⚠️'} "
+        f"| Movement: {movement_type}",
     )
 
 
+class GazeData(TypedDict):
+    """Tobii gaze data sample from a timestamp."""
+
+    device_time_stamp: int
+    left_gaze_point_on_display_area: tuple[float, float]
+    right_gaze_point_on_display_area: tuple[float, float]
+    left_pupil_diameter: float
+    right_pupil_diameter: float
+    left_gaze_point_validity: int
+    right_gaze_point_validity: int
+
+
 # Tobii Callback Function
-def gaze_callback(gaze_data):
+def gaze_callback(gaze_data: GazeData) -> None:
+    """Parse gaze data and forward it to the handler."""
     timestamp = gaze_data["device_time_stamp"]
     left_eye = gaze_data["left_gaze_point_on_display_area"]
     right_eye = gaze_data["right_gaze_point_on_display_area"]
@@ -205,12 +233,12 @@ try:
 
         if TEST_MODE:
             timestamp = int(time.time() * 1e6)
-            gaze_x_left = random.uniform(0.3, 0.7)
-            gaze_y_left = random.uniform(0.3, 0.7)
-            gaze_x_right = random.uniform(0.3, 0.7)
-            gaze_y_right = random.uniform(0.3, 0.7)
-            pupil_left = random.uniform(2.5, 3.5)
-            pupil_right = random.uniform(2.5, 3.5)
+            gaze_x_left = random.uniform(0.3, 0.7)  # noqa: S311
+            gaze_y_left = random.uniform(0.3, 0.7)  # noqa: S311
+            gaze_x_right = random.uniform(0.3, 0.7)  # noqa: S311
+            gaze_y_right = random.uniform(0.3, 0.7)  # noqa: S311
+            pupil_left = random.uniform(2.5, 3.5)  # noqa: S311
+            pupil_right = random.uniform(2.5, 3.5)  # noqa: S311
             validity_left = 1
             validity_right = 1
             handle_gaze_data(
