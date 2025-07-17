@@ -1,12 +1,21 @@
-# @webmoti-employ/electron
+# @webmoti-employ/electron <!-- omit from toc -->
 
-This bundles the built React client so it can be run locally as an Electron app.
+This Electron app bundles the built React client so it can be run locally.
+
+- [Setup](#setup)
+  - [uv](#uv)
+  - [Dependencies](#dependencies)
+  - [Ruff](#ruff)
+- [Running the eyetracking script locally](#running-the-eyetracking-script-locally)
+- [Creating distributable file](#creating-distributable-file)
 
 ## Setup
 
+The electron app uses a Python script to run eyetracking.
+
 ### uv
 
-Install the `uv` python package manager:
+Install the `uv` Python package manager:
 
 ```powershell
 # Windows install
@@ -18,15 +27,31 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
+### Dependencies
+
+```bash
+cd electron/python
+
+# create .venv and install deps
+uv sync
+```
+
 ### Ruff
 
 Install this for linting and formatting Python code.
+Also if using VSCode, install the [extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff).
 
 ```bash
 uv tool install ruff@latest
 ```
 
-### Dependencies
+## Running the eyetracking script locally
+
+```bash
+cd electron/python
+
+uv run main.py
+```
 
 ## Creating distributable file
 
