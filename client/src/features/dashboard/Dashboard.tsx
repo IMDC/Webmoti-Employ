@@ -53,7 +53,7 @@ export function Dashboard() {
       styles={{
         header: { border: 'none' },
         // hide horizontal scrollbar
-        main: { overflowX: 'hidden', height: 'calc(100vh - 60px)' },
+        main: { height: 'calc(100vh - 60px)' },
       }}
     >
       <AppShell.Header>
