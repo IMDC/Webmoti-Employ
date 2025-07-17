@@ -1,4 +1,6 @@
-# WebMoti-Employ Server <!-- omit from toc -->
+# @webmoti-employ/server <!-- omit from toc -->
+
+The server uses the Hono framework so it can run on serverless environments. This server is deployed to Cloudflare workers and responds to the web client and desktop app.
 
 - [Setup](#setup)
   - [Set secrets](#set-secrets)

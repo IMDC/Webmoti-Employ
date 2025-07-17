@@ -1,4 +1,6 @@
-# WebMoti-Employ React Client
+# @webmoti-employ/client
+
+This is a React and Vite app that's deployed online and also wrapped in Electron for the desktop app.
 
 ## Setup
 
