@@ -1,5 +1,6 @@
-import { Button, Flex, Popover } from '@mantine/core'
+import { Button, Flex, Group, Popover, Text } from '@mantine/core'
 import { IconChevronUp } from '@tabler/icons-react'
+import { useCurrentTime } from '@/hooks/useCurrentTime'
 import { useAppStore } from '@/useAppStore'
 import { ToggleCaptionsButton } from '../captions/ToggleCaptionsButton'
 import { ControlsMenu } from '../session/components/ControlsMenu'
@@ -30,10 +31,16 @@ export function MenuBar({
   const permissionState = useAppStore(s => s.permissionState)
   const disableMediaButtons = permissionState === 'idle' || permissionState === 'acquiring'
 
+  const time = useCurrentTime()
+
   return (
     <Flex justify="center" align="center" h="100%" px="md">
       {/* left section */}
-      <div style={{ flex: 1 }} />
+      <Group flex={1}>
+        <Text ff="monospace">
+          {time}
+        </Text>
+      </Group>
 
       {/* center section */}
       <Flex align="center" gap="md">
