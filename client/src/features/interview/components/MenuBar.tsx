@@ -14,6 +14,9 @@ import { ChangeMediaDevice } from './ChangeMediaDevice'
 interface MenuBarProps {
   onToggleMic: () => Promise<void>
   onToggleVideo: () => Promise<void>
+  isCaptionsAreaOpen: boolean
+  toggleCaptionsArea: () => void
+  isChatOpen: boolean
   onToggleChat?: () => void
 }
 
@@ -21,6 +24,9 @@ export function MenuBar({
   onToggleMic,
   onToggleVideo,
   onToggleChat,
+  isChatOpen,
+  isCaptionsAreaOpen,
+  toggleCaptionsArea,
 }: MenuBarProps) {
   // const [isLayoutModalOpen, { open: openLayoutModal, close: closeLayoutModal }]
   //   = useDisclosure(false)
@@ -83,13 +89,16 @@ export function MenuBar({
 
         </Button.Group>
 
-        <ToggleCaptionsButton />
+        <ToggleCaptionsButton
+          isCaptionsAreaOpen={isCaptionsAreaOpen}
+          toggleCaptionsArea={toggleCaptionsArea}
+        />
       </Flex>
 
       {/* right section */}
       <Flex align="center" gap="md" style={{ flex: 1 }} justify="flex-end">
         <>
-          <ToggleChatButton onToggleChat={onToggleChat} />
+          <ToggleChatButton isChatOpen={isChatOpen} onToggleChat={onToggleChat} />
 
           <ControlsMenu />
 

@@ -17,7 +17,7 @@ export function Room() {
   const participantStageRef = useRef<HTMLDivElement>(null)
 
   const [isChatOpen, setIsChatOpen] = useState(false)
-  // const [isCaptionsOn, setIsCaptionsOn] = useState(false)
+  const [isCaptionsAreaOpen, setIsCaptionsAreaOpen] = useState(false)
 
   const permissionState = useAppStore(s => s.permissionState)
   const isVideoOn = useZoomSessionStore(s => s.isVideoOn)
@@ -116,7 +116,14 @@ export function Room() {
                   isLoadingProfiles={isLoadingProfiles}
                 />
 
-                <CaptionsArea />
+                {isCaptionsAreaOpen && (
+                  <Box
+                    w="100%"
+                    h="20%"
+                  >
+                    <CaptionsArea />
+                  </Box>
+                )}
               </Stack>
             </Box>
           )}
@@ -143,6 +150,9 @@ export function Room() {
               <MenuBar
                 onToggleMic={onToggleMic}
                 onToggleVideo={onToggleVideo}
+                isCaptionsAreaOpen={isCaptionsAreaOpen}
+                toggleCaptionsArea={() => setIsCaptionsAreaOpen(o => !o)}
+                isChatOpen={isChatOpen}
                 onToggleChat={() => {
                   setIsChatOpen(!isChatOpen)
                 }}
@@ -152,6 +162,7 @@ export function Room() {
               <MobileMenuBar
                 onToggleMic={onToggleMic}
                 onToggleVideo={onToggleVideo}
+                isChatOpen={isChatOpen}
                 onToggleChat={() => {
                   setIsChatOpen(!isChatOpen)
                 }}

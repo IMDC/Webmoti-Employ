@@ -8,19 +8,21 @@ import { ToggleVideoButton } from './buttons/ToggleVideoButton'
 interface MobileMenuBarProps {
   onToggleMic: () => Promise<void>
   onToggleVideo: () => Promise<void>
+  isChatOpen: boolean
   onToggleChat?: () => void
 }
 
 export function MobileMenuBar({
   onToggleMic,
   onToggleVideo,
+  isChatOpen,
   onToggleChat,
 }: MobileMenuBarProps) {
   return (
     <Group justify="center" align="center" h="100%" gap="sm">
       <ToggleAudioButton onToggleMic={onToggleMic} />
       <ToggleVideoButton onToggleVideo={onToggleVideo} />
-      <ToggleChatButton onToggleChat={onToggleChat} />
+      <ToggleChatButton isChatOpen={isChatOpen} onToggleChat={onToggleChat} />
       <ControlsMenu isMobile />
       <EndCallButton />
     </Group>

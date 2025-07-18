@@ -36,10 +36,16 @@ function DeviceSelect({
           leftSection={icon}
           leftSectionPointerEvents="none"
           comboboxProps={{ withinPortal: false }}
+          styles={{ label: { paddingBottom: 8 } }}
         />
       )
     : (
-        <Radio.Group label={label} value={selected || ''} onChange={onChange}>
+        <Radio.Group
+          label={label}
+          value={selected || ''}
+          onChange={onChange}
+          styles={{ label: { paddingBottom: 8 } }}
+        >
           <Stack gap="xs">
             {devices.map(d => (
               <Radio
