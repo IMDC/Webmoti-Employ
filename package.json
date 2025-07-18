@@ -20,7 +20,7 @@
     "deploy": "pnpm build && pnpm run -r deploy"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^4.16.2",
+    "@antfu/eslint-config": "^4.17.0",
     "eslint": "^9.31.0"
   }
 }

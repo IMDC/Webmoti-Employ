@@ -13,9 +13,9 @@
     "dist:mac": "pnpm run build:electron && electron-builder --mac --x64"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^4.16.2",
+    "@antfu/eslint-config": "^4.17.0",
     "cross-env": "^7.0.3",
-    "electron": "37.2.1",
+    "electron": "37.2.3",
     "electron-builder": "^26.0.12",
     "eslint": "^9.31.0",
     "rimraf": "^6.0.1",
