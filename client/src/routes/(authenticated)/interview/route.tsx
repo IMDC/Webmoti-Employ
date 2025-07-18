@@ -3,6 +3,8 @@ import { DeviceContextProvider } from '@/features/interview/zoom/DeviceContextPr
 import { ZoomSessionContextProvider } from '@/features/interview/zoom/ZoomSessionContextProvider'
 
 export const Route = createFileRoute('/(authenticated)/interview')({
+  // set fromInterview so navigating to /end won't redirect
+  beforeLoad: () => sessionStorage.setItem('fromInterview', '1'),
   component: ZoomSessionLayout,
 })
 

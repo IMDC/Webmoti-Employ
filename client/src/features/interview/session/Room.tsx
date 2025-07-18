@@ -76,7 +76,6 @@ export function Room() {
 
   useEffect(() => {
     if (callState === 'left') {
-      sessionStorage.setItem('fromInterview', '1')
       navigate({ to: '/end/$id', params: { id } })
     }
   }, [callState, navigate, id])

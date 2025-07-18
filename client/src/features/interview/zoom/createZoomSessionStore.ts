@@ -103,6 +103,8 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         }
       },
       leave: async () => {
+        logger.log('Leaving zoom session...')
+
         set({
           callState: 'left',
           stream: null,
@@ -155,6 +157,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       },
 
       cleanup: async () => {
+        logger.log('Cleaning up zoom client...')
         client.off('user-added', updateParticipants)
         client.off('user-removed', updateParticipants)
         client.off('user-updated', updateParticipants)
