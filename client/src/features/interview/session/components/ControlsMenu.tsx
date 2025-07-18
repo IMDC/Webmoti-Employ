@@ -1,5 +1,14 @@
 import { Button, Menu } from '@mantine/core'
-import { IconDotsVertical, IconLayoutGrid, IconMenu2, IconScreenShare, IconSettings } from '@tabler/icons-react'
+import {
+  IconDotsVertical,
+  IconLayoutGrid,
+  IconMaximize,
+  IconMenu2,
+  IconMinimize,
+  IconScreenShare,
+  IconSettings,
+} from '@tabler/icons-react'
+import { useEffect, useState } from 'react'
 import { useAppStore } from '@/useAppStore'
 
 interface ControlsMenuProps {
@@ -9,6 +18,23 @@ interface ControlsMenuProps {
 
 export function ControlsMenu({ onLayoutOpen, isMobile }: ControlsMenuProps) {
   const setIsSettingsOpen = useAppStore(state => state.setIsSettingsOpen)
+
+  const [isFullscreen, setIsFullscreen] = useState(false)
+
+  useEffect(() => {
+    const handleChange = () => setIsFullscreen(!!document.fullscreenElement)
+    document.addEventListener('fullscreenchange', handleChange)
+    return () => document.removeEventListener('fullscreenchange', handleChange)
+  }, [])
+
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen()
+    }
+    else {
+      document.documentElement.requestFullscreen()
+    }
+  }
 
   return (
     <Menu shadow="md" position="top-end">
@@ -25,7 +51,16 @@ export function ControlsMenu({ onLayoutOpen, isMobile }: ControlsMenuProps) {
           Layout
         </Menu.Item>
 
-        <Menu.Item leftSection={<IconScreenShare size={14} />}>Share Screen</Menu.Item>
+        <Menu.Item leftSection={<IconScreenShare size={14} />}>Share screen</Menu.Item>
+
+        <Menu.Item
+          leftSection={
+            isFullscreen ? <IconMinimize size={14} /> : <IconMaximize size={14} />
+          }
+          onClick={toggleFullscreen}
+        >
+          {isFullscreen ? 'Exit full screen' : 'Full screen'}
+        </Menu.Item>
 
         <Menu.Item onClick={() => setIsSettingsOpen(true)} leftSection={<IconSettings size={14} />}>
           Settings
