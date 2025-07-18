@@ -16,6 +16,7 @@ import mediapipe as mp
 import mss
 import numpy as np
 import tobii_research as tr
+from loguru import logger
 
 # Test Mode Configuration
 TEST_MODE = False  # Auto-set later if no tracker is found
@@ -79,14 +80,14 @@ csv_writer.writerow(
 trackers = tr.find_all_eyetrackers()
 if trackers:
     tracker = trackers[0]
-    print("Connected to:", tracker.model)
+    logger.debug("Connected to:", tracker.model)
 else:
-    print("⚠️ No eye tracker found. Running in TEST MODE.")
+    logger.warning("⚠️ No eye tracker found. Running in TEST MODE.")
     TEST_MODE = True
 
 
 # Screen and AOI functions
-def get_screen_frame() -> np.ndarray:  # noqa: D103
+def get_screen_frame() -> np.ndarray:
     img = np.array(sct.grab(monitor))
     return cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
 
@@ -166,7 +167,7 @@ def handle_gaze_data(
         ],
     )
 
-    print(
+    logger.debug(
         f"{elapsed_seconds:.2f}s "
         f"{'✅' if looking_at_interviewer else '⚠️'} "
         f"| Movement: {movement_type}",
@@ -258,7 +259,7 @@ try:
             break
 
 except KeyboardInterrupt:
-    print("Stopped by user.")
+    logger.info("Stopped by user.")
 
 finally:
     if not TEST_MODE:

@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "@webmoti-employ/electron eyetracking script"
 requires-python = "==3.10.*"
 dependencies = [
+  "loguru>=0.7.3",
   "mediapipe>=0.10.21",
   "mss>=10.0.0",
   "numpy>=1.26.4",
@@ -16,3 +17,10 @@ dev = [ "ruff>=0.12.4", ]
 
 [tool.ruff.lint]
 select = [ "ALL" ]
+ignore = [
+  "D103", # https://docs.astral.sh/ruff/rules/undocumented-public-function
+  "D100" # https://docs.astral.sh/ruff/rules/undocumented-public-module
+]
+
+[tool.ruff.format]
+quote-style = "double"
