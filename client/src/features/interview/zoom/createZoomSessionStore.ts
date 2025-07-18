@@ -79,6 +79,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
 
       join: async (name, roomName, token) => {
         set({ callState: 'joining' })
+        logger.log('Joining zoom session...')
 
         try {
           await client.join(roomName, token, name)
@@ -115,10 +116,12 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       },
 
       startVideo: async () => {
+        logger.log('Starting video...')
         await stream().startVideo()
       },
 
       stopVideo: async () => {
+        logger.log('Stopping video...')
         await stream().stopVideo()
       },
       switchCamera: async (deviceId) => {
@@ -135,13 +138,16 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       },
 
       detachVideoPlayer: async (userId: number) => {
+        logger.log('Detaching video player...')
         await stream().detachVideo(userId)
       },
 
       startAudio: async () => {
+        logger.log('Starting audio...')
         await stream().startAudio()
       },
       stopAudio: async () => {
+        logger.log('Stopping audio...')
         // this will stop the user from both sharing and hearing audio
         await stream().stopAudio()
       },
