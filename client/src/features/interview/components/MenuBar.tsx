@@ -1,6 +1,7 @@
 import { Button, Flex, Popover } from '@mantine/core'
 import { IconChevronUp } from '@tabler/icons-react'
 import { useAppStore } from '@/useAppStore'
+import { ToggleCaptionsButton } from '../captions/ToggleCaptionsButton'
 import { ControlsMenu } from '../session/components/ControlsMenu'
 import { useZoomSessionStore } from '../zoom/useZoomSessionStore'
 import { EndCallButton } from './buttons/EndCallButton'
@@ -72,7 +73,10 @@ export function MenuBar({
           </Popover>
 
           <ToggleVideoButton onToggleVideo={onToggleVideo} />
+
         </Button.Group>
+
+        <ToggleCaptionsButton />
       </Flex>
 
       {/* right section */}

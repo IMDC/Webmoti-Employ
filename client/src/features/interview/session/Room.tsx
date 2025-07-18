@@ -1,4 +1,4 @@
-import { AppShell, Box, em, useMantineTheme } from '@mantine/core'
+import { AppShell, Box, em, Stack, useMantineTheme } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
@@ -6,6 +6,7 @@ import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
 import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore'
 import { useAppStore } from '@/useAppStore'
 import { GALLERY_VIEW_MARGIN } from '@/utils/constants'
+import { CaptionsArea } from '../captions/CaptionsArea'
 import { Chat } from '../chat/Chat'
 import { MenuBar } from '../components/MenuBar'
 import { MobileMenuBar } from '../components/MobileMenuBar'
@@ -14,7 +15,9 @@ import { VideoGrid } from './components/VideoGrid'
 
 export function Room() {
   const participantStageRef = useRef<HTMLDivElement>(null)
+
   const [isChatOpen, setIsChatOpen] = useState(false)
+  // const [isCaptionsOn, setIsCaptionsOn] = useState(false)
 
   const permissionState = useAppStore(s => s.permissionState)
   const isVideoOn = useZoomSessionStore(s => s.isVideoOn)
@@ -105,12 +108,16 @@ export function Room() {
                 gap: GALLERY_VIEW_MARGIN,
               }}
             >
-              <VideoGrid
-                containerRef={participantStageRef}
-                participants={participants}
-                profiles={profiles}
-                isLoadingProfiles={isLoadingProfiles}
-              />
+              <Stack>
+                <VideoGrid
+                  containerRef={participantStageRef}
+                  participants={participants}
+                  profiles={profiles}
+                  isLoadingProfiles={isLoadingProfiles}
+                />
+
+                <CaptionsArea />
+              </Stack>
             </Box>
           )}
 
