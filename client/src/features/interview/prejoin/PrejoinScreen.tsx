@@ -1,10 +1,10 @@
 import type { InterviewSessionArgs } from './queries'
-import { UserButton, useUser } from '@clerk/clerk-react'
+import { useUser } from '@clerk/clerk-react'
 import { AppShell, Button, Center, Flex, Group, Loader, Stack, Text, Title } from '@mantine/core'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { MyCopyButton } from '@/components/MyCopyButton'
-import { SettingsButton } from '@/components/SettingsButton'
+import { RightHeader } from '@/components/RightHeader'
 import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
 import { getUserIdentity } from '@/utils/utils'
 import { useZoomSessionStore } from '../zoom/useZoomSessionStore'
@@ -99,10 +99,7 @@ export function PrejoinScreen() {
             </Button>
           </Link>
 
-          <Group>
-            <SettingsButton />
-            <UserButton />
-          </Group>
+          <RightHeader />
         </Flex>
       </AppShell.Header>
 

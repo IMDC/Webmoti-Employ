@@ -1,4 +1,4 @@
-import { UserButton, useUser } from '@clerk/clerk-react'
+import { useUser } from '@clerk/clerk-react'
 import {
   ActionIcon,
   Affix,
@@ -27,7 +27,7 @@ import {
 } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
-import { SettingsButton } from '@/components/SettingsButton'
+import { RightHeader } from '@/components/RightHeader'
 import { InterviewList } from './components/InterviewList'
 import { ScheduleForm } from './components/ScheduleForm'
 import { JoinCodeInput } from './schema'
@@ -80,10 +80,7 @@ export function Dashboard() {
             </Group>
           </Anchor>
 
-          <Group>
-            <SettingsButton />
-            <UserButton />
-          </Group>
+          <RightHeader />
         </Flex>
       </AppShell.Header>
 
