@@ -31,8 +31,9 @@ jobs:
       - name: Run lint
         run: pnpm lint
 
-      - name: Check types
-        run: pnpm typecheck
-
+      # run build before checking server types
       - name: Run build
         run: pnpm run build
+
+      - name: Check types
+        run: pnpm typecheck
