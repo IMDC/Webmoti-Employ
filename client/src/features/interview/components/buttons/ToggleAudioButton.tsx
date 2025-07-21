@@ -1,4 +1,4 @@
-import { Button, Indicator } from '@mantine/core'
+import { Button, Indicator, Tooltip } from '@mantine/core'
 import { IconMicrophoneFilled, IconMicrophoneOff } from '@tabler/icons-react'
 import { useAppStore } from '@/useAppStore'
 import { getHighlightColor } from '@/utils/utils'
@@ -15,17 +15,22 @@ export function ToggleAudioButton({ onToggleMic }: ToggleAudioButtonProps) {
 
   return (
     <Indicator color="orange" disabled={permissionState !== 'denied'}>
-      <Button
-        variant={isAudioOn ? 'default' : 'filled'}
-        color={getHighlightColor(isColorblindModeOn)}
-        px={{ base: 'sm', sm: 'md' }}
-        onClick={onToggleMic}
-        disabled={permissionState === 'idle' || permissionState === 'acquiring'}
+      <Tooltip
+        label={isAudioOn ? 'Turn off microphone' : 'Turn on microphone'}
+        color="gray"
       >
-        {isAudioOn
-          ? (<IconMicrophoneFilled size={18} />)
-          : (<IconMicrophoneOff size={18} style={{ fill: 'white' }} />)}
-      </Button>
+        <Button
+          variant={isAudioOn ? 'default' : 'filled'}
+          color={getHighlightColor(isColorblindModeOn)}
+          px={{ base: 'sm', sm: 'md' }}
+          onClick={onToggleMic}
+          disabled={permissionState === 'idle' || permissionState === 'acquiring'}
+        >
+          {isAudioOn
+            ? (<IconMicrophoneFilled size={18} />)
+            : (<IconMicrophoneOff size={18} style={{ fill: 'white' }} />)}
+        </Button>
+      </Tooltip>
     </Indicator>
 
   )

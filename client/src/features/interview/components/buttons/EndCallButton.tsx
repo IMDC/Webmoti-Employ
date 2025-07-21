@@ -1,4 +1,4 @@
-import { Button } from '@mantine/core'
+import { Button, Tooltip } from '@mantine/core'
 import { IconPhoneOff } from '@tabler/icons-react'
 import { useAppStore } from '@/useAppStore'
 import { getHighlightColor } from '@/utils/utils'
@@ -9,8 +9,10 @@ export function EndCallButton() {
   const isColorblindModeOn = useAppStore(s => s.isColorblindModeOn)
 
   return (
-    <Button color={getHighlightColor(isColorblindModeOn)} onClick={leave} radius="xl">
-      <IconPhoneOff size={18} style={{ fill: 'white' }} />
-    </Button>
+    <Tooltip label="Leave interview" color="gray">
+      <Button color={getHighlightColor(isColorblindModeOn)} onClick={leave} radius="xl">
+        <IconPhoneOff size={18} style={{ fill: 'white' }} />
+      </Button>
+    </Tooltip>
   )
 }

@@ -1,9 +1,9 @@
-import { Button, Group, Popover } from '@mantine/core'
-import { IconChevronUp } from '@tabler/icons-react'
+import { Button, Group } from '@mantine/core'
 import { useAppStore } from '@/useAppStore'
 import { ToggleAudioButton } from '../../components/buttons/ToggleAudioButton'
 import { ToggleVideoButton } from '../../components/buttons/ToggleVideoButton'
-import { ChangeMediaDevice } from '../../components/ChangeMediaDevice'
+import { ChangeAudioPopover } from '../../components/popovers/ChangeAudioPopover'
+import { ChangeVideoPopover } from '../../components/popovers/ChangeVideoPopover'
 import { useDeviceStore } from '../../zoom/useDeviceStore'
 import { useZoomSessionStore } from '../../zoom/useZoomSessionStore'
 import { usePreviewStore } from '../hooks/usePreviewStore'
@@ -11,7 +11,6 @@ import { usePreviewStore } from '../hooks/usePreviewStore'
 export function PrejoinMenuBar() {
   const toggleIsVideoOn = useZoomSessionStore(s => s.toggleIsVideoOn)
   const permissionState = useAppStore(s => s.permissionState)
-  const disableMediaButtons = permissionState === 'idle' || permissionState === 'acquiring'
 
   const initDevices = useDeviceStore(s => s.initDevices)
 
@@ -37,40 +36,12 @@ export function PrejoinMenuBar() {
   return (
     <Group justify="center" align="center" h="100%" gap="sm">
       <Button.Group>
-        <Popover>
-          <Popover.Target>
-            <Button variant="default" disabled={disableMediaButtons} px="xs">
-              <IconChevronUp size={18} />
-            </Button>
-          </Popover.Target>
-          <Popover.Dropdown>
-            <ChangeMediaDevice
-              mediaType="audio"
-              variant="radio"
-              onSwitchMicrophone={switchMicrophone}
-            />
-          </Popover.Dropdown>
-        </Popover>
-
+        <ChangeAudioPopover switchMicrophone={switchMicrophone} />
         <ToggleAudioButton onToggleMic={onToggleMic} />
       </Button.Group>
 
       <Button.Group>
-        <Popover>
-          <Popover.Target>
-            <Button variant="default" disabled={disableMediaButtons} px="xs">
-              <IconChevronUp size={18} />
-            </Button>
-          </Popover.Target>
-          <Popover.Dropdown>
-            <ChangeMediaDevice
-              mediaType="video"
-              variant="radio"
-              onSwitchCamera={switchCamera}
-            />
-          </Popover.Dropdown>
-        </Popover>
-
+        <ChangeVideoPopover switchCamera={switchCamera} />
         <ToggleVideoButton onToggleVideo={onToggleVideo} />
       </Button.Group>
     </Group>

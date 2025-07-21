@@ -1,4 +1,4 @@
-import { Button, Indicator } from '@mantine/core'
+import { Button, Indicator, Tooltip } from '@mantine/core'
 import { IconVideoFilled, IconVideoOff } from '@tabler/icons-react'
 import { useAppStore } from '@/useAppStore'
 import { getHighlightColor } from '@/utils/utils'
@@ -15,17 +15,19 @@ export function ToggleVideoButton({ onToggleVideo }: ToggleVideoButtonProps) {
 
   return (
     <Indicator color="orange" disabled={permissionState !== 'denied'}>
-      <Button
-        variant={isVideoOn ? 'default' : 'filled'}
-        color={getHighlightColor(isColorblindModeOn)}
-        px={{ base: 'sm', sm: 'md' }}
-        onClick={onToggleVideo}
-        disabled={permissionState === 'idle' || permissionState === 'acquiring'}
-      >
-        {isVideoOn
-          ? (<IconVideoFilled size={18} />)
-          : (<IconVideoOff style={{ fill: 'white' }} size={18} />)}
-      </Button>
+      <Tooltip label={isVideoOn ? 'Turn off camera' : 'Turn on camera'} color="gray">
+        <Button
+          variant={isVideoOn ? 'default' : 'filled'}
+          color={getHighlightColor(isColorblindModeOn)}
+          px={{ base: 'sm', sm: 'md' }}
+          onClick={onToggleVideo}
+          disabled={permissionState === 'idle' || permissionState === 'acquiring'}
+        >
+          {isVideoOn
+            ? (<IconVideoFilled size={18} />)
+            : (<IconVideoOff style={{ fill: 'white' }} size={18} />)}
+        </Button>
+      </Tooltip>
     </Indicator>
 
   )

@@ -1,4 +1,4 @@
-import { Button, Menu } from '@mantine/core'
+import { Button, Menu, Tooltip } from '@mantine/core'
 import {
   IconDotsVertical,
   IconLayoutGrid,
@@ -39,9 +39,11 @@ export function ControlsMenu({ onLayoutOpen, isMobile }: ControlsMenuProps) {
   return (
     <Menu shadow="md" position="top-end">
       <Menu.Target>
-        <Button variant="default" px={{ base: 5, sm: 'md' }}>
-          {isMobile ? <IconDotsVertical size={18} /> : <IconMenu2 size={18} />}
-        </Button>
+        <Tooltip color="gray" label="Controls menu">
+          <Button variant="default" px={{ base: 5, sm: 'md' }}>
+            {isMobile ? <IconDotsVertical size={18} /> : <IconMenu2 size={18} />}
+          </Button>
+        </Tooltip>
       </Menu.Target>
 
       <Menu.Dropdown>

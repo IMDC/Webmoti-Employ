@@ -1,7 +1,5 @@
-import { Button, Flex, Group, Popover, Text } from '@mantine/core'
-import { IconChevronUp } from '@tabler/icons-react'
+import { Button, Flex, Group, Text } from '@mantine/core'
 import { useCurrentTime } from '@/hooks/useCurrentTime'
-import { useAppStore } from '@/useAppStore'
 import { ToggleCaptionsButton } from '../captions/ToggleCaptionsButton'
 import { ControlsMenu } from '../session/components/ControlsMenu'
 import { useZoomSessionStore } from '../zoom/useZoomSessionStore'
@@ -9,7 +7,8 @@ import { EndCallButton } from './buttons/EndCallButton'
 import { ToggleAudioButton } from './buttons/ToggleAudioButton'
 import { ToggleChatButton } from './buttons/ToggleChatButton'
 import { ToggleVideoButton } from './buttons/ToggleVideoButton'
-import { ChangeMediaDevice } from './ChangeMediaDevice'
+import { ChangeAudioPopover } from './popovers/ChangeAudioPopover'
+import { ChangeVideoPopover } from './popovers/ChangeVideoPopover'
 
 interface MenuBarProps {
   onToggleMic: () => Promise<void>
@@ -34,9 +33,6 @@ export function MenuBar({
   const switchCamera = useZoomSessionStore(s => s.switchCamera)
   const switchMicrophone = useZoomSessionStore(s => s.switchMicrophone)
 
-  const permissionState = useAppStore(s => s.permissionState)
-  const disableMediaButtons = permissionState === 'idle' || permissionState === 'acquiring'
-
   const time = useCurrentTime()
 
   return (
@@ -51,42 +47,13 @@ export function MenuBar({
       {/* center section */}
       <Flex align="center" gap="md">
         <Button.Group>
-          <Popover>
-            <Popover.Target>
-              <Button variant="default" disabled={disableMediaButtons} px="xs">
-                <IconChevronUp size={18} />
-              </Button>
-            </Popover.Target>
-            <Popover.Dropdown>
-              <ChangeMediaDevice
-                mediaType="audio"
-                variant="radio"
-                onSwitchMicrophone={switchMicrophone}
-              />
-            </Popover.Dropdown>
-          </Popover>
-
+          <ChangeAudioPopover switchMicrophone={switchMicrophone} />
           <ToggleAudioButton onToggleMic={onToggleMic} />
         </Button.Group>
 
         <Button.Group>
-          <Popover>
-            <Popover.Target>
-              <Button variant="default" disabled={disableMediaButtons} px="xs">
-                <IconChevronUp size={18} />
-              </Button>
-            </Popover.Target>
-            <Popover.Dropdown>
-              <ChangeMediaDevice
-                mediaType="video"
-                variant="radio"
-                onSwitchCamera={switchCamera}
-              />
-            </Popover.Dropdown>
-          </Popover>
-
+          <ChangeVideoPopover switchCamera={switchCamera} />
           <ToggleVideoButton onToggleVideo={onToggleVideo} />
-
         </Button.Group>
 
         <ToggleCaptionsButton

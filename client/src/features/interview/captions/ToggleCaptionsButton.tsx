@@ -1,4 +1,4 @@
-import { Button } from '@mantine/core'
+import { Button, Tooltip } from '@mantine/core'
 import { IconBadgeCcFilled } from '@tabler/icons-react'
 
 interface ToggleCaptionsButtonProps {
@@ -11,12 +11,17 @@ export function ToggleCaptionsButton({
   toggleCaptionsArea,
 }: ToggleCaptionsButtonProps) {
   return (
-    <Button
-      variant={isCaptionsAreaOpen ? 'filled' : 'default'}
-      radius={isCaptionsAreaOpen ? 'sm' : 'xl'}
-      onClick={toggleCaptionsArea}
+    <Tooltip
+      color="gray"
+      label={isCaptionsAreaOpen ? 'Turn off captions' : 'Turn on captions'}
     >
-      <IconBadgeCcFilled />
-    </Button>
+      <Button
+        variant={isCaptionsAreaOpen ? 'filled' : 'default'}
+        radius={isCaptionsAreaOpen ? 'sm' : 'xl'}
+        onClick={toggleCaptionsArea}
+      >
+        <IconBadgeCcFilled />
+      </Button>
+    </Tooltip>
   )
 }
