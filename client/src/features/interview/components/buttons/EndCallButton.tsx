@@ -11,7 +11,7 @@ export function EndCallButton() {
   return (
     <Tooltip label="Leave interview" color="gray">
       <Button color={getHighlightColor(isColorblindModeOn)} onClick={leave} radius="xl">
-        <IconPhoneOff size={18} style={{ fill: 'white' }} />
+        <IconPhoneOff size={18} style={{ fill: 'white', stroke: 'white' }} />
       </Button>
     </Tooltip>
   )

@@ -28,7 +28,7 @@ export function ToggleAudioButton({ onToggleMic }: ToggleAudioButtonProps) {
         >
           {isAudioOn
             ? (<IconMicrophoneFilled size={18} />)
-            : (<IconMicrophoneOff size={18} style={{ fill: 'white' }} />)}
+            : (<IconMicrophoneOff size={18} style={{ fill: 'white', stroke: 'white' }} />)}
         </Button>
       </Tooltip>
     </Indicator>
