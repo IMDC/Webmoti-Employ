@@ -6,6 +6,7 @@ The server uses the Hono framework so it can run on serverless environments. Thi
   - [Set secrets](#set-secrets)
     - [.dev.vars](#devvars)
     - [.env](#env)
+  - [Local database](#local-database)
 - [Deploying](#deploying)
 - [Services](#services)
   - [Video Calling](#video-calling)
@@ -36,7 +37,32 @@ Whenever you change any env variables in `.dev.vars`, run `pnpm run cf-typegen` 
 
 Rename `.env.example` to `.env`. This hyperdrive variable doesn't get detected in `.dev.vars`, so we need to make a `.env` just for this.
 
-1. Add `WRANGLER_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` ([more info](#cloudflare-hyperdrive))
+1. Add `WRANGLER_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` ([see below for details](#local-database))
+
+### Local database
+
+For running the server locally, you need a local PostgreSQL database.
+
+Setup video: <https://www.youtube.com/watch?v=tu7zuv6aMug> (up to 3:45)
+
+1. Setup PostgreSQL
+    1. [Download](https://www.postgresql.org/download/) PostgreSQL (version 17)
+    2. Create a password for the superuser (it can be anything)
+    3. Open pgAdmin and unlock with your superuser password
+2. Create database
+    1. Right click `Databases` > `Create` > `Database...`
+    2. Under `General`, Enter anything for the `Database` name (ex. webmoti-employ)
+    3. Press `Save`
+3. Create tables
+    1. Right click the new database > `Query Tool`
+    2. Paste the [create tables sql](#neon)
+    3. Press `Execute script` (also `F5` shortcut works)
+4. Get the connection string (postgresql://USERNAME:PASSWORD@localhost:5432/DATABASE_NAME)
+    - USERNAME: your superuser username (probably `postgres` if unchanged)
+    - PASSWORD: your superuser password
+    - DATABASE_NAME: your database name
+    - localhost:5432: this part is the same if you selected the default port
+5. Put this connection string in `server/.env` as `WRANGLER_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`
 
 ## Deploying
 
@@ -77,8 +103,28 @@ The database is postgres deployed with the Neon service. We also use Cloudflare 
 1. Choose the closest region (Azure East US 2 (Virginia))
 2. Create the tables in the public schema:
 
-   ![Interview table](docs/interview_table.png)
-   ![Interview invite table](docs/interview_invite_table.png)
+    ```sql
+    CREATE TABLE "public"."interview" (
+      "id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+      "creator_id" varchar(128) NOT NULL,
+      "start_time" timestamp with time zone NOT NULL,
+      "end_time" timestamp with time zone NOT NULL,
+      "session_id" uuid UNIQUE NOT NULL DEFAULT gen_random_uuid (),
+      "created_at" timestamp with time zone NOT NULL DEFAULT now(),
+      "updated_at" timestamp with time zone NOT NULL DEFAULT now()
+    );
+
+    CREATE TABLE "public"."interview_invite" (
+      "id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+      "interview_id" integer NOT NULL,
+      "email" text NOT NULL,
+      "is_interviewer" boolean NOT NULL DEFAULT false,
+      "is_interview_creator" boolean NOT NULL DEFAULT false,
+      "created_at" timestamp with time zone NOT NULL DEFAULT now(),
+      CONSTRAINT "interview_id_fkey" FOREIGN KEY ("interview_id") REFERENCES "public"."interview" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
+      CONSTRAINT "interview_invite_interview_id_email_key" UNIQUE ("interview_id", "email")
+    )
+    ```
 
 3. Create a non owner role to use (replace `<password>` with the actual password) ([More info](https://neon.com/docs/manage/database-access#create-a-read-write-role)) The password should have at least 12 characters with a mix of lowercase, uppercase, number, and symbol characters.
 

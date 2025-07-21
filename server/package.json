@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "wrangler dev --remote",
+    "dev": "wrangler dev",
     "dev:electron": "pnpm run dev",
     "deploy": "wrangler deploy --minify",
     "install:deploy": "pnpm install --filter @webmoti-employ/shared --filter @webmoti-employ/server",
