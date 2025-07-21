@@ -14,6 +14,7 @@
     "dist:linux": "pnpm --filter @webmoti-employ/electron dist:linux",
     "dist:mac": "pnpm --filter @webmoti-employ/electron dist:mac",
     "build": "pnpm run -r build",
+    "typecheck": "pnpm run -r typecheck",
     "lint": "pnpm run -r --parallel lint",
     "lint:fix": "pnpm run -r --parallel lint:fix",
     "lint:root": "eslint tsconfig.json README.md .github",

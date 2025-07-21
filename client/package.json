@@ -7,7 +7,7 @@
     "dev": "vite",
     "dev:electron": "pnpm run dev",
     "typecheck": "tsc --noEmit",
-    "build": "pnpm run typecheck && vite build",
+    "build": "vite build",
     "install:deploy": "pnpm install --filter @webmoti-employ/shared --filter @webmoti-employ/client",
     "build:deploy": "pnpm -r --filter @webmoti-employ/shared --filter @webmoti-employ/client build",
     "preview": "vite preview",

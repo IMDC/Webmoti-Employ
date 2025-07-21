@@ -11,6 +11,7 @@
     "cf-typegen": "wrangler types src/worker-configuration.d.ts --env-interface CloudflareBindings",
     "db-typegen": "kysely-codegen",
     "postinstall": "node scripts/postinstall.js",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
