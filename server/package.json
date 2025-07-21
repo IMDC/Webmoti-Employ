@@ -8,7 +8,7 @@
     "dev:electron": "pnpm run dev",
     "deploy": "wrangler deploy --minify",
     "install:deploy": "pnpm install --filter @webmoti-employ/shared --filter @webmoti-employ/server",
-    "cf-typegen": "wrangler types src/worker-configuration.d.ts --env-interface CloudflareBindings",
+    "cf-typegen": "wrangler types src/types/worker-configuration.d.ts --env-interface CloudflareBindings",
     "db-typegen": "kysely-codegen",
     "postinstall": "node scripts/postinstall.js",
     "typecheck": "tsc --noEmit",
