@@ -28,6 +28,7 @@
     "@tabler/icons-react": "^3.34.1",
     "@tanstack/react-query": "^5.83.0",
     "@tanstack/react-router": "^1.129.0",
+    "@tanstack/react-virtual": "^3.13.12",
     "@webmoti-employ/shared": "workspace:^",
     "@zoom/videosdk": "^2.2.5",
     "linkify-react": "^4.3.1",

@@ -8,12 +8,12 @@ import {
   Group,
   ScrollArea,
   Skeleton,
-  Stack,
   Text,
   Textarea,
   ThemeIcon,
 } from '@mantine/core'
 import { IconMessages, IconSend, IconTool, IconUserFilled, IconX } from '@tabler/icons-react'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import Linkify from 'linkify-react'
 import { DateTime } from 'luxon'
 import { useEffect, useRef, useState } from 'react'
@@ -36,7 +36,7 @@ function Message({ chatMessage, participants, profiles, isLoadingProfiles }: Mes
 
   return (
     <Flex gap={5}>
-      <Text c="dimmed" size="sm">
+      <Text c="dimmed" size="sm" mb={10}>
         {DateTime.fromMillis(timestamp).toFormat('h:mm')}
       </Text>
 
@@ -86,6 +86,15 @@ export function Chat({ onClose, profiles, isLoadingProfiles }: ChatProps) {
     sendChat(trimmed)
     setChatText('')
   }
+
+  const rowVirtualizer = useVirtualizer({
+    count: messages.length,
+    getScrollElement: () => scrollViewportRef.current,
+    estimateSize: () => 35,
+    overscan: 5,
+  })
+
+  const items = rowVirtualizer.getVirtualItems()
 
   const handleScroll = ({ y }: { x: number, y: number }) => {
     const el = scrollViewportRef.current
@@ -141,22 +150,40 @@ export function Chat({ onClose, profiles, isLoadingProfiles }: ChatProps) {
 
       {/* message list */}
       <Box style={{ flex: 1, overflow: 'hidden', margin: '12px 0' }}>
-        <ScrollArea
-          style={{ height: '100%' }}
-          viewportRef={scrollViewportRef}
-          onScrollPositionChange={handleScroll}
-        >
-          <Stack gap={5}>
-            {messages.map(msg => (
-              <Message
-                key={msg.id}
-                chatMessage={msg}
-                participants={participants}
-                profiles={profiles}
-                isLoadingProfiles={isLoadingProfiles}
-              />
-            ))}
-          </Stack>
+        <ScrollArea h="100%" viewportRef={scrollViewportRef} onScrollPositionChange={handleScroll}>
+          <div
+            style={{
+              height: rowVirtualizer.getTotalSize(),
+              width: '100%',
+              position: 'relative',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                transform: `translateY(${items[0]?.start ?? 0}px)`,
+              }}
+            >
+              {items.map(virtualRow => (
+                <div
+                  key={virtualRow.key}
+                  data-index={virtualRow.index}
+                  ref={rowVirtualizer.measureElement}
+                  style={{ width: '100%' }}
+                >
+                  <Message
+                    chatMessage={messages[virtualRow.index]}
+                    participants={participants}
+                    profiles={profiles}
+                    isLoadingProfiles={isLoadingProfiles}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
         </ScrollArea>
       </Box>
 
