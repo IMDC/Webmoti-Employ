@@ -1,5 +1,6 @@
 import type { Kysely } from 'kysely'
 import type { DB } from './db/schema'
+import { cloudflareRateLimiter } from '@hono-rate-limiter/cloudflare'
 import { clerkMiddleware } from '@hono/clerk-auth'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
@@ -19,7 +20,7 @@ export interface AppContext {
 
 const app = new Hono<AppContext>()
 
-app.use('*', async (c, next) => {
+app.use(async (c, next) => {
   const corsMiddleware = cors({
     origin: c.env.CORS_ORIGIN,
     allowMethods: ['GET', 'POST'],
@@ -29,8 +30,16 @@ app.use('*', async (c, next) => {
 })
 
 // all routes require authentication
-app.use('*', clerkMiddleware())
-app.use('*', useAuth)
+app.use(clerkMiddleware())
+app.use(useAuth)
+
+// rate limit by user id and fallback to ip
+app.use(
+  cloudflareRateLimiter<AppContext>({
+    rateLimitBinding: c => c.env.RATE_LIMITER,
+    keyGenerator: c => c.var.clerkUserId ?? c.req.header('cf-connecting-ip') ?? '',
+  }),
+)
 
 app.onError((err, c) => {
   console.error(err)

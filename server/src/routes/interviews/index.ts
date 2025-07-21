@@ -10,7 +10,7 @@ import { zValidator } from '../../validator-wrapper'
 import { createInterview, getInterviews } from './db-queries'
 
 const interviewsRoute = new Hono<AppContext>()
-interviewsRoute.use('*', useDb)
+interviewsRoute.use(useDb)
 
 interviewsRoute.get('/', useUserEmail, async (c) => {
   const db = requireDb(c)
