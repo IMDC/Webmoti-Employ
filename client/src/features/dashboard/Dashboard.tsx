@@ -62,7 +62,7 @@ export function Dashboard() {
           <Anchor component={Link} to="/" underline="never">
             <Group gap="xs">
               <Image
-                src="/src/favicon.svg"
+                src="/favicon.svg"
                 h={{ base: 15, sm: 25 }}
                 w="auto"
                 fit="contain"

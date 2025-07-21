@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="client/src/favicon.svg" alt="Icon" height="150"/>
+  <img src="client/public/favicon.svg" alt="Icon" height="150"/>
 </p>
 
 <h1 align="center">WebMoti-Employ</h1>
