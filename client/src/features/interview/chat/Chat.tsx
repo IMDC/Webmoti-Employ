@@ -150,7 +150,12 @@ export function Chat({ onClose, profiles, isLoadingProfiles }: ChatProps) {
 
       {/* message list */}
       <Box style={{ flex: 1, overflow: 'hidden', margin: '12px 0' }}>
-        <ScrollArea h="100%" viewportRef={scrollViewportRef} onScrollPositionChange={handleScroll}>
+        <ScrollArea
+          h="100%"
+          viewportRef={scrollViewportRef}
+          onScrollPositionChange={handleScroll}
+          offsetScrollbars
+        >
           <div
             style={{
               height: rowVirtualizer.getTotalSize(),

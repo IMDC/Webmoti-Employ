@@ -95,37 +95,37 @@ export function Room() {
         <Box display="flex" h="100%">
           {/* chat takes up full width when open on mobile */}
           {!(isMobile && isChatOpen) && (
-            <Box
-              ref={participantStageRef}
-              flex={1}
-              miw={0}
-              p={GALLERY_VIEW_MARGIN}
-              display="flex"
-              style={{
-                flexWrap: 'wrap',
-                justifyContent: 'center',
-                alignContent: 'center',
-                gap: GALLERY_VIEW_MARGIN,
-              }}
-            >
-              <Stack>
+            <Stack w="100%" gap={0}>
+              <Box
+                ref={participantStageRef}
+                flex={1}
+                miw={0}
+                p={GALLERY_VIEW_MARGIN}
+                display="flex"
+                style={{
+                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                  alignContent: 'center',
+                  gap: GALLERY_VIEW_MARGIN,
+                }}
+              >
                 <VideoGrid
                   containerRef={participantStageRef}
                   participants={participants}
                   profiles={profiles}
                   isLoadingProfiles={isLoadingProfiles}
                 />
+              </Box>
 
-                {isCaptionsAreaOpen && (
-                  <Box
-                    w="100%"
-                    h="20%"
-                  >
-                    <CaptionsArea />
-                  </Box>
-                )}
-              </Stack>
-            </Box>
+              {isCaptionsAreaOpen && (
+                <Box
+                  w="100%"
+                  h="25%"
+                >
+                  <CaptionsArea />
+                </Box>
+              )}
+            </Stack>
           )}
 
           {isChatOpen && (
