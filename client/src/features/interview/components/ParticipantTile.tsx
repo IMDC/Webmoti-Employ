@@ -25,10 +25,8 @@ export function ParticipantTile({
       w={width}
       p={0}
       radius="lg"
-      style={{
-        position: 'relative',
-        overflow: 'hidden',
-      }}
+      pos="relative"
+      style={{ overflow: 'hidden' }}
     >
       <NoVideoBackground
         profileUrl={profileUrl}
@@ -40,7 +38,7 @@ export function ParticipantTile({
       {name && (
         <Corner position="bottom-left" yOffset={15} xOffset={15}>
           <Skeleton visible={isLoadingProfiles}>
-            <Text size="sm" c="white" style={{ userSelect: 'none' }}>
+            <Text size="sm" c="white">
               {name}
             </Text>
           </Skeleton>

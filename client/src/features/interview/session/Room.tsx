@@ -1,4 +1,4 @@
-import { AppShell, Box, em, Stack, useMantineTheme } from '@mantine/core'
+import { AppShell, Box, em, Flex, Stack, useMantineTheme } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
@@ -96,18 +96,16 @@ export function Room() {
           {/* chat takes up full width when open on mobile */}
           {!(isMobile && isChatOpen) && (
             <Stack w="100%" gap={0}>
-              <Box
+              <Flex
                 ref={participantStageRef}
                 flex={1}
                 miw={0}
                 p={GALLERY_VIEW_MARGIN}
                 display="flex"
-                style={{
-                  flexWrap: 'wrap',
-                  justifyContent: 'center',
-                  alignContent: 'center',
-                  gap: GALLERY_VIEW_MARGIN,
-                }}
+                justify="center"
+                align="center"
+                gap={GALLERY_VIEW_MARGIN}
+                wrap="wrap"
               >
                 <VideoGrid
                   containerRef={participantStageRef}
@@ -115,7 +113,7 @@ export function Room() {
                   profiles={profiles}
                   isLoadingProfiles={isLoadingProfiles}
                 />
-              </Box>
+              </Flex>
 
               {isCaptionsAreaOpen && (
                 <Box

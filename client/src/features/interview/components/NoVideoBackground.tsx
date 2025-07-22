@@ -12,35 +12,17 @@ export function NoVideoBackground({ profileUrl, isLoadingProfiles }: NoVideoBack
         pos="absolute"
         w="100%"
         h="100%"
+        bgp="center"
+        bgsz="cover"
         style={{
           backgroundImage: `url(${profileUrl})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
           filter: 'blur(100px)',
         }}
       />
       <Center pos="absolute" w="100%" h="100%">
         {!isLoadingProfiles
-          ? (
-              <Avatar
-                src={profileUrl}
-                style={{
-                  height: 'clamp(50px, 25%, 150px)',
-                  width: 'auto',
-                  aspectRatio: '1 / 1',
-                }}
-              />
-            )
-          : (
-              <Skeleton
-                circle
-                style={{
-                  height: 'clamp(50px, 25%, 150px)',
-                  width: 'auto',
-                  aspectRatio: '1 / 1',
-                }}
-              />
-            )}
+          ? <Avatar src={profileUrl} w="15%" h="auto" />
+          : <Skeleton circle w="15%" h="auto" />}
       </Center>
     </>
   )

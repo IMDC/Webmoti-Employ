@@ -28,7 +28,11 @@ export function ErrorDialog() {
       zIndex={9999}
     >
       <Text fw="bolder">Error</Text>
-      <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{formatted}</pre>
+      <pre
+        style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+      >
+        {formatted}
+      </pre>
     </Dialog>
   )
 }

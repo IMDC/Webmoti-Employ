@@ -15,13 +15,10 @@ export function JoiningScreen({ visible }: JoiningScreenProps) {
     >
       {styles => (
         <Center
-          style={{
-            ...styles,
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'black',
-            zIndex: 1000,
-          }}
+          pos="fixed"
+          bg="black"
+          inset={0}
+          style={{ ...styles, zIndex: 1000 }}
         >
           <Group>
             <Loader color="white" />

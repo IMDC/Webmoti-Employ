@@ -73,7 +73,6 @@ export function Dashboard() {
                 variant="gradient"
                 gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
                 draggable={false}
-                style={{ userSelect: 'none' }}
               >
                 WebMoti-Employ
               </Text>

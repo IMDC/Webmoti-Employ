@@ -144,7 +144,7 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
         placeholder="Email"
         leftSection={<IconAt size={16} />}
         withAsterisk
-        style={{ flex: 1 }}
+        flex={1}
         key={form.key(`invites.${index}.email`)}
         {...form.getInputProps(`invites.${index}.email`)}
       />

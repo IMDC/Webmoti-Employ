@@ -24,8 +24,8 @@ export function ToggleVideoButton({ onToggleVideo }: ToggleVideoButtonProps) {
           disabled={permissionState === 'idle' || permissionState === 'acquiring'}
         >
           {isVideoOn
-            ? (<IconVideoFilled size={18} />)
-            : (<IconVideoOff style={{ fill: 'white', stroke: 'white' }} size={18} />)}
+            ? <IconVideoFilled size={18} />
+            : <IconVideoOff style={{ fill: 'white', stroke: 'white' }} size={18} />}
         </Button>
       </Tooltip>
     </Indicator>

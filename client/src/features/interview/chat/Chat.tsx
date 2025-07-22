@@ -47,9 +47,7 @@ function Message({ chatMessage, participants, profiles, isLoadingProfiles }: Mes
       <Skeleton visible={isLoadingProfiles}>
         <Text
           lh="xs"
-          style={{
-            overflowWrap: 'anywhere',
-          }}
+          style={{ overflowWrap: 'anywhere' }}
         >
           <strong style={{ marginRight: 5 }}>
             {displayName}
@@ -126,12 +124,10 @@ export function Chat({ onClose, profiles, isLoadingProfiles }: ChatProps) {
 
   return (
     <Card
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        padding: 16,
-      }}
+      h="100%"
+      p={16}
+      display="flex"
+      style={{ flexDirection: 'column' }}
       withBorder
     >
       {/* header */}
@@ -149,7 +145,7 @@ export function Chat({ onClose, profiles, isLoadingProfiles }: ChatProps) {
       </Group>
 
       {/* message list */}
-      <Box style={{ flex: 1, overflow: 'hidden', margin: '12px 0' }}>
+      <Box flex={1} my={12} style={{ overflow: 'hidden' }}>
         <ScrollArea
           h="100%"
           viewportRef={scrollViewportRef}

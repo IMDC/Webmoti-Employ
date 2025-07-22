@@ -63,7 +63,7 @@ export function MenuBar({
       </Flex>
 
       {/* right section */}
-      <Flex align="center" gap="md" style={{ flex: 1 }} justify="flex-end">
+      <Flex align="center" gap="md" flex={1} justify="flex-end">
         <>
           <ToggleChatButton isChatOpen={isChatOpen} onToggleChat={onToggleChat} />
 

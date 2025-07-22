@@ -27,8 +27,8 @@ export function ToggleAudioButton({ onToggleMic }: ToggleAudioButtonProps) {
           disabled={permissionState === 'idle' || permissionState === 'acquiring'}
         >
           {isAudioOn
-            ? (<IconMicrophoneFilled size={18} />)
-            : (<IconMicrophoneOff size={18} style={{ fill: 'white', stroke: 'white' }} />)}
+            ? <IconMicrophoneFilled size={18} />
+            : <IconMicrophoneOff size={18} style={{ fill: 'white', stroke: 'white' }} />}
         </Button>
       </Tooltip>
     </Indicator>
