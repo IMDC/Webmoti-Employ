@@ -69,6 +69,12 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       initClient: async () => {
         logger.log('Initializing zoom client...')
 
+        if (!(ZoomVideo.checkSystemRequirements().video
+          && ZoomVideo.checkSystemRequirements().audio)) {
+          useAppStore.getState().setError({ message: 'Your device is not supported' })
+          return
+        }
+
         await client.init('en-US', 'Global', {
           patchJsMedia: true,
           leaveOnPageUnload: true,
@@ -191,6 +197,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
   // client.on('device-permission-change', );
   // client.on('active-media-failed', );
   // client.on('active-media-failed', );
+  // client.on('network-quality-change', );
   // others... https://developers.zoom.us/docs/video-sdk/web/handle-events/
 
   return zoomSessionStore
