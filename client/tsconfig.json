@@ -11,7 +11,12 @@
       "@test-utils": ["./test-utils"]
     },
     "resolveJsonModule": true,
-    "types": ["node", "@testing-library/jest-dom", "vitest/globals"],
+    "types": [
+      "node",
+      "@testing-library/jest-dom",
+      "vitest/globals",
+      "../shared/src/electron"
+    ],
     "allowJs": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

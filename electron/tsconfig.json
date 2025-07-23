@@ -1,12 +1,20 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "composite": true,
     "baseUrl": ".",
     "module": "commonjs",
     "moduleResolution": "node",
+    "paths": {
+      "@webmoti-employ/shared": ["../shared/src/index.ts"]
+    },
+    "types": ["../shared/src/electron"],
     "noImplicitAny": true,
     "outDir": "dist",
     "esModuleInterop": true
   },
+  "references": [
+    { "path": "../shared" }
+  ],
   "include": ["src"]
 }

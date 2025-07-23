@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.17.0",
+    "@webmoti-employ/shared": "workspace:^",
     "cross-env": "^7.0.3",
     "electron": "37.2.3",
     "electron-builder": "^26.0.12",
