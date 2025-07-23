@@ -6,6 +6,7 @@ export default antfu({
   markdown: true,
   formatters: {
     css: true,
+    html: true,
   },
   ignores: [
     '**/routeTree.gen.ts',
