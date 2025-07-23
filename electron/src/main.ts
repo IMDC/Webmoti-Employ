@@ -1,20 +1,21 @@
 import path from 'node:path'
 import process from 'node:process'
 import { app, BrowserWindow } from 'electron'
-
-const isDev = !app.isPackaged
+import { getPreloadPath, isDev } from './utils'
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    webPreferences: {
+      preload: getPreloadPath(),
+    },
   })
 
   if (isDev) {
     // load vite dev server running in /client
     mainWindow.setIcon(path.join(__dirname, '..', 'icon.png'))
     mainWindow.loadURL('http://localhost:5173')
-    mainWindow.webContents.openDevTools()
   }
   else {
     // load built app from /client

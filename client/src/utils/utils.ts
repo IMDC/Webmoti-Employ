@@ -81,3 +81,7 @@ export function getInterviewLink(sessionId: string) {
 export function getHighlightColor(isColorblindModeOn: boolean) {
   return isColorblindModeOn ? 'black' : 'red'
 }
+
+export function isElectron() {
+  return 'electron' in window
+}
