@@ -19,6 +19,12 @@ WebMoti-Employ is an app that uses eyetracking to deliver real-time feedback dur
 - [VSCode Auto Formatting Code](#vscode-auto-formatting-code)
 - [Firefox Dev WebRTC error](#firefox-dev-webrtc-error)
 
+![Dashboard](img/dashboard.png)
+
+![Interview room](img/room.png)
+
+[See more app screenshots here](img/screenshots.md)
+
 ## Stack
 
 - PNPM - package manager
