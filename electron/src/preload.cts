@@ -1,5 +1,19 @@
 import electron from 'electron'
 
+// export const isDev = !app.isPackaged
+
+// function getModelPath() {
+//   return path.join(app.getAppPath(), isDev ? '.' : '..', 'models')
+// }
+
+// function getFaceModelPath() {
+//   return path.join(getModelPath(), 'blaze_face_short_range.tflite')
+// }
+
+// function getWasmPath() {
+//   return path.join(getModelPath(), 'wasm')
+// }
+
 // expose these methods to the renderer process
 electron.contextBridge.exposeInMainWorld('electron', {
   subscribeToFeedback: callback =>
@@ -8,6 +22,8 @@ electron.contextBridge.exposeInMainWorld('electron', {
     }),
   // eslint-disable-next-line no-console
   sendInterviewerCoordinates: coordinates => console.log(coordinates),
+  // getFaceModelPath: () => getFaceModelPath(),
+  // getWasmPath: () => getWasmPath(),
 } satisfies Window['electron'])
 
 // export function ipcInvoke<Key extends keyof EventPayloadMapping>(

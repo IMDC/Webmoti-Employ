@@ -17,7 +17,6 @@
   "references": [
     { "path": "client" },
     { "path": "server" },
-    { "path": "shared" },
-    { "path": "electron" }
+    { "path": "shared" }
   ]
 }

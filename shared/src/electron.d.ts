@@ -21,6 +21,8 @@ declare global {
     electron: {
       subscribeToFeedback: (callback: (feedback: Feedback) => void) => UnsubscribeFunction
       sendInterviewerCoordinates: (coordinates: InterviewerCoordinates) => void
+      // getFaceModelPath: () => string
+      // getWasmPath: () => string
     }
   }
 }

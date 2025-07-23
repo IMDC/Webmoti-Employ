@@ -12,6 +12,7 @@ import { MenuBar } from '../components/MenuBar'
 import { MobileMenuBar } from '../components/MobileMenuBar'
 import { useParticipantProfiles } from '../profiles/useParticipantProfiles'
 import { VideoGrid } from './components/VideoGrid'
+import { useFaceDetection } from './hooks/useFaceDetection'
 
 export function Room() {
   const participantStageRef = useRef<HTMLDivElement>(null)
@@ -24,16 +25,16 @@ export function Room() {
   const setIsVideoOn = useZoomSessionStore(s => s.setIsVideoOn)
   const isAudioOn = useZoomSessionStore(s => s.isAudioOn)
   const setIsAudioOn = useZoomSessionStore(s => s.setIsAudioOn)
-
-  // TODO maybe remove this in favour of startVideo permission check
-  const initDevices = useDeviceStore(s => s.initDevices)
-
   const startVideo = useZoomSessionStore(s => s.startVideo)
   const stopVideo = useZoomSessionStore(s => s.stopVideo)
   const startAudio = useZoomSessionStore(s => s.startAudio)
   const stopAudio = useZoomSessionStore(s => s.stopAudio)
-
   const callState = useZoomSessionStore(s => s.callState)
+
+  // TODO maybe remove this in favour of startVideo permission check
+  const initDevices = useDeviceStore(s => s.initDevices)
+
+  useFaceDetection()
 
   const navigate = useNavigate()
 

@@ -6,11 +6,7 @@ import { app, ipcMain } from 'electron'
 export const isDev = !app.isPackaged
 
 export function getPreloadPath() {
-  return path.join(
-    app.getAppPath(),
-    isDev ? '.' : '..',
-    '/dist/preload.cjs',
-  )
+  return path.join(app.getAppPath(), isDev ? '.' : '..', '/dist/preload.cjs')
 }
 
 export function getUiPath() {
