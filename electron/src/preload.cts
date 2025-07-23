@@ -2,8 +2,10 @@ import electron from 'electron'
 
 // expose these methods to the renderer process
 electron.contextBridge.exposeInMainWorld('electron', {
-  // TODO add unsubscribe method
-  subscribeToFeedback: callback => callback({ feedbackType: 'fixation' }),
+  subscribeToFeedback: callback =>
+    ipcOn('feedback', (feedback) => {
+      callback(feedback)
+    }),
   // eslint-disable-next-line no-console
   sendInterviewerCoordinates: coordinates => console.log(coordinates),
 } satisfies Window['electron'])
@@ -14,9 +16,11 @@ electron.contextBridge.exposeInMainWorld('electron', {
 //   return electron.ipcRenderer.invoke(key)
 // }
 
-// export function ipcOn<Key extends keyof EventPayloadMapping>(
-//   key: Key,
-//   callback: (payload: EventPayloadMapping[Key]) => void,
-// ) {
-//   electron.ipcRenderer.on(key, (_, payload) => callback(payload))
-// }
+export function ipcOn<Key extends keyof EventPayloadMapping>(
+  key: Key,
+  callback: (payload: EventPayloadMapping[Key]) => void,
+) {
+  const cb = (_: Electron.IpcRendererEvent, payload: any) => callback(payload)
+  electron.ipcRenderer.on(key, cb)
+  return () => electron.ipcRenderer.off(key, cb)
+}

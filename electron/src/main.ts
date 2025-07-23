@@ -1,7 +1,7 @@
 import path from 'node:path'
 import process from 'node:process'
 import { app, BrowserWindow } from 'electron'
-import { getPreloadPath, isDev } from './utils'
+import { getLocalDomain, getPreloadPath, getUiPath, isDev } from './utils'
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -15,12 +15,11 @@ function createWindow() {
   if (isDev) {
     // load vite dev server running in /client
     mainWindow.setIcon(path.join(__dirname, '..', 'icon.png'))
-    mainWindow.loadURL('http://localhost:5173')
+    mainWindow.loadURL(`http://${getLocalDomain()}`)
   }
   else {
     // load built app from /client
-    const distPath = path.join(app.getAppPath(), 'client', 'dist', 'index.html')
-    mainWindow.loadFile(distPath)
+    mainWindow.loadFile(getUiPath())
   }
 }
 

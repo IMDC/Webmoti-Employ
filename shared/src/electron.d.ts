@@ -15,9 +15,11 @@ declare global {
     coordinates: InterviewerCoordinates
   }
 
+  type UnsubscribeFunction = () => void
+
   interface Window {
     electron: {
-      subscribeToFeedback: (callback: (feedback: Feedback) => void) => void
+      subscribeToFeedback: (callback: (feedback: Feedback) => void) => UnsubscribeFunction
       sendInterviewerCoordinates: (coordinates: InterviewerCoordinates) => void
     }
   }
