@@ -1,4 +1,5 @@
 import type { WebContents, WebFrameMain } from 'electron'
+import fs from 'node:fs'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { app, ipcMain } from 'electron'
@@ -11,6 +12,17 @@ export function getPreloadPath() {
 
 export function getUiPath() {
   return path.join(app.getAppPath(), 'client', 'dist', 'index.html')
+}
+
+function getModelPath() {
+  return path.join(app.getAppPath(), isDev ? '.' : '..', 'models', 'blaze_face_short_range.tflite')
+}
+
+export function getModelBuffer(): ArrayBuffer {
+  const modelPath = getModelPath()
+  const buffer = fs.readFileSync(modelPath)
+  // only return actual model data
+  return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength)
 }
 
 export function getLocalDomain() {

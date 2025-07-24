@@ -15,9 +15,13 @@ export function useFaceDetection() {
       // eslint-disable-next-line no-console
       console.log(electron)
 
-      const vision = await FilesetResolver.forVisionTasks(electron.getWasmPath())
+      const vision = await FilesetResolver.forVisionTasks(
+        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm',
+      )
 
-      const faceDetector = await FaceDetector.createFromModelPath(vision, electron.getFaceModelPath())
+      const rawBuffer = await window.electron.getModelBuffer()
+      const modelBuffer = new Uint8Array(rawBuffer)
+      const faceDetector = await FaceDetector.createFromModelBuffer(vision, modelBuffer)
 
       // eslint-disable-next-line no-console
       console.log(faceDetector)

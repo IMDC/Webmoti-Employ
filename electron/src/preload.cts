@@ -1,18 +1,5 @@
-import electron from 'electron'
-
-// export const isDev = !app.isPackaged
-
-// function getModelPath() {
-//   return path.join(app.getAppPath(), isDev ? '.' : '..', 'models')
-// }
-
-// function getFaceModelPath() {
-//   return path.join(getModelPath(), 'blaze_face_short_range.tflite')
-// }
-
-// function getWasmPath() {
-//   return path.join(getModelPath(), 'wasm')
-// }
+/* eslint-disable ts/no-require-imports */
+const electron = require('electron')
 
 // expose these methods to the renderer process
 electron.contextBridge.exposeInMainWorld('electron', {
@@ -22,17 +9,16 @@ electron.contextBridge.exposeInMainWorld('electron', {
     }),
   // eslint-disable-next-line no-console
   sendInterviewerCoordinates: coordinates => console.log(coordinates),
-  // getFaceModelPath: () => getFaceModelPath(),
-  // getWasmPath: () => getWasmPath(),
+  getModelBuffer: () => ipcInvoke('getModelBuffer'),
 } satisfies Window['electron'])
 
-// export function ipcInvoke<Key extends keyof EventPayloadMapping>(
-//   key: Key,
-// ): Promise<EventPayloadMapping[Key]> {
-//   return electron.ipcRenderer.invoke(key)
-// }
+function ipcInvoke<Key extends keyof EventPayloadMapping>(
+  key: Key,
+): Promise<EventPayloadMapping[Key]> {
+  return electron.ipcRenderer.invoke(key)
+}
 
-export function ipcOn<Key extends keyof EventPayloadMapping>(
+function ipcOn<Key extends keyof EventPayloadMapping>(
   key: Key,
   callback: (payload: EventPayloadMapping[Key]) => void,
 ) {

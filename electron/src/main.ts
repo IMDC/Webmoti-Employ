@@ -1,26 +1,37 @@
 import path from 'node:path'
 import process from 'node:process'
 import { app, BrowserWindow } from 'electron'
-import { getLocalDomain, getPreloadPath, getUiPath, isDev } from './utils'
+import {
+  getLocalDomain,
+  getModelBuffer,
+  getPreloadPath,
+  getUiPath,
+  ipcHandle,
+  isDev,
+} from './utils'
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
     webPreferences: {
       preload: getPreloadPath(),
     },
+    // only show after maximized
+    show: false,
   })
+  mainWindow.maximize()
 
   if (isDev) {
     // load vite dev server running in /client
     mainWindow.setIcon(path.join(app.getAppPath(), 'icon.png'))
     mainWindow.loadURL(`http://${getLocalDomain()}`)
+    mainWindow.webContents.openDevTools()
   }
   else {
     // load built app from /client
     mainWindow.loadFile(getUiPath())
   }
+
+  ipcHandle('getModelBuffer', getModelBuffer)
 }
 
 // This method will be called when Electron has finished
