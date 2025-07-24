@@ -5,7 +5,7 @@ import ZoomVideo, { VideoQuality } from '@zoom/videosdk'
 import { createStore } from 'zustand'
 import { useAppStore } from '@/useAppStore'
 import { logger } from '@/utils/logger'
-import { handleAppError } from '@/utils/utils'
+import { handleAppError, isExecutedFailure } from '@/utils/utils'
 
 export interface ZoomSessionStore {
   client: typeof VideoClient
@@ -29,7 +29,7 @@ export interface ZoomSessionStore {
   stopVideo: () => Promise<void>
   switchCamera: (deviceId: string) => Promise<void>
 
-  attachVideoPlayer: (userId: number, element: VideoPlayer) => Promise<void>
+  attachVideoPlayer: (userId: number, element: VideoPlayer) => Promise<VideoPlayer>
   detachVideoPlayer: (userId: number) => Promise<void>
 
   startAudio: () => Promise<void>
@@ -140,7 +140,13 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         await stream().detachVideo(userId)
 
         logger.log('Attaching video player...')
-        await stream().attachVideo(userId, VideoQuality.Video_720P, element)
+        const player = await stream().attachVideo(userId, VideoQuality.Video_720P, element)
+
+        if (isExecutedFailure(player)) {
+          throw new Error('Failed to attach video player')
+        }
+
+        return player
       },
 
       detachVideoPlayer: async (userId: number) => {

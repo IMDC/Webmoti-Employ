@@ -19,7 +19,7 @@ export function getFittedSize(
   return [width, height]
 }
 
-function isExecutedFailure(error: unknown): error is ExecutedFailure {
+export function isExecutedFailure(error: unknown): error is ExecutedFailure {
   return typeof error === 'object' && error !== null && 'reason' in error && 'errorCode' in error
 }
 

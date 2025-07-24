@@ -34,8 +34,6 @@ export function Room() {
   // TODO maybe remove this in favour of startVideo permission check
   const initDevices = useDeviceStore(s => s.initDevices)
 
-  useFaceDetection()
-
   const navigate = useNavigate()
 
   const { id } = useParams({ from: '/(authenticated)/interview/$id' })
@@ -45,6 +43,9 @@ export function Room() {
 
   const participants = useZoomSessionStore(store => store.participants)
   const { profiles, isLoadingProfiles } = useParticipantProfiles(participants)
+
+  const [hostVideo, setHostVideo] = useState<HTMLVideoElement | null>(null)
+  useFaceDetection(hostVideo)
 
   async function onToggleMic() {
     if (permissionState !== 'granted') {
@@ -110,6 +111,7 @@ export function Room() {
               >
                 <VideoGrid
                   containerRef={participantStageRef}
+                  setHostVideo={setHostVideo}
                   participants={participants}
                   profiles={profiles}
                   isLoadingProfiles={isLoadingProfiles}

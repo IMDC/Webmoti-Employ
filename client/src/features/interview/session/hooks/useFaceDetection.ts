@@ -1,32 +1,36 @@
-import { FaceDetector, FilesetResolver } from '@mediapipe/tasks-vision'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { isElectron } from '@/utils/utils'
+import { FaceDetectorRunner } from './FaceDetectorRunner'
 
-export function useFaceDetection() {
+export function useFaceDetection(hostVideo: HTMLVideoElement | null) {
+  const runnerRef = useRef<FaceDetectorRunner | null>(null)
+
   useEffect(() => {
-    async function setupFaceDetector() {
-      // only run face detection in electron environment
-      if (!isElectron()) {
+    if (!isElectron() || !hostVideo)
+      return
+
+    const startDetection = () => {
+      if (hostVideo.videoWidth === 0 || hostVideo.videoHeight === 0)
         return
-      }
 
-      const electron = window.electron
-
-      // eslint-disable-next-line no-console
-      console.log(electron)
-
-      const vision = await FilesetResolver.forVisionTasks(
-        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm',
-      )
-
-      const rawBuffer = await window.electron.getModelBuffer()
-      const modelBuffer = new Uint8Array(rawBuffer)
-      const faceDetector = await FaceDetector.createFromModelBuffer(vision, modelBuffer)
-
-      // eslint-disable-next-line no-console
-      console.log(faceDetector)
+      // you can increase this to run detection more often
+      const DETECTION_FPS = 5
+      const runner = new FaceDetectorRunner(hostVideo, DETECTION_FPS)
+      runnerRef.current = runner
+      runner.init()
     }
 
-    setupFaceDetector()
-  }, [])
+    // wait until video is loaded
+    if (hostVideo.readyState >= 2) {
+      startDetection()
+    }
+    else {
+      hostVideo.addEventListener('loadeddata', startDetection)
+    }
+
+    return () => {
+      runnerRef.current?.stop()
+      hostVideo.removeEventListener('loadeddata', startDetection)
+    }
+  }, [hostVideo])
 }

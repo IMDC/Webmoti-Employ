@@ -1,4 +1,5 @@
 import type { Participant, VideoPlayer } from '@zoom/videosdk'
+import type { Dispatch, SetStateAction } from 'react'
 import { useCallback } from 'react'
 import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore'
 import { Corner } from '../../../../components/Corner'
@@ -13,9 +14,18 @@ interface SessionTileProps {
   name: string
   profileUrl: string
   isLoadingProfiles: boolean
+  setHostVideo?: Dispatch<SetStateAction<HTMLVideoElement | null>>
 }
 
-export function SessionTile({ height, width, participant, profileUrl, isLoadingProfiles, name }: SessionTileProps) {
+export function SessionTile({
+  height,
+  width,
+  participant,
+  profileUrl,
+  isLoadingProfiles,
+  name,
+  setHostVideo,
+}: SessionTileProps) {
   const attach = useZoomSessionStore(s => s.attachVideoPlayer)
   const detach = useZoomSessionStore(s => s.detachVideoPlayer)
 
@@ -34,7 +44,13 @@ export function SessionTile({ height, width, participant, profileUrl, isLoadingP
       profileUrl={profileUrl}
       isLoadingProfiles={isLoadingProfiles}
     >
-      {participant.bVideoOn && <VideoRenderer attach={attachStable} detach={detachStable} />}
+      {participant.bVideoOn && (
+        <VideoRenderer
+          attach={attachStable}
+          detach={detachStable}
+          setHostVideo={setHostVideo}
+        />
+      )}
 
       <Corner position="bottom-right" yOffset={6} xOffset={8}>
         <AudioLevelIndicator

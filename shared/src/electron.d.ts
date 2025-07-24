@@ -5,9 +5,16 @@ declare global {
     feedbackType: 'fixation' | 'speech'
   }
 
-  interface InterviewerCoordinates {
+  interface FaceDetectionBoundingBox {
     x: number
     y: number
+    width: number
+    height: number
+  }
+
+  interface InterviewerCoordinates {
+    found: boolean
+    boundingBox: FaceDetectionBoundingBox
   }
 
   interface EventPayloadMapping {
