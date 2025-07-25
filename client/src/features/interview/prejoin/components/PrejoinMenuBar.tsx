@@ -12,7 +12,7 @@ export function PrejoinMenuBar() {
   const { toggleIsVideoOn } = useZoomSessionActions()
   const permissionState = useAppPermissionState()
   const { initDevices } = useDeviceStoreActions()
-  const {toggleMuteMicrophone,switchCamera, switchMicrophone} = usePreviewActions()
+  const { toggleMuteMicrophone, switchCamera, switchMicrophone } = usePreviewActions()
 
   async function onToggleMic() {
     if (permissionState !== 'granted') {
