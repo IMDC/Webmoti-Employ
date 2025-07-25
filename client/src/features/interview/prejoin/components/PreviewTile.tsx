@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Corner } from '@/components/Corner'
-import { usePreviewStore } from '@/features/interview/prejoin/hooks/usePreviewStore'
+import { useLocalAudioTrack, usePreviewActions } from '@/features/interview/prejoin/hooks/usePreviewStore'
 import { useAppPermissionState } from '@/useAppStore'
 import AudioLevelIndicator from '../../components/AudioLevelIndicator'
 import { ParticipantTile } from '../../components/ParticipantTile'
@@ -16,11 +16,8 @@ interface PreviewTileProps {
 
 export function PreviewTile({ height, width, name, profileUrl }: PreviewTileProps) {
   const permissionState = useAppPermissionState()
-
-  const startCamera = usePreviewStore(s => s.startCamera)
-  const stopCamera = usePreviewStore(s => s.stopCamera)
-  const startMicrophone = usePreviewStore(s => s.startMicrophone)
-  const localAudioTrack = usePreviewStore(s => s.localAudioTrack)
+  const {startCamera, stopCamera, startMicrophone} = usePreviewActions()
+  const localAudioTrack = useLocalAudioTrack()
   const isVideoOn = useIsVideoOn()
   const isAudioOn = useIsAudioOn()
 

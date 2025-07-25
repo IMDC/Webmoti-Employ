@@ -6,16 +6,13 @@ import { ChangeAudioPopover } from '../../components/popovers/ChangeAudioPopover
 import { ChangeVideoPopover } from '../../components/popovers/ChangeVideoPopover'
 import { useDeviceStoreActions } from '../../zoom/useDeviceStore'
 import { useZoomSessionActions } from '../../zoom/useZoomSessionStore'
-import { usePreviewStore } from '../hooks/usePreviewStore'
+import { usePreviewActions } from '../hooks/usePreviewStore'
 
 export function PrejoinMenuBar() {
   const { toggleIsVideoOn } = useZoomSessionActions()
   const permissionState = useAppPermissionState()
   const { initDevices } = useDeviceStoreActions()
-
-  const toggleMuteMicrophone = usePreviewStore(s => s.toggleMuteMicrophone)
-  const switchCamera = usePreviewStore(s => s.switchCamera)
-  const switchMicrophone = usePreviewStore(s => s.switchMicrophone)
+  const {toggleMuteMicrophone,switchCamera, switchMicrophone} = usePreviewActions()
 
   async function onToggleMic() {
     if (permissionState !== 'granted') {
