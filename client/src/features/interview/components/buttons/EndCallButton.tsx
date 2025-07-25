@@ -2,10 +2,10 @@ import { Button, Tooltip } from '@mantine/core'
 import { IconPhoneOff } from '@tabler/icons-react'
 import { useAppIsColorblindModeOn } from '@/useAppStore'
 import { getHighlightColor } from '@/utils/utils'
-import { useZoomSessionStore } from '../../zoom/useZoomSessionStore'
+import { useZoomSessionActions } from '../../zoom/useZoomSessionStore'
 
 export function EndCallButton() {
-  const leave = useZoomSessionStore(s => s.leave)
+  const { leave } = useZoomSessionActions()
   const isColorblindModeOn = useAppIsColorblindModeOn()
 
   return (

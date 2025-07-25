@@ -17,7 +17,7 @@ import { useVirtualizer } from '@tanstack/react-virtual'
 import Linkify from 'linkify-react'
 import { DateTime } from 'luxon'
 import { useEffect, useRef, useState } from 'react'
-import { useZoomSessionStore } from '../zoom/useZoomSessionStore'
+import { useZoomParticipants } from '../zoom/useZoomSessionStore'
 import { useChatStore } from './useChatStore'
 
 interface MessageProps {
@@ -73,7 +73,7 @@ export function Chat({ onClose, profiles, isLoadingProfiles }: ChatProps) {
   const sendChat = useChatStore(s => s.sendChat)
   const setChatRead = useChatStore(s => s.setChatRead)
 
-  const participants = useZoomSessionStore(s => s.participants)
+  const participants = useZoomParticipants()
 
   const scrollViewportRef = useRef<HTMLDivElement>(null)
 

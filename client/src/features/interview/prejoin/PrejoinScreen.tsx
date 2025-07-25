@@ -8,7 +8,7 @@ import { RightHeader } from '@/components/RightHeader'
 import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
 import { useAppActions } from '@/useAppStore'
 import { getUserIdentity } from '@/utils/utils'
-import { useZoomSessionStore } from '../zoom/useZoomSessionStore'
+import { useZoomCallState, useZoomSessionActions } from '../zoom/useZoomSessionStore'
 import { ErrorScreen } from './components/ErrorScreen'
 import { JoiningScreen } from './components/JoiningScreen'
 import { PrejoinMenuBar } from './components/PrejoinMenuBar'
@@ -20,10 +20,8 @@ export function PrejoinScreen() {
 
   const initDevices = useDeviceStore(s => s.initDevices)
 
-  const callState = useZoomSessionStore(s => s.callState)
-  const joinZoom = useZoomSessionStore(s => s.join)
-  const setIsVideoOn = useZoomSessionStore(s => s.setIsVideoOn)
-  const setIsAudioOn = useZoomSessionStore(s => s.setIsAudioOn)
+  const callState = useZoomCallState()
+  const { join, setIsVideoOn, setIsAudioOn } = useZoomSessionActions()
 
   const { setPermissionState } = useAppActions()
 
@@ -130,7 +128,7 @@ export function PrejoinScreen() {
               </Group>
               <Button
                 onClick={async () =>
-                  joinZoom(userId, interviewSession.sessionId, interviewSession.token)}
+                  join(userId, interviewSession.sessionId, interviewSession.token)}
               >
                 {`${args.action === 'create' ? 'Start' : 'Join'}`}
               </Button>

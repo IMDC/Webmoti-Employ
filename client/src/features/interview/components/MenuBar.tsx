@@ -2,7 +2,7 @@ import { Button, Flex, Group, Text } from '@mantine/core'
 import { useCurrentTime } from '@/hooks/useCurrentTime'
 import { ToggleCaptionsButton } from '../captions/ToggleCaptionsButton'
 import { ControlsMenu } from '../session/components/ControlsMenu'
-import { useZoomSessionStore } from '../zoom/useZoomSessionStore'
+import { useZoomSessionActions } from '../zoom/useZoomSessionStore'
 import { EndCallButton } from './buttons/EndCallButton'
 import { ToggleAudioButton } from './buttons/ToggleAudioButton'
 import { ToggleChatButton } from './buttons/ToggleChatButton'
@@ -30,8 +30,7 @@ export function MenuBar({
   // const [isLayoutModalOpen, { open: openLayoutModal, close: closeLayoutModal }]
   //   = useDisclosure(false)
 
-  const switchCamera = useZoomSessionStore(s => s.switchCamera)
-  const switchMicrophone = useZoomSessionStore(s => s.switchMicrophone)
+  const { switchCamera, switchMicrophone } = useZoomSessionActions()
 
   const time = useCurrentTime()
 

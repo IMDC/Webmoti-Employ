@@ -3,7 +3,13 @@ import { useMediaQuery } from '@mantine/hooks'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
-import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore'
+import {
+  useIsAudioOn,
+  useIsVideoOn,
+  useZoomCallState,
+  useZoomParticipants,
+  useZoomSessionActions,
+} from '@/features/interview/zoom/useZoomSessionStore'
 import { useAppPermissionState } from '@/useAppStore'
 import { GALLERY_VIEW_MARGIN } from '@/utils/constants'
 import { CaptionsArea } from '../captions/CaptionsArea'
@@ -21,15 +27,18 @@ export function Room() {
   const [isCaptionsAreaOpen, setIsCaptionsAreaOpen] = useState(false)
 
   const permissionState = useAppPermissionState()
-  const isVideoOn = useZoomSessionStore(s => s.isVideoOn)
-  const setIsVideoOn = useZoomSessionStore(s => s.setIsVideoOn)
-  const isAudioOn = useZoomSessionStore(s => s.isAudioOn)
-  const setIsAudioOn = useZoomSessionStore(s => s.setIsAudioOn)
-  const startVideo = useZoomSessionStore(s => s.startVideo)
-  const stopVideo = useZoomSessionStore(s => s.stopVideo)
-  const startAudio = useZoomSessionStore(s => s.startAudio)
-  const stopAudio = useZoomSessionStore(s => s.stopAudio)
-  const callState = useZoomSessionStore(s => s.callState)
+
+  const {
+    setIsVideoOn,
+    setIsAudioOn,
+    startVideo,
+    stopVideo,
+    startAudio,
+    stopAudio,
+  } = useZoomSessionActions()
+  const isVideoOn = useIsVideoOn()
+  const isAudioOn = useIsAudioOn()
+  const callState = useZoomCallState()
 
   // TODO maybe remove this in favour of startVideo permission check
   const initDevices = useDeviceStore(s => s.initDevices)
@@ -41,7 +50,7 @@ export function Room() {
   const theme = useMantineTheme()
   const isMobile = useMediaQuery(`(max-width: ${em(theme.breakpoints.sm)})`)
 
-  const participants = useZoomSessionStore(store => store.participants)
+  const participants = useZoomParticipants()
   const { profiles, isLoadingProfiles } = useParticipantProfiles(participants)
 
   const [hostVideo, setHostVideo] = useState<HTMLVideoElement | null>(null)

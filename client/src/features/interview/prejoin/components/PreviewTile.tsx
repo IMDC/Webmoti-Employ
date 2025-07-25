@@ -5,7 +5,7 @@ import { useAppPermissionState } from '@/useAppStore'
 import AudioLevelIndicator from '../../components/AudioLevelIndicator'
 import { ParticipantTile } from '../../components/ParticipantTile'
 import { VideoRenderer } from '../../session/components/VideoRenderer'
-import { useZoomSessionStore } from '../../zoom/useZoomSessionStore'
+import { useIsAudioOn, useIsVideoOn } from '../../zoom/useZoomSessionStore'
 
 interface PreviewTileProps {
   height: number
@@ -21,9 +21,8 @@ export function PreviewTile({ height, width, name, profileUrl }: PreviewTileProp
   const stopCamera = usePreviewStore(s => s.stopCamera)
   const startMicrophone = usePreviewStore(s => s.startMicrophone)
   const localAudioTrack = usePreviewStore(s => s.localAudioTrack)
-
-  const isVideoOn = useZoomSessionStore(s => s.isVideoOn)
-  const isAudioOn = useZoomSessionStore(s => s.isAudioOn)
+  const isVideoOn = useIsVideoOn()
+  const isAudioOn = useIsAudioOn()
 
   const [volume, setVolume] = useState(0)
 

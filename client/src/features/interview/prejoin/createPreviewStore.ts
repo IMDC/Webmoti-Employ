@@ -4,7 +4,7 @@ import type { ZoomSessionStore } from '../zoom/createZoomSessionStore'
 import type { DeviceStore } from '@/features/interview/zoom/createDeviceStore'
 import ZoomVideo from '@zoom/videosdk'
 import { createStore } from 'zustand'
-import { useAppStore } from '@/useAppStore'
+import { appStore } from '@/useAppStore'
 import { logger } from '@/utils/logger'
 import { handleAppError } from '@/utils/utils'
 
@@ -45,7 +45,7 @@ export function createPreviewStore(
         set({ localVideoTrack: track })
       }
       catch (error) {
-        const { setError } = useAppStore.getState().actions
+        const { setError } = appStore.getState().actions
         handleAppError(error, setError, 'Failed to start camera')
       }
     },
@@ -104,7 +104,7 @@ export function createPreviewStore(
       else {
         await localAudioTrack?.unmute()
       }
-      zoomSessionStore.getState().toggleIsAudioOn()
+      zoomSessionStore.getState().actions.toggleIsAudioOn()
     },
     switchMicrophone: async (microphoneId) => {
       const localAudioTrack = get().localAudioTrack

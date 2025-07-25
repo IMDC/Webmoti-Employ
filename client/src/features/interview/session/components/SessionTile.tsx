@@ -1,7 +1,7 @@
 import type { Participant, VideoPlayer } from '@zoom/videosdk'
 import type { Dispatch, SetStateAction } from 'react'
 import { useCallback } from 'react'
-import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore'
+import { useZoomSessionActions } from '@/features/interview/zoom/useZoomSessionStore'
 import { Corner } from '../../../../components/Corner'
 import AudioLevelIndicator from '../../components/AudioLevelIndicator'
 import { ParticipantTile } from '../../components/ParticipantTile'
@@ -26,15 +26,17 @@ export function SessionTile({
   name,
   setHostVideo,
 }: SessionTileProps) {
-  const attach = useZoomSessionStore(s => s.attachVideoPlayer)
-  const detach = useZoomSessionStore(s => s.detachVideoPlayer)
+  const { attachVideoPlayer, detachVideoPlayer } = useZoomSessionActions()
 
   const attachStable = useCallback(
-    (el: VideoPlayer) => attach(participant.userId, el),
-    [attach, participant.userId],
+    (el: VideoPlayer) => attachVideoPlayer(participant.userId, el),
+    [attachVideoPlayer, participant.userId],
   )
 
-  const detachStable = useCallback(() => detach(participant.userId), [detach, participant.userId])
+  const detachStable = useCallback(
+    () => detachVideoPlayer(participant.userId),
+    [detachVideoPlayer, participant.userId],
+  )
 
   return (
     <ParticipantTile

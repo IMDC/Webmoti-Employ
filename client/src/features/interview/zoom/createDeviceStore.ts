@@ -1,7 +1,7 @@
 import ZoomVideo from '@zoom/videosdk'
 import { createStore } from 'zustand'
 import { logger } from '@/utils/logger'
-import { useAppStore } from '../../../useAppStore'
+import { appStore } from '../../../useAppStore'
 
 export interface DeviceStore {
   videoDevices: MediaDeviceInfo[]
@@ -27,7 +27,7 @@ export function createDeviceStore() {
     selectedAudioOutputDevice: null,
 
     initDevices: async () => {
-      const appState = useAppStore.getState()
+      const appState = appStore.getState()
       const appActions = appState.actions
       if (appState.permissionState === 'acquiring') {
         logger.log('Already acquiring devices')
@@ -68,7 +68,7 @@ export function createDeviceStore() {
     cleanup: () => {
       // setting this makes it so next time the prejoin screen is loaded,
       // it will init devices properly
-      useAppStore.getState().actions.setPermissionState('idle')
+      appStore.getState().actions.setPermissionState('idle')
     },
   }))
 }

@@ -17,6 +17,7 @@
     "test": "pnpm run -r test",
     "typecheck": "pnpm run -r typecheck",
     "lint": "pnpm run -r --parallel lint",
+    "check": "pnpm -r run typecheck & pnpm -r run lint",
     "lint:fix": "pnpm run -r --parallel lint:fix",
     "lint:root": "eslint tsconfig.json README.md .github",
     "deploy": "pnpm build && pnpm run -r deploy"

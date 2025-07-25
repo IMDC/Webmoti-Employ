@@ -5,7 +5,7 @@ import { useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { useAppActions } from '@/useAppStore'
 import { handleAppError } from '@/utils/utils'
-import { useZoomSessionStore } from '../zoom/useZoomSessionStore'
+import { useZoomSessionClient } from '../zoom/useZoomSessionStore'
 import { createChatStore } from './createChatStore'
 import { ChatStoreContext } from './useChatStore'
 
@@ -14,7 +14,7 @@ interface ChatContextProviderProps {
 }
 
 export function ChatContextProvider({ children }: ChatContextProviderProps) {
-  const zoomClient = useZoomSessionStore(s => s.client)
+  const zoomClient = useZoomSessionClient()
   const [store, setStore] = useState<StoreApi<ChatStore>>()
 
   const { setError } = useAppActions()

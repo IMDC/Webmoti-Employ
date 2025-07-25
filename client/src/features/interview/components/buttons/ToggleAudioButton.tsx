@@ -2,7 +2,7 @@ import { Button, Indicator, Tooltip } from '@mantine/core'
 import { IconMicrophoneFilled, IconMicrophoneOff } from '@tabler/icons-react'
 import { useAppIsColorblindModeOn, useAppPermissionState } from '@/useAppStore'
 import { getHighlightColor } from '@/utils/utils'
-import { useZoomSessionStore } from '../../zoom/useZoomSessionStore'
+import { useIsAudioOn } from '../../zoom/useZoomSessionStore'
 
 interface ToggleAudioButtonProps {
   onToggleMic: () => Promise<void>
@@ -10,7 +10,7 @@ interface ToggleAudioButtonProps {
 
 export function ToggleAudioButton({ onToggleMic }: ToggleAudioButtonProps) {
   const permissionState = useAppPermissionState()
-  const isAudioOn = useZoomSessionStore(state => state.isAudioOn)
+  const isAudioOn = useIsAudioOn()
   const isColorblindModeOn = useAppIsColorblindModeOn()
 
   return (

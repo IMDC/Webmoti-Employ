@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { createStore, useStore } from 'zustand'
 
 export type PermissionState = 'idle' | 'acquiring' | 'granted' | 'denied'
 
@@ -24,7 +24,7 @@ interface AppStore {
   actions: AppActions
 }
 
-export const useAppStore = create<AppStore>(set => ({
+export const appStore = createStore<AppStore>(set => ({
   error: null,
   permissionState: 'idle',
   isSettingsOpen: false,
@@ -38,6 +38,8 @@ export const useAppStore = create<AppStore>(set => ({
     setIsSettingsOpen: value => set({ isSettingsOpen: value }),
   },
 }))
+
+const useAppStore = <T>(selector: (state: AppStore) => T): T => useStore(appStore, selector)
 
 export const useAppActions = () => useAppStore(s => s.actions)
 export const useAppError = () => useAppStore(s => s.error)
