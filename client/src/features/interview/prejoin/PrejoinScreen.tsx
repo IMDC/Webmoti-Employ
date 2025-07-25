@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 import { MyCopyButton } from '@/components/MyCopyButton'
 import { RightHeader } from '@/components/RightHeader'
 import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
-import { useAppStore } from '@/useAppStore'
+import { useAppActions } from '@/useAppStore'
 import { getUserIdentity } from '@/utils/utils'
 import { useZoomSessionStore } from '../zoom/useZoomSessionStore'
 import { ErrorScreen } from './components/ErrorScreen'
@@ -25,7 +25,7 @@ export function PrejoinScreen() {
   const setIsVideoOn = useZoomSessionStore(s => s.setIsVideoOn)
   const setIsAudioOn = useZoomSessionStore(s => s.setIsAudioOn)
 
-  const setPermissionState = useAppStore(s => s.setPermissionState)
+  const { setPermissionState } = useAppActions()
 
   const { user } = useUser()
   const { id: sessionId } = useParams({ strict: false })

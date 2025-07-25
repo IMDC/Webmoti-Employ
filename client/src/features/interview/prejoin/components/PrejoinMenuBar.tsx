@@ -1,5 +1,5 @@
 import { Button, Group } from '@mantine/core'
-import { useAppStore } from '@/useAppStore'
+import { useAppPermissionState } from '@/useAppStore'
 import { ToggleAudioButton } from '../../components/buttons/ToggleAudioButton'
 import { ToggleVideoButton } from '../../components/buttons/ToggleVideoButton'
 import { ChangeAudioPopover } from '../../components/popovers/ChangeAudioPopover'
@@ -10,7 +10,7 @@ import { usePreviewStore } from '../hooks/usePreviewStore'
 
 export function PrejoinMenuBar() {
   const toggleIsVideoOn = useZoomSessionStore(s => s.toggleIsVideoOn)
-  const permissionState = useAppStore(s => s.permissionState)
+  const permissionState = useAppPermissionState()
 
   const initDevices = useDeviceStore(s => s.initDevices)
 

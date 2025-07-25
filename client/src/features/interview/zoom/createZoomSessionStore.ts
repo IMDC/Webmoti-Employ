@@ -73,7 +73,8 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
 
         const checkReqs = ZoomVideo.checkSystemRequirements()
         if (!checkReqs.video || !checkReqs.audio) {
-          useAppStore.getState().setError({ message: 'Your device is not supported' })
+          const { setError } = useAppStore.getState().actions
+          setError({ message: 'Your device is not supported' })
           return
         }
 
@@ -105,7 +106,8 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         }
         catch (error) {
           set({ callState: 'prejoin', stream: null })
-          handleAppError(error, useAppStore.getState().setError, 'Failed to join Zoom session')
+          const { setError } = useAppStore.getState().actions
+          handleAppError(error, setError, 'Failed to join Zoom session')
         }
       },
 

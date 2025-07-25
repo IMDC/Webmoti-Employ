@@ -1,12 +1,12 @@
 import { Button, Tooltip } from '@mantine/core'
 import { IconPhoneOff } from '@tabler/icons-react'
-import { useAppStore } from '@/useAppStore'
+import { useAppIsColorblindModeOn } from '@/useAppStore'
 import { getHighlightColor } from '@/utils/utils'
 import { useZoomSessionStore } from '../../zoom/useZoomSessionStore'
 
 export function EndCallButton() {
   const leave = useZoomSessionStore(s => s.leave)
-  const isColorblindModeOn = useAppStore(s => s.isColorblindModeOn)
+  const isColorblindModeOn = useAppIsColorblindModeOn()
 
   return (
     <Tooltip label="Leave interview" color="gray">

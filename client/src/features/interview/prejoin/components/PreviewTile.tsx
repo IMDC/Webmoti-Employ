@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Corner } from '@/components/Corner'
 import { usePreviewStore } from '@/features/interview/prejoin/hooks/usePreviewStore'
-import { useAppStore } from '@/useAppStore'
+import { useAppPermissionState } from '@/useAppStore'
 import AudioLevelIndicator from '../../components/AudioLevelIndicator'
 import { ParticipantTile } from '../../components/ParticipantTile'
 import { VideoRenderer } from '../../session/components/VideoRenderer'
@@ -15,7 +15,7 @@ interface PreviewTileProps {
 }
 
 export function PreviewTile({ height, width, name, profileUrl }: PreviewTileProps) {
-  const permissionState = useAppStore(s => s.permissionState)
+  const permissionState = useAppPermissionState()
 
   const startCamera = usePreviewStore(s => s.startCamera)
   const stopCamera = usePreviewStore(s => s.stopCamera)

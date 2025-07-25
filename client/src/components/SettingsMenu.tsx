@@ -1,17 +1,16 @@
 import { Group, Modal, Stack, Switch, Text } from '@mantine/core'
-import { useAppStore } from '@/useAppStore'
+import { useAppActions, useAppIsColorblindModeOn, useAppIsSettingsOpen } from '@/useAppStore'
 import { ColorSchemeToggle } from './ColorSchemeToggle'
 
 export function SettingsMenu() {
-  const isSettingsOpened = useAppStore(state => state.isSettingsOpen)
-  const setIsSettingsOpened = useAppStore(state => state.setIsSettingsOpen)
-  const setIsColorblindModeOn = useAppStore(state => state.setIsColorblindModeOn)
-  const isColorblindModeOn = useAppStore(state => state.isColorblindModeOn)
+  const isSettingsOpened = useAppIsSettingsOpen()
+  const { setIsSettingsOpen, setIsColorblindModeOn } = useAppActions()
+  const isColorblindModeOn = useAppIsColorblindModeOn()
 
   return (
     <Modal
       opened={isSettingsOpened}
-      onClose={() => setIsSettingsOpened(false)}
+      onClose={() => setIsSettingsOpen(false)}
       title={<Text fw="bolder">Settings</Text>}
       overlayProps={{
         backgroundOpacity: 0.55,

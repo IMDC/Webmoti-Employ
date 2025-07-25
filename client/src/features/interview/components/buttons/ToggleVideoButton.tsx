@@ -1,6 +1,6 @@
 import { Button, Indicator, Tooltip } from '@mantine/core'
 import { IconVideoFilled, IconVideoOff } from '@tabler/icons-react'
-import { useAppStore } from '@/useAppStore'
+import { useAppIsColorblindModeOn, useAppPermissionState } from '@/useAppStore'
 import { getHighlightColor } from '@/utils/utils'
 import { useZoomSessionStore } from '../../zoom/useZoomSessionStore'
 
@@ -9,9 +9,9 @@ interface ToggleVideoButtonProps {
 }
 
 export function ToggleVideoButton({ onToggleVideo }: ToggleVideoButtonProps) {
-  const permissionState = useAppStore(state => state.permissionState)
+  const permissionState = useAppPermissionState()
   const isVideoOn = useZoomSessionStore(state => state.isVideoOn)
-  const isColorblindModeOn = useAppStore(s => s.isColorblindModeOn)
+  const isColorblindModeOn = useAppIsColorblindModeOn()
 
   return (
     <Indicator color="orange" disabled={permissionState !== 'denied'}>

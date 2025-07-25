@@ -1,10 +1,10 @@
 import { Dialog, Text } from '@mantine/core'
-import { useAppStore } from '@/useAppStore'
+import { useAppActions, useAppError } from '@/useAppStore'
 import { formatAppError } from '@/utils/utils'
 
 export function ErrorDialog() {
-  const error = useAppStore(state => state.error)
-  const clearError = useAppStore(state => state.clearError)
+  const error = useAppError()
+  const { clearError } = useAppActions()
 
   if (!error) {
     return null

@@ -4,7 +4,7 @@ import { useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
 import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore'
-import { useAppStore } from '@/useAppStore'
+import { useAppPermissionState } from '@/useAppStore'
 import { GALLERY_VIEW_MARGIN } from '@/utils/constants'
 import { CaptionsArea } from '../captions/CaptionsArea'
 import { Chat } from '../chat/Chat'
@@ -20,7 +20,7 @@ export function Room() {
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [isCaptionsAreaOpen, setIsCaptionsAreaOpen] = useState(false)
 
-  const permissionState = useAppStore(s => s.permissionState)
+  const permissionState = useAppPermissionState()
   const isVideoOn = useZoomSessionStore(s => s.isVideoOn)
   const setIsVideoOn = useZoomSessionStore(s => s.setIsVideoOn)
   const isAudioOn = useZoomSessionStore(s => s.isAudioOn)

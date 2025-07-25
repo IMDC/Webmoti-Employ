@@ -28,11 +28,12 @@ export function createDeviceStore() {
 
     initDevices: async () => {
       const appState = useAppStore.getState()
+      const appActions = appState.actions
       if (appState.permissionState === 'acquiring') {
         logger.log('Already acquiring devices')
         return 'skipped'
       }
-      appState.setPermissionState('acquiring')
+      appActions.setPermissionState('acquiring')
 
       // try catch doesn't work on this function
       const devices = await ZoomVideo.getDevices()
@@ -46,8 +47,8 @@ export function createDeviceStore() {
       const hasPermission = [...videoDevices, ...audioInputDevices].some(isValidDevice)
 
       if (!hasPermission) {
-        appState.setError({ message: 'Could not access media devices' })
-        appState.setPermissionState('denied')
+        appActions.setError({ message: 'Could not access media devices' })
+        appActions.setPermissionState('denied')
         return 'denied'
       }
 
@@ -60,14 +61,14 @@ export function createDeviceStore() {
         selectedAudioOutputDevice: audioOutputDevices[0]?.deviceId ?? null,
       })
 
-      appState.setPermissionState('granted')
+      appActions.setPermissionState('granted')
       return 'granted'
     },
 
     cleanup: () => {
       // setting this makes it so next time the prejoin screen is loaded,
       // it will init devices properly
-      useAppStore.getState().setPermissionState('idle')
+      useAppStore.getState().actions.setPermissionState('idle')
     },
   }))
 }

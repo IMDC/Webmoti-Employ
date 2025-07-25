@@ -45,7 +45,8 @@ export function createPreviewStore(
         set({ localVideoTrack: track })
       }
       catch (error) {
-        handleAppError(error, useAppStore.getState().setError, 'Failed to start camera')
+        const { setError } = useAppStore.getState().actions
+        handleAppError(error, setError, 'Failed to start camera')
       }
     },
 
