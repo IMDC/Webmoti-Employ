@@ -39,7 +39,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
     }
 
     return () => {
-      chatStore?.getState().cleanup()
+      chatStore?.getState().actions.cleanup()
     }
   }, [zoomClient, setError, id, navigate])
 

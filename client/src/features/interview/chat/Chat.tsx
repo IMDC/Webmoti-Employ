@@ -18,7 +18,7 @@ import Linkify from 'linkify-react'
 import { DateTime } from 'luxon'
 import { useEffect, useRef, useState } from 'react'
 import { useZoomParticipants } from '../zoom/useZoomSessionStore'
-import { useChatStore } from './useChatStore'
+import { useChatActions, useChatMessages } from './useChatStore'
 
 interface MessageProps {
   chatMessage: ChatMessage
@@ -69,9 +69,8 @@ export function Chat({ onClose, profiles, isLoadingProfiles }: ChatProps) {
   const [chatText, setChatText] = useState('')
   const [isAtBottom, setIsAtBottom] = useState(true)
 
-  const messages = useChatStore(s => s.messages)
-  const sendChat = useChatStore(s => s.sendChat)
-  const setChatRead = useChatStore(s => s.setChatRead)
+  const messages = useChatMessages()
+  const { sendChat, setChatRead } = useChatActions()
 
   const participants = useZoomParticipants()
 
