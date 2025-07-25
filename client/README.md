@@ -14,15 +14,15 @@ Then add environment variables:
 
 ## Deploying
 
-The client is deployed on Vercel. It integrates with GitHub so when you push a commit, the deployment is automatically updated.
+The client is deployed on Vercel. Since Vercel doesn't allow collaborators on the hobby plan, we use a Github action instead for automatic deployments.
 
-Steps:
+Steps for automatic deployments:
 
-1. Make vercel account with GitHub sign in
-2. Click Install GitHub application under Import Git Repository
-3. Click import for the GitHub repo and make new project
-4. Change project name
-5. Set root to `client`
-6. Add environment variables from `.env`
-7. Click Deploy
-8. [Deploy server](../server/README.md#deploying), get deployed url, and set new environment variable (`VITE_API_BASE_URL`) in `Settings` > `Environment Variables`
+<https://vercel.com/guides/how-can-i-use-github-actions-with-vercel>
+<https://faisalhusa.in/blog/vercel-free-tier-cicd-fix>
+
+1. Retrieve your [Vercel Access Token](https://vercel.com/guides/how-do-i-use-a-vercel-api-access-token)
+2. (optional) Install the [Vercel CLI](https://vercel.com/cli) and run vercel login
+3. (optional) Inside your folder, run vercel link to create a new Vercel project
+4. (optional) Inside the generated .vercel folder, save the projectId and orgId from the project.json
+5. Inside GitHub, add VERCEL_TOKEN, VERCEL_ORG_ID, and VERCEL_PROJECT_ID as [secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
