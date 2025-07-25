@@ -46,6 +46,7 @@ export function SessionTile({
     >
       {participant.bVideoOn && (
         <VideoRenderer
+          userId={participant.userId}
           attach={attachStable}
           detach={detachStable}
           setHostVideo={setHostVideo}

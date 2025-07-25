@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 import { MyCopyButton } from '@/components/MyCopyButton'
 import { RightHeader } from '@/components/RightHeader'
 import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
+import { useAppStore } from '@/useAppStore'
 import { getUserIdentity } from '@/utils/utils'
 import { useZoomSessionStore } from '../zoom/useZoomSessionStore'
 import { ErrorScreen } from './components/ErrorScreen'
@@ -24,6 +25,8 @@ export function PrejoinScreen() {
   const setIsVideoOn = useZoomSessionStore(s => s.setIsVideoOn)
   const setIsAudioOn = useZoomSessionStore(s => s.setIsAudioOn)
 
+  const setPermissionState = useAppStore(s => s.setPermissionState)
+
   const { user } = useUser()
   const { id: sessionId } = useParams({ strict: false })
 
@@ -37,8 +40,11 @@ export function PrejoinScreen() {
 
   useEffect(() => {
     // wait until the interview session query is successful before init devices
-    if (!interviewSession || interviewSessionError)
+    if (!interviewSession || interviewSessionError) {
+      // set this to disable menu bar while initializing devices
+      setPermissionState('acquiring')
       return
+    }
 
     const handleInitDevices = async () => {
       const permission = await initDevices()
@@ -55,6 +61,7 @@ export function PrejoinScreen() {
     initDevices,
     setIsAudioOn,
     setIsVideoOn,
+    setPermissionState,
   ])
 
   useEffect(() => {

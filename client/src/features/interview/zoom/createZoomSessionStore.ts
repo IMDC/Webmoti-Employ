@@ -93,8 +93,12 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           const stream = client.getMediaStream()
           try {
             if (useAppStore.getState().permissionState === 'granted') {
-              await stream.startVideo()
-              await stream.startAudio()
+              if (get().isVideoOn) {
+                await stream.startVideo()
+              }
+              if (get().isAudioOn) {
+                await stream.startAudio()
+              }
             }
           }
           catch (error: unknown) {
@@ -112,11 +116,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       leave: async () => {
         logger.log('Leaving zoom session...')
 
-        set({
-          callState: 'left',
-          stream: null,
-          participants: new Map(),
-        })
+        set({ callState: 'left', participants: new Map() })
 
         await client.leave()
       },
@@ -124,11 +124,13 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       startVideo: async () => {
         logger.log('Starting video...')
         await stream().startVideo()
+        updateParticipants()
       },
 
       stopVideo: async () => {
         logger.log('Stopping video...')
         await stream().stopVideo()
+        updateParticipants()
       },
       switchCamera: async (deviceId) => {
         await stream().switchCamera(deviceId)
@@ -151,7 +153,13 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
 
       detachVideoPlayer: async (userId: number) => {
         logger.log('Detaching video player...')
-        await stream().detachVideo(userId)
+        try {
+          await stream().detachVideo(userId)
+        }
+        catch {
+          // this happens when you leave the room
+          logger.log('Could not detach video player')
+        }
       },
 
       startAudio: async () => {
@@ -176,9 +184,10 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
 
       cleanup: async () => {
         logger.log('Cleaning up zoom client...')
-        client.off('user-added', updateParticipants)
-        client.off('user-removed', updateParticipants)
-        client.off('user-updated', updateParticipants)
+        client.off('user-added', handleUserAdded)
+        client.off('user-removed', handleUserRemoved)
+        client.off('user-updated', handleUserUpdated)
+        client.off('peer-video-state-change', handlePeerVideoStateChange)
         await ZoomVideo.destroyClient()
       },
     }
@@ -193,10 +202,58 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       participants: new Map(client.getAllUser().map(user => [user.userId, user])),
     })
   }
+
   // todo change this to show notification about user join/leave
-  client.on('user-added', updateParticipants)
-  client.on('user-removed', updateParticipants)
-  client.on('user-updated', updateParticipants)
+  function handleUserAdded(payload: Participant[]) {
+    payload.forEach((user) => {
+      logger.log(`${user.userId} joined the session.`)
+    })
+    updateParticipants()
+  }
+
+  function handleUserRemoved(payload: Participant[]) {
+    payload.forEach((user) => {
+      logger.log(`${user.userId} left the session.`)
+    })
+    updateParticipants()
+  }
+
+  function handleUserUpdated(payload: Participant[]) {
+    payload.forEach((user) => {
+      logger.log(`${user.userId} was updated.`)
+    })
+    updateParticipants()
+  }
+
+  client.on('user-added', handleUserAdded)
+  client.on('user-removed', handleUserRemoved)
+  client.on('user-updated', handleUserUpdated)
+
+  function handlePeerVideoStateChange({ userId, action }: { userId: number, action: string }) {
+    logger.log('peer video state change')
+
+    const { stream, attachVideoPlayer, detachVideoPlayer } = zoomSessionStore.getState()
+    if (!stream)
+      return
+
+    const player = document.querySelector(`[data-user-id="${userId}"] video-player`) as VideoPlayer | null
+    if (!player)
+      return
+
+    try {
+      if (action === 'Start') {
+        attachVideoPlayer(userId, player)
+      }
+      else if (action === 'Stop') {
+        detachVideoPlayer(userId)
+      }
+    }
+    catch (err) {
+      console.error(`Error handling peer-video-state-change for user ${userId}`, err)
+    }
+  }
+
+  client.on('peer-video-state-change', handlePeerVideoStateChange)
 
   // TODO
   // client.on('device-change', );

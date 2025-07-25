@@ -4,6 +4,9 @@ import type { ZoomSessionStore } from '../zoom/createZoomSessionStore'
 import type { DeviceStore } from '@/features/interview/zoom/createDeviceStore'
 import ZoomVideo from '@zoom/videosdk'
 import { createStore } from 'zustand'
+import { useAppStore } from '@/useAppStore'
+import { logger } from '@/utils/logger'
+import { handleAppError } from '@/utils/utils'
 
 export interface PreviewStore {
   localVideoTrack: LocalVideoTrack | null
@@ -32,12 +35,18 @@ export function createPreviewStore(
     startCamera: async (element) => {
       const selectedVideoDevice = deviceStore.getState().selectedVideoDevice
       if (!selectedVideoDevice) {
-        throw new Error('No video device found')
+        logger.log('No video device found')
+        return
       }
 
-      const track = ZoomVideo.createLocalVideoTrack(selectedVideoDevice)
-      await track.start(element)
-      set({ localVideoTrack: track })
+      try {
+        const track = ZoomVideo.createLocalVideoTrack(selectedVideoDevice)
+        await track.start(element)
+        set({ localVideoTrack: track })
+      }
+      catch (error) {
+        handleAppError(error, useAppStore.getState().setError, 'Failed to start camera')
+      }
     },
 
     stopCamera: async () => {
@@ -57,7 +66,8 @@ export function createPreviewStore(
     startMicrophone: async () => {
       const selectedAudioInputDevice = deviceStore.getState().selectedAudioInputDevice
       if (!selectedAudioInputDevice) {
-        throw new Error('No audio device found')
+        logger.log('No audio device found')
+        return
       }
 
       const track = ZoomVideo.createLocalAudioTrack(selectedAudioInputDevice)

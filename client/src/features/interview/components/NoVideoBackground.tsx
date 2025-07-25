@@ -21,7 +21,7 @@ export function NoVideoBackground({ profileUrl, isLoadingProfiles }: NoVideoBack
       />
       <Center pos="absolute" w="100%" h="100%">
         {!isLoadingProfiles
-          ? <Avatar src={profileUrl} w="15%" h="auto" />
+          ? <Avatar src={profileUrl} w="15%" h="auto" draggable={false} />
           : <Skeleton circle w="15%" h="auto" />}
       </Center>
     </>

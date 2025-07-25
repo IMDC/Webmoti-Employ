@@ -16,11 +16,10 @@ interface PreviewTileProps {
 
 export function PreviewTile({ height, width, name, profileUrl }: PreviewTileProps) {
   const permissionState = useAppStore(s => s.permissionState)
+
   const startCamera = usePreviewStore(s => s.startCamera)
   const stopCamera = usePreviewStore(s => s.stopCamera)
-
   const startMicrophone = usePreviewStore(s => s.startMicrophone)
-
   const localAudioTrack = usePreviewStore(s => s.localAudioTrack)
 
   const isVideoOn = useZoomSessionStore(s => s.isVideoOn)

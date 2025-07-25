@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { isElectron } from '@/utils/utils'
 import { FaceDetectorRunner } from './FaceDetectorRunner'
 
-export function useFaceDetection(hostVideo: HTMLVideoElement | null) {
+export function useFaceDetection(hostVideo: HTMLVideoElement | null, fps: number) {
   const runnerRef = useRef<FaceDetectorRunner | null>(null)
 
   useEffect(() => {
@@ -13,9 +13,7 @@ export function useFaceDetection(hostVideo: HTMLVideoElement | null) {
       if (hostVideo.videoWidth === 0 || hostVideo.videoHeight === 0)
         return
 
-      // you can increase this to run detection more often
-      const DETECTION_FPS = 5
-      const runner = new FaceDetectorRunner(hostVideo, DETECTION_FPS)
+      const runner = new FaceDetectorRunner(hostVideo, fps)
       runnerRef.current = runner
       runner.init()
     }
@@ -32,5 +30,5 @@ export function useFaceDetection(hostVideo: HTMLVideoElement | null) {
       runnerRef.current?.stop()
       hostVideo.removeEventListener('loadeddata', startDetection)
     }
-  }, [hostVideo])
+  }, [hostVideo, fps])
 }

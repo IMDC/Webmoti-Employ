@@ -6,9 +6,10 @@ interface VideoRendererProps {
   attach: (el: VideoPlayer) => Promise<VideoPlayer | void>
   detach: () => void
   setHostVideo?: Dispatch<SetStateAction<HTMLVideoElement | null>>
+  userId?: number
 }
 
-export function VideoRenderer({ attach, detach, setHostVideo }: VideoRendererProps) {
+export function VideoRenderer({ attach, detach, setHostVideo, userId }: VideoRendererProps) {
   const ref = useRef<VideoPlayer>(null)
 
   useEffect(() => {
@@ -43,7 +44,7 @@ export function VideoRenderer({ attach, detach, setHostVideo }: VideoRendererPro
 
   return (
     <video-player-container>
-      <video-player ref={ref} />
+      <video-player ref={ref} data-user-id={userId} />
     </video-player-container>
   )
 }

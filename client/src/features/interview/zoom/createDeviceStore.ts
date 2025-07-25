@@ -1,5 +1,6 @@
 import ZoomVideo from '@zoom/videosdk'
 import { createStore } from 'zustand'
+import { logger } from '@/utils/logger'
 import { useAppStore } from '../../../useAppStore'
 
 export interface DeviceStore {
@@ -26,9 +27,14 @@ export function createDeviceStore() {
 
     initDevices: async () => {
       const appState = useAppStore.getState()
-      if (appState.permissionState === 'acquiring' || appState.permissionState === 'granted') {
+      if (appState.permissionState === 'acquiring') {
+        logger.log('Skipping devices')
         return 'skipped'
       }
+      if (appState.permissionState === 'granted') {
+        logger.log('Permissions already granted')
+      }
+      // set to acquiring even if granted so prejoin screen can react
       appState.setPermissionState('acquiring')
 
       // try catch doesn't work on this function
@@ -56,6 +62,7 @@ export function createDeviceStore() {
         selectedAudioInputDevice: audioInputDevices[0]?.deviceId ?? null,
         selectedAudioOutputDevice: audioOutputDevices[0]?.deviceId ?? null,
       })
+
       appState.setPermissionState('granted')
       return 'granted'
     },

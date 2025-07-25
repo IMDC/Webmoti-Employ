@@ -45,7 +45,7 @@ export function Room() {
   const { profiles, isLoadingProfiles } = useParticipantProfiles(participants)
 
   const [hostVideo, setHostVideo] = useState<HTMLVideoElement | null>(null)
-  useFaceDetection(hostVideo)
+  useFaceDetection(hostVideo, 5)
 
   async function onToggleMic() {
     if (permissionState !== 'granted') {
