@@ -4,15 +4,14 @@ import { ToggleAudioButton } from '../../components/buttons/ToggleAudioButton'
 import { ToggleVideoButton } from '../../components/buttons/ToggleVideoButton'
 import { ChangeAudioPopover } from '../../components/popovers/ChangeAudioPopover'
 import { ChangeVideoPopover } from '../../components/popovers/ChangeVideoPopover'
-import { useDeviceStore } from '../../zoom/useDeviceStore'
+import { useDeviceStoreActions } from '../../zoom/useDeviceStore'
 import { useZoomSessionActions } from '../../zoom/useZoomSessionStore'
 import { usePreviewStore } from '../hooks/usePreviewStore'
 
 export function PrejoinMenuBar() {
   const { toggleIsVideoOn } = useZoomSessionActions()
   const permissionState = useAppPermissionState()
-
-  const initDevices = useDeviceStore(s => s.initDevices)
+  const { initDevices } = useDeviceStoreActions()
 
   const toggleMuteMicrophone = usePreviewStore(s => s.toggleMuteMicrophone)
   const switchCamera = usePreviewStore(s => s.switchCamera)

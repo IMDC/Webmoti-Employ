@@ -5,7 +5,7 @@ import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { MyCopyButton } from '@/components/MyCopyButton'
 import { RightHeader } from '@/components/RightHeader'
-import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
+import { useDeviceStoreActions } from '@/features/interview/zoom/useDeviceStore'
 import { useAppActions } from '@/useAppStore'
 import { getUserIdentity } from '@/utils/utils'
 import { useZoomCallState, useZoomSessionActions } from '../zoom/useZoomSessionStore'
@@ -18,7 +18,7 @@ import { useInterviewSession } from './queries'
 export function PrejoinScreen() {
   const navigate = useNavigate()
 
-  const initDevices = useDeviceStore(s => s.initDevices)
+  const { initDevices } = useDeviceStoreActions()
 
   const callState = useZoomCallState()
   const { join, setIsVideoOn, setIsAudioOn } = useZoomSessionActions()

@@ -14,7 +14,7 @@ export function DeviceContextProvider({ children }: DeviceContextProviderProps) 
 
   useEffect(() => {
     return () => {
-      store?.getState().cleanup()
+      store?.getState().actions.cleanup()
     }
   }, [store])
 

@@ -2,7 +2,7 @@ import { AppShell, Box, em, Flex, Stack, useMantineTheme } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
-import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
+import { useDeviceStoreActions } from '@/features/interview/zoom/useDeviceStore'
 import {
   useIsAudioOn,
   useIsVideoOn,
@@ -41,7 +41,7 @@ export function Room() {
   const callState = useZoomCallState()
 
   // TODO maybe remove this in favour of startVideo permission check
-  const initDevices = useDeviceStore(s => s.initDevices)
+  const { initDevices } = useDeviceStoreActions()
 
   const navigate = useNavigate()
 
