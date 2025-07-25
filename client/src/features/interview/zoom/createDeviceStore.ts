@@ -13,6 +13,7 @@ export interface DeviceStore {
   selectedAudioOutputDevice: string | null
 
   initDevices: () => Promise<PermissionState | 'skipped'>
+  cleanup: () => void
 }
 
 export function createDeviceStore() {
@@ -28,13 +29,9 @@ export function createDeviceStore() {
     initDevices: async () => {
       const appState = useAppStore.getState()
       if (appState.permissionState === 'acquiring') {
-        logger.log('Skipping devices')
+        logger.log('Already acquiring devices')
         return 'skipped'
       }
-      if (appState.permissionState === 'granted') {
-        logger.log('Permissions already granted')
-      }
-      // set to acquiring even if granted so prejoin screen can react
       appState.setPermissionState('acquiring')
 
       // try catch doesn't work on this function
@@ -65,6 +62,12 @@ export function createDeviceStore() {
 
       appState.setPermissionState('granted')
       return 'granted'
+    },
+
+    cleanup: () => {
+      // setting this makes it so next time the prejoin screen is loaded,
+      // it will init devices properly
+      useAppStore.getState().setPermissionState('idle')
     },
   }))
 }

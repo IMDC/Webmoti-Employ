@@ -7,10 +7,12 @@ import { useAppStore } from '@/useAppStore'
 import { logger } from '@/utils/logger'
 import { handleAppError, isExecutedFailure } from '@/utils/utils'
 
+export type CallState = 'prejoin' | 'joining' | 'joined' | 'left'
+
 export interface ZoomSessionStore {
   client: typeof VideoClient
-  stream: ReturnType<typeof VideoClient.getMediaStream> | null
-  callState: 'prejoin' | 'joining' | 'joined' | 'left'
+  stream: ReturnType<typeof VideoClient['getMediaStream']> | null
+  callState: CallState
   participants: Map<number, Participant>
 
   isAudioOn: boolean
@@ -69,8 +71,8 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       initClient: async () => {
         logger.log('Initializing zoom client...')
 
-        if (!(ZoomVideo.checkSystemRequirements().video
-          && ZoomVideo.checkSystemRequirements().audio)) {
+        const checkReqs = ZoomVideo.checkSystemRequirements()
+        if (!checkReqs.video || !checkReqs.audio) {
           useAppStore.getState().setError({ message: 'Your device is not supported' })
           return
         }
@@ -89,35 +91,27 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
 
         try {
           await client.join(roomName, token, name)
-
           const stream = client.getMediaStream()
-          try {
-            if (useAppStore.getState().permissionState === 'granted') {
-              if (get().isVideoOn) {
-                await stream.startVideo()
-              }
-              if (get().isAudioOn) {
-                await stream.startAudio()
-              }
-            }
-          }
-          catch (error: unknown) {
-            handleAppError(error, useAppStore.getState().setError, 'Failed to start media')
-          }
+
+          const { isAudioOn, isVideoOn } = get()
+          const granted = useAppStore.getState().permissionState === 'granted'
+          if (granted && isVideoOn)
+            await stream.startVideo()
+          if (granted && isAudioOn)
+            await stream.startAudio()
 
           set({ stream, callState: 'joined' })
           updateParticipants()
         }
-        catch (error: unknown) {
+        catch (error) {
           set({ callState: 'prejoin', stream: null })
           handleAppError(error, useAppStore.getState().setError, 'Failed to join Zoom session')
         }
       },
+
       leave: async () => {
         logger.log('Leaving zoom session...')
-
         set({ callState: 'left', participants: new Map() })
-
         await client.leave()
       },
 
@@ -132,6 +126,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         await stream().stopVideo()
         updateParticipants()
       },
+
       switchCamera: async (deviceId) => {
         await stream().switchCamera(deviceId)
         deviceStore.setState({ selectedVideoDevice: deviceId })

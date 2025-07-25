@@ -41,8 +41,6 @@ export function PrejoinScreen() {
   useEffect(() => {
     // wait until the interview session query is successful before init devices
     if (!interviewSession || interviewSessionError) {
-      // set this to disable menu bar while initializing devices
-      setPermissionState('acquiring')
       return
     }
 
