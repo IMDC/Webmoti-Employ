@@ -1,6 +1,31 @@
 import path from 'node:path'
 import process from 'node:process'
 import { app, BrowserWindow } from 'electron'
+// Importing net module to create a socket connection
+// This assumes you have a Python server running that listens on port 65432
+// Adjust the port as necessary to match your Python server configuration
+import net from 'node:net';
+
+const client = net.createConnection({ port: 65432 }, () => {
+    console.log('✅ Connected to Python socket server');
+});
+
+client.on('data', (data) => {
+    const received = JSON.parse(data.toString());
+    console.log('🚀 Received from Python:', received);
+
+    // Optionally, send response back
+    client.write('Received your data, Python!');
+});
+
+client.on('end', () => {
+    console.log('⚠️ Disconnected from Python server');
+});
+
+client.on('error', (error) => {
+    console.error('❌ Socket Error:', error);
+});
+// end of socket connection code
 
 const isDev = !app.isPackaged
 
