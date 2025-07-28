@@ -42,12 +42,15 @@ jobs:
       - name: Check types
         run: pnpm typecheck
 
+  # only deploy when pushing to main, not other branches (like dependabot)
   deploy-vercel:
+    if: github.ref == 'refs/heads/master'
     uses: ./.github/workflows/deploy-vercel.yml
     needs: [build]
     secrets: inherit
 
   deploy-cloudflare:
+    if: github.ref == 'refs/heads/master'
     uses: ./.github/workflows/deploy-cloudflare.yml
     needs: [build]
     secrets: inherit
