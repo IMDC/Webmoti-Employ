@@ -1,41 +1,42 @@
 name: Cloudflare Deploy
 
-on:
-  workflow_run:
-    workflows: [Build]
-    types:
-      - completed
-    branches:
-      - master
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
-  cancel-in-progress: true
+on: [workflow_call]
 
 jobs:
   # only deploy when files in server/ change
-  filter:
+  check-server-changes:
     runs-on: ubuntu-latest
     outputs:
-      server: ${{ steps.filter.outputs.server }}
+      changed: ${{ steps.filter.outputs.changed }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
-            server:
+            changed:
               - 'server/**'
+              - 'shared/**'
 
   deploy:
-    needs: filter
-    if: needs.filter.outputs.server == 'true' && github.event.workflow_run.conclusion == 'success'
+    needs: check-server-changes
+    if: needs.check-server-changes.outputs.changed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: pnpm
+
       - name: Build & Deploy Worker
         uses: cloudflare/wrangler-action@v3
         with:
+          workingDirectory: server
+          packageManager: pnpm
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
