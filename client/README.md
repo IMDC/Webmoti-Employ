@@ -16,6 +16,13 @@ Then add environment variables:
 
 The client is deployed on Vercel. Since Vercel doesn't allow collaborators on the hobby plan, we use a Github action instead for automatic deployments.
 
+1. Make vercel project
+2. Change project name
+3. Set root to `client`
+4. Add environment variables from `.env`
+5. Click Deploy
+6. [Deploy server](../server/README.md#deploying), get deployed url, and set new environment variable (`VITE_API_BASE_URL`) in `Settings` > `Environment Variables`
+
 Steps for automatic deployments:
 
 <https://vercel.com/guides/how-can-i-use-github-actions-with-vercel>
