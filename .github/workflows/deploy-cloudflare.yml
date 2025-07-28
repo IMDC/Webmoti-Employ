@@ -4,22 +4,23 @@ on: [workflow_call]
 
 jobs:
   # only deploy when files in server/ change
-  filter:
+  check-server-changes:
     runs-on: ubuntu-latest
     outputs:
-      server: ${{ steps.filter.outputs.server }}
+      changed: ${{ steps.filter.outputs.changed }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
-            server:
+            changed:
               - 'server/**'
+              - 'shared/**'
 
   deploy:
-    needs: filter
-    if: needs.filter.outputs.server == 'true'
+    needs: check-server-changes
+    if: needs.check-server-changes.outputs.changed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
