@@ -1,12 +1,6 @@
 name: Cloudflare Deploy
 
-on:
-  workflow_run:
-    workflows: [Build]
-    types:
-      - completed
-    branches:
-      - master
+on: [workflow_call]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
@@ -29,7 +23,7 @@ jobs:
 
   deploy:
     needs: filter
-    if: needs.filter.outputs.server == 'true' && github.event.workflow_run.conclusion == 'success'
+    if: needs.filter.outputs.server == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:

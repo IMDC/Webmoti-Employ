@@ -1,12 +1,6 @@
 name: Vercel Deploy
 
-on:
-  workflow_run:
-    workflows: [Build]
-    types:
-      - completed
-    branches:
-      - master
+on: [workflow_call]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
@@ -37,7 +31,7 @@ jobs:
 
   deploy:
     needs: filter
-    if: needs.filter.outputs.client == 'true' && github.event.workflow_run.conclusion == 'success'
+    if: needs.filter.outputs.client == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
