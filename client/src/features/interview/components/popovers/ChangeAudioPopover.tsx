@@ -1,6 +1,6 @@
 import { Button, Popover, Tooltip } from '@mantine/core'
 import { IconChevronUp } from '@tabler/icons-react'
-import { useAppStore } from '@/useAppStore'
+import { useAppPermissionState } from '@/useAppStore'
 import { ChangeMediaDevice } from '../ChangeMediaDevice'
 
 interface ChangeAudioPopoverProps {
@@ -8,7 +8,7 @@ interface ChangeAudioPopoverProps {
 }
 
 export function ChangeAudioPopover({ switchMicrophone }: ChangeAudioPopoverProps) {
-  const permissionState = useAppStore(s => s.permissionState)
+  const permissionState = useAppPermissionState()
   const disableMediaButtons = permissionState === 'idle' || permissionState === 'acquiring'
 
   return (

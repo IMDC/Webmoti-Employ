@@ -23,7 +23,7 @@ import {
 import { DateTime } from 'luxon'
 import { zod4Resolver } from 'mantine-form-zod-resolver'
 import z from 'zod'
-import { useAppStore } from '@/useAppStore'
+import { useAppActions, useAppIsColorblindModeOn } from '@/useAppStore'
 import { getHighlightColor, getInterviewLink, handleAppError } from '@/utils/utils'
 import { useScheduleInterview } from '../queries'
 import { ScheduleInterviewForm } from '../schema'
@@ -64,8 +64,8 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
   const { scheduleInterviewMutation, isScheduleInterviewPending } = useScheduleInterview()
   const { user } = useUser()
 
-  const setError = useAppStore(s => s.setError)
-  const isColorblindModeOn = useAppStore(s => s.isColorblindModeOn)
+  const { setError } = useAppActions()
+  const isColorblindModeOn = useAppIsColorblindModeOn()
 
   const interviewTimeRange = getTimeRange({ startTime: '09:00', endTime: '16:00', interval: '00:30' })
 
@@ -144,7 +144,7 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
         placeholder="Email"
         leftSection={<IconAt size={16} />}
         withAsterisk
-        style={{ flex: 1 }}
+        flex={1}
         key={form.key(`invites.${index}.email`)}
         {...form.getInputProps(`invites.${index}.email`)}
       />

@@ -5,9 +5,10 @@ import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { MyCopyButton } from '@/components/MyCopyButton'
 import { RightHeader } from '@/components/RightHeader'
-import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
+import { useDeviceStoreActions } from '@/features/interview/zoom/useDeviceStore'
+import { useAppActions } from '@/useAppStore'
 import { getUserIdentity } from '@/utils/utils'
-import { useZoomSessionStore } from '../zoom/useZoomSessionStore'
+import { useZoomCallState, useZoomSessionActions } from '../zoom/useZoomSessionStore'
 import { ErrorScreen } from './components/ErrorScreen'
 import { JoiningScreen } from './components/JoiningScreen'
 import { PrejoinMenuBar } from './components/PrejoinMenuBar'
@@ -17,12 +18,12 @@ import { useInterviewSession } from './queries'
 export function PrejoinScreen() {
   const navigate = useNavigate()
 
-  const initDevices = useDeviceStore(s => s.initDevices)
+  const { initDevices } = useDeviceStoreActions()
 
-  const callState = useZoomSessionStore(s => s.callState)
-  const joinZoom = useZoomSessionStore(s => s.join)
-  const setIsVideoOn = useZoomSessionStore(s => s.setIsVideoOn)
-  const setIsAudioOn = useZoomSessionStore(s => s.setIsAudioOn)
+  const callState = useZoomCallState()
+  const { join, setIsVideoOn, setIsAudioOn } = useZoomSessionActions()
+
+  const { setPermissionState } = useAppActions()
 
   const { user } = useUser()
   const { id: sessionId } = useParams({ strict: false })
@@ -37,8 +38,9 @@ export function PrejoinScreen() {
 
   useEffect(() => {
     // wait until the interview session query is successful before init devices
-    if (!interviewSession || interviewSessionError)
+    if (!interviewSession || interviewSessionError) {
       return
+    }
 
     const handleInitDevices = async () => {
       const permission = await initDevices()
@@ -55,6 +57,7 @@ export function PrejoinScreen() {
     initDevices,
     setIsAudioOn,
     setIsVideoOn,
+    setPermissionState,
   ])
 
   useEffect(() => {
@@ -125,7 +128,7 @@ export function PrejoinScreen() {
               </Group>
               <Button
                 onClick={async () =>
-                  joinZoom(userId, interviewSession.sessionId, interviewSession.token)}
+                  join(userId, interviewSession.sessionId, interviewSession.token)}
               >
                 {`${args.action === 'create' ? 'Start' : 'Join'}`}
               </Button>

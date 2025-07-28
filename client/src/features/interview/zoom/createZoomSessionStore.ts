@@ -3,18 +3,11 @@ import type { StoreApi } from 'zustand'
 import type { DeviceStore } from './createDeviceStore'
 import ZoomVideo, { VideoQuality } from '@zoom/videosdk'
 import { createStore } from 'zustand'
-import { useAppStore } from '@/useAppStore'
+import { appStore } from '@/useAppStore'
 import { logger } from '@/utils/logger'
-import { handleAppError } from '@/utils/utils'
+import { handleAppError, isExecutedFailure } from '@/utils/utils'
 
-export interface ZoomSessionStore {
-  client: typeof VideoClient
-  stream: ReturnType<typeof VideoClient.getMediaStream> | null
-  callState: 'prejoin' | 'joining' | 'joined' | 'left'
-  participants: Map<number, Participant>
-
-  isAudioOn: boolean
-  isVideoOn: boolean
+export interface ZoomSessionActions {
   setIsAudioOn: (value: boolean) => void
   setIsVideoOn: (value: boolean) => void
   toggleIsAudioOn: () => void
@@ -29,7 +22,7 @@ export interface ZoomSessionStore {
   stopVideo: () => Promise<void>
   switchCamera: (deviceId: string) => Promise<void>
 
-  attachVideoPlayer: (userId: number, element: VideoPlayer) => Promise<void>
+  attachVideoPlayer: (userId: number, element: VideoPlayer) => Promise<VideoPlayer>
   detachVideoPlayer: (userId: number) => Promise<void>
 
   startAudio: () => Promise<void>
@@ -39,6 +32,18 @@ export interface ZoomSessionStore {
   switchMicrophone: (deviceId: string) => Promise<void>
 
   cleanup: () => Promise<void>
+}
+
+export type CallState = 'prejoin' | 'joining' | 'joined' | 'left'
+
+export interface ZoomSessionStore {
+  client: typeof VideoClient
+  stream: ReturnType<typeof VideoClient['getMediaStream']> | null
+  callState: CallState
+  participants: Map<number, Participant>
+  isAudioOn: boolean
+  isVideoOn: boolean
+  actions: ZoomSessionActions
 }
 
 export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
@@ -58,116 +63,124 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       stream: null,
       callState: 'prejoin',
       participants: new Map(),
-
       isAudioOn: true,
       isVideoOn: true,
-      setIsAudioOn: value => set({ isAudioOn: value }),
-      setIsVideoOn: value => set({ isVideoOn: value }),
-      toggleIsAudioOn: () => set(state => ({ isAudioOn: !state.isAudioOn })),
-      toggleIsVideoOn: () => set(state => ({ isVideoOn: !state.isVideoOn })),
 
-      initClient: async () => {
-        logger.log('Initializing zoom client...')
+      actions: {
+        setIsAudioOn: value => set({ isAudioOn: value }),
+        setIsVideoOn: value => set({ isVideoOn: value }),
+        toggleIsAudioOn: () => set(state => ({ isAudioOn: !state.isAudioOn })),
+        toggleIsVideoOn: () => set(state => ({ isVideoOn: !state.isVideoOn })),
+        initClient: async () => {
+          logger.log('Initializing zoom client...')
 
-        await client.init('en-US', 'Global', {
-          patchJsMedia: true,
-          leaveOnPageUnload: true,
-        })
+          const checkReqs = ZoomVideo.checkSystemRequirements()
+          if (!checkReqs.video || !checkReqs.audio) {
+            const { setError } = appStore.getState().actions
+            setError({ message: 'Your device is not supported' })
+            return
+          }
 
-        ZoomVideo.preloadDependentAssets()
-      },
+          await client.init('en-US', 'Global', {
+            patchJsMedia: true,
+            leaveOnPageUnload: true,
+          })
 
-      join: async (name, roomName, token) => {
-        set({ callState: 'joining' })
-        logger.log('Joining zoom session...')
+          ZoomVideo.preloadDependentAssets()
+        },
+        join: async (name, roomName, token) => {
+          set({ callState: 'joining' })
+          logger.log('Joining zoom session...')
 
-        try {
-          await client.join(roomName, token, name)
-
-          const stream = client.getMediaStream()
           try {
-            if (useAppStore.getState().permissionState === 'granted') {
+            await client.join(roomName, token, name)
+            const stream = client.getMediaStream()
+
+            const { isAudioOn, isVideoOn } = get()
+            const granted = appStore.getState().permissionState === 'granted'
+            if (granted && isVideoOn)
               await stream.startVideo()
+            if (granted && isAudioOn)
               await stream.startAudio()
-            }
-          }
-          catch (error: unknown) {
-            handleAppError(error, useAppStore.getState().setError, 'Failed to start media')
-          }
 
-          set({ stream, callState: 'joined' })
+            set({ stream, callState: 'joined' })
+            updateParticipants()
+          }
+          catch (error) {
+            set({ callState: 'prejoin', stream: null })
+            const { setError } = appStore.getState().actions
+            handleAppError(error, setError, 'Failed to join Zoom session')
+          }
+        },
+        leave: async () => {
+          logger.log('Leaving zoom session...')
+          set({ callState: 'left', participants: new Map() })
+          await client.leave()
+        },
+        startVideo: async () => {
+          logger.log('Starting video...')
+          await stream().startVideo()
           updateParticipants()
-        }
-        catch (error: unknown) {
-          set({ callState: 'prejoin', stream: null })
-          handleAppError(error, useAppStore.getState().setError, 'Failed to join Zoom session')
-        }
-      },
-      leave: async () => {
-        logger.log('Leaving zoom session...')
-
-        set({
-          callState: 'left',
-          stream: null,
-          participants: new Map(),
-        })
-
-        await client.leave()
-      },
-
-      startVideo: async () => {
-        logger.log('Starting video...')
-        await stream().startVideo()
-      },
-
-      stopVideo: async () => {
-        logger.log('Stopping video...')
-        await stream().stopVideo()
-      },
-      switchCamera: async (deviceId) => {
-        await stream().switchCamera(deviceId)
-        deviceStore.setState({ selectedVideoDevice: deviceId })
-      },
-
-      attachVideoPlayer: async (userId: number, element: VideoPlayer) => {
+        },
+        stopVideo: async () => {
+          logger.log('Stopping video...')
+          await stream().stopVideo()
+          updateParticipants()
+        },
+        switchCamera: async (deviceId) => {
+          await stream().switchCamera(deviceId)
+          deviceStore.setState({ selectedVideoDevice: deviceId })
+        },
+        attachVideoPlayer: async (userId: number, element: VideoPlayer) => {
         // need to detach first to ensure it works properly (this matters in strict mode)
-        await stream().detachVideo(userId)
+          await stream().detachVideo(userId)
 
-        logger.log('Attaching video player...')
-        await stream().attachVideo(userId, VideoQuality.Video_720P, element)
-      },
+          logger.log('Attaching video player...')
+          const player = await stream().attachVideo(userId, VideoQuality.Video_720P, element)
 
-      detachVideoPlayer: async (userId: number) => {
-        logger.log('Detaching video player...')
-        await stream().detachVideo(userId)
-      },
+          if (isExecutedFailure(player)) {
+            throw new Error('Failed to attach video player')
+          }
 
-      startAudio: async () => {
-        logger.log('Starting audio...')
-        await stream().startAudio()
-      },
-      stopAudio: async () => {
-        logger.log('Stopping audio...')
-        // this will stop the user from both sharing and hearing audio
-        await stream().stopAudio()
-      },
-      muteAudio: async () => {
-        await stream().muteAudio()
-      },
-      unmuteAudio: async () => {
-        await stream().unmuteAudio()
-      },
-      switchMicrophone: async (deviceId) => {
-        stream().switchMicrophone(deviceId)
-        deviceStore.setState({ selectedAudioInputDevice: deviceId })
-      },
-
-      cleanup: async () => {
-        logger.log('Cleaning up zoom client...')
-        client.off('user-added', updateParticipants)
-        client.off('user-removed', updateParticipants)
-        client.off('user-updated', updateParticipants)
-        await ZoomVideo.destroyClient()
+          return player
+        },
+        detachVideoPlayer: async (userId: number) => {
+          logger.log('Detaching video player...')
+          try {
+            await stream().detachVideo(userId)
+          }
+          catch {
+          // this happens when you leave the room
+            logger.log('Could not detach video player')
+          }
+        },
+        startAudio: async () => {
+          logger.log('Starting audio...')
+          await stream().startAudio()
+        },
+        stopAudio: async () => {
+          logger.log('Stopping audio...')
+          // this will stop the user from both sharing and hearing audio
+          await stream().stopAudio()
+        },
+        muteAudio: async () => {
+          await stream().muteAudio()
+        },
+        unmuteAudio: async () => {
+          await stream().unmuteAudio()
+        },
+        switchMicrophone: async (deviceId) => {
+          stream().switchMicrophone(deviceId)
+          deviceStore.setState({ selectedAudioInputDevice: deviceId })
+        },
+        cleanup: async () => {
+          logger.log('Cleaning up zoom client...')
+          client.off('user-added', handleUserAdded)
+          client.off('user-removed', handleUserRemoved)
+          client.off('user-updated', handleUserUpdated)
+          client.off('peer-video-state-change', handlePeerVideoStateChange)
+          await ZoomVideo.destroyClient()
+        },
       },
     }
   })
@@ -181,16 +194,65 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       participants: new Map(client.getAllUser().map(user => [user.userId, user])),
     })
   }
+
   // todo change this to show notification about user join/leave
-  client.on('user-added', updateParticipants)
-  client.on('user-removed', updateParticipants)
-  client.on('user-updated', updateParticipants)
+  function handleUserAdded(payload: Participant[]) {
+    payload.forEach((user) => {
+      logger.log(`${user.userId} joined the session.`)
+    })
+    updateParticipants()
+  }
+
+  function handleUserRemoved(payload: Participant[]) {
+    payload.forEach((user) => {
+      logger.log(`${user.userId} left the session.`)
+    })
+    updateParticipants()
+  }
+
+  function handleUserUpdated(payload: Participant[]) {
+    payload.forEach((user) => {
+      logger.log(`${user.userId} was updated.`)
+    })
+    updateParticipants()
+  }
+
+  client.on('user-added', handleUserAdded)
+  client.on('user-removed', handleUserRemoved)
+  client.on('user-updated', handleUserUpdated)
+
+  function handlePeerVideoStateChange({ userId, action }: { userId: number, action: string }) {
+    logger.log('peer video state change')
+
+    const { stream, actions } = zoomSessionStore.getState()
+    if (!stream)
+      return
+
+    const player = document.querySelector(`[data-user-id="${userId}"] video-player`) as VideoPlayer | null
+    if (!player)
+      return
+
+    try {
+      if (action === 'Start') {
+        actions.attachVideoPlayer(userId, player)
+      }
+      else if (action === 'Stop') {
+        actions.detachVideoPlayer(userId)
+      }
+    }
+    catch (err) {
+      console.error(`Error handling peer-video-state-change for user ${userId}`, err)
+    }
+  }
+
+  client.on('peer-video-state-change', handlePeerVideoStateChange)
 
   // TODO
   // client.on('device-change', );
   // client.on('device-permission-change', );
   // client.on('active-media-failed', );
   // client.on('active-media-failed', );
+  // client.on('network-quality-change', );
   // others... https://developers.zoom.us/docs/video-sdk/web/handle-events/
 
   return zoomSessionStore

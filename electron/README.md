@@ -7,6 +7,7 @@ This Electron app bundles the built React client so it can be run locally. It al
   - [Install Dependencies](#install-dependencies)
   - [Ruff](#ruff)
 - [Running the eyetracking script locally](#running-the-eyetracking-script-locally)
+- [Face detection](#face-detection)
 - [Creating distributable file](#creating-distributable-file)
 
 ## Setup
@@ -58,6 +59,12 @@ cd electron/python
 
 uv run main.py
 ```
+
+## Face detection
+
+To get the area of interest dynamically for eyetracking analysis we use Mediapipe Face Detector. This uses a machine learning model (BlazeFace) to locate faces so we can tell the eyetracking script where the interviewer is. Face detection runs in the React frontend and sends the bounding box to the Electron backend.
+
+[Download the BlazeFace model here](https://ai.google.dev/edge/mediapipe/solutions/vision/face_detector/index#blazeface_short-range) and store it in `electron/models`.
 
 ## Creating distributable file
 

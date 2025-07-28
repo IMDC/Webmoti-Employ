@@ -1,17 +1,17 @@
 import { Button, Indicator, Tooltip } from '@mantine/core'
 import { IconMicrophoneFilled, IconMicrophoneOff } from '@tabler/icons-react'
-import { useAppStore } from '@/useAppStore'
+import { useAppIsColorblindModeOn, useAppPermissionState } from '@/useAppStore'
 import { getHighlightColor } from '@/utils/utils'
-import { useZoomSessionStore } from '../../zoom/useZoomSessionStore'
+import { useIsAudioOn } from '../../zoom/useZoomSessionStore'
 
 interface ToggleAudioButtonProps {
   onToggleMic: () => Promise<void>
 }
 
 export function ToggleAudioButton({ onToggleMic }: ToggleAudioButtonProps) {
-  const permissionState = useAppStore(state => state.permissionState)
-  const isAudioOn = useZoomSessionStore(state => state.isAudioOn)
-  const isColorblindModeOn = useAppStore(s => s.isColorblindModeOn)
+  const permissionState = useAppPermissionState()
+  const isAudioOn = useIsAudioOn()
+  const isColorblindModeOn = useAppIsColorblindModeOn()
 
   return (
     <Indicator color="orange" disabled={permissionState !== 'denied'}>
@@ -27,8 +27,8 @@ export function ToggleAudioButton({ onToggleMic }: ToggleAudioButtonProps) {
           disabled={permissionState === 'idle' || permissionState === 'acquiring'}
         >
           {isAudioOn
-            ? (<IconMicrophoneFilled size={18} />)
-            : (<IconMicrophoneOff size={18} style={{ fill: 'white', stroke: 'white' }} />)}
+            ? <IconMicrophoneFilled size={18} />
+            : <IconMicrophoneOff size={18} style={{ fill: 'white', stroke: 'white' }} />}
         </Button>
       </Tooltip>
     </Indicator>

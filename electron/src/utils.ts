@@ -1,0 +1,63 @@
+import type { WebContents, WebFrameMain } from 'electron'
+import fs from 'node:fs'
+import path from 'node:path'
+import { pathToFileURL } from 'node:url'
+import { app, ipcMain } from 'electron'
+
+export const isDev = !app.isPackaged
+
+export function getPreloadPath() {
+  return path.join(app.getAppPath(), isDev ? '.' : '..', '/dist/preload.cjs')
+}
+
+export function getUiPath() {
+  return path.join(app.getAppPath(), 'client', 'dist', 'index.html')
+}
+
+function getModelPath() {
+  return path.join(app.getAppPath(), isDev ? '.' : '..', 'models', 'blaze_face_short_range.tflite')
+}
+
+export function getModelBuffer(): ArrayBuffer {
+  const modelPath = getModelPath()
+  const buffer = fs.readFileSync(modelPath)
+  // only return actual model data
+  return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength)
+}
+
+export function getLocalDomain() {
+  return 'localhost:5173'
+}
+
+function validateEventFrame(frame: WebFrameMain) {
+  if (isDev && new URL(frame.url).host === getLocalDomain()) {
+    return
+  }
+  const uiPath = pathToFileURL(getUiPath()).toString()
+  if (!frame.url.startsWith(uiPath)) {
+    throw new Error('Not valid event')
+  }
+}
+
+export function ipcHandle<Key extends keyof EventPayloadMapping>(
+  key: Key,
+  handler: () => EventPayloadMapping[Key],
+) {
+  ipcMain.handle(key, (event) => {
+    if (!event.senderFrame) {
+      console.warn('Sender frame is null')
+      return
+    }
+
+    validateEventFrame(event.senderFrame)
+    return handler()
+  })
+}
+
+export function ipcWebContentsSend<Key extends keyof EventPayloadMapping>(
+  key: Key,
+  webContents: WebContents,
+  payload: EventPayloadMapping[Key],
+) {
+  webContents.send(key, payload)
+}

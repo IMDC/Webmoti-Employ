@@ -1,10 +1,16 @@
-import { AppShell, Box, em, Stack, useMantineTheme } from '@mantine/core'
+import { AppShell, Box, em, Flex, Stack, useMantineTheme } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
-import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
-import { useZoomSessionStore } from '@/features/interview/zoom/useZoomSessionStore'
-import { useAppStore } from '@/useAppStore'
+import { useDeviceStoreActions } from '@/features/interview/zoom/useDeviceStore'
+import {
+  useIsAudioOn,
+  useIsVideoOn,
+  useZoomCallState,
+  useZoomParticipants,
+  useZoomSessionActions,
+} from '@/features/interview/zoom/useZoomSessionStore'
+import { useAppPermissionState } from '@/useAppStore'
 import { GALLERY_VIEW_MARGIN } from '@/utils/constants'
 import { CaptionsArea } from '../captions/CaptionsArea'
 import { Chat } from '../chat/Chat'
@@ -12,6 +18,7 @@ import { MenuBar } from '../components/MenuBar'
 import { MobileMenuBar } from '../components/MobileMenuBar'
 import { useParticipantProfiles } from '../profiles/useParticipantProfiles'
 import { VideoGrid } from './components/VideoGrid'
+import { useFaceDetection } from './hooks/useFaceDetection'
 
 export function Room() {
   const participantStageRef = useRef<HTMLDivElement>(null)
@@ -19,21 +26,22 @@ export function Room() {
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [isCaptionsAreaOpen, setIsCaptionsAreaOpen] = useState(false)
 
-  const permissionState = useAppStore(s => s.permissionState)
-  const isVideoOn = useZoomSessionStore(s => s.isVideoOn)
-  const setIsVideoOn = useZoomSessionStore(s => s.setIsVideoOn)
-  const isAudioOn = useZoomSessionStore(s => s.isAudioOn)
-  const setIsAudioOn = useZoomSessionStore(s => s.setIsAudioOn)
+  const permissionState = useAppPermissionState()
+
+  const {
+    setIsVideoOn,
+    setIsAudioOn,
+    startVideo,
+    stopVideo,
+    startAudio,
+    stopAudio,
+  } = useZoomSessionActions()
+  const isVideoOn = useIsVideoOn()
+  const isAudioOn = useIsAudioOn()
+  const callState = useZoomCallState()
 
   // TODO maybe remove this in favour of startVideo permission check
-  const initDevices = useDeviceStore(s => s.initDevices)
-
-  const startVideo = useZoomSessionStore(s => s.startVideo)
-  const stopVideo = useZoomSessionStore(s => s.stopVideo)
-  const startAudio = useZoomSessionStore(s => s.startAudio)
-  const stopAudio = useZoomSessionStore(s => s.stopAudio)
-
-  const callState = useZoomSessionStore(s => s.callState)
+  const { initDevices } = useDeviceStoreActions()
 
   const navigate = useNavigate()
 
@@ -42,8 +50,11 @@ export function Room() {
   const theme = useMantineTheme()
   const isMobile = useMediaQuery(`(max-width: ${em(theme.breakpoints.sm)})`)
 
-  const participants = useZoomSessionStore(store => store.participants)
+  const participants = useZoomParticipants()
   const { profiles, isLoadingProfiles } = useParticipantProfiles(participants)
+
+  const [hostVideo, setHostVideo] = useState<HTMLVideoElement | null>(null)
+  useFaceDetection(hostVideo, 5)
 
   async function onToggleMic() {
     if (permissionState !== 'granted') {
@@ -96,26 +107,25 @@ export function Room() {
           {/* chat takes up full width when open on mobile */}
           {!(isMobile && isChatOpen) && (
             <Stack w="100%" gap={0}>
-              <Box
+              <Flex
                 ref={participantStageRef}
                 flex={1}
                 miw={0}
                 p={GALLERY_VIEW_MARGIN}
                 display="flex"
-                style={{
-                  flexWrap: 'wrap',
-                  justifyContent: 'center',
-                  alignContent: 'center',
-                  gap: GALLERY_VIEW_MARGIN,
-                }}
+                justify="center"
+                align="center"
+                gap={GALLERY_VIEW_MARGIN}
+                wrap="wrap"
               >
                 <VideoGrid
                   containerRef={participantStageRef}
+                  setHostVideo={setHostVideo}
                   participants={participants}
                   profiles={profiles}
                   isLoadingProfiles={isLoadingProfiles}
                 />
-              </Box>
+              </Flex>
 
               {isCaptionsAreaOpen && (
                 <Box

@@ -9,7 +9,7 @@ import {
   IconSettings,
 } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
-import { useAppStore } from '@/useAppStore'
+import { useAppActions } from '@/useAppStore'
 
 interface ControlsMenuProps {
   onLayoutOpen?: () => void
@@ -17,7 +17,7 @@ interface ControlsMenuProps {
 }
 
 export function ControlsMenu({ onLayoutOpen, isMobile }: ControlsMenuProps) {
-  const setIsSettingsOpen = useAppStore(state => state.setIsSettingsOpen)
+  const { setIsSettingsOpen } = useAppActions()
 
   const [isFullscreen, setIsFullscreen] = useState(false)
 

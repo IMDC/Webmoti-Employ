@@ -23,8 +23,8 @@ export function Corner({
 
   return (
     <Box
+      pos="absolute"
       style={{
-        position: 'absolute',
         ...styleMap[position],
       }}
     >

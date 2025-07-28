@@ -5,12 +5,10 @@ export function SpotlightView() {
   return (
     <>
       <Box
-        style={{
-          width: '100%',
-          height: '100%',
-          margin: GALLERY_VIEW_MARGIN,
-          position: 'relative',
-        }}
+        w="100%"
+        h="100%"
+        m={GALLERY_VIEW_MARGIN}
+        pos="relative"
       >
         {/* <ParticipantTile width="100%" height="100%" />
 

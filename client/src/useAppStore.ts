@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { createStore, useStore } from 'zustand'
 
 export type PermissionState = 'idle' | 'acquiring' | 'granted' | 'denied'
 
@@ -8,30 +8,41 @@ export interface AppError {
   details?: unknown
 }
 
-interface AppStore {
-  error: AppError | null
+interface AppActions {
   setError: (error: AppError | null) => void
   clearError: () => void
-
-  permissionState: PermissionState
   setPermissionState: (value: PermissionState) => void
-
-  isSettingsOpen: boolean
   setIsSettingsOpen: (value: boolean) => void
-  isColorblindModeOn: boolean
   setIsColorblindModeOn: (value: boolean) => void
 }
 
-export const useAppStore = create<AppStore>(set => ({
+interface AppStore {
+  error: AppError | null
+  permissionState: PermissionState
+  isSettingsOpen: boolean
+  isColorblindModeOn: boolean
+  actions: AppActions
+}
+
+export const appStore = createStore<AppStore>(set => ({
   error: null,
-  setError: error => set({ error }),
-  clearError: () => set({ error: null }),
-
   permissionState: 'idle',
-  setPermissionState: value => set({ permissionState: value }),
-
   isSettingsOpen: false,
-  setIsSettingsOpen: value => set({ isSettingsOpen: value }),
   isColorblindModeOn: false,
-  setIsColorblindModeOn: value => set({ isColorblindModeOn: value }),
+
+  actions: {
+    setError: error => set({ error }),
+    clearError: () => set({ error: null }),
+    setPermissionState: value => set({ permissionState: value }),
+    setIsColorblindModeOn: value => set({ isColorblindModeOn: value }),
+    setIsSettingsOpen: value => set({ isSettingsOpen: value }),
+  },
 }))
+
+const useAppStore = <T>(selector: (state: AppStore) => T): T => useStore(appStore, selector)
+
+export const useAppActions = () => useAppStore(s => s.actions)
+export const useAppError = () => useAppStore(s => s.error)
+export const useAppPermissionState = () => useAppStore(s => s.permissionState)
+export const useAppIsSettingsOpen = () => useAppStore(s => s.isSettingsOpen)
+export const useAppIsColorblindModeOn = () => useAppStore(s => s.isColorblindModeOn)

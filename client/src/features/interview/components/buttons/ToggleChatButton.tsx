@@ -1,6 +1,6 @@
 import { Button, Indicator, Tooltip } from '@mantine/core'
 import { IconMessageFilled } from '@tabler/icons-react'
-import { useChatStore } from '../../chat/useChatStore'
+import { useIsChatUnread } from '../../chat/useChatStore'
 
 interface ToggleChatButtonProps {
   isChatOpen: boolean
@@ -8,7 +8,7 @@ interface ToggleChatButtonProps {
 }
 
 export function ToggleChatButton({ isChatOpen, onToggleChat }: ToggleChatButtonProps) {
-  const isChatUnread = useChatStore(s => s.isChatUnread)
+  const isChatUnread = useIsChatUnread()
 
   return (
     <Indicator processing disabled={!isChatUnread}>

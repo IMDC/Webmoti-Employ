@@ -17,8 +17,8 @@ import { useVirtualizer } from '@tanstack/react-virtual'
 import Linkify from 'linkify-react'
 import { DateTime } from 'luxon'
 import { useEffect, useRef, useState } from 'react'
-import { useZoomSessionStore } from '../zoom/useZoomSessionStore'
-import { useChatStore } from './useChatStore'
+import { useZoomParticipants } from '../zoom/useZoomSessionStore'
+import { useChatActions, useChatMessages } from './useChatStore'
 
 interface MessageProps {
   chatMessage: ChatMessage
@@ -47,9 +47,7 @@ function Message({ chatMessage, participants, profiles, isLoadingProfiles }: Mes
       <Skeleton visible={isLoadingProfiles}>
         <Text
           lh="xs"
-          style={{
-            overflowWrap: 'anywhere',
-          }}
+          style={{ overflowWrap: 'anywhere' }}
         >
           <strong style={{ marginRight: 5 }}>
             {displayName}
@@ -71,11 +69,10 @@ export function Chat({ onClose, profiles, isLoadingProfiles }: ChatProps) {
   const [chatText, setChatText] = useState('')
   const [isAtBottom, setIsAtBottom] = useState(true)
 
-  const messages = useChatStore(s => s.messages)
-  const sendChat = useChatStore(s => s.sendChat)
-  const setChatRead = useChatStore(s => s.setChatRead)
+  const messages = useChatMessages()
+  const { sendChat, setChatRead } = useChatActions()
 
-  const participants = useZoomSessionStore(s => s.participants)
+  const participants = useZoomParticipants()
 
   const scrollViewportRef = useRef<HTMLDivElement>(null)
 
@@ -126,12 +123,10 @@ export function Chat({ onClose, profiles, isLoadingProfiles }: ChatProps) {
 
   return (
     <Card
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        padding: 16,
-      }}
+      h="100%"
+      p={16}
+      display="flex"
+      style={{ flexDirection: 'column' }}
       withBorder
     >
       {/* header */}
@@ -149,7 +144,7 @@ export function Chat({ onClose, profiles, isLoadingProfiles }: ChatProps) {
       </Group>
 
       {/* message list */}
-      <Box style={{ flex: 1, overflow: 'hidden', margin: '12px 0' }}>
+      <Box flex={1} my={12} style={{ overflow: 'hidden' }}>
         <ScrollArea
           h="100%"
           viewportRef={scrollViewportRef}

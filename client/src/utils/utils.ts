@@ -2,6 +2,7 @@ import type { UserResource } from '@clerk/types'
 import type { ExecutedFailure } from '@zoom/videosdk'
 import type { AppError } from '@/useAppStore'
 import { HttpError } from './HttpError'
+import { logger } from './logger'
 
 export function getFittedSize(
   containerWidth: number,
@@ -19,7 +20,7 @@ export function getFittedSize(
   return [width, height]
 }
 
-function isExecutedFailure(error: unknown): error is ExecutedFailure {
+export function isExecutedFailure(error: unknown): error is ExecutedFailure {
   return typeof error === 'object' && error !== null && 'reason' in error && 'errorCode' in error
 }
 
@@ -28,6 +29,7 @@ export function handleAppError(
   setError: (e: AppError) => void,
   defaultMessage: string,
 ) {
+  logger.log(defaultMessage)
   if (isExecutedFailure(error)) {
     setError({ message: defaultMessage, status: error.errorCode, details: error.reason })
   }
@@ -80,4 +82,8 @@ export function getInterviewLink(sessionId: string) {
 
 export function getHighlightColor(isColorblindModeOn: boolean) {
   return isColorblindModeOn ? 'black' : 'red'
+}
+
+export function isElectron() {
+  return 'electron' in window
 }

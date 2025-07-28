@@ -1,15 +1,17 @@
 import type { ChatClient, ChatMessage, VideoClient } from '@zoom/videosdk'
 import { createStore } from 'zustand'
 
+export interface ChatStoreActions {
+  setChatRead: () => void
+  sendChat: (messageText: string) => Promise<void>
+  cleanup: () => void
+}
+
 export interface ChatStore {
   chatClient: typeof ChatClient
   messages: Array<ChatMessage>
   isChatUnread: boolean
-  setChatRead: () => void
-
-  sendChat: (messageText: string) => Promise<void>
-
-  cleanup: () => void
+  actions: ChatStoreActions
 }
 
 export function createChatStore(zoomClient: typeof VideoClient) {
@@ -25,15 +27,17 @@ export function createChatStore(zoomClient: typeof VideoClient) {
     chatClient,
     messages,
     isChatUnread: false,
-    setChatRead: () => {
-      set({ isChatUnread: false })
-    },
 
-    sendChat: async (messageText) => {
-      await chatClient.sendToAll(messageText)
-    },
-    cleanup: () => {
-      zoomClient.off('chat-on-message', handleMessage)
+    actions: {
+      setChatRead: () => {
+        set({ isChatUnread: false })
+      },
+      sendChat: async (messageText) => {
+        await chatClient.sendToAll(messageText)
+      },
+      cleanup: () => {
+        zoomClient.off('chat-on-message', handleMessage)
+      },
     },
   }))
 

@@ -1,6 +1,12 @@
 import ZoomVideo from '@zoom/videosdk'
 import { createStore } from 'zustand'
-import { useAppStore } from '../../../useAppStore'
+import { logger } from '@/utils/logger'
+import { appStore } from '../../../useAppStore'
+
+export interface DeviceStoreActions {
+  initDevices: () => Promise<PermissionState | 'skipped'>
+  cleanup: () => void
+}
 
 export interface DeviceStore {
   videoDevices: MediaDeviceInfo[]
@@ -11,7 +17,7 @@ export interface DeviceStore {
   selectedAudioInputDevice: string | null
   selectedAudioOutputDevice: string | null
 
-  initDevices: () => Promise<PermissionState | 'skipped'>
+  actions: DeviceStoreActions
 }
 
 export function createDeviceStore() {
@@ -24,40 +30,51 @@ export function createDeviceStore() {
     selectedAudioInputDevice: null,
     selectedAudioOutputDevice: null,
 
-    initDevices: async () => {
-      const appState = useAppStore.getState()
-      if (appState.permissionState === 'acquiring' || appState.permissionState === 'granted') {
-        return 'skipped'
-      }
-      appState.setPermissionState('acquiring')
+    actions: {
+      initDevices: async () => {
+        const appState = appStore.getState()
+        const appActions = appState.actions
+        if (appState.permissionState === 'acquiring') {
+          logger.log('Already acquiring devices')
+          return 'skipped'
+        }
+        appActions.setPermissionState('acquiring')
 
-      // try catch doesn't work on this function
-      const devices = await ZoomVideo.getDevices()
+        // try catch doesn't work on this function
+        const devices = await ZoomVideo.getDevices()
 
-      const videoDevices = devices.filter(d => d.kind === 'videoinput')
-      const audioInputDevices = devices.filter(d => d.kind === 'audioinput')
-      const audioOutputDevices = devices.filter(d => d.kind === 'audiooutput')
+        const videoDevices = devices.filter(d => d.kind === 'videoinput')
+        const audioInputDevices = devices.filter(d => d.kind === 'audioinput')
+        const audioOutputDevices = devices.filter(d => d.kind === 'audiooutput')
 
-      // need to check for dummy devices when permission denied
-      const isValidDevice = (d: MediaDeviceInfo) => d.deviceId && d.label
-      const hasPermission = [...videoDevices, ...audioInputDevices].some(isValidDevice)
+        // need to check for dummy devices when permission denied
+        const isValidDevice = (d: MediaDeviceInfo) => d.deviceId && d.label
+        const hasPermission = [...videoDevices, ...audioInputDevices].some(isValidDevice)
 
-      if (!hasPermission) {
-        appState.setError({ message: 'Could not access media devices' })
-        appState.setPermissionState('denied')
-        return 'denied'
-      }
+        if (!hasPermission) {
+          appActions.setError({ message: 'Could not access media devices' })
+          appActions.setPermissionState('denied')
+          return 'denied'
+        }
 
-      set({
-        videoDevices,
-        audioInputDevices,
-        audioOutputDevices,
-        selectedVideoDevice: videoDevices[0]?.deviceId ?? null,
-        selectedAudioInputDevice: audioInputDevices[0]?.deviceId ?? null,
-        selectedAudioOutputDevice: audioOutputDevices[0]?.deviceId ?? null,
-      })
-      appState.setPermissionState('granted')
-      return 'granted'
+        set({
+          videoDevices,
+          audioInputDevices,
+          audioOutputDevices,
+          selectedVideoDevice: videoDevices[0]?.deviceId ?? null,
+          selectedAudioInputDevice: audioInputDevices[0]?.deviceId ?? null,
+          selectedAudioOutputDevice: audioOutputDevices[0]?.deviceId ?? null,
+        })
+
+        appActions.setPermissionState('granted')
+        return 'granted'
+      },
+
+      cleanup: () => {
+      // setting this makes it so next time the prejoin screen is loaded,
+      // it will init devices properly
+        appStore.getState().actions.setPermissionState('idle')
+      },
     },
   }))
 }

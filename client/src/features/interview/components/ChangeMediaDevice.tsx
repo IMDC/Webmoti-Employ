@@ -1,7 +1,14 @@
 import { Radio, Select, Stack, Text } from '@mantine/core'
 import { IconMicrophone, IconVideo, IconVolume } from '@tabler/icons-react'
-import { useDeviceStore } from '@/features/interview/zoom/useDeviceStore'
-import { useAppStore } from '@/useAppStore'
+import {
+  useAudioInputDevices,
+  useAudioOutputDevices,
+  useSelectedAudioInputDevice,
+  useSelectedAudioOutputDevice,
+  useSelectedVideoDevice,
+  useVideoDevices,
+} from '@/features/interview/zoom/useDeviceStore'
+import { useAppPermissionState } from '@/useAppStore'
 
 type MediaType = 'audio' | 'video'
 type Variant = 'dropdown' | 'radio'
@@ -72,13 +79,13 @@ export function ChangeMediaDevice({
   onSwitchCamera,
   onSwitchMicrophone,
 }: ChangeMediaDeviceProps) {
-  const permissionState = useAppStore(s => s.permissionState)
-  const videoDevices = useDeviceStore(s => s.videoDevices)
-  const audioInputDevices = useDeviceStore(s => s.audioInputDevices)
-  const audioOutputDevices = useDeviceStore(s => s.audioOutputDevices)
-  const selectedVideoDevice = useDeviceStore(s => s.selectedVideoDevice)
-  const selectedAudioInputDevice = useDeviceStore(s => s.selectedAudioInputDevice)
-  const selectedAudioOutputDevice = useDeviceStore(s => s.selectedAudioOutputDevice)
+  const permissionState = useAppPermissionState()
+  const videoDevices = useVideoDevices()
+  const audioInputDevices = useAudioInputDevices()
+  const audioOutputDevices = useAudioOutputDevices()
+  const selectedVideoDevice = useSelectedVideoDevice()
+  const selectedAudioInputDevice = useSelectedAudioInputDevice()
+  const selectedAudioOutputDevice = useSelectedAudioOutputDevice()
 
   if (permissionState === 'denied') {
     return <Text>Media permissions denied</Text>

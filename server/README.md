@@ -66,23 +66,28 @@ Setup video: <https://www.youtube.com/watch?v=tu7zuv6aMug> (up to 3:45)
 
 ## Deploying
 
-The server is deployed using Cloudflare workers. This also integrates with GitHub.
+The server is deployed using Cloudflare workers.
 
 Steps:
 
 1. Go to cloudflare dashboard
 2. Click `Add` > `Workers`
-3. Click `Import a repository`
-4. Connect to GitHub
-5. Set `Root directory` to `/server`
-6. Set `Deploy command` to `pnpm run deploy`
-7. Set `Build command` to `pnpm run install:deploy`
-8. Add `SKIP_DEPENDENCY_INSTALL` Build variable and set to `1` (this skips a full project `pnpm install` and later runs the custom install command above)
-9. Create new API token
-10. Deploy
-11. In `Settings` > `Variables and Secrets`, add everything in `.dev.vars` except `DATABASE_URL` (it's not needed since it's only used for `db-typegen`)
-12. Get the deployed server url and set it in Vercel for client as `VITE_API_BASE_URL`
-13. [Deploy client](../client/README.md#deploying), get the url, and set `CORS_ORIGIN` secret in Cloudflare
+3. Set `Root directory` to `/server`
+4. Set `Deploy command` to `pnpm run deploy`
+5. Set `Build command` to `pnpm run install:deploy`
+6. Add `SKIP_DEPENDENCY_INSTALL` Build variable and set to `1` (this skips a full project `pnpm install` and later runs the custom install command above)
+7. Create new API token
+8. Deploy
+9. In `Settings` > `Variables and Secrets`, add everything in `.dev.vars` except `DATABASE_URL` (it's not needed since it's only used for `db-typegen`)
+10. Get the deployed server url and set it in Vercel for client as `VITE_API_BASE_URL`
+11. [Deploy client](../client/README.md#deploying), get the url, and set `CORS_ORIGIN` secret in Cloudflare
+
+Steps for automatic deployments:
+
+<https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/>
+
+1. Create API token
+2. Add `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` to Github as secrets.
 
 ## Services
 

@@ -28,24 +28,37 @@ client.on('error', (error) => {
 // end of socket connection code
 
 const isDev = !app.isPackaged
+import {
+  getLocalDomain,
+  getModelBuffer,
+  getPreloadPath,
+  getUiPath,
+  ipcHandle,
+  isDev,
+} from './utils'
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    webPreferences: {
+      preload: getPreloadPath(),
+    },
+    // only show after maximized
+    show: false,
   })
+  mainWindow.maximize()
 
   if (isDev) {
     // load vite dev server running in /client
-    mainWindow.setIcon(path.join(__dirname, '..', 'icon.png'))
-    mainWindow.loadURL('http://localhost:5173')
+    mainWindow.setIcon(path.join(app.getAppPath(), 'icon.png'))
+    mainWindow.loadURL(`http://${getLocalDomain()}`)
     mainWindow.webContents.openDevTools()
   }
   else {
     // load built app from /client
-    const distPath = path.join(app.getAppPath(), 'client', 'dist', 'index.html')
-    mainWindow.loadFile(distPath)
+    mainWindow.loadFile(getUiPath())
   }
+
+  ipcHandle('getModelBuffer', getModelBuffer)
 }
 
 // This method will be called when Electron has finished
