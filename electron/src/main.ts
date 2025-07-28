@@ -1,10 +1,10 @@
 // Importing net module to create a socket connection
 // This assumes you have a Python server running that listens on port 65432
 // Adjust the port as necessary to match your Python server configuration
-import net from 'node:net'
+import { io } from 'socket.io-client'
 import path from 'node:path'
 import process from 'node:process'
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow} from 'electron'
 import {
   getLocalDomain,
   getModelBuffer,
@@ -14,25 +14,31 @@ import {
   isDev,
 } from './utils'
 
-const client = net.createConnection({ port: 65432 }, () => {
-  console.log('✅ Connected to Python socket server')
-})
+let socket: ReturnType<typeof io>
 
-client.on('data', (data) => {
-  const received = JSON.parse(data.toString())
-  console.log('🚀 Received from Python:', received)
+function setupSocket() {
+  socket = io('http://localhost:65432')
 
-  // Optionally, send response back
-  client.write('Received your data, Python!')
-})
+  socket.on('connect', () => {
+    console.log('✅ Connected to Python Socket.IO server')
 
-client.on('end', () => {
-  console.log('⚠️ Disconnected from Python server')
-})
+    // Optionally send initial message upon connection
+    socket.emit('electron_message', { greeting: 'Hello Python!' })
+  })
 
-client.on('error', (error) => {
-  console.error('❌ Socket Error:', error)
-})
+  socket.on('python_data', (data) => {
+    console.log('🚀 Received from Python:', data)
+  })
+
+  socket.on('disconnect', () => {
+    console.log('⚠️ Disconnected from Python server')
+  })
+
+  socket.on('connect_error', (error) => {
+    console.error('❌ Connection Error:', error)
+  })
+}
+
 // end of socket connection code
 
 function createWindow() {
@@ -57,6 +63,8 @@ function createWindow() {
   }
 
   ipcHandle('getModelBuffer', getModelBuffer)
+
+  setupSocket()
 }
 
 // This method will be called when Electron has finished

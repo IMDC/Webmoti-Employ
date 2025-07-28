@@ -1,41 +1,28 @@
-import socket
-import json
-import time
+import socketio
+from aiohttp import web
+import asyncio
 
-HOST = 'localhost'
-PORT = 65432
+sio = socketio.AsyncServer(cors_allowed_origins="*")
+app = web.Application()
+sio.attach(app)
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind((HOST, PORT))
-server.listen()
+@sio.event
+async def connect(sid, environ):
+    print("✅ Electron connected:", sid)
 
-print(f"✅ Python Socket server started at {HOST}:{PORT}")
+    # Send initial message to Electron upon connection
+    await sio.emit('python_data', {'message': 'Hello Electron!'})
 
-conn, addr = server.accept()
-print(f"✅ Electron connected: {addr}")
+@sio.event
+async def disconnect(sid):
+    print("⚠️ Electron disconnected:", sid)
 
-try:
-    count = 0
-    while True:
-        # Send simple incrementing count as test data every 2 seconds
-        test_data = {'message': f'Hello Electron! Count = {count}'}
-        conn.sendall(json.dumps(test_data).encode())
-        print(f"🚀 Sent: {test_data}")
+@sio.event
+async def electron_message(sid, data):
+    print("🔍 Received from Electron:", data)
 
-        # Wait for potential response from Electron (optional)
-        conn.settimeout(1.0)
-        try:
-            data = conn.recv(1024)
-            if data:
-                print(f"🔍 Received from Electron: {data.decode()}")
-        except socket.timeout:
-            pass
+    # Echo back the received message with additional info
+    await sio.emit('python_data', {'response': 'Message received!', 'original': data})
 
-        count += 1
-        time.sleep(2)
-
-except KeyboardInterrupt:
-    print("⚠️ Stopped by user.")
-finally:
-    conn.close()
-    server.close()
+if __name__ == "__main__":
+    web.run_app(app, host="localhost", port=65432)
