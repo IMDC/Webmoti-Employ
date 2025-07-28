@@ -24,10 +24,6 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.17.0",
-    "@types/socket.io-client": "^3.0.0",
     "eslint": "^9.31.0"
-  },
-  "dependencies": {
-    "socket.io-client": "^4.8.1"
   }
 }
