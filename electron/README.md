@@ -6,9 +6,10 @@ This Electron app bundles the built React client so it can be run locally. It al
   - [uv](#uv)
   - [Install Dependencies](#install-dependencies)
   - [Ruff](#ruff)
-- [Running the eyetracking script locally](#running-the-eyetracking-script-locally)
+- [Running the app locally](#running-the-app-locally)
 - [Face detection](#face-detection)
-- [Creating distributable file](#creating-distributable-file)
+- [Packaging the app](#packaging-the-app)
+  - [Local packaging](#local-packaging)
 
 ## Setup
 
@@ -52,7 +53,16 @@ You can also install Ruff globally with `uv`:
 uv tool install ruff@latest
 ```
 
-## Running the eyetracking script locally
+## Running the app locally
+
+```bash
+# you can run this in the root or in the electron/ dir.
+# this command runs the client vite server, the hono server, and the electron app in parallel.
+# the electron app will load localhost:5173 (the vite server), so any changes you make to the client will hot reload.
+pnpm run dev:electron
+```
+
+You can also run the eyetracking script locally but it might not work:
 
 ```bash
 cd electron/python
@@ -66,6 +76,25 @@ To get the area of interest dynamically for eyetracking analysis we use Mediapip
 
 [Download the BlazeFace model here](https://ai.google.dev/edge/mediapipe/solutions/vision/face_detector/index#blazeface_short-range) and store it in `electron/models`.
 
-## Creating distributable file
+## Packaging the app
 
-- On Windows, you need to run as admin before running `pnpm run dist:win` the first time you run this command.
+Packaging the app is automated using Github actions:
+
+1. Increment the `version` field in `electron/package.json`
+2. Commit this change
+3. Github actions will detect this and automatically create a new release with the packaged app files (this can take 5-10 minutes)
+
+### Local packaging
+
+You might want to package it locally for debugging purposes since you can inspect what files get packaged. To do this, open `electron/dist` after packaging the app.
+
+> [!NOTE]
+> On Windows, you might need to run as admin before running `pnpm run dist:win` the first time you run this command.
+
+```bash
+# create a distributable app file
+# (run the one for your operating system)
+pnpm run dist:win
+pnpm run dist:linux
+pnpm run dist:mac
+```

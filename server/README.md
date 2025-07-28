@@ -31,7 +31,7 @@ Then add secrets:
 3. Add `CLERK_SECRET_KEY` and `CLERK_PUBLISHABLE_KEY` ([more info](#authentication))
 4. Add `DATABASE_URL` (This is for kysely-codegen only (to generate types for the Neon database). Set this to the [Neon database connection string](#neon))
 
-Whenever you change any env variables in `.dev.vars`, run `pnpm run cf-typegen` ([more info here](https://developers.cloudflare.com/workers/wrangler/commands/#types))
+Whenever you change any env variables in `.dev.vars`, run `pnpm run cf-typegen` ([more info here](https://developers.cloudflare.com/workers/wrangler/commands/#types)). For first time setup you don't need to do this since there is a postinstall script which will run this automatically.
 
 #### .env
 
