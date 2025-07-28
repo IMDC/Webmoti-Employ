@@ -32,12 +32,11 @@ jobs:
         with:
           node-version-file: package.json
           cache: pnpm
-      - name: Install server devDependencies
-        run: pnpm install --filter @webmoti-employ/server --prod=false
 
       - name: Build & Deploy Worker
         uses: cloudflare/wrangler-action@v3
         with:
-          wranglerVersion: none
+          workingDirectory: server
+          packageManager: pnpm
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
