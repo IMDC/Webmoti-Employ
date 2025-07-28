@@ -1,0 +1,114 @@
+name: Electron Package
+
+on:
+  push:
+    branches:
+      - master
+    # only run when electron package.json version changes
+    paths:
+      - electron/package.json
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.check.outputs.changed }}
+      version: ${{ steps.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        uses: EndBug/version-check@v2
+        with:
+          diff-search: true
+          file-name: electron/package.json
+
+  package-linux:
+    if: needs.check-version.outputs.changed == 'true'
+    needs: check-version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: pnpm
+
+      - name: Package for linux
+        run: pnpm run dist:linux
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-dist
+          path: electron/dist/*.AppImage
+
+  package-windows:
+    if: needs.check-version.outputs.changed == 'true'
+    needs: check-version
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: pnpm
+
+      - name: Package for windows
+        run: pnpm run dist:win
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-dist
+          path: electron/dist/*.exe
+
+  package-macos:
+    if: needs.check-version.outputs.changed == 'true'
+    needs: check-version
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: pnpm
+
+      - name: Package for macos
+        run: pnpm run dist:mac
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-dist
+          path: electron/dist/*.dmg
+
+  release:
+    if: needs.check-version.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    needs: [check-version, package-linux, package-windows, package-macos]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: '*-dist'
+          path: release/
+          merge-multiple: true
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.check-version.outputs.version }}
+          name: Release ${{ needs.check-version.outputs.version }}
+          files: release/**
