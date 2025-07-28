@@ -1,16 +1,6 @@
 name: Vercel Deploy
 
-on:
-  workflow_run:
-    workflows: [Build]
-    types:
-      - completed
-    branches:
-      - master
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
-  cancel-in-progress: true
+on: [workflow_call]
 
 permissions:
   contents: read
@@ -22,22 +12,23 @@ env:
 
 jobs:
   # only deploy when files in client/ change
-  filter:
+  check-client-changes:
     runs-on: ubuntu-latest
     outputs:
-      client: ${{ steps.filter.outputs.client }}
+      changed: ${{ steps.filter.outputs.changed }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
-            client:
+            changed:
               - 'client/**'
+              - 'shared/**'
 
   deploy:
-    needs: filter
-    if: needs.filter.outputs.client == 'true' && github.event.workflow_run.conclusion == 'success'
+    needs: check-client-changes
+    if: needs.check-client-changes.outputs.changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
