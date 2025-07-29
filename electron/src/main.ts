@@ -1,6 +1,6 @@
 import path from 'node:path'
 import process from 'node:process'
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import { io } from 'socket.io-client'
 import {
   getLocalDomain,
@@ -13,68 +13,58 @@ import {
 
 let socket: ReturnType<typeof io>
 
-function setupSocket() {
+function setupSocket(mainWindow: BrowserWindow) {
   socket = io('http://localhost:65432')
 
   socket.on('connect', () => {
-    // eslint-disable-next-line no-console
     console.log('✅ Connected to Python Socket.IO server')
-
-    // Optionally send initial message upon connection
-    socket.emit('electron_message', { greeting: 'Hello Python!' })
   })
 
-  socket.on('python_data', (data) => {
-    // eslint-disable-next-line no-console
-    console.log('🚀 Received from Python:', data)
+  socket.on('gaze_data', (data) => {
+    console.log('🚀 Received gaze data from Python:', data)
+    // Forward data to renderer (frontend React app) if needed
+    mainWindow.webContents.send('gaze_data', data)
   })
 
   socket.on('disconnect', () => {
-    // eslint-disable-next-line no-console
     console.log('⚠️ Disconnected from Python server')
   })
 
   socket.on('connect_error', (error) => {
     console.error('❌ Connection Error:', error)
   })
-}
 
-// end of socket connection code
+  // Listen for AOI updates from frontend renderer (React app)
+  ipcMain.on('update_aoi', (_event, boundingBox) => {
+    socket.emit('update_aoi', boundingBox)
+  })
+}
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
     webPreferences: {
       preload: getPreloadPath(),
     },
-    // only show after maximized
     show: false,
   })
   mainWindow.maximize()
 
   if (isDev) {
-    // load vite dev server running in /client
     mainWindow.setIcon(path.join(app.getAppPath(), 'icon.png'))
     mainWindow.loadURL(`http://${getLocalDomain()}`)
     mainWindow.webContents.openDevTools()
   }
   else {
-    // load built app from /client
     mainWindow.loadFile(getUiPath())
   }
 
   ipcHandle('getModelBuffer', getModelBuffer)
 
-  setupSocket()
+  setupSocket(mainWindow)
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.on('ready', createWindow)
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
@@ -82,8 +72,6 @@ app.on('window-all-closed', () => {
 })
 
 app.on('activate', () => {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow()
   }

@@ -1,31 +1,35 @@
-"""The main eyetracking script.
-
-This is run from the Electron main process and communicates with it to send feedback.
-"""
-
-import csv
+import asyncio
 import math
 import random
 import time
 from collections import deque
-from pathlib import Path
-from typing import Literal, TypedDict
-
-import cv2
-import mediapipe as mp
-import mss
-import numpy as np
+from typing import Literal, TypedDict, Any
 import tobii_research as tr
+import socketio
+from aiohttp import web
 from loguru import logger
 
-# Test Mode Configuration
-TEST_MODE = False  # Auto-set later if no tracker is found
+# Setup Socket.IO Server
+sio = socketio.AsyncServer(cors_allowed_origins="*")
+app = web.Application()
+sio.attach(app)
+
+# Global state
+current_aoi_bbox = None
+start_timestamp = None
+TEST_MODE = False  # Auto-set if no tracker
 
 # Eye movement classification setup
 gaze_history = deque(maxlen=5)
 FIXATION_VELOCITY_THRESHOLD = 100  # pixels per second
 MIN_GAZE_POINTS = 2
 
+# AOI data structure from Electron
+class AOIBoundingBox(TypedDict):
+    x: float
+    y: float
+    width: float
+    height: float
 
 def classify_eye_movement(
     new_point: tuple[float, float],
@@ -45,64 +49,17 @@ def classify_eye_movement(
     velocity = dist / delta_t
     return "Fixation" if velocity < FIXATION_VELOCITY_THRESHOLD else "Saccade"
 
+# Tobii gaze data format
+class GazeData(TypedDict):
+    device_time_stamp: int
+    left_gaze_point_on_display_area: tuple[float, float]
+    right_gaze_point_on_display_area: tuple[float, float]
+    left_pupil_diameter: float
+    right_pupil_diameter: float
+    left_gaze_point_validity: int
+    right_gaze_point_validity: int
 
-# Setup
-mp_face_detection = mp.solutions.face_detection.FaceDetection(
-    min_detection_confidence=0.7,
-)
-sct = mss.mss()
-monitor = sct.monitors[1]
-current_aoi_bbox = None
-start_timestamp = None
-
-# CSV setup
-csv_file = Path("gaze_data.csv").open(mode="w", newline="")
-csv_writer = csv.writer(csv_file)
-csv_writer.writerow(
-    [
-        "Elapsed_Time_s",
-        "Gaze_X_Left",
-        "Gaze_Y_Left",
-        "Gaze_X_Right",
-        "Gaze_Y_Right",
-        "Gaze_X_Average",
-        "Gaze_Y_Average",
-        "Pupil_Diameter_Left",
-        "Pupil_Diameter_Right",
-        "Validity_Left",
-        "Validity_Right",
-        "Looking_At_Interviewer",
-        "Eye_Movement_Type",
-    ],
-)
-
-# Connect to Tobii
-trackers = tr.find_all_eyetrackers()
-if trackers:
-    tracker = trackers[0]
-    logger.debug("Connected to:", tracker.model)
-else:
-    logger.warning("⚠️ No eye tracker found. Running in TEST MODE.")
-    TEST_MODE = True
-
-
-# Screen and AOI functions
-def get_screen_frame() -> np.ndarray:
-    img = np.array(sct.grab(monitor))
-    return cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
-
-
-def detect_interviewer(frame: np.ndarray):
-    """Detect the interviewer's face and return the bounding box, or None."""
-    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    results = mp_face_detection.process(rgb_frame)
-    if results.detections:
-        return results.detections[0].location_data.relative_bounding_box
-    return None
-
-
-# Real or Simulated Gaze Callback
-def handle_gaze_data(
+async def handle_gaze_data(
     timestamp: int,
     gaze_x_left: float,
     gaze_y_left: float,
@@ -113,12 +70,10 @@ def handle_gaze_data(
     validity_left: int,
     validity_right: int,
 ) -> None:
-    """Process gaze data, classify movement, and log to CSV."""
     global current_aoi_bbox, start_timestamp
 
-    # Check for valid gaze points explicitly
     if not (validity_left and validity_right):
-        return  # Immediately skip if data is invalid
+        return
 
     if start_timestamp is None:
         start_timestamp = timestamp
@@ -127,20 +82,19 @@ def handle_gaze_data(
     gaze_coords_x = [x for x in [gaze_x_left, gaze_x_right] if x is not None]
     gaze_coords_y = [y for y in [gaze_y_left, gaze_y_right] if y is not None]
 
-    # If averages can't be calculated, skip recording
     if not gaze_coords_x or not gaze_coords_y:
         return
 
-    gaze_x_avg = np.mean(gaze_coords_x)
-    gaze_y_avg = np.mean(gaze_coords_y)
+    gaze_x_avg = sum(gaze_coords_x) / len(gaze_coords_x)
+    gaze_y_avg = sum(gaze_coords_y) / len(gaze_coords_y)
 
     looking_at_interviewer = False
     if current_aoi_bbox:
         xmin, ymin, width, height = (
-            current_aoi_bbox.xmin,
-            current_aoi_bbox.ymin,
-            current_aoi_bbox.width,
-            current_aoi_bbox.height,
+            current_aoi_bbox["x"],
+            current_aoi_bbox["y"],
+            current_aoi_bbox["width"],
+            current_aoi_bbox["height"],
         )
         looking_at_interviewer = (
             xmin <= gaze_x_avg <= xmin + width and ymin <= gaze_y_avg <= ymin + height
@@ -148,121 +102,80 @@ def handle_gaze_data(
 
     movement_type = classify_eye_movement((gaze_x_avg, gaze_y_avg), timestamp)
 
-    # Now write only valid data points to CSV
-    csv_writer.writerow(
-        [
-            f"{elapsed_seconds:.3f}",
-            gaze_x_left,
-            gaze_y_left,
-            gaze_x_right,
-            gaze_y_right,
-            gaze_x_avg,
-            gaze_y_avg,
-            pupil_left,
-            pupil_right,
-            validity_left,
-            validity_right,
-            looking_at_interviewer,
-            movement_type,
-        ],
-    )
+    data = {
+        "elapsed_seconds": elapsed_seconds,
+        "gaze_x_avg": gaze_x_avg,
+        "gaze_y_avg": gaze_y_avg,
+        "looking_at_interviewer": looking_at_interviewer,
+        "movement_type": movement_type,
+    }
 
-    logger.debug(
-        f"{elapsed_seconds:.2f}s "
-        f"{'✅' if looking_at_interviewer else '⚠️'} "
-        f"| Movement: {movement_type}",
-    )
+    # Emit data to Electron frontend via Socket.IO
+    await sio.emit("gaze_data", data)
+    logger.info(f"Sent gaze data: {data}")
 
-
-class GazeData(TypedDict):
-    """Tobii gaze data sample from a timestamp."""
-
-    device_time_stamp: int
-    left_gaze_point_on_display_area: tuple[float, float]
-    right_gaze_point_on_display_area: tuple[float, float]
-    left_pupil_diameter: float
-    right_pupil_diameter: float
-    left_gaze_point_validity: int
-    right_gaze_point_validity: int
-
-
-# Tobii Callback Function
 def gaze_callback(gaze_data: GazeData) -> None:
-    """Parse gaze data and forward it to the handler."""
-    timestamp = gaze_data["device_time_stamp"]
-    left_eye = gaze_data["left_gaze_point_on_display_area"]
-    right_eye = gaze_data["right_gaze_point_on_display_area"]
-    pupil_left = gaze_data["left_pupil_diameter"]
-    pupil_right = gaze_data["right_pupil_diameter"]
-    validity_left = gaze_data["left_gaze_point_validity"]
-    validity_right = gaze_data["right_gaze_point_validity"]
+    asyncio.create_task(handle_gaze_data(
+        gaze_data["device_time_stamp"],
+        *gaze_data["left_gaze_point_on_display_area"],
+        *gaze_data["right_gaze_point_on_display_area"],
+        gaze_data["left_pupil_diameter"],
+        gaze_data["right_pupil_diameter"],
+        gaze_data["left_gaze_point_validity"],
+        gaze_data["right_gaze_point_validity"],
+    ))
 
-    gaze_x_left, gaze_y_left = left_eye
-    gaze_x_right, gaze_y_right = right_eye
+@sio.event
+async def connect(sid, environ):
+    logger.info(f"Electron connected: {sid}")
 
-    handle_gaze_data(
-        timestamp,
-        gaze_x_left,
-        gaze_y_left,
-        gaze_x_right,
-        gaze_y_right,
-        pupil_left,
-        pupil_right,
-        validity_left,
-        validity_right,
-    )
+@sio.event
+async def disconnect(sid):
+    logger.info(f"Electron disconnected: {sid}")
 
+@sio.event
+async def update_aoi(sid, data: AOIBoundingBox):
+    global current_aoi_bbox
+    current_aoi_bbox = data
+    logger.info(f"Updated AOI from Electron: {data}")
 
-# Main Loop
-if not TEST_MODE:
-    tracker.subscribe_to(tr.EYETRACKER_GAZE_DATA, gaze_callback, as_dictionary=True)
+async def simulate_gaze_data():
+    global TEST_MODE
+    while TEST_MODE:
+        timestamp = int(time.time() * 1e6)
+        await handle_gaze_data(
+            timestamp,
+            random.uniform(0.3, 0.7),
+            random.uniform(0.3, 0.7),
+            random.uniform(0.3, 0.7),
+            random.uniform(0.3, 0.7),
+            random.uniform(2.5, 3.5),
+            random.uniform(2.5, 3.5),
+            1,
+            1,
+        )
+        await asyncio.sleep(0.1)
 
-try:
+async def main():
+    global TEST_MODE
+    trackers = tr.find_all_eyetrackers()
+    if trackers:
+        tracker = trackers[0]
+        logger.info(f"Connected to Tobii: {tracker.model}")
+        tracker.subscribe_to(tr.EYETRACKER_GAZE_DATA, gaze_callback, as_dictionary=True)
+    else:
+        logger.warning("⚠️ No Tobii tracker found. Using TEST_MODE.")
+        TEST_MODE = True
+        asyncio.create_task(simulate_gaze_data())
+
+    web_runner = web.AppRunner(app)
+    await web_runner.setup()
+    site = web.TCPSite(web_runner, "localhost", 65432)
+    await site.start()
+    logger.info("Socket.IO server running at http://localhost:65432")
+
     while True:
-        frame = get_screen_frame()
-        current_aoi_bbox = detect_interviewer(frame)
+        await asyncio.sleep(3600)  # Keep running
 
-        if current_aoi_bbox:
-            h, w, _ = frame.shape
-            x, y, box_w, box_h = (
-                int(current_aoi_bbox.xmin * w),
-                int(current_aoi_bbox.ymin * h),
-                int(current_aoi_bbox.width * w),
-                int(current_aoi_bbox.height * h),
-            )
-            cv2.rectangle(frame, (x, y), (x + box_w, y + box_h), (0, 255, 0), 2)
-
-        if TEST_MODE:
-            timestamp = int(time.time() * 1e6)
-            gaze_x_left = random.uniform(0.3, 0.7)  # noqa: S311
-            gaze_y_left = random.uniform(0.3, 0.7)  # noqa: S311
-            gaze_x_right = random.uniform(0.3, 0.7)  # noqa: S311
-            gaze_y_right = random.uniform(0.3, 0.7)  # noqa: S311
-            pupil_left = random.uniform(2.5, 3.5)  # noqa: S311
-            pupil_right = random.uniform(2.5, 3.5)  # noqa: S311
-            validity_left = 1
-            validity_right = 1
-            handle_gaze_data(
-                timestamp,
-                gaze_x_left,
-                gaze_y_left,
-                gaze_x_right,
-                gaze_y_right,
-                pupil_left,
-                pupil_right,
-                validity_left,
-                validity_right,
-            )
-
-        cv2.imshow("Interviewer AOI Tracking", frame)
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
-
-except KeyboardInterrupt:
-    logger.info("Stopped by user.")
-
-finally:
-    if not TEST_MODE:
-        tracker.unsubscribe_from(tr.EYETRACKER_GAZE_DATA, gaze_callback)
-    csv_file.close()
-    cv2.destroyAllWindows()
+if __name__ == "__main__":
+    asyncio.run(main())
