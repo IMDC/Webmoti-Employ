@@ -17,16 +17,19 @@ function setupSocket(mainWindow: BrowserWindow) {
   socket = io('http://localhost:65432')
 
   socket.on('connect', () => {
+    // eslint-disable-next-line no-console
     console.log('✅ Connected to Python Socket.IO server')
   })
 
   socket.on('gaze_data', (data) => {
+    // eslint-disable-next-line no-console
     console.log('🚀 Received gaze data from Python:', data)
     // Forward data to renderer (frontend React app) if needed
     mainWindow.webContents.send('gaze_data', data)
   })
 
   socket.on('disconnect', () => {
+    // eslint-disable-next-line no-console
     console.log('⚠️ Disconnected from Python server')
   })
 
