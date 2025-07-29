@@ -1,7 +1,7 @@
 {
   "name": "@webmoti-employ/electron",
   "productName": "WebMoti-Employ",
-  "version": "0.0.0",
+  "version": "0.0.4",
   "description": "WebMoti-Employ desktop app",
   "author": "IMDC",
   "main": "dist/main.js",
@@ -11,14 +11,18 @@
     "build:electron": "rimraf dist && tsc && cross-env VITE_IS_ELECTRON=true pnpm --filter @webmoti-employ/client build:deploy",
     "dist:win": "pnpm run build:electron && electron-builder --win --x64",
     "dist:linux": "pnpm run build:electron && electron-builder --linux --arm64",
-    "dist:mac": "pnpm run build:electron && electron-builder --mac --x64"
+    "dist:mac": "pnpm run build:electron && electron-builder --mac --x64",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^4.17.0",
-    "cross-env": "^7.0.3",
-    "electron": "37.2.3",
+    "@antfu/eslint-config": "^5.0.0",
+    "cross-env": "^10.0.0",
+    "electron": "37.2.4",
     "electron-builder": "^26.0.12",
-    "eslint": "^9.31.0",
+    "eslint": "^9.32.0",
     "rimraf": "^6.0.1",
     "typescript": "~5.8.3"
   }

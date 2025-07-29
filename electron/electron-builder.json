@@ -14,8 +14,21 @@
       "to": "dist"
     }
   ],
-  "extraResources": ["dist/preload.cjs", "models"],
-  "mac": { "target": "dmg" },
-  "linux": { "target": "AppImage", "category": "Telephony" },
-  "win": { "target": ["portable", "msi"] }
+  "extraResources": [
+    "dist/preload.cjs",
+    "models"
+  ],
+  "mac": {
+    "target": "dmg",
+    "forceCodeSigning": false
+  },
+  "linux": {
+    "target": "AppImage",
+    "category": "Telephony",
+    "forceCodeSigning": false
+  },
+  "win": {
+    "target": ["portable"],
+    "forceCodeSigning": false
+  }
 }

@@ -1,4 +1,5 @@
 name: Build and Deploy
+name: Build and Deploy
 
 on:
   push:
@@ -11,6 +12,10 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
+  deployments: write
 
 permissions:
   contents: read
@@ -48,6 +53,19 @@ jobs:
     secrets: inherit
 
   deploy-cloudflare:
+    uses: ./.github/workflows/deploy-cloudflare.yml
+    needs: [build]
+    secrets: inherit
+
+  # only deploy when pushing to main, not other branches (like dependabot)
+  deploy-vercel:
+    if: github.ref == 'refs/heads/master'
+    uses: ./.github/workflows/deploy-vercel.yml
+    needs: [build]
+    secrets: inherit
+
+  deploy-cloudflare:
+    if: github.ref == 'refs/heads/master'
     uses: ./.github/workflows/deploy-cloudflare.yml
     needs: [build]
     secrets: inherit

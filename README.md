@@ -14,6 +14,8 @@ WebMoti-Employ is an app that uses eyetracking to deliver real-time feedback dur
 
 - [Stack](#stack)
 - [Setup](#setup)
+- [CI/CD](#cicd)
+- [Dependabot](#dependabot)
 - [Desktop App](#desktop-app)
 - [Deploying](#deploying)
 - [VSCode Auto Formatting Code](#vscode-auto-formatting-code)
@@ -52,6 +54,9 @@ Desktop App:
 
 - Electron
 - Electron-Builder
+- Python
+- Socket.IO
+- Tobii Pro SDK (Eyetracking)
 
 Hosting:
 
@@ -67,28 +72,71 @@ Hosting:
 
 3. [Setup the desktop app](electron/README.md#setup)
 
-4. Install dependencies
+4. Install pnpm
 
-```bash
-# This project uses pnpm. If not installed, run `npm install -g pnpm`
-pnpm install
+    ```bash
+    npm install -g pnpm
+    ```
 
-# run both client and server
-pnpm run dev
-```
+5. Install dependencies
+
+    ```bash
+    pnpm install
+    ```
+
+6. Setup ESLint
+
+    This project uses ESLint to have better code quality and prevent bugs. This should be configured depending on your IDE so you can see issues as you write code. If you use VSCode, follow [these steps](#vscode-auto-formatting-code) to set it up.
+
+7. Run the project locally
+
+    ```bash
+    # this will run both the client and server in parallel
+    pnpm run dev
+    ```
+
+## CI/CD
+
+We use Github actions for CI/CD automation. There are five main workflows:
+
+1. `Build and Deploy`
+    - Lints code
+    - Checks for Typescript errors
+    - Builds code
+    - Runs tests
+    - Activates the deploy workflows
+2. `Vercel Deploy`
+    - Checks for changes in `client/`
+    - If changed, deploys client to Vercel
+    - Creates a Github deployment
+3. `Cloudflare Deploy`
+    - Checks for changes in `server/`
+    - If changed, deploys server to Cloudflare
+4. `Electron Package`
+   - Checks for changes in `electron/package.json` `version` field
+   - If changed, packages the electron app for Windows, Linux, and MacOS
+   - Creates a Github release and uploads the packaged files
+5. `Dependabot Updates` ([More info here](#dependabot))
+   - Creates PRs for dependency updates
+
+## Dependabot
+
+Dependabot checks for new dependencies for all `package.json` files in the project. It also does this for python in `electron/python/pyproject.toml`, but this doesn't work and always fails because Dependabot doesn't properly work for the `uv` package manager.
+
+All patch and minor versions are grouped in the `non-breaking` group in new pull requests. You can just merge these. Major updates are not grouped and have separate PRs for each one since they might break the code.
+
+Steps to update dependencies:
+
+1. Go to `Pull requests`
+2. Click one
+3. (optional) Comment `@dependabot rebase` if you made commits after this PR and there are conflicts, and wait for it to fix it
+4. Check that all checks passed
+5. Use the dropdown to switch to `Squash and merge`
+6. Click `Squash and merge`
 
 ## Desktop App
 
-```bash
-# run the app locally
-pnpm run dev:electron
-
-# create a distributable app file
-# (run the one for your operating system)
-pnpm run dist:win
-pnpm run dist:linux
-pnpm run dist:mac
-```
+The desktop app is a cross platform Electron app that wraps the React client and runs a Python server in the background. This allows us to connect to the eyetracker using the Tobii Pro Python SDK.
 
 [More info about desktop app here](electron/README.md)
 

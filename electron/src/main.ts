@@ -1,10 +1,7 @@
-// Importing net module to create a socket connection
-// This assumes you have a Python server running that listens on port 65432
-// Adjust the port as necessary to match your Python server configuration
-import { io } from 'socket.io-client'
 import path from 'node:path'
 import process from 'node:process'
-import { app, BrowserWindow} from 'electron'
+import { app, BrowserWindow } from 'electron'
+import { io } from 'socket.io-client'
 import {
   getLocalDomain,
   getModelBuffer,
@@ -20,6 +17,7 @@ function setupSocket() {
   socket = io('http://localhost:65432')
 
   socket.on('connect', () => {
+    // eslint-disable-next-line no-console
     console.log('✅ Connected to Python Socket.IO server')
 
     // Optionally send initial message upon connection
@@ -27,10 +25,12 @@ function setupSocket() {
   })
 
   socket.on('python_data', (data) => {
+    // eslint-disable-next-line no-console
     console.log('🚀 Received from Python:', data)
   })
 
   socket.on('disconnect', () => {
+    // eslint-disable-next-line no-console
     console.log('⚠️ Disconnected from Python server')
   })
 
