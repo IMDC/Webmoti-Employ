@@ -18,12 +18,11 @@ export function startPythonServer(): Promise<void> {
   }
 
   const basePath = path.join(app.getAppPath(), 'python')
-  const scriptPath = path.join(basePath, 'main.py')
 
   return new Promise((resolve, reject) => {
     // TODO: This will only work locally. For the actual app, need to
     // bundle python and deps with app, and run that
-    pythonProcess = spawn('uv', ['run', 'python', scriptPath], {
+    pythonProcess = spawn('uv', ['run', 'main.py'], {
       cwd: basePath,
       // eslint-disable-next-line node/prefer-global/process
       env: { ...process.env, PYTHONUNBUFFERED: '1' },

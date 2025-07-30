@@ -61,9 +61,14 @@ export class FaceDetectorRunner {
   private runDetection() {
     const now = performance.now()
     const result = this.detector!.detectForVideo(this.videoEl, now)
-    // only use the first detected face
     const faceBox = result.detections?.[0]?.boundingBox
     const videoRect = this.videoEl.getBoundingClientRect()
+
+    const videoWidth = this.videoEl.videoWidth
+    const videoHeight = this.videoEl.videoHeight
+
+    const scaleX = videoRect.width / videoWidth
+    const scaleY = videoRect.height / videoHeight
 
     const defaultBox = {
       x: videoRect.left,
@@ -72,15 +77,15 @@ export class FaceDetectorRunner {
       height: videoRect.height,
     }
 
-    // if no face is found, the video rect is sent to electron
+    // the bounding box is screen relative. So (0, 0) is the top left
     const payload = {
       found: !!faceBox,
       boundingBox: faceBox
         ? {
-            x: videoRect.left + faceBox.originX,
-            y: videoRect.top + faceBox.originY,
-            width: faceBox.width,
-            height: faceBox.height,
+            x: videoRect.left + faceBox.originX * scaleX,
+            y: videoRect.top + faceBox.originY * scaleY,
+            width: faceBox.width * scaleX,
+            height: faceBox.height * scaleY,
           }
         : defaultBox,
     }

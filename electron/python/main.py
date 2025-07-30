@@ -151,7 +151,7 @@ async def disconnect(sid):
 async def update_aoi(sid, data: AOIBoundingBox):
     global current_aoi_bbox
     current_aoi_bbox = data
-    logger.info(f"Updated AOI from Electron: {data}")
+    # logger.info(f"Updated AOI from Electron: {data}")
 
 
 async def simulate_gaze_data():

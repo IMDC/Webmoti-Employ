@@ -3,7 +3,6 @@ import process from 'node:process'
 import { app, BrowserWindow } from 'electron'
 import { io } from 'socket.io-client'
 import z from 'zod'
-import { startPythonServer } from './startPythonServer'
 import {
   getLocalDomain,
   getModelBuffer,
@@ -24,7 +23,13 @@ const FeedbackSchema = z.array(z.object({
 let socket: ReturnType<typeof io>
 
 function setupSocket(mainWindow: BrowserWindow) {
-  socket = io('http://localhost:65432')
+  socket = io('http://localhost:65432', {
+    autoConnect: true,
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 2000,
+    timeout: 1000,
+  })
 
   socket.on('connect', () => {
     // eslint-disable-next-line no-console
@@ -39,8 +44,7 @@ function setupSocket(mainWindow: BrowserWindow) {
     }
     const feedback = parsed.data
 
-    // eslint-disable-next-line no-console
-    console.log('feedback:', feedback)
+    // console.log('feedback:', feedback)
 
     ipcWebContentsSend('feedback', mainWindow.webContents, feedback)
   })
@@ -50,12 +54,7 @@ function setupSocket(mainWindow: BrowserWindow) {
   })
 
   socket.on('connect_error', (error) => {
-    console.error('Connection Error:', error)
-  })
-
-  // Listen for updates from frontend renderer (React app)
-  ipcOnMain('coordinates', (_event, coordinates) => {
-    socket.emit('update_aoi', coordinates.boundingBox)
+    console.error('Connection Error:', error.message)
   })
 }
 
@@ -79,11 +78,18 @@ async function createWindow() {
 
   ipcHandle('getModelBuffer', getModelBuffer)
 
-  await startPythonServer()
-  setupSocket(mainWindow)
+  // Listen for updates from frontend renderer (React app)
+  ipcOnMain('coordinates', (_event, coordinates) => {
+    socket.emit('update_aoi', coordinates.boundingBox)
+  })
+
+  return mainWindow
 }
 
-app.on('ready', createWindow)
+app.on('ready', async () => {
+  const mainWindow = await createWindow()
+  setupSocket(mainWindow)
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
