@@ -1,13 +1,13 @@
 import type { InterviewSessionArgs } from './queries'
-import { useUser } from '@clerk/clerk-react'
-import { AppShell, Button, Center, Flex, Group, Loader, Stack, Text, Title } from '@mantine/core'
+import { AppShell, Button, Flex, Group, Stack, Text, Title } from '@mantine/core'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect } from 'react'
+import { Loading } from '@/components/Loading'
 import { MyCopyButton } from '@/components/MyCopyButton'
 import { RightHeader } from '@/components/RightHeader'
+import { useUser } from '@/features/auth/hooks/useUserStore'
 import { useDeviceStoreActions } from '@/features/interview/zoom/useDeviceStore'
 import { useAppActions } from '@/useAppStore'
-import { getUserIdentity } from '@/utils/utils'
 import { useZoomCallState, useZoomSessionActions } from '../zoom/useZoomSessionStore'
 import { ErrorScreen } from './components/ErrorScreen'
 import { JoiningScreen } from './components/JoiningScreen'
@@ -25,13 +25,12 @@ export function PrejoinScreen() {
 
   const { setPermissionState } = useAppActions()
 
-  const { user } = useUser()
+  const user = useUser()
   const { id: sessionId } = useParams({ strict: false })
 
-  const userIdentity = getUserIdentity(user!)
-  const userId = user!.id
-  const userProfileUrl = user!.imageUrl
-  const args = buildInterviewSessionArgs(sessionId, userIdentity)
+  const userId = user.id
+  const userProfileUrl = user.image!
+  const args = buildInterviewSessionArgs(sessionId, user.name)
 
   const { interviewSession, isInterviewSessionPending, interviewSessionError }
     = useInterviewSession(args)
@@ -71,11 +70,7 @@ export function PrejoinScreen() {
   }, [callState, interviewSession, navigate])
 
   if (isInterviewSessionPending) {
-    return (
-      <Center mih="100vh">
-        <Loader type="dots" />
-      </Center>
-    )
+    return <Loading />
   }
 
   if (interviewSessionError) {
@@ -113,7 +108,7 @@ export function PrejoinScreen() {
         <Flex justify="center" align="center" h="100%">
           <Group justify="center" p="xl" m="xl">
             <Stack>
-              <PreviewTile height={196.875} width={350} name={userIdentity} profileUrl={userProfileUrl} />
+              <PreviewTile height={196.875} width={350} name={user.name} profileUrl={userProfileUrl} />
 
               <PrejoinMenuBar />
             </Stack>

@@ -3,6 +3,9 @@ import type { AppContext } from '@/index'
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
+import { requireAuth } from '@/middleware/useAuth'
+import { requireDb, useDb } from '@/middleware/useDb'
+import { getProfilesByEmails, getProfilesByIds } from './db-queries'
 
 const profilesRoute = new Hono<AppContext>()
 
@@ -20,47 +23,26 @@ const GetProfiles = z.object({
   }
 })
 
-function getDisplayName(user: any, fallback: string): string {
-  const first = user.firstName?.trim()
-  const last = user.lastName?.trim()
-
-  if (first && last)
-    return `${first} ${last}`
-  if (first)
-    return first
-  if (user.username)
-    return user.username
-  return user.emailAddresses?.[0]?.emailAddress || fallback
-}
-
-profilesRoute.post('/', zValidator('json', GetProfiles), async (c) => {
+profilesRoute.post('/', zValidator('json', GetProfiles), useDb, async (c) => {
   const { userIds = [], userEmails = [] } = c.req.valid('json')
-  const clerkClient = c.get('clerk')
+  requireAuth(c)
+  const db = requireDb(c)
 
   const results: ProfilesResponse = {}
 
-  // fetch by id
-  for (const userId of userIds) {
-    try {
-      const user = await clerkClient.users.getUser(userId)
-      results[userId] = { displayName: getDisplayName(user, userId), profilePic: user.imageUrl }
-    }
-    catch {
-      results[userId] = null
+  const usersById = await getProfilesByIds(db, userIds)
+  for (const user of usersById) {
+    results[user.id] = {
+      displayName: user.name,
+      profilePic: user.image || '',
     }
   }
 
-  // fetch by email
-  for (const email of userEmails) {
-    try {
-      const users = await clerkClient.users.getUserList({ emailAddress: [email] })
-      const user = users.data[0]
-      results[email] = user
-        ? { displayName: getDisplayName(user, email), profilePic: user.imageUrl }
-        : null
-    }
-    catch {
-      results[email] = null
+  const usersByEmail = await getProfilesByEmails(db, userEmails)
+  for (const user of usersByEmail) {
+    results[user.email] = {
+      displayName: user.name,
+      profilePic: user.image || '',
     }
   }
 

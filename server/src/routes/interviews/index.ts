@@ -4,19 +4,20 @@ import { NewInterview, NewInterviewInvite } from '@webmoti-employ/shared'
 
 import { Hono } from 'hono'
 import z from 'zod'
+import { requireAuth } from '@/middleware/useAuth'
 import { requireDb, useDb } from '../../middleware/useDb'
-import { requireUserEmail, useUserEmail } from '../../middleware/useUserEmail'
 import { zValidator } from '../../validator-wrapper'
 import { createInterview, getInterviews } from './db-queries'
 
 const interviewsRoute = new Hono<AppContext>()
 interviewsRoute.use(useDb)
 
-interviewsRoute.get('/', useUserEmail, async (c) => {
+interviewsRoute.get('/', async (c) => {
   const db = requireDb(c)
-  const userEmail = requireUserEmail(c).toLowerCase()
+  const user = requireAuth(c)
+  const userEmail = user.email.toLowerCase()
 
-  const interviewRows = await getInterviews(db, c.var.clerkUserId, userEmail)
+  const interviewRows = await getInterviews(db, user.id, userEmail)
 
   function nestInterviews(rows: typeof interviewRows, userEmail: string) {
     const interviewMap = new Map<number, Partial<InterviewResponse>>()
@@ -68,14 +69,13 @@ export const PostNewInterview = NewInterview.extend({
   invites: z.array(PostNewInterviewInvite).optional(),
 })
 
-interviewsRoute.post('/', zValidator('json', PostNewInterview), useUserEmail, async (c) => {
+interviewsRoute.post('/', zValidator('json', PostNewInterview), async (c) => {
   const db = requireDb(c)
+  const user = requireAuth(c)
   const data = c.req.valid('json')
 
-  const userEmail = requireUserEmail(c)
-  const invitedSelf = (data.invites || []).some(
-    invite => invite.email.toLowerCase() === userEmail.toLowerCase(),
-  )
+  const userEmail = user.email.toLowerCase()
+  const invitedSelf = (data.invites || []).some(invite => invite.email.toLowerCase() === userEmail)
   if (invitedSelf) {
     return c.json({ error: 'You cannot invite yourself' }, 400)
   }

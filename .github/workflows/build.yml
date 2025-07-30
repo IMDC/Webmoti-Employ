@@ -23,6 +23,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # this renames the example .dev.vars so typegen populates CloudflareBindings properly
+      - name: Prepare env for wrangler typegen
+        working-directory: server
+        run: |
+          cp .dev.vars.example .dev.vars
+
       - uses: pnpm/action-setup@v4
         with:
           run_install: true

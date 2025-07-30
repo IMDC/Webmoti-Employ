@@ -1,5 +1,5 @@
-import { UserButton } from '@clerk/clerk-react'
 import { Group, Text } from '@mantine/core'
+import { UserButton } from '@/features/auth/components/UserButton'
 import { useCurrentTime } from '@/hooks/useCurrentTime'
 import { SettingsButton } from './SettingsButton'
 

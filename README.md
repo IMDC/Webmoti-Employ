@@ -42,7 +42,7 @@ Client:
 - Tanstack router - routing
 - Tanstack query - server state
 - Zustand - client state
-- Clerk - auth
+- Better-Auth
 - Zoom Video
 
 Server:

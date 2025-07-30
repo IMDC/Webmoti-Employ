@@ -1,4 +1,3 @@
-import type { UserResource } from '@clerk/types'
 import type { ExecutedFailure } from '@zoom/videosdk'
 import type { AppError } from '@/useAppStore'
 import { HttpError } from './HttpError'
@@ -48,10 +47,6 @@ export function jsonStringifyIndented(json: unknown) {
   return JSON.stringify(json, null, 2)
 }
 
-export function getUserIdentity(user: UserResource) {
-  return `${user.firstName} ${user.lastName}`
-}
-
 export function formatAppError(error: AppError): string {
   const { status, message, details } = error
 
@@ -86,4 +81,8 @@ export function getHighlightColor(isColorblindModeOn: boolean) {
 
 export function isElectron() {
   return 'electron' in window
+}
+
+export function getFirstName(name: string) {
+  return name.split(' ')[0]
 }

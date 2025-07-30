@@ -1,4 +1,3 @@
-import { useUser } from '@clerk/clerk-react'
 import {
   ActionIcon,
   Affix,
@@ -28,6 +27,8 @@ import {
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { RightHeader } from '@/components/RightHeader'
+import { getFirstName } from '@/utils/utils'
+import { useUser } from '../auth/hooks/useUserStore'
 import { InterviewList } from './components/InterviewList'
 import { ScheduleForm } from './components/ScheduleForm'
 import { JoinCodeInput } from './schema'
@@ -37,8 +38,6 @@ export function Dashboard() {
   const [isScheduleModalOpened, { open: openScheduleModal, close: closeScheduleModal }]
     = useDisclosure(false)
 
-  const { user } = useUser()
-
   const [scroll, scrollTo] = useWindowScroll()
 
   const [{ value: joinCode, valid: isJoinCodeValid }, setJoinCode] = useValidatedState(
@@ -46,6 +45,8 @@ export function Dashboard() {
     val => JoinCodeInput.safeParse(val).success,
     false,
   )
+
+  const user = useUser()
 
   return (
     <AppShell
@@ -107,7 +108,7 @@ export function Dashboard() {
         <Flex justify="center" align="center"direction="column" w="100vw">
           <Stack align="center" gap="xs">
             <Title ta="center" mt={{ base: 25, sm: 50 }} fz={{ base: 25, sm: 35, md: 45 }} px="lg">
-              {`Welcome ${user!.firstName}!`}
+              {`Welcome ${getFirstName(user.name)}!`}
             </Title>
             <Text c="dimmed">
               Your interview schedule is below.

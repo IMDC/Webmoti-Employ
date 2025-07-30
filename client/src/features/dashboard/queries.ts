@@ -1,5 +1,4 @@
 import type { NewInterview } from '@webmoti-employ/shared'
-import { useAuth } from '@clerk/clerk-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
 import { HttpError } from '@/utils/HttpError'
@@ -12,15 +11,15 @@ const queryKeys = {
 // ----------------------------------------------------------------
 // GET from interviews
 
-async function getInterviews(authToken: string | null) {
-  if (!authToken) {
-    throw new HttpError('Missing auth token', 401)
-  }
+async function getInterviews() {
+  // if (!authToken) {
+  //   throw new HttpError('Missing auth token', 401)
+  // }
 
   const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/interviews`, {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${authToken}`,
+      // 'Authorization': `Bearer ${authToken}`,
     },
   })
   if (!response.ok) {
@@ -37,17 +36,13 @@ async function getInterviews(authToken: string | null) {
 }
 
 export function useInterviews() {
-  const { getToken } = useAuth()
   const {
     data: interviews,
     isPending,
     error,
   } = useQuery({
     queryKey: queryKeys.interviews,
-    queryFn: async () => {
-      const token = await getToken()
-      return getInterviews(token)
-    },
+    queryFn: getInterviews,
   })
 
   return { interviews, isPending, error }
@@ -56,16 +51,16 @@ export function useInterviews() {
 // ----------------------------------------------------------------
 // POST to interviews
 
-async function scheduleInterview(interview: NewInterview, authToken: string | null) {
-  if (!authToken) {
-    throw new HttpError('Missing auth token', 401)
-  }
+async function scheduleInterview(interview: NewInterview) {
+  // if (!authToken) {
+  //   throw new HttpError('Missing auth token', 401)
+  // }
 
   const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/interviews`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${authToken}`,
+      // 'Authorization': `Bearer ${authToken}`,
     },
     body: JSON.stringify(interview),
   })
@@ -86,13 +81,11 @@ async function scheduleInterview(interview: NewInterview, authToken: string | nu
 
 export function useScheduleInterview() {
   const queryClient = useQueryClient()
-  const { getToken } = useAuth()
 
   const { mutateAsync: scheduleInterviewMutation, isPending: isScheduleInterviewPending }
     = useMutation({
       mutationFn: async (interview: NewInterview) => {
-        const token = await getToken()
-        return scheduleInterview(interview, token)
+        return scheduleInterview(interview)
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.interviews })

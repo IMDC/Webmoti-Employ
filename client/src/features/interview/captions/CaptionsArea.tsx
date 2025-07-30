@@ -1,13 +1,13 @@
-import { useUser } from '@clerk/clerk-react'
 import { Avatar, Flex, Group, ScrollArea, Space, Stack, Text } from '@mantine/core'
 import { useEffect, useRef } from 'react'
+import { useUser } from '@/features/auth/hooks/useUserStore'
 
 function Caption() {
-  const { user } = useUser()
+  const user = useUser()
 
   return (
     <Group>
-      <Avatar src={user?.imageUrl} />
+      <Avatar src={user.image} />
 
       <Stack gap={0}>
         <Text>You</Text>

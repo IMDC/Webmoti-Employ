@@ -1,4 +1,3 @@
-import { useAuth } from '@clerk/clerk-react'
 import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 import { HttpError } from '@/utils/HttpError'
@@ -22,11 +21,10 @@ export type InterviewSessionArgs = CreateArgs | JoinArgs
 
 async function fetchInterviewSession(
   args: InterviewSessionArgs,
-  authToken: string | null,
 ): Promise<SessionsGetResponse> {
-  if (!authToken) {
-    throw new HttpError('Missing auth token', 401)
-  }
+  // if (!authToken) {
+  //   throw new HttpError('Missing auth token', 401)
+  // }
 
   const { action, userIdentity } = args
 
@@ -41,9 +39,9 @@ async function fetchInterviewSession(
   }
 
   const response = await fetch(endpoint, {
-    headers: {
-      Authorization: `Bearer ${authToken}`,
-    },
+    // headers: {
+    //   Authorization: `Bearer ${authToken}`,
+    // },
   })
   const json = await response.json()
   if (!response.ok) {
@@ -67,8 +65,6 @@ function getInterviewSessionKey(args: InterviewSessionArgs) {
 }
 
 export function useInterviewSession(args: InterviewSessionArgs) {
-  const { getToken } = useAuth()
-
   const {
     data: interviewSession,
     isPending: isInterviewSessionPending,
@@ -76,8 +72,7 @@ export function useInterviewSession(args: InterviewSessionArgs) {
   } = useQuery({
     queryKey: getInterviewSessionKey(args),
     queryFn: async () => {
-      const token = await getToken()
-      return fetchInterviewSession(args, token)
+      return fetchInterviewSession(args)
     },
     refetchInterval: 1000 * 60 * 105, // 1 hour 45 minutes (15 less than jwt exp)
     refetchIntervalInBackground: true,

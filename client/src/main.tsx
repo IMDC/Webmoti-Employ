@@ -1,4 +1,3 @@
-import { ClerkProvider } from '@clerk/clerk-react'
 import { MantineProvider } from '@mantine/core'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider } from '@tanstack/react-router'
@@ -13,22 +12,14 @@ import '@mantine/dates/styles.css'
 import '@mantine/notifications/styles.css'
 import './global.css'
 
-const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
-
-if (!CLERK_PUBLISHABLE_KEY) {
-  throw new Error('Missing Clerk Publishable Key')
-}
-
 // eslint-disable-next-line react-refresh/only-export-components
 function App() {
   return (
     <StrictMode>
       <MantineProvider theme={theme} defaultColorScheme="dark">
-        <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} signInUrl="/sign-in">
-          <QueryClientProvider client={queryClient}>
-            <RouterProvider router={router} />
-          </QueryClientProvider>
-        </ClerkProvider>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
       </MantineProvider>
     </StrictMode>
   )

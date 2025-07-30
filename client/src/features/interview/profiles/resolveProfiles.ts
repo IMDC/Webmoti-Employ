@@ -3,21 +3,20 @@ import z from 'zod'
 import { HttpError } from '@/utils/HttpError'
 
 export async function resolveProfiles(
-  authToken: string | null,
   input: {
     userIds?: string[]
     userEmails?: string[]
   },
 ) {
-  if (!authToken) {
-    throw new HttpError('Missing auth token', 401)
-  }
+  // if (!authToken) {
+  //   throw new HttpError('Missing auth token', 401)
+  // }
 
   const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/profiles`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${authToken}`,
+      // 'Authorization': `Bearer ${authToken}`,
     },
     body: JSON.stringify(input),
   })

@@ -1,8 +1,8 @@
 import type { AppContext } from '../..'
 import { Hono } from 'hono'
 import { z } from 'zod'
+import { requireAuth } from '@/middleware/useAuth'
 import { requireDb, useDb } from '../../middleware/useDb'
-import { requireUserEmail, useUserEmail } from '../../middleware/useUserEmail'
 import { zValidator } from '../../validator-wrapper'
 import { getInterviews } from '../interviews/db-queries'
 import { generateZoomApiJwt, generateZoomVideoJwt } from './jwt'
@@ -16,6 +16,7 @@ const SessionsCreateRequestQuery = z.object({
 
 sessionsRoute.get('/', zValidator('query', SessionsCreateRequestQuery), async (c) => {
   const { userIdentity } = c.req.valid('query')
+  requireAuth(c)
 
   const sessionId = crypto.randomUUID()
 
@@ -42,7 +43,6 @@ const SessionsJoinRequestParams = z.object({
 sessionsRoute.get(
   '/:sessionId',
   useDb,
-  useUserEmail,
   zValidator('param', SessionsJoinRequestParams),
   zValidator('query', SessionsJoinRequestQuery),
   async (c) => {
@@ -50,7 +50,8 @@ sessionsRoute.get(
     const { userIdentity } = c.req.valid('query')
 
     const db = requireDb(c)
-    const userEmail = requireUserEmail(c)
+    const user = requireAuth(c)
+    const userEmail = user.email.toLowerCase()
 
     async function returnJoinToken() {
       const token = await generateZoomVideoJwt({
@@ -71,7 +72,7 @@ sessionsRoute.get(
 
     const hasScheduledAccess = await getInterviews(
       db,
-      c.var.clerkUserId,
+      user.id,
       userEmail,
       sessionId,
       true,

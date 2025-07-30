@@ -14,7 +14,8 @@ The server uses the Hono framework so it can run on serverless environments. Thi
     - [Neon](#neon)
     - [Cloudflare Hyperdrive](#cloudflare-hyperdrive)
   - [Authentication](#authentication)
-    - [Setup Allowlist](#setup-allowlist)
+    - [Better Auth Setup](#better-auth-setup)
+    - [Google OAuth Setup](#google-oauth-setup)
 
 ## Setup
 
@@ -28,16 +29,20 @@ Then add secrets:
 
 1. Add `ZOOM_VIDEO_SDK_KEY` and `ZOOM_VIDEO_SDK_SECRET` ([more info](#video-calling))
 2. Add `ZOOM_API_KEY` and `ZOOM_API_SECRET` ([more info](#video-calling))
-3. Add `CLERK_SECRET_KEY` and `CLERK_PUBLISHABLE_KEY` ([more info](#authentication))
-4. Add `DATABASE_URL` (This is for kysely-codegen only (to generate types for the Neon database). Set this to the [Neon database connection string](#neon))
+3. Add `DATABASE_URL` (This is for kysely-codegen only (to generate types for the Neon database). Set this to the [Neon database connection string](#neon))
+4. Add `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` ([more info](#authentication))
+5. Add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` ([more info](#google-oauth-setup))
+6. Add `CORS_ORIGIN`. This is the url of the client.
+7. Add `LOCAL_DATABASE_URL`. This is the same as the `WRANGLER_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` below.
 
 Whenever you change any env variables in `.dev.vars`, run `pnpm run cf-typegen` ([more info here](https://developers.cloudflare.com/workers/wrangler/commands/#types)). For first time setup you don't need to do this since there is a postinstall script which will run this automatically.
 
 #### .env
 
-Rename `.env.example` to `.env`. This hyperdrive variable doesn't get detected in `.dev.vars`, so we need to make a `.env` just for this.
+Rename `.env.example` to `.env`. This hyperdrive variable doesn't get detected in `.dev.vars`, so we need to make a `.env` just for this. The `.env` is only used for local development to make some variables available to dev tools.
 
 1. Add `WRANGLER_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` ([see below for details](#local-database))
+2. Add `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET`, `DATABASE_URL`. Note that the database url is the Neon database url, not the local postgres url used above.
 
 ### Local database
 
@@ -129,6 +134,16 @@ The database is postgres deployed with the Neon service. We also use Cloudflare 
       CONSTRAINT "interview_id_fkey" FOREIGN KEY ("interview_id") REFERENCES "public"."interview" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
       CONSTRAINT "interview_invite_interview_id_email_key" UNIQUE ("interview_id", "email")
     )
+
+    <!-- the below tables are generated using better-auth. see `server/src/db/better-auth-schema.sql` -->
+
+    create table "user" ("id" text not null primary key, "name" text not null, "email" text not null unique, "email_verified" boolean not null, "image" text, "created_at" timestamp not null, "updated_at" timestamp not null);
+
+    create table "session" ("id" text not null primary key, "expires_at" timestamp not null, "token" text not null unique, "created_at" timestamp not null, "updated_at" timestamp not null, "ip_address" text, "user_agent" text, "user_id" text not null references "user" ("id"));
+
+    create table "account" ("id" text not null primary key, "account_id" text not null, "provider_id" text not null, "user_id" text not null references "user" ("id"), "access_token" text, "refresh_token" text, "id_token" text, "access_token_expires_at" timestamp, "refresh_token_expires_at" timestamp, "scope" text, "password" text, "created_at" timestamp not null, "updated_at" timestamp not null);
+
+    create table "verification" ("id" text not null primary key, "identifier" text not null, "value" text not null, "expires_at" timestamp not null, "created_at" timestamp, "updated_at" timestamp);
     ```
 
 3. Create a non owner role to use (replace `<password>` with the actual password) ([More info](https://neon.com/docs/manage/database-access#create-a-read-write-role)) The password should have at least 12 characters with a mix of lowercase, uppercase, number, and symbol characters.
@@ -170,17 +185,30 @@ npx wrangler hyperdrive update my-hyperdrive-id --origin-password my-db-password
 
 ### Authentication
 
-Authentication is done using Clerk.
+Authentication is done using Better Auth. This is self hosted.
 
-Get your secret key and publishable key from the clerk dashboard in `Configure` > `API keys`
+Set environment variables: <https://www.better-auth.com/docs/installation#set-environment-variables>
 
-#### Setup Allowlist
+#### Better Auth Setup
 
-This restricts the app to only people with a TMU Google account.
+A good resource for this is: <https://hono.dev/examples/better-auth-on-cloudflare>
 
-Note: This is a paid feature and will only work in Clerk developement mode. For production, use [Better Auth](https://www.better-auth.com/) instead of Clerk. In production, you'll also need to make a Google OAuth client and publish it.
+1. Use the site to generate the `BETTER_AUTH_SECRET`. For the `BETTER_AUTH_URL`, you can set this to `http://localhost:8787` for dev (assuming the hono app runs on port `8787`). For production you can set this to the actual url of the Cloudflare deployed hono app.
+2. Create Better Auth Tables: `pnpm run db:better-auth-gen`. This will generate `src/db/better-auth-schema.sql` which we don't use, but it's useful to use for creating local tables in the local Postgresql database.
+3. Add Better Auth Tables to the database: `pnpm run:db:better-auth-migrate`. This will connect to the Neon database and add the tables.
+4.
 
-1. Go to <https://dashboard.clerk.com/last-active?path=user-authentication/restrictions>
-2. In the Allowlist section, toggle on Enable allowlist.
-3. Add `torontomu.ca` to the allowlist
-4. Save changes
+#### Google OAuth Setup
+
+This is for enabling Google login.
+
+1. Go to Google Cloud Console
+2. Create project
+3. Go to `Credentials` > `Configure consent screen`
+4. Fill out App Information
+   - Select `Internal` Audience to only make it available to users in the TMU organization. This also means you don't have to verify the app. Also, it means that you don't have to manually add users to the "test users".
+5. Create OAuth client:
+   - Application type: `Web application`
+   - Name: Anything
+   - Add to the `Authorized redirect URLs`: `http://localhost:8787/auth/callback/google` (for local dev), and add the actual url for the deployed Cloudflare server.
+6. Copy the secret and id, and put that into `.dev.vars`

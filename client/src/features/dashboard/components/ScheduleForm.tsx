@@ -1,4 +1,3 @@
-import { useUser } from '@clerk/clerk-react'
 import {
   ActionIcon,
   Button,
@@ -23,6 +22,7 @@ import {
 import { DateTime } from 'luxon'
 import { zod4Resolver } from 'mantine-form-zod-resolver'
 import z from 'zod'
+import { useUser } from '@/features/auth/hooks/useUserStore'
 import { useAppActions, useAppIsColorblindModeOn } from '@/useAppStore'
 import { getHighlightColor, getInterviewLink, handleAppError } from '@/utils/utils'
 import { useScheduleInterview } from '../queries'
@@ -62,7 +62,7 @@ interface ScheduleFormProps {
 
 export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
   const { scheduleInterviewMutation, isScheduleInterviewPending } = useScheduleInterview()
-  const { user } = useUser()
+  const user = useUser()
 
   const { setError } = useAppActions()
   const isColorblindModeOn = useAppIsColorblindModeOn()
@@ -95,11 +95,6 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
     const localDate = DateTime.fromISO(date, { zone: 'local' }).set({ hour, minute })
     const startTimeDate = localDate.toUTC().toJSDate()
     const endTimeDate = localDate.plus({ hours: 1 }).toUTC().toJSDate()
-
-    if (!user) {
-      setError({ message: 'User is not set' })
-      return
-    }
 
     try {
       const sessionId = await scheduleInterviewMutation({
