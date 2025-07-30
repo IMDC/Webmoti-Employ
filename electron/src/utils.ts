@@ -61,3 +61,10 @@ export function ipcWebContentsSend<Key extends keyof EventPayloadMapping>(
 ) {
   webContents.send(key, payload)
 }
+
+export function ipcOnMain<Key extends keyof EventPayloadMapping>(
+  key: Key,
+  handler: (event: Electron.IpcMainEvent, payload: EventPayloadMapping[Key]) => void,
+) {
+  ipcMain.on(key, (event, payload) => handler(event, payload))
+}

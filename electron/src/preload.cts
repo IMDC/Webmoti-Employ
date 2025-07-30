@@ -7,8 +7,7 @@ electron.contextBridge.exposeInMainWorld('electron', {
     ipcOn('feedback', (feedback) => {
       callback(feedback)
     }),
-  // eslint-disable-next-line no-console
-  sendInterviewerCoordinates: coordinates => console.log(coordinates),
+  sendInterviewerCoordinates: coordinates => ipcSend('coordinates', coordinates),
   getModelBuffer: () => ipcInvoke('getModelBuffer'),
 } satisfies Window['electron'])
 
@@ -25,4 +24,11 @@ function ipcOn<Key extends keyof EventPayloadMapping>(
   const cb = (_: Electron.IpcRendererEvent, payload: any) => callback(payload)
   electron.ipcRenderer.on(key, cb)
   return () => electron.ipcRenderer.off(key, cb)
+}
+
+function ipcSend<Key extends keyof EventPayloadMapping>(
+  key: Key,
+  payload: EventPayloadMapping[Key],
+): void {
+  electron.ipcRenderer.send(key, payload)
 }

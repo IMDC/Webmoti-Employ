@@ -1,6 +1,6 @@
 import path from 'node:path'
 import process from 'node:process'
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import { io } from 'socket.io-client'
 import {
   getLocalDomain,
@@ -8,6 +8,7 @@ import {
   getPreloadPath,
   getUiPath,
   ipcHandle,
+  ipcOnMain,
   isDev,
 } from './utils'
 
@@ -37,9 +38,9 @@ function setupSocket(mainWindow: BrowserWindow) {
     console.error('❌ Connection Error:', error)
   })
 
-  // Listen for AOI updates from frontend renderer (React app)
-  ipcMain.on('update_aoi', (_event, boundingBox) => {
-    socket.emit('update_aoi', boundingBox)
+  // Listen for updates from frontend renderer (React app)
+  ipcOnMain('coordinates', (_event, coordinates) => {
+    socket.emit('update_aoi', coordinates.boundingBox)
   })
 }
 

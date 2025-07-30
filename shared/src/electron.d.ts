@@ -2,7 +2,8 @@ export {}
 
 declare global {
   interface Feedback {
-    feedbackType: 'fixation' | 'speech'
+    feedbackType: 'fixation' | 'speech' | 'lookingAtInterviewer'
+    isActive: boolean
   }
 
   interface FaceDetectionBoundingBox {
