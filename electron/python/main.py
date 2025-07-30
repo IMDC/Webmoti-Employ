@@ -3,9 +3,10 @@ import math
 import random
 import time
 from collections import deque
-from typing import Literal, TypedDict, Any
-import tobii_research as tr
+from typing import Literal, TypedDict
+
 import socketio
+import tobii_research as tr
 from aiohttp import web
 from loguru import logger
 
@@ -24,12 +25,14 @@ gaze_history = deque(maxlen=5)
 FIXATION_VELOCITY_THRESHOLD = 100  # pixels per second
 MIN_GAZE_POINTS = 2
 
+
 # AOI data structure from Electron
 class AOIBoundingBox(TypedDict):
     x: float
     y: float
     width: float
     height: float
+
 
 def classify_eye_movement(
     new_point: tuple[float, float],
@@ -49,6 +52,7 @@ def classify_eye_movement(
     velocity = dist / delta_t
     return "Fixation" if velocity < FIXATION_VELOCITY_THRESHOLD else "Saccade"
 
+
 # Tobii gaze data format
 class GazeData(TypedDict):
     device_time_stamp: int
@@ -58,6 +62,7 @@ class GazeData(TypedDict):
     right_pupil_diameter: float
     left_gaze_point_validity: int
     right_gaze_point_validity: int
+
 
 async def handle_gaze_data(
     timestamp: int,
@@ -114,30 +119,37 @@ async def handle_gaze_data(
     await sio.emit("gaze_data", data)
     logger.info(f"Sent gaze data: {data}")
 
+
 def gaze_callback(gaze_data: GazeData) -> None:
-    asyncio.create_task(handle_gaze_data(
-        gaze_data["device_time_stamp"],
-        *gaze_data["left_gaze_point_on_display_area"],
-        *gaze_data["right_gaze_point_on_display_area"],
-        gaze_data["left_pupil_diameter"],
-        gaze_data["right_pupil_diameter"],
-        gaze_data["left_gaze_point_validity"],
-        gaze_data["right_gaze_point_validity"],
-    ))
+    asyncio.create_task(
+        handle_gaze_data(
+            gaze_data["device_time_stamp"],
+            *gaze_data["left_gaze_point_on_display_area"],
+            *gaze_data["right_gaze_point_on_display_area"],
+            gaze_data["left_pupil_diameter"],
+            gaze_data["right_pupil_diameter"],
+            gaze_data["left_gaze_point_validity"],
+            gaze_data["right_gaze_point_validity"],
+        )
+    )
+
 
 @sio.event
 async def connect(sid, environ):
     logger.info(f"Electron connected: {sid}")
 
+
 @sio.event
 async def disconnect(sid):
     logger.info(f"Electron disconnected: {sid}")
+
 
 @sio.event
 async def update_aoi(sid, data: AOIBoundingBox):
     global current_aoi_bbox
     current_aoi_bbox = data
     logger.info(f"Updated AOI from Electron: {data}")
+
 
 async def simulate_gaze_data():
     global TEST_MODE
@@ -155,6 +167,7 @@ async def simulate_gaze_data():
             1,
         )
         await asyncio.sleep(0.1)
+
 
 async def main():
     global TEST_MODE
@@ -176,6 +189,7 @@ async def main():
 
     while True:
         await asyncio.sleep(3600)  # Keep running
+
 
 if __name__ == "__main__":
     asyncio.run(main())

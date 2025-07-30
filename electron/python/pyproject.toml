@@ -4,11 +4,9 @@ version = "0.1.0"
 description = "@webmoti-employ/electron eyetracking script"
 requires-python = "==3.10.*"
 dependencies = [
+  "aiohttp>=3.12.15",
   "loguru>=0.7.3",
-  "mediapipe>=0.10.21",
-  "mss>=10.0.0",
-  "numpy>=1.26.4",
-  "opencv-python>=4.11.0.86",
+  "python-socketio>=5.13.0",
   "tobii-research>=2.1.0",
 ]
 
