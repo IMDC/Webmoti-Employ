@@ -168,6 +168,9 @@ importers:
       socket.io-client:
         specifier: ^4.8.1
         version: 4.8.1
+      zod:
+        specifier: ^4.0.10
+        version: 4.0.10
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^5.0.0

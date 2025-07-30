@@ -19,7 +19,7 @@ declare global {
   }
 
   interface EventPayloadMapping {
-    feedback: Feedback
+    feedback: Feedback[]
     coordinates: InterviewerCoordinates
     getModelBuffer: ArrayBuffer
   }
@@ -28,7 +28,7 @@ declare global {
 
   interface Window {
     electron: {
-      subscribeToFeedback: (callback: (feedback: Feedback) => void) => UnsubscribeFunction
+      subscribeToFeedback: (callback: (feedback: Feedback[]) => void) => UnsubscribeFunction
       sendInterviewerCoordinates: (coordinates: InterviewerCoordinates) => void
       getModelBuffer: () => Promise<ArrayBuffer>
     }

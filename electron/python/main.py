@@ -104,20 +104,23 @@ async def handle_gaze_data(
         looking_at_interviewer = (
             xmin <= gaze_x_avg <= xmin + width and ymin <= gaze_y_avg <= ymin + height
         )
+    else:
+        logger.warning("No bounding box found")
 
     movement_type = classify_eye_movement((gaze_x_avg, gaze_y_avg), timestamp)
 
-    data = {
-        "elapsed_seconds": elapsed_seconds,
-        "gaze_x_avg": gaze_x_avg,
-        "gaze_y_avg": gaze_y_avg,
-        "looking_at_interviewer": looking_at_interviewer,
-        "movement_type": movement_type,
-    }
+    # see shared/src/electron.d.ts and electron/src/main.ts for feedback structure
+    feedback = [
+        {
+            "feedbackType": "lookingAtInterviewer",
+            "isActive": looking_at_interviewer,
+        },
+        {"feedbackType": "fixation", "isActive": movement_type == "Fixation"},
+    ]
 
     # Emit data to Electron frontend via Socket.IO
-    await sio.emit("gaze_data", data)
-    logger.info(f"Sent gaze data: {data}")
+    await sio.emit("feedback", feedback)
+    logger.info(f"Sent feedback: {feedback}")
 
 
 def gaze_callback(gaze_data: GazeData) -> None:
@@ -166,7 +169,7 @@ async def simulate_gaze_data():
             1,
             1,
         )
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(0.5)
 
 
 async def main():

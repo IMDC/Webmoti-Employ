@@ -2,6 +2,8 @@ import path from 'node:path'
 import process from 'node:process'
 import { app, BrowserWindow } from 'electron'
 import { io } from 'socket.io-client'
+import z from 'zod'
+import { startPythonServer } from './startPythonServer'
 import {
   getLocalDomain,
   getModelBuffer,
@@ -9,8 +11,15 @@ import {
   getUiPath,
   ipcHandle,
   ipcOnMain,
+  ipcWebContentsSend,
   isDev,
 } from './utils'
+
+// TODO: move this to @webmoti-employ/shared
+const FeedbackSchema = z.array(z.object({
+  feedbackType: z.enum(['fixation', 'speech', 'lookingAtInterviewer']),
+  isActive: z.boolean(),
+}))
 
 let socket: ReturnType<typeof io>
 
@@ -19,23 +28,29 @@ function setupSocket(mainWindow: BrowserWindow) {
 
   socket.on('connect', () => {
     // eslint-disable-next-line no-console
-    console.log('✅ Connected to Python Socket.IO server')
+    console.log('Connected to Python Socket.IO server')
   })
 
-  socket.on('gaze_data', (data) => {
+  socket.on('feedback', (data) => {
+    const parsed = FeedbackSchema.safeParse(data)
+    if (!parsed.success) {
+      console.error('Invalid feedback payload:', z.flattenError(parsed.error))
+      return
+    }
+    const feedback = parsed.data
+
     // eslint-disable-next-line no-console
-    console.log('🚀 Received gaze data from Python:', data)
-    // Forward data to renderer (frontend React app) if needed
-    mainWindow.webContents.send('gaze_data', data)
+    console.log('feedback:', feedback)
+
+    ipcWebContentsSend('feedback', mainWindow.webContents, feedback)
   })
 
   socket.on('disconnect', () => {
-    // eslint-disable-next-line no-console
-    console.log('⚠️ Disconnected from Python server')
+    console.warn('Disconnected from Python server')
   })
 
   socket.on('connect_error', (error) => {
-    console.error('❌ Connection Error:', error)
+    console.error('Connection Error:', error)
   })
 
   // Listen for updates from frontend renderer (React app)
@@ -44,7 +59,7 @@ function setupSocket(mainWindow: BrowserWindow) {
   })
 }
 
-function createWindow() {
+async function createWindow() {
   const mainWindow = new BrowserWindow({
     webPreferences: {
       preload: getPreloadPath(),
@@ -64,6 +79,7 @@ function createWindow() {
 
   ipcHandle('getModelBuffer', getModelBuffer)
 
+  await startPythonServer()
   setupSocket(mainWindow)
 }
 

@@ -15,7 +15,8 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "zod": "^4.0.10"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.0.0",
