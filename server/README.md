@@ -75,23 +75,26 @@ The server is deployed using Cloudflare workers.
 
 Steps:
 
-1. Go to cloudflare dashboard
-2. Click `Add` > `Workers`
-3. Set `Root directory` to `/server`
-4. Set `Deploy command` to `pnpm run deploy`
-5. Set `Build command` to `pnpm run install:deploy`
-6. Add `SKIP_DEPENDENCY_INSTALL` Build variable and set to `1` (this skips a full project `pnpm install` and later runs the custom install command above)
-7. Create new API token
-8. Deploy
-9. In `Settings` > `Variables and Secrets`, add everything in `.dev.vars` except `DATABASE_URL` (it's not needed since it's only used for `db-typegen`)
-10. Get the deployed server url and set it in Vercel for client as `VITE_API_BASE_URL`
-11. [Deploy client](../client/README.md#deploying), get the url, and set `CORS_ORIGIN` secret in Cloudflare
+1. `pnpm dlx wrangler login`
+2. (optional) Setup hyperdrive if you haven't already
+3. Create project: `cd server` `pnpm run deploy`
+4. Go to cloudflare dashboard and then to your worker
+5. In `Settings` > `Variables and Secrets`, add everything in `.dev.vars` except `DATABASE_URL` and `LOCAL_DATABASE_URL`. You can copy the whole env and paste it into the `Variable name` field which speeds up the process (make sure you exclude the two database ones). For `BETTER_AUTH_URL`, set this to the url of the server (the deployed cloudflare worker). Set `CORS_ORIGIN` to the deployed client vercel url.
+6. Set the type of all the secrets to `Secret` instead of `Text`
+7. Press `Deploy`
+8. Get the deployed server url and set it in Vercel for client as `VITE_API_BASE_URL`
+9. [Deploy client](../client/README.md#deploying), get the url, and set `CORS_ORIGIN` secret in Cloudflare
 
 Steps for automatic deployments:
 
 <https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/>
 
 1. Create API token
+   - Log in to the Cloudflare dashboard
+   - Select `Manage Account` > `Account API Tokens`.
+   - Select `Create Token` > find `Edit Cloudflare Workers` > select `Use Template`.
+   - Customize your token name.
+   - Scope your token.
 2. Add `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` to Github as secrets.
 
 ## Services
@@ -110,7 +113,7 @@ The database is postgres deployed with the Neon service. We also use Cloudflare 
 
 #### Neon
 
-1. Choose the closest region (Azure East US 2 (Virginia))
+1. Choose the closest region (AWS US East 1 (N. Virginia))
 2. Create the tables in the public schema:
 
     ```sql
@@ -133,9 +136,9 @@ The database is postgres deployed with the Neon service. We also use Cloudflare 
       "created_at" timestamp with time zone NOT NULL DEFAULT now(),
       CONSTRAINT "interview_id_fkey" FOREIGN KEY ("interview_id") REFERENCES "public"."interview" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
       CONSTRAINT "interview_invite_interview_id_email_key" UNIQUE ("interview_id", "email")
-    )
+    );
 
-    <!-- the below tables are generated using better-auth. see `server/src/db/better-auth-schema.sql` -->
+    -- the below tables are generated using better-auth. see `server/src/db/better-auth-schema.sql`
 
     create table "user" ("id" text not null primary key, "name" text not null, "email" text not null unique, "email_verified" boolean not null, "image" text, "created_at" timestamp not null, "updated_at" timestamp not null);
 
@@ -165,23 +168,22 @@ The database is postgres deployed with the Neon service. We also use Cloudflare 
    GRANT readwrite TO readwrite_imdc;
    ```
 
-4. Get the connection string. Make sure the role is readwrite_imdc. Put this connection string in `.dev.vars` as the `DATABASE_URL` field.
+4. Get the connection string. Make sure the role is readwrite_imdc. Put this connection string in `.dev.vars` as the `DATABASE_URL` field. Also put it in `.env`.
 5. Run `pnpm run db-typegen` to generate types for the database. Do this whenever you change the Neon database.
 
 #### Cloudflare Hyperdrive
 
 <https://developers.cloudflare.com/hyperdrive/get-started/>
 
-1. Login to cloudflare: `npx wrangler login`
-2. `npx wrangler hyperdrive create <YOUR_CONFIG_NAME> --connection-string="<MY_CONNECTION_STRING>"` (You get this connection string from the Neon dashboard. Make sure you turn off Connection pooling before copying it: <https://neon.com/blog/hyperdrive-neon-faq#so-should-i-use-hyperdrive-together-with-neons-pooling>) (If you already initialized it, you can update it like this: `npx wrangler hyperdrive update <MY_HYPERDRIVE_ID> --connection-string "<MY_CONNECTION_STRING_WITHOUT_POOLING>"`)
+1. Login to cloudflare: `pnpm dlx wrangler login`
+2. `pnpm dlx wrangler hyperdrive create <YOUR_CONFIG_NAME> --connection-string="<MY_CONNECTION_STRING>"` (You get this connection string from the Neon dashboard. Make sure you turn off Connection pooling before copying it: <https://neon.com/blog/hyperdrive-neon-faq#so-should-i-use-hyperdrive-together-with-neons-pooling>) (If you already initialized it, you can update it like this: `pnpm dlx wrangler hyperdrive update <MY_HYPERDRIVE_ID> --connection-string "<MY_CONNECTION_STRING_WITHOUT_POOLING>"`)
 3. Set `WRANGLER_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` in `.env` as your local postgres db connection string. You can also set this to the Neon db connection string, but then you need to run the server with `wrangler dev --remote` (note: this env variable ends with `_HYPERDRIVE` since that's what the `hyperdrive` binding is set to in `wrangler.jsonc`)
-
-Disable caching to prevent stale reads:
+4. Disable caching to prevent stale reads:
 <https://developers.cloudflare.com/hyperdrive/configuration/query-caching/>
 
-```bash
-npx wrangler hyperdrive update my-hyperdrive-id --origin-password my-db-password --caching-disabled true
-```
+    ```bash
+    pnpm dlx wrangler hyperdrive update my-hyperdrive-id --origin-password my-db-password --caching-disabled true
+    ```
 
 ### Authentication
 

@@ -16,20 +16,23 @@ Then add environment variables:
 
 The client is deployed on Vercel. Since Vercel doesn't allow collaborators on the hobby plan, we use a Github action instead for automatic deployments.
 
-1. Make vercel project
-2. Change project name
-3. Set root to `client`
-4. Add environment variables from `.env`
-5. Click Deploy
-6. [Deploy server](../server/README.md#deploying), get deployed url, and set new environment variable (`VITE_API_BASE_URL`) in `Settings` > `Environment Variables`
+<https://www.alexchantastic.com/deploying-with-vercel-cli>
+
+1. `pnpm dlx vercel login`
+2. Continue with Google
+3. `pnpm dlx vercel`
+4. Don't link to existing project
+5. Set root to `./client`
+6. Use default deployment protection settings
+7. Go to your new project in Vercel dashboard
+8. Add environment variables from `.env`
+9. [Deploy server](../server/README.md#deploying), get deployed url, and set new environment variable (`VITE_API_BASE_URL`) in `Settings` > `Environment Variables`
 
 Steps for automatic deployments:
 
 <https://vercel.com/guides/how-can-i-use-github-actions-with-vercel>
 <https://faisalhusa.in/blog/vercel-free-tier-cicd-fix>
 
-1. Retrieve your [Vercel Access Token](https://vercel.com/guides/how-do-i-use-a-vercel-api-access-token)
-2. (optional) Install the [Vercel CLI](https://vercel.com/cli) and run vercel login
-3. (optional) Inside your folder, run vercel link to create a new Vercel project
-4. (optional) Inside the generated .vercel folder, save the projectId and orgId from the project.json
-5. Inside GitHub, add VERCEL_TOKEN, VERCEL_ORG_ID, and VERCEL_PROJECT_ID as [secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+1. In Vercel dashboard > `Account settings` > `Tokens`, make a new API token.
+2. Inside the generated `.vercel` folder (from above steps), save the projectId and orgId from the project.json. You can also get this from the Vercel dashboard.
+3. Inside GitHub, add VERCEL_TOKEN, VERCEL_ORG_ID, and VERCEL_PROJECT_ID as [secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
