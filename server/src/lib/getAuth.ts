@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth'
 import { APIError } from 'better-auth/api'
+import { bearer } from 'better-auth/plugins'
 import { getDb } from '@/db/getDb'
 import { betterAuthOptions } from './better-auth-options'
 
@@ -13,6 +14,7 @@ export function getAuth(env: CloudflareBindings): ReturnType<typeof betterAuth> 
 
   return betterAuth({
     ...betterAuthOptions,
+    plugins: [bearer()],
     trustedOrigins: [env.CORS_ORIGIN],
     socialProviders: {
       google: {
@@ -31,15 +33,6 @@ export function getAuth(env: CloudflareBindings): ReturnType<typeof betterAuth> 
     },
     baseURL: env.BETTER_AUTH_URL,
     secret: env.BETTER_AUTH_SECRET,
-    // client and server are on different origins
-    advanced: {
-      useSecureCookies: !IS_DEV,
-      defaultCookieAttributes: {
-        sameSite: 'none',
-        secure: true,
-        partitioned: true,
-      },
-    },
     // only allow TMU accounts
     databaseHooks: {
       user: {

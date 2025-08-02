@@ -34,8 +34,9 @@ async function fetchInterviewSession(
     endpoint = `${import.meta.env.VITE_API_BASE_URL}/sessions/${sessionId}?${params.toString()}`
   }
 
+  const authToken = localStorage.getItem('bearer_token')
   const response = await fetch(endpoint, {
-    credentials: 'include',
+    headers: { Authorization: `Bearer ${authToken}` },
   })
   const json = await response.json()
   if (!response.ok) {

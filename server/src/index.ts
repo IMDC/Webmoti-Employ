@@ -29,7 +29,7 @@ app.use(async (c, next) => {
     allowHeaders: ['Content-Type', 'Authorization'],
     exposeHeaders: ['Content-Length'],
     maxAge: 600,
-    credentials: true,
+    // credentials: true,
   })
   return corsMiddleware(c, next)
 })
@@ -41,7 +41,7 @@ app.use('/auth/*', cloudflareRateLimiter<AppContext>({
 
 app.route('/auth', authRoute)
 
-const protectedRoutes = app.basePath('/')
+const protectedRoutes = new Hono<AppContext>()
 
 // all routes except /auth require authentication
 protectedRoutes.use(useAuth)
@@ -54,6 +54,8 @@ protectedRoutes.use(cloudflareRateLimiter<AppContext>({
 protectedRoutes.route('/sessions', sessionsRoute)
 protectedRoutes.route('/interviews', interviewsRoute)
 protectedRoutes.route('/profiles', profilesRoute)
+
+app.route('/', protectedRoutes)
 
 app.onError((err, c) => {
   console.error(err)

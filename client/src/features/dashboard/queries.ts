@@ -12,9 +12,12 @@ const queryKeys = {
 // GET from interviews
 
 async function getInterviews() {
+  const authToken = localStorage.getItem('bearer_token')
   const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/interviews`, {
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${authToken}`,
+    },
   })
   if (!response.ok) {
     throw new Error(`Failed to get interviews: ${response.status}`)
@@ -46,11 +49,14 @@ export function useInterviews() {
 // POST to interviews
 
 async function scheduleInterview(interview: NewInterview) {
+  const authToken = localStorage.getItem('bearer_token')
   const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/interviews`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${authToken}`,
+    },
     body: JSON.stringify(interview),
-    credentials: 'include',
   })
 
   if (!response.ok) {
