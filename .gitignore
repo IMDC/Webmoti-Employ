@@ -15,6 +15,13 @@ dist/
 # client
 .tanstack/
 .vercel/
+.stylelintcache
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
 
 # server
 .wrangler/

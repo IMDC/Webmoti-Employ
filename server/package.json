@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "wrangler dev",
     "dev:electron": "pnpm run dev",
-    "test": "vitest",
+    "test": "vitest run",
+    "vitest:watch": "vitest",
     "deploy": "wrangler deploy --minify",
     "install:deploy": "pnpm install --filter @webmoti-employ/shared --filter @webmoti-employ/server",
     "cf-typegen": "wrangler types worker-configuration.d.ts --env-interface CloudflareBindings",

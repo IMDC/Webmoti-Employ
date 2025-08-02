@@ -1,3 +1,4 @@
+import path from 'node:path'
 import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
 
 // use mock string to get past local hyperdrive error
@@ -11,6 +12,10 @@ export default defineWorkersConfig({
       workers: {
         wrangler: { configPath: './wrangler.jsonc' },
       },
+    },
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+      '@webmoti-employ/shared': path.resolve(__dirname, '../shared/src/index.ts'),
     },
   },
 })
