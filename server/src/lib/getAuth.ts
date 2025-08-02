@@ -1,6 +1,5 @@
 import { betterAuth } from 'better-auth'
 import { APIError } from 'better-auth/api'
-import { bearer } from 'better-auth/plugins'
 import { getDb } from '@/db/getDb'
 import { betterAuthOptions } from './better-auth-options'
 
@@ -14,7 +13,7 @@ export function getAuth(env: CloudflareBindings): ReturnType<typeof betterAuth> 
 
   return betterAuth({
     ...betterAuthOptions,
-    plugins: [bearer()],
+    // plugins: [bearer()],
     trustedOrigins: [env.CORS_ORIGIN],
     socialProviders: {
       google: {

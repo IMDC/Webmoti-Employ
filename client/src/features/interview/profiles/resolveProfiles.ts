@@ -8,12 +8,12 @@ export async function resolveProfiles(
     userEmails?: string[]
   },
 ) {
-  const authToken = localStorage.getItem('bearer_token')
+  // const authToken = localStorage.getItem('bearer_token')
   const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/profiles`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${authToken}`,
+      // 'Authorization': `Bearer ${authToken}`,
     },
     body: JSON.stringify(input),
   })
