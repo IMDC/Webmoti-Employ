@@ -22,10 +22,6 @@ export type InterviewSessionArgs = CreateArgs | JoinArgs
 async function fetchInterviewSession(
   args: InterviewSessionArgs,
 ): Promise<SessionsGetResponse> {
-  // if (!authToken) {
-  //   throw new HttpError('Missing auth token', 401)
-  // }
-
   const { action, userIdentity } = args
 
   const params = new URLSearchParams({ userIdentity })
@@ -39,9 +35,7 @@ async function fetchInterviewSession(
   }
 
   const response = await fetch(endpoint, {
-    // headers: {
-    //   Authorization: `Bearer ${authToken}`,
-    // },
+    credentials: 'include',
   })
   const json = await response.json()
   if (!response.ok) {

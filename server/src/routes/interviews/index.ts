@@ -4,7 +4,6 @@ import { NewInterview, NewInterviewInvite } from '@webmoti-employ/shared'
 
 import { Hono } from 'hono'
 import z from 'zod'
-import { requireAuth } from '@/middleware/useAuth'
 import { requireDb, useDb } from '../../middleware/useDb'
 import { zValidator } from '../../validator-wrapper'
 import { createInterview, getInterviews } from './db-queries'
@@ -14,7 +13,7 @@ interviewsRoute.use(useDb)
 
 interviewsRoute.get('/', async (c) => {
   const db = requireDb(c)
-  const user = requireAuth(c)
+  const user = c.var.user
   const userEmail = user.email.toLowerCase()
 
   const interviewRows = await getInterviews(db, user.id, userEmail)
@@ -71,7 +70,7 @@ export const PostNewInterview = NewInterview.extend({
 
 interviewsRoute.post('/', zValidator('json', PostNewInterview), async (c) => {
   const db = requireDb(c)
-  const user = requireAuth(c)
+  const user = c.var.user
   const data = c.req.valid('json')
 
   const userEmail = user.email.toLowerCase()

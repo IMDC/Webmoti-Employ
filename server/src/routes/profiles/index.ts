@@ -3,7 +3,6 @@ import type { AppContext } from '@/index'
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
-import { requireAuth } from '@/middleware/useAuth'
 import { requireDb, useDb } from '@/middleware/useDb'
 import { getProfilesByEmails, getProfilesByIds } from './db-queries'
 
@@ -25,7 +24,6 @@ const GetProfiles = z.object({
 
 profilesRoute.post('/', zValidator('json', GetProfiles), useDb, async (c) => {
   const { userIds = [], userEmails = [] } = c.req.valid('json')
-  requireAuth(c)
   const db = requireDb(c)
 
   const results: ProfilesResponse = {}

@@ -14,10 +14,9 @@ import sessionsRoute from './routes/sessions'
 export interface AppContext {
   Bindings: CloudflareBindings
   Variables: {
-    user: User | null
-    session: Session | null
+    user: User
+    session: Session
     db?: Kysely<DB>
-    userEmail?: string
   }
 }
 
@@ -35,16 +34,26 @@ app.use(async (c, next) => {
   return corsMiddleware(c, next)
 })
 
-// all routes require authentication
-app.use(useAuth)
+app.use('/auth/*', cloudflareRateLimiter<AppContext>({
+  rateLimitBinding: c => c.env.PUBLIC_RATE_LIMITER,
+  keyGenerator: c => c.req.header('cf-connecting-ip') ?? '',
+}))
 
-// rate limit by user id and fallback to ip
-app.use(
-  cloudflareRateLimiter<AppContext>({
-    rateLimitBinding: c => c.env.RATE_LIMITER,
-    keyGenerator: c => c.var.user?.id ?? c.req.header('cf-connecting-ip') ?? '',
-  }),
-)
+app.route('/auth', authRoute)
+
+const protectedRoutes = app.basePath('/')
+
+// all routes except /auth require authentication
+protectedRoutes.use(useAuth)
+
+protectedRoutes.use(cloudflareRateLimiter<AppContext>({
+  rateLimitBinding: c => c.env.USER_RATE_LIMITER,
+  keyGenerator: c => c.var.user.id ?? '',
+}))
+
+protectedRoutes.route('/sessions', sessionsRoute)
+protectedRoutes.route('/interviews', interviewsRoute)
+protectedRoutes.route('/profiles', profilesRoute)
 
 app.onError((err, c) => {
   console.error(err)
@@ -54,10 +63,5 @@ app.onError((err, c) => {
 app.notFound((c) => {
   return c.json({ error: `Route not found: ${c.req.method} ${c.req.path}` }, 404)
 })
-
-app.route('/sessions', sessionsRoute)
-app.route('/interviews', interviewsRoute)
-app.route('/profiles', profilesRoute)
-app.route('/auth', authRoute)
 
 export default app

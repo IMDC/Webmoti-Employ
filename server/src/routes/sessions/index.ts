@@ -1,7 +1,6 @@
 import type { AppContext } from '../..'
 import { Hono } from 'hono'
 import { z } from 'zod'
-import { requireAuth } from '@/middleware/useAuth'
 import { requireDb, useDb } from '../../middleware/useDb'
 import { zValidator } from '../../validator-wrapper'
 import { getInterviews } from '../interviews/db-queries'
@@ -16,7 +15,6 @@ const SessionsCreateRequestQuery = z.object({
 
 sessionsRoute.get('/', zValidator('query', SessionsCreateRequestQuery), async (c) => {
   const { userIdentity } = c.req.valid('query')
-  requireAuth(c)
 
   const sessionId = crypto.randomUUID()
 
@@ -50,7 +48,7 @@ sessionsRoute.get(
     const { userIdentity } = c.req.valid('query')
 
     const db = requireDb(c)
-    const user = requireAuth(c)
+    const user = c.var.user
     const userEmail = user.email.toLowerCase()
 
     async function returnJoinToken() {

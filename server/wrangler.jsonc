@@ -17,11 +17,20 @@
   "unsafe": {
     "bindings": [
       {
-        "name": "RATE_LIMITER",
+        "name": "PUBLIC_RATE_LIMITER",
+        "type": "ratelimit",
+        "namespace_id": "1002",
+        "simple": {
+          "limit": 500,
+          "period": 60
+        }
+      },
+      {
+        "name": "USER_RATE_LIMITER",
         "type": "ratelimit",
         "namespace_id": "1001",
         "simple": {
-          "limit": 100,
+          "limit": 250,
           "period": 60
         }
       }

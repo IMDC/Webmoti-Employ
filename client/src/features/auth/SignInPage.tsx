@@ -2,7 +2,7 @@ import { Button, Card, Center, Stack, Text, Title } from '@mantine/core'
 import { useSearch } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { Loading } from '@/components/Loading'
-import { signIn } from '@/lib/auth-client'
+import { googleSignIn } from '@/lib/auth-client'
 import { useAppActions } from '@/useAppStore'
 import GoogleSignInImg from './web_dark_rd_ctn.svg'
 
@@ -13,15 +13,7 @@ export function SignInPage() {
 
   const handleGoogleLogin = async () => {
     setLoading(true)
-    const base = window.location.origin
-    // redirectTo is not always set
-    const callbackURL = redirectTo ? `${base}${redirectTo}` : base
-    const errorCallbackURL = `${base}/sign-in${redirectTo ? `?redirectTo=${redirectTo}` : ''}`
-
-    await signIn.social(
-      { provider: 'google', callbackURL, errorCallbackURL },
-      { onError: error => setError({ message: 'Failed to sign in', details: error }) },
-    )
+    await googleSignIn(redirectTo, setError)
   }
 
   // this checks for an error in the search params and if it finds it,

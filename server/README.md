@@ -212,5 +212,5 @@ This is for enabling Google login.
 5. Create OAuth client:
    - Application type: `Web application`
    - Name: Anything
-   - Add to the `Authorized redirect URLs`: `http://localhost:8787/auth/callback/google` (for local dev), and add the actual url for the deployed Cloudflare server.
+   - Add to the `Authorized redirect URLs`: `http://localhost:8787/auth/callback/google` (for local dev), and add the actual url for the deployed Cloudflare server (with `/auth/callback/google` at the end).
 6. Copy the secret and id, and put that into `.dev.vars`

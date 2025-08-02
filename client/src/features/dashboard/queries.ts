@@ -12,15 +12,9 @@ const queryKeys = {
 // GET from interviews
 
 async function getInterviews() {
-  // if (!authToken) {
-  //   throw new HttpError('Missing auth token', 401)
-  // }
-
   const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/interviews`, {
-    headers: {
-      'Content-Type': 'application/json',
-      // 'Authorization': `Bearer ${authToken}`,
-    },
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
   })
   if (!response.ok) {
     throw new Error(`Failed to get interviews: ${response.status}`)
@@ -52,17 +46,11 @@ export function useInterviews() {
 // POST to interviews
 
 async function scheduleInterview(interview: NewInterview) {
-  // if (!authToken) {
-  //   throw new HttpError('Missing auth token', 401)
-  // }
-
   const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/interviews`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      // 'Authorization': `Bearer ${authToken}`,
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(interview),
+    credentials: 'include',
   })
 
   if (!response.ok) {

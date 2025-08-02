@@ -8,16 +8,10 @@ export async function resolveProfiles(
     userEmails?: string[]
   },
 ) {
-  // if (!authToken) {
-  //   throw new HttpError('Missing auth token', 401)
-  // }
-
   const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/profiles`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      // 'Authorization': `Bearer ${authToken}`,
-    },
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(input),
   })
   if (!response.ok) {
