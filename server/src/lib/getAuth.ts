@@ -44,5 +44,15 @@ export function getAuth(env: CloudflareBindings): ReturnType<typeof betterAuth> 
         },
       },
     },
+    // https://www.better-auth.com/docs/integrations/hono#cross-domain-cookies
+    // this also needs to be here for electron for some reason
+    // TODO: replace this with bearer token auth instead
+    advanced: {
+      defaultCookieAttributes: {
+        sameSite: 'none',
+        secure: true,
+        partitioned: true,
+      },
+    },
   })
 }
