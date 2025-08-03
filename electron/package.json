@@ -16,12 +16,12 @@
   },
   "dependencies": {
     "socket.io-client": "^4.8.1",
-    "zod": "^4.0.10"
+    "zod": "^4.0.14"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^5.0.0",
+    "@antfu/eslint-config": "^5.1.0",
     "cross-env": "^10.0.0",
-    "electron": "37.2.4",
+    "electron": "37.2.5",
     "electron-builder": "^26.0.12",
     "eslint": "^9.32.0",
     "rimraf": "^6.0.1",
