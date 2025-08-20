@@ -86,3 +86,11 @@ export function isElectron() {
 export function getFirstName(name: string) {
   return name.split(' ')[0]
 }
+
+export function clearUrlParam(param: string) {
+  const url = new URL(window.location.href)
+  if (url.searchParams.has(param)) {
+    url.searchParams.delete(param)
+    window.history.replaceState({}, document.title, url.toString())
+  }
+}

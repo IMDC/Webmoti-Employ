@@ -29,7 +29,6 @@ app.use(async (c, next) => {
     allowHeaders: ['Content-Type', 'Authorization'],
     exposeHeaders: ['Content-Length'],
     maxAge: 600,
-    // credentials: true,
   })
   return corsMiddleware(c, next)
 })

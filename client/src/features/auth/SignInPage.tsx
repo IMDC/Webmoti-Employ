@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Loading } from '@/components/Loading'
 import { googleSignIn } from '@/lib/auth-client'
 import { useAppActions } from '@/useAppStore'
+import { clearUrlParam } from '@/utils/utils'
 import GoogleSignInImg from './web_dark_rd_ctn.svg'
 
 export function SignInPage() {
@@ -23,9 +24,7 @@ export function SignInPage() {
     if (error) {
       const formatError = (msg: string) => msg.replace(/_/g, ' ')
       setError({ message: formatError(error) })
-      const url = new URL(window.location.href)
-      url.searchParams.delete('error')
-      window.history.replaceState({}, '', url.toString())
+      clearUrlParam('error')
     }
   }, [error, setError])
 

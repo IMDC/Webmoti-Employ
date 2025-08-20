@@ -1,7 +1,9 @@
 import { betterAuth } from 'better-auth'
 import { APIError } from 'better-auth/api'
+import { bearer } from 'better-auth/plugins'
 import { getDb } from '@/db/getDb'
 import { betterAuthOptions } from './better-auth-options'
+import { socialBearer } from './socialBearerPlugin'
 
 /**
  * Better Auth Instance
@@ -13,7 +15,10 @@ export function getAuth(env: CloudflareBindings): ReturnType<typeof betterAuth> 
 
   return betterAuth({
     ...betterAuthOptions,
-    // plugins: [bearer()],
+    plugins: [
+      bearer(),
+      socialBearer(),
+    ],
     trustedOrigins: [env.CORS_ORIGIN],
     socialProviders: {
       google: {
@@ -42,16 +47,6 @@ export function getAuth(env: CloudflareBindings): ReturnType<typeof betterAuth> 
             }
           },
         },
-      },
-    },
-    // https://www.better-auth.com/docs/integrations/hono#cross-domain-cookies
-    // this also needs to be here for electron for some reason
-    // TODO: replace this with bearer token auth instead
-    advanced: {
-      defaultCookieAttributes: {
-        sameSite: 'none',
-        secure: true,
-        partitioned: true,
       },
     },
   })

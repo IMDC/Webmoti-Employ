@@ -3,7 +3,10 @@ import { createMiddleware } from 'hono/factory'
 import { getAuth } from '@/lib/getAuth'
 
 export const useAuth = createMiddleware<AppContext>(async (c, next) => {
-  const session = await getAuth(c.env).api.getSession({ headers: c.req.raw.headers })
+  // remove cookie header since it causes bearer_token to be ignored
+  const headers = new Headers(c.req.raw.headers)
+  headers.delete('cookie')
+  const session = await getAuth(c.env).api.getSession({ headers })
 
   if (!session) {
     return c.json({ error: 'Unauthorized' }, 401)
