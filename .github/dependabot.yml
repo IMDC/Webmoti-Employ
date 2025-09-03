@@ -4,6 +4,17 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
+      semver-patch-days: 2
+      semver-minor-days: 14
+      semver-major-days: 30
+      include:
+        - '*'
+      exclude:
+        - jose
+        - better-auth
+        - wrangler
     groups:
       non-breaking:
         update-types:
@@ -16,6 +27,11 @@ updates:
     directory: /electron/python/
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 14
+      semver-major-days: 45
+      include:
+        - '*'
     groups:
       non-breaking:
         update-types:
