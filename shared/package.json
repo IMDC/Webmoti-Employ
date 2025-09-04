@@ -10,11 +10,11 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "zod": "^4.0.14"
+    "zod": "^4.0.17"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^5.1.0",
-    "eslint": "^9.32.0",
+    "@antfu/eslint-config": "^5.2.1",
+    "eslint": "^9.33.0",
     "typescript": "^5.8.3"
   }
 }
