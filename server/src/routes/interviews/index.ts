@@ -46,7 +46,7 @@ interviewsRoute.get('/', async (c) => {
 
         if (isYou) {
           interview.yourRole
-          = row.inviteIsInterviewCreator
+            = row.inviteIsInterviewCreator
               ? 'creator'
               : row.inviteIsInterviewer
                 ? 'interviewer'
