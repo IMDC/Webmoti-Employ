@@ -22,6 +22,8 @@ updates:
           - minor
         exclude-patterns:
           - typescript
+          - eslint
+          - '@antfu/eslint-config'
 
   - package-ecosystem: uv
     directory: /electron/python/
