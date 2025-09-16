@@ -10,8 +10,8 @@ updates:
           - patch
           - minor
         exclude-patterns:
+          # these are excluded since they have broken things on minor updates in the past
           - typescript
-          - eslint
           - '@antfu/eslint-config'
 
   - package-ecosystem: uv
