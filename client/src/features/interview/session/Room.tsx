@@ -1,5 +1,6 @@
+import type { LayoutValue } from './components/ChangeLayoutModal/ChangeLayoutModal'
 import { AppShell, Box, em, Flex, Stack, useMantineTheme } from '@mantine/core'
-import { useMediaQuery } from '@mantine/hooks'
+import { useDisclosure, useMediaQuery } from '@mantine/hooks'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { useDeviceStoreActions } from '@/features/interview/zoom/useDeviceStore'
@@ -18,7 +19,9 @@ import { Chat } from '../chat/Chat'
 import { MenuBar } from '../components/MenuBar'
 import { MobileMenuBar } from '../components/MobileMenuBar'
 import { useParticipantProfiles } from '../profiles/useParticipantProfiles'
+import { ChangeLayoutModal } from './components/ChangeLayoutModal/ChangeLayoutModal'
 import { FeedbackArea } from './components/FeedbackArea'
+import { SpotlightView } from './components/SpotlightView'
 import { VideoGrid } from './components/VideoGrid'
 import { useFaceDetection } from './hooks/useFaceDetection'
 
@@ -57,6 +60,10 @@ export function Room() {
 
   const [hostVideo, setHostVideo] = useState<HTMLVideoElement | null>(null)
   useFaceDetection(hostVideo, 5)
+
+  const [isLayoutModalOpen, { open: openLayoutModal, close: closeLayoutModal }]
+    = useDisclosure(false)
+  const [layout, setLayout] = useState<LayoutValue>('spotlight')
 
   async function onToggleMic() {
     if (permissionState !== 'granted') {
@@ -122,6 +129,7 @@ export function Room() {
                 ref={participantStageRef}
                 flex={1}
                 miw={0}
+                mih={0}
                 p={GALLERY_VIEW_MARGIN}
                 display="flex"
                 justify="center"
@@ -129,13 +137,25 @@ export function Room() {
                 gap={GALLERY_VIEW_MARGIN}
                 wrap="wrap"
               >
-                <VideoGrid
-                  containerRef={participantStageRef}
-                  setHostVideo={setHostVideo}
-                  participants={participants}
-                  profiles={profiles}
-                  isLoadingProfiles={isLoadingProfiles}
-                />
+                {layout === 'spotlight'
+                  ? (
+                      <SpotlightView
+                        containerRef={participantStageRef}
+                        setHostVideo={setHostVideo}
+                        participants={participants}
+                        profiles={profiles}
+                        isLoadingProfiles={isLoadingProfiles}
+                      />
+                    )
+                  : (
+                      <VideoGrid
+                        containerRef={participantStageRef}
+                        setHostVideo={setHostVideo}
+                        participants={participants}
+                        profiles={profiles}
+                        isLoadingProfiles={isLoadingProfiles}
+                      />
+                    )}
               </Flex>
 
               {isCaptionsAreaOpen && (
@@ -163,6 +183,13 @@ export function Room() {
             </Box>
           )}
         </Box>
+
+        <ChangeLayoutModal
+          isOpen={isLayoutModalOpen}
+          onClose={closeLayoutModal}
+          layout={layout}
+          onChangeLayout={setLayout}
+        />
       </AppShell.Main>
 
       <AppShell.Footer>
@@ -177,6 +204,7 @@ export function Room() {
                 onToggleChat={() => {
                   setIsChatOpen(!isChatOpen)
                 }}
+                onToggleLayoutModal={openLayoutModal}
               />
             )
           : (
@@ -187,6 +215,7 @@ export function Room() {
                 onToggleChat={() => {
                   setIsChatOpen(!isChatOpen)
                 }}
+                onToggleLayoutModal={openLayoutModal}
               />
             )}
       </AppShell.Footer>

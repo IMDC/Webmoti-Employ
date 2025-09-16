@@ -22,7 +22,8 @@ export function ParticipantTile({
   return (
     <Card
       h={height}
-      w={width}
+      w="100%"
+      maw={width}
       p={0}
       radius="lg"
       pos="relative"

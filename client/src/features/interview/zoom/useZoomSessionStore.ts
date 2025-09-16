@@ -19,3 +19,4 @@ export const useZoomParticipants = () => useZoomSessionStore(s => s.participants
 export const useIsVideoOn = () => useZoomSessionStore(s => s.isVideoOn)
 export const useIsAudioOn = () => useZoomSessionStore(s => s.isAudioOn)
 export const useZoomSessionClient = () => useZoomSessionStore(s => s.client)
+export const useLocalUserId = () => useZoomSessionStore(s => s.localUserId)
