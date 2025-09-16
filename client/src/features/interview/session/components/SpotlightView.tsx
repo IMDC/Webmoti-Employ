@@ -1,6 +1,8 @@
 import type { ProfilesResponse } from '@webmoti-employ/shared'
 import type { Participant } from '@zoom/videosdk'
 import type { Dispatch, RefObject, SetStateAction } from 'react'
+import { AspectRatio } from '@mantine/core'
+import { GALLERY_VIEW_ASPECT_RATIO } from '@/utils/constants'
 import { logger } from '@/utils/logger'
 import { useLocalUserId } from '../../zoom/useZoomSessionStore'
 import { useSingleLayout } from '../hooks/useSingleLayout'
@@ -30,10 +32,17 @@ export function SpotlightView({
     return null
   }
 
-  const localProfile = profiles?.[localParticipant.displayName]
+  const remoteParticipants = [...participants.values()].filter(
+    p => p.userId !== localUserId,
+  )
 
-  const mainParticipant = localParticipant
-  const mainProfile = localProfile
+  const hasRemote = remoteParticipants.length > 0
+
+  const mainParticipant = hasRemote ? remoteParticipants[0] : localParticipant
+  const secondaryParticipant = hasRemote ? localParticipant : null
+
+  const mainProfile = profiles?.[mainParticipant.displayName]
+  const secondaryProfile = secondaryParticipant ? profiles?.[secondaryParticipant.displayName] : null
 
   return (
     <>
@@ -43,22 +52,31 @@ export function SpotlightView({
         height={height}
         width={width}
         participant={mainParticipant}
-        name={mainParticipant?.displayName || mainParticipant.displayName}
+        name={mainParticipant.displayName}
         profileUrl={mainProfile?.profilePic || ''}
         isLoadingProfiles={isLoadingProfiles}
       />
 
-      {/* <AspectRatio
-          ratio={16 / 9}
-          w={250}
+      {secondaryParticipant && (
+        <AspectRatio
+          ratio={GALLERY_VIEW_ASPECT_RATIO}
+          w={300}
           style={{
             position: 'absolute',
             bottom: 15,
             right: 15,
           }}
         >
-          <ParticipantTile width="100%" height="100%" />
-        </AspectRatio>  */}
+          <SessionTile
+            height="100%"
+            width="100%"
+            participant={secondaryParticipant}
+            name={secondaryParticipant.displayName}
+            profileUrl={secondaryProfile?.profilePic || ''}
+            isLoadingProfiles={isLoadingProfiles}
+          />
+        </AspectRatio>
+      )}
     </>
   )
 }

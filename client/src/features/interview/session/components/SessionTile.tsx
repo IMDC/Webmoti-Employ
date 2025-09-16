@@ -8,8 +8,8 @@ import { ParticipantTile } from '../../components/ParticipantTile'
 import { VideoRenderer } from './VideoRenderer'
 
 interface SessionTileProps {
-  height: number
-  width: number
+  height: number | string
+  width: number | string
   participant: Participant
   name: string
   profileUrl: string

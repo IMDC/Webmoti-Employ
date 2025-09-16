@@ -136,6 +136,8 @@ export function Room() {
                 align="center"
                 gap={GALLERY_VIEW_MARGIN}
                 wrap="wrap"
+                // relative is for spotlight view
+                pos="relative"
               >
                 {layout === 'spotlight'
                   ? (
