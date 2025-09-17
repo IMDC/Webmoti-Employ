@@ -20,6 +20,12 @@ jobs:
   build:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      # don't run postinstall scripts for security
+      PNPM_CONFIG_IGNORE_SCRIPTS: true
+      NPM_CONFIG_IGNORE_SCRIPTS: true
 
     steps:
       - uses: actions/checkout@v4
@@ -33,6 +39,10 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           run_install: true
+
+      - name: Generate Cloudflare types
+        working-directory: server
+        run: pnpm run cf-typegen
 
       - uses: actions/setup-node@v4
         with:
