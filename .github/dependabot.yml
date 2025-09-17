@@ -3,23 +3,21 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
-    groups:
-      non-breaking:
-        update-types:
-          - patch
-          - minor
-        exclude-patterns:
-          # these are excluded since they have broken things on minor updates in the past
-          - typescript
-          - '@antfu/eslint-config'
+      interval: monthly
+    cooldown:
+      default-days: 30
+      semver-major-days: 30
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-minor', 'version-update:semver-patch']
 
   - package-ecosystem: uv
     directory: /electron/python/
     schedule:
-      interval: weekly
-    groups:
-      non-breaking:
-        update-types:
-          - patch
-          - minor
+      interval: monthly
+    cooldown:
+      default-days: 30
+      semver-major-days: 30
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-minor', 'version-update:semver-patch']
