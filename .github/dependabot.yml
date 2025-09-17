@@ -4,16 +4,20 @@ updates:
     directory: /
     schedule:
       interval: monthly
-    update-types:
-      - major
+    allow:
+      - dependency-type: all
+        update-type: 'version-update:semver-major'
     cooldown:
+      default-days: 30
       semver-major-days: 30
 
   - package-ecosystem: uv
     directory: /electron/python/
     schedule:
       interval: monthly
-    update-types:
-      - major
+    allow:
+      - dependency-type: all
+        update-type: 'version-update:semver-major'
     cooldown:
+      default-days: 30
       semver-major-days: 30
