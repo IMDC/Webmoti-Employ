@@ -107,7 +107,7 @@ export function PrejoinScreen() {
 
         <Flex justify="center" align="center" h="100%">
           <Group justify="center" p="xl" m="xl">
-            <Stack>
+            <Stack w={350}>
               <PreviewTile height={196.875} width={350} name={user.name} profileUrl={userProfileUrl} />
 
               <PrejoinMenuBar />

@@ -23,7 +23,7 @@ export function VideoGrid({
   const participantCount = participants.size
   const { participantVideoWidth } = useGalleryViewLayout(participantCount, containerRef)
 
-  const participantHeight = participantVideoWidth * GALLERY_VIEW_ASPECT_RATIO
+  const participantHeight = participantVideoWidth / GALLERY_VIEW_ASPECT_RATIO
 
   return (
     <>

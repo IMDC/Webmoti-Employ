@@ -10,6 +10,7 @@ interface MobileMenuBarProps {
   onToggleVideo: () => Promise<void>
   isChatOpen: boolean
   onToggleChat?: () => void
+  onToggleLayoutModal?: () => void
 }
 
 export function MobileMenuBar({
@@ -17,13 +18,14 @@ export function MobileMenuBar({
   onToggleVideo,
   isChatOpen,
   onToggleChat,
+  onToggleLayoutModal,
 }: MobileMenuBarProps) {
   return (
     <Group justify="center" align="center" h="100%" gap="sm">
       <ToggleAudioButton onToggleMic={onToggleMic} />
       <ToggleVideoButton onToggleVideo={onToggleVideo} />
       <ToggleChatButton isChatOpen={isChatOpen} onToggleChat={onToggleChat} />
-      <ControlsMenu isMobile />
+      <ControlsMenu isMobile onLayoutOpen={onToggleLayoutModal} />
       <EndCallButton />
     </Group>
   )

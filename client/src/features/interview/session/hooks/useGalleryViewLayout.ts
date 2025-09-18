@@ -9,7 +9,7 @@ import { useContainerDimensions } from './useContainerDimensions'
 
 export function layoutIsTooSmall(newVideoSize: number, participantCount: number, containerWidth: number, containerHeight: number) {
   const videoWidth = newVideoSize
-  const videoHeight = newVideoSize * GALLERY_VIEW_ASPECT_RATIO
+  const videoHeight = newVideoSize / GALLERY_VIEW_ASPECT_RATIO
 
   const columns = Math.floor(containerWidth / videoWidth)
   const rows = Math.ceil(participantCount / columns)

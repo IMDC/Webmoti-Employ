@@ -1,2 +1,2 @@
-export const GALLERY_VIEW_ASPECT_RATIO = 9 / 16
+export const GALLERY_VIEW_ASPECT_RATIO = 16 / 9
 export const GALLERY_VIEW_MARGIN = 3

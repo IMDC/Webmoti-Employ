@@ -3,22 +3,6 @@ import type { AppError } from '@/useAppStore'
 import { HttpError } from './HttpError'
 import { logger } from './logger'
 
-export function getFittedSize(
-  containerWidth: number,
-  containerHeight: number,
-  aspectRatio: number,
-): [number, number] {
-  let height = containerHeight
-  let width = height * aspectRatio
-
-  if (width > containerWidth) {
-    width = containerWidth
-    height = width / aspectRatio
-  }
-
-  return [width, height]
-}
-
 export function isExecutedFailure(error: unknown): error is ExecutedFailure {
   return typeof error === 'object' && error !== null && 'reason' in error && 'errorCode' in error
 }

@@ -1,24 +1,23 @@
 import { Group, Modal, Radio, Stack, Text } from '@mantine/core'
 import {
-  IconLayoutDashboard,
   IconLayoutGrid,
-  IconLayoutSidebarRight,
   IconSquare,
 } from '@tabler/icons-react'
-import { useState } from 'react'
 import classes from './ChangeLayoutModal.module.css'
 
-interface ChangeLayoutModalProps {
-  isOpen: boolean
-  onClose: () => void
-}
-
 const layouts = [
+  // TODO: implement Auto mode
+  // {
+  //   value: 'auto',
+  //   label: 'Auto',
+  //   description: 'Automatically selects the best layout.',
+  //   icon: IconLayoutDashboard,
+  // },
   {
-    value: 'auto',
-    label: 'Auto',
-    description: 'Automatically selects the best layout.',
-    icon: IconLayoutDashboard,
+    value: 'spotlight',
+    label: 'Spotlight',
+    description: 'Emphasizes the active speaker.',
+    icon: IconSquare,
   },
   {
     value: 'grid',
@@ -26,23 +25,25 @@ const layouts = [
     description: 'Displays all participants equally in a grid.',
     icon: IconLayoutGrid,
   },
-  {
-    value: 'spotlight',
-    label: 'Speaker',
-    description: 'Emphasizes the active speaker.',
-    icon: IconSquare,
-  },
-  {
-    value: 'sidebar',
-    label: 'Sidebar',
-    description: 'Main view with participants in a side panel.',
-    icon: IconLayoutSidebarRight,
-  },
-]
+  // TODO: implement Sidebar mode
+  // {
+  //   value: 'sidebar',
+  //   label: 'Sidebar',
+  //   description: 'Main view with participants in a side panel.',
+  //   icon: IconLayoutSidebarRight,
+  // },
+] as const
 
-export function ChangeLayoutModal({ isOpen, onClose }: ChangeLayoutModalProps) {
-  const [value, setValue] = useState<string | null>('auto')
+export type LayoutValue = typeof layouts[number]['value']
 
+interface ChangeLayoutModalProps {
+  layout: string
+  onChangeLayout: (val: LayoutValue) => void
+  isOpen: boolean
+  onClose: () => void
+}
+
+export function ChangeLayoutModal({ isOpen, onClose, layout, onChangeLayout }: ChangeLayoutModalProps) {
   const cards = layouts.map(layout => (
     <Radio.Card key={layout.value} value={layout.value} radius="md" className={classes.root}>
       <Group wrap="nowrap" align="flex-start">
@@ -63,7 +64,11 @@ export function ChangeLayoutModal({ isOpen, onClose }: ChangeLayoutModalProps) {
       title="Select Layout"
       overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
     >
-      <Radio.Group value={value} onChange={setValue} name="layout">
+      <Radio.Group
+        value={layout}
+        onChange={(val: string) => onChangeLayout(val as LayoutValue)}
+        name="layout"
+      >
         <Stack pt="md" gap="xs">
           {cards}
         </Stack>

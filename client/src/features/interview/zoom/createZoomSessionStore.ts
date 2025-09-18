@@ -41,6 +41,9 @@ export interface ZoomSessionStore {
   stream: ReturnType<typeof VideoClient['getMediaStream']> | null
   callState: CallState
   participants: Map<number, Participant>
+  // only track local user id and not local participant to avoid stale local participant.
+  // we can get the local participant by accessing participants[localUserId].
+  localUserId: number | null
   isAudioOn: boolean
   isVideoOn: boolean
   actions: ZoomSessionActions
@@ -63,6 +66,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       stream: null,
       callState: 'prejoin',
       participants: new Map(),
+      localUserId: null,
       isAudioOn: true,
       isVideoOn: true,
 
@@ -103,7 +107,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
             if (granted && isAudioOn)
               await stream.startAudio()
 
-            set({ stream, callState: 'joined' })
+            set({ stream, callState: 'joined', localUserId: client.getCurrentUserInfo().userId })
             updateParticipants()
           }
           catch (error) {
