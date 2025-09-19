@@ -15,6 +15,7 @@ import { useAppPermissionState } from '@/useAppStore'
 import { GALLERY_VIEW_MARGIN } from '@/utils/constants'
 import { isElectron } from '@/utils/utils'
 import { CaptionsArea } from '../captions/CaptionsArea'
+import { useTranscription } from '../captions/useTranscription'
 import { Chat } from '../chat/Chat'
 import { MenuBar } from '../components/MenuBar'
 import { MobileMenuBar } from '../components/MobileMenuBar'
@@ -30,6 +31,8 @@ export function Room() {
 
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [isCaptionsAreaOpen, setIsCaptionsAreaOpen] = useState(false)
+
+  useTranscription()
 
   const permissionState = useAppPermissionState()
 
