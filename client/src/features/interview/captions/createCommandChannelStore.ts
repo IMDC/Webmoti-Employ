@@ -1,46 +1,62 @@
 import type { CommandChannel, VideoClient } from '@zoom/videosdk'
 import { createStore } from 'zustand'
 
+export interface CommandChannelMessage {
+  senderId: string
+  senderName: string
+  text: string
+  timestamp: number
+  msgid: string
+}
+
 export interface CommandChannelStoreActions {
-  //
-  // TODO: put command store actions (functions) here
-  // these functions should operate on the state in this store
-  // see chat/createChatStore.ts for an example of this
-  //
+  sendMessage: (text: string, userId?: number) => Promise<void>
   cleanup: () => void
 }
 
 export interface CommandChannelStore {
-  //
-  // TODO: add state here
-  //
   commandChannelClient: typeof CommandChannel
+  messages: Array<CommandChannelMessage>
+  isConnected: boolean
   actions: CommandChannelStoreActions
 }
 
 export function createCommandChannelStore(zoomClient: typeof VideoClient) {
   const commandChannelClient = zoomClient.getCommandClient()
+  const currentUserId = zoomClient.getCurrentUserInfo().userId.toString()
 
   const commandChannelStore = createStore<CommandChannelStore>(() => ({
     commandChannelClient,
-    //
-    // TODO
-    //
+    messages: [],
+    isConnected: false,
     actions: {
-    //
-    // TODO
-    //
+      sendMessage: async (text: string, userId?: number) => {
+        try {
+          await commandChannelClient.send(text, userId)
+        } catch (error) {
+          console.error('Failed to send command channel message:', error)
+        }
+      },
       cleanup: () => {
-        //
-        // TODO: cleanup any added listeners
-        //
+        zoomClient.off('command-channel-message', handleMessage)
+        zoomClient.off('command-channel-status', handleStatus)
       },
     },
   }))
 
-  //
-  // TODO: handle messages here (add event listeners)
-  //
+  function handleMessage(payload: CommandChannelMessage) {
+    commandChannelStore.setState(state => ({
+      messages: [...state.messages, payload],
+    }))
+  }
+
+  function handleStatus(payload: { status: string }) {
+    commandChannelStore.setState({ isConnected: payload.status === 'connected' })
+  }
+
+  // Add event listeners
+  zoomClient.on('command-channel-message', handleMessage)
+  zoomClient.on('command-channel-status', handleStatus)
 
   return commandChannelStore
 }

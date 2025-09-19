@@ -14,6 +14,6 @@ function useCommandChannelStore<T>(selector: (state: CommandChannelStore) => T):
 }
 
 export const useCommandChannelActions = () => useCommandChannelStore(s => s.actions)
-//
-// TODO: expose selectors for each necessary part of the state
-//
+export const useCommandChannelMessages = () => useCommandChannelStore(s => s.messages)
+export const useCommandChannelConnected = () => useCommandChannelStore(s => s.isConnected)
+export const useCommandChannelClient = () => useCommandChannelStore(s => s.commandChannelClient)
