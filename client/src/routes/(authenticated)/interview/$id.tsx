@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { ChatContextProvider } from '@/features/interview/chat/ChatContextProvider'
 import { CommandChannelContextProvider } from '@/features/interview/captions/CommandChannelContextProvider'
+import { ChatContextProvider } from '@/features/interview/chat/ChatContextProvider'
 import { Room } from '@/features/interview/session/Room'
 
 export const Route = createFileRoute('/(authenticated)/interview/$id')({

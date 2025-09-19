@@ -57,17 +57,17 @@ export function CaptionsArea() {
       >
         <Space h="xl" />
         <Space h="xl" />
-        
+
         {/* Test Command Channel */}
         <Group>
           <Text size="sm" c="dimmed">Test Command Channel:</Text>
           <input
             type="text"
             value={testMessage}
-            onChange={(e) => setTestMessage(e.target.value)}
+            onChange={e => setTestMessage(e.target.value)}
             placeholder="Type a test message..."
             style={{ flex: 1, padding: '4px 8px', borderRadius: '4px', border: '1px solid #ccc' }}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendTestMessage()}
+            onKeyPress={e => e.key === 'Enter' && handleSendTestMessage()}
           />
           <Button size="xs" onClick={handleSendTestMessage} disabled={!testMessage.trim()}>
             Send
@@ -76,10 +76,10 @@ export function CaptionsArea() {
 
         {/* Command Channel Messages */}
         {messages.map((message, index) => (
-          <Caption 
-            key={message.msgid || index} 
-            message={message} 
-            isOwn={message.senderId === user.id} 
+          <Caption
+            key={message.msgid || index}
+            message={message}
+            isOwn={message.senderId === user.id}
           />
         ))}
       </Flex>

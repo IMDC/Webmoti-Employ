@@ -23,7 +23,6 @@ export interface CommandChannelStore {
 
 export function createCommandChannelStore(zoomClient: typeof VideoClient) {
   const commandChannelClient = zoomClient.getCommandClient()
-  const currentUserId = zoomClient.getCurrentUserInfo().userId.toString()
 
   const commandChannelStore = createStore<CommandChannelStore>(() => ({
     commandChannelClient,
@@ -33,7 +32,8 @@ export function createCommandChannelStore(zoomClient: typeof VideoClient) {
       sendMessage: async (text: string, userId?: number) => {
         try {
           await commandChannelClient.send(text, userId)
-        } catch (error) {
+        }
+        catch (error) {
           console.error('Failed to send command channel message:', error)
         }
       },
