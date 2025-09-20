@@ -10,3 +10,6 @@ onlyBuiltDependencies:
   - esbuild
   - sharp
   - workerd
+
+# 3 day delay (avoid supply chain attack)
+minimumReleaseAge: 4320
