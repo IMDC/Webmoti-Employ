@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { CommandChannelContextProvider } from '@/features/interview/captions/CommandChannelContextProvider'
 import { ChatContextProvider } from '@/features/interview/chat/ChatContextProvider'
 import { Room } from '@/features/interview/session/Room'
 
@@ -25,7 +26,9 @@ export const Route = createFileRoute('/(authenticated)/interview/$id')({
 function RouteComponent() {
   return (
     <ChatContextProvider>
-      <Room />
+      <CommandChannelContextProvider>
+        <Room />
+      </CommandChannelContextProvider>
     </ChatContextProvider>
   )
 }
