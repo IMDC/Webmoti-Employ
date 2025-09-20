@@ -16,4 +16,3 @@ function useCommandChannelStore<T>(selector: (state: CommandChannelStore) => T):
 export const useCommandChannelActions = () => useCommandChannelStore(s => s.actions)
 export const useCommandChannelMessages = () => useCommandChannelStore(s => s.messages)
 export const useCommandChannelConnected = () => useCommandChannelStore(s => s.isConnected)
-export const useCommandChannelClient = () => useCommandChannelStore(s => s.commandChannelClient)
