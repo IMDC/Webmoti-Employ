@@ -1,7 +1,7 @@
-import { notifications } from '@mantine/notifications'
 import { useCallback, useEffect, useState } from 'react'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 import { logger } from '@/utils/logger'
+import { errorNotification } from '@/utils/utils'
 import { useIsAudioOn } from '../zoom/useZoomSessionStore'
 
 export function useTranscription() {
@@ -12,6 +12,7 @@ export function useTranscription() {
     transcript,
     finalTranscript,
     listening,
+    isMicrophoneAvailable,
   }
     = useSpeechRecognition()
 
@@ -20,25 +21,41 @@ export function useTranscription() {
   const startTranscribing = useCallback(async () => {
     if (!browserSupportsSpeechRecognition) {
       if (!hasNotifiedUser) {
-        notifications.show({
-          title: 'Unsupported browser',
-          message: 'Your browser does not support the Web Speech API',
-        })
+        errorNotification(
+          'Transcription is not supported',
+          'Your browser does not support the Web Speech API',
+        )
         setHasNotifiedUser(true)
       }
       return
     }
 
-    await SpeechRecognition.startListening({
-      continuous: true,
-      language: 'en-US',
-      interimResults: true,
-    })
-  }, [browserSupportsSpeechRecognition, hasNotifiedUser])
+    if (!isMicrophoneAvailable) {
+      logger.warn('Microphone is not available for transcription')
+      return
+    }
+
+    try {
+      await SpeechRecognition.startListening({
+        continuous: true,
+        language: 'en-US',
+        interimResults: true,
+      })
+    }
+    catch (error) {
+      errorNotification('Transcription error', error)
+    }
+  }, [browserSupportsSpeechRecognition, hasNotifiedUser, isMicrophoneAvailable])
 
   const stopTranscribing = useCallback(async () => {
     if (listening) {
-      await SpeechRecognition.abortListening()
+      try {
+        await SpeechRecognition.abortListening()
+      }
+      catch (error) {
+        // it's better to not notify user here and just log in console
+        logger.error('Failed to stop transcription:', error)
+      }
     }
   }, [listening])
 
@@ -51,7 +68,7 @@ export function useTranscription() {
     }
 
     return () => {
-      stopTranscribing()
+      void stopTranscribing()
     }
   }, [isAudioEnabled, startTranscribing, stopTranscribing])
 
