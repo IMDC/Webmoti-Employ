@@ -1,5 +1,6 @@
 import type { ExecutedFailure } from '@zoom/videosdk'
 import type { AppError } from '@/useAppStore'
+import { notifications } from '@mantine/notifications'
 import { HttpError } from './HttpError'
 import { logger } from './logger'
 
@@ -25,6 +26,36 @@ export function handleAppError(
   else {
     setError({ message: defaultMessage })
   }
+}
+
+export function errorNotification(title: string, error: unknown) {
+  logger.error(title, error)
+
+  let message: string | undefined
+  let code: string | number | undefined
+
+  if (typeof error === 'string') {
+    message = error
+  }
+  else if (isExecutedFailure(error)) {
+    message = error.reason ?? undefined
+    code = error.errorCode
+  }
+  else if (error instanceof HttpError) {
+    message = error.message || undefined
+    code = error.status
+  }
+  else if (error instanceof Error) {
+    message = error.message || undefined
+  }
+
+  const fullTitle = code ? `${title} (${code})` : title
+
+  notifications.show({
+    title: fullTitle,
+    message,
+    color: 'red',
+  })
 }
 
 export function jsonStringifyIndented(json: unknown) {
