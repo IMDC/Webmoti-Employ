@@ -31,3 +31,4 @@ worker-configuration.d.ts
 gaze_data.csv
 
 test.py
+.vercel

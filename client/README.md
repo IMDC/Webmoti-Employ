@@ -24,9 +24,10 @@ The client is deployed on Vercel. Since Vercel doesn't allow collaborators on th
 4. Don't link to existing project
 5. Set root to `./client`
 6. Use default deployment protection settings
-7. Go to your new project in Vercel dashboard
-8. Add environment variables from `.env`
-9. [Deploy server](../server/README.md#deploying), get deployed url, and set new environment variable (`VITE_API_BASE_URL`) in `Settings` > `Environment Variables`
+7. Linking to repository is not needed
+8. Go to your new project in Vercel dashboard
+9. Add environment variables from `.env`
+10. [Deploy server](../server/README.md#deploying), get deployed url, and set new environment variable (`VITE_API_BASE_URL`) in `Settings` > `Environment Variables`
 
 Steps for automatic deployments:
 

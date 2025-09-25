@@ -79,11 +79,12 @@ Steps:
 2. (optional) Setup hyperdrive if you haven't already
 3. Create project: `cd server` `pnpm run deploy`
 4. Go to cloudflare dashboard and then to your worker
-5. In `Settings` > `Variables and Secrets`, add everything in `.dev.vars` except `DATABASE_URL` and `LOCAL_DATABASE_URL`. You can copy the whole env and paste it into the `Variable name` field which speeds up the process (make sure you exclude the two database ones). For `BETTER_AUTH_URL`, set this to the url of the server (the deployed cloudflare worker). Set `CORS_ORIGIN` to the deployed client vercel url.
-6. Set the type of all the secrets to `Secret` instead of `Text`
-7. Press `Deploy`
-8. Get the deployed server url and set it in Vercel for client as `VITE_API_BASE_URL`
-9. [Deploy client](../client/README.md#deploying), get the url, and set `CORS_ORIGIN` secret in Cloudflare
+5. In `Settings` > `Variables and Secrets`, add everything in `.dev.vars` except `DATABASE_URL` and `LOCAL_DATABASE_URL`. You can copy the whole env and paste it into the `Variable name` field which speeds up the process (make sure you exclude the two database ones).
+6. For `BETTER_AUTH_URL`, set this to the url of the server (the deployed cloudflare worker). Set `CORS_ORIGIN` to the deployed client vercel url.
+7. Set the type of all the secrets to `Secret` instead of `Text`
+8. Press `Deploy`
+9. Get the deployed server url and set it in Vercel for client as `VITE_API_BASE_URL`
+10. [Deploy client](../client/README.md#deploying), get the url, and set `CORS_ORIGIN` secret in Cloudflare
 
 Steps for automatic deployments:
 
@@ -169,7 +170,7 @@ The database is postgres deployed with the Neon service. We also use Cloudflare 
    ```
 
 4. Get the connection string. Make sure the role is readwrite_imdc. Put this connection string in `.dev.vars` as the `DATABASE_URL` field. Also put it in `.env`.
-5. Run `pnpm run db-typegen` to generate types for the database. Do this whenever you change the Neon database.
+5. Run `pnpm run db:typegen` to generate types for the database. Do this whenever you change the Neon database.
 
 #### Cloudflare Hyperdrive
 
