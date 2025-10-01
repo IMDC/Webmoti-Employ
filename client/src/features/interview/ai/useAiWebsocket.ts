@@ -5,11 +5,17 @@ import useWebSocket, { ReadyState } from 'react-use-websocket'
 export function useAiWebsocket() {
   // const roomName = useRoomName()
 
+  const protocol = import.meta.env.DEV ? 'ws' : 'wss'
+  const host = import.meta.env.DEV
+    ? 'localhost:8787'
+    : import.meta.env.VITE_API_BASE_URL.replace(/^https?:\/\//, '')
+  const socketUrl = `${protocol}://${host}/ws`
+
   const {
     lastJsonMessage,
     sendJsonMessage,
     readyState,
-  } = useWebSocket<WebSocketMessage>(`${import.meta.env.VITE_API_BASE_URL}/ai`, {
+  } = useWebSocket<WebSocketMessage>(socketUrl, {
     // queryParams: { identity },
     shouldReconnect: () => true,
   })
