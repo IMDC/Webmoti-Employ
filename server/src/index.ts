@@ -40,12 +40,7 @@ app.use('/auth/*', cloudflareRateLimiter<AppContext>({
   keyGenerator: c => c.req.header('cf-connecting-ip') ?? '',
 }))
 
-// TODO
 // websocket can't authenticate with headers
-// const wsProtected = new Hono<AppContext>()
-// wsProtected.use(useQueryAuth)
-// wsProtected.route('/', wsRoute)
-// app.route('/ws', wsProtected)
 app.route('/ws', wsRoute)
 
 // the order matters, need to declare this before applying useAuth middleware

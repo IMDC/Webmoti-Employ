@@ -1,7 +1,10 @@
 import type { AppContext } from '@/index'
 import { Hono } from 'hono'
+import { useQueryAuth } from '@/middleware/useQueryAuth'
 
 const wsRoute = new Hono<AppContext>()
+
+wsRoute.use(useQueryAuth)
 
 wsRoute.get(
   '/',

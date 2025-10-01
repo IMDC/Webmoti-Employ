@@ -16,7 +16,7 @@ export function useAiWebsocket() {
     sendJsonMessage,
     readyState,
   } = useWebSocket<WebSocketMessage>(socketUrl, {
-    // queryParams: { identity },
+    queryParams: { token: encodeURIComponent(localStorage.getItem('bearer_token') ?? '') },
     shouldReconnect: () => true,
   })
 

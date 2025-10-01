@@ -1,3 +1,5 @@
+// https://dzone.com/articles/serverless-websocket-real-time-apps
+
 import { TranscriptMessage } from '@webmoti-employ/shared'
 
 export class AiRoom {
