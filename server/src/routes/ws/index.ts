@@ -1,17 +1,25 @@
 import type { AppContext } from '@/index'
+import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
+import z from 'zod'
 import { useQueryAuth } from '@/middleware/useQueryAuth'
 
 const wsRoute = new Hono<AppContext>()
 
 wsRoute.use(useQueryAuth)
 
+const WsRequestQuery = z.object({
+  token: z.string(),
+  room: z.string(),
+})
+
 wsRoute.get(
   '/',
+  zValidator('query', WsRequestQuery),
   (c) => {
-    // Use a hardcoded name to create a consistent Durable Object ID.
-    // This ensures all clients connect to the same 'global-chat-room' instance.
-    const objectId = c.env.AI_ROOM.idFromName('global-chat-room')
+    const { room } = c.req.query()
+
+    const objectId = c.env.AI_ROOM.idFromName(room)
     const durableObjectStub = c.env.AI_ROOM.get(objectId)
 
     // Forward the original request to the Durable Object stub.
