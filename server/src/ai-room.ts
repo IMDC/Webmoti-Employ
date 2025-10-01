@@ -31,7 +31,7 @@ export class AiRoom {
   }
 
   // Handles messages received from any connected client.
-  async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
+  async webSocketMessage(_: WebSocket, message: string | ArrayBuffer): Promise<void> {
     if (typeof message !== 'string')
       return
 
