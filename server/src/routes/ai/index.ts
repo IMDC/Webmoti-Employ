@@ -1,7 +1,7 @@
-import process from 'node:process'
+import { groq as createGroqModel } from '@ai-sdk/groq'
 import type { CoreMessage } from 'ai'
 import { generateText, streamText } from 'ai'
-import { groq as createGroqModel } from '@ai-sdk/groq'
+import process from 'node:process'
 
 export interface AiGenerateOptions {
   model?: GroqModelName
@@ -11,8 +11,8 @@ export interface AiGenerateOptions {
   temperature?: number
 }
 
-export type GroqModelName
-  = 'llama-3.1-8b-instant'
+export type GroqModelName =
+    'llama-3.1-8b-instant'
   | 'llama-3.1-70b-versatile'
   | 'llama-3.2-90b-vision-preview'
   | 'llama-3.2-11b-vision-preview'
@@ -35,10 +35,10 @@ function getGroqModel(modelName: GroqModelName) {
   return createGroqModel(modelName)
 }
 
-export type AiGenerateResult = {
-  text: string,
-  finishReason: unknown,
-  usage: unknown,
+export interface AiGenerateResult {
+  text: string;
+  finishReason: unknown;
+  usage: unknown;
 }
 
 export async function aiGenerateText(options: AiGenerateOptions): Promise<AiGenerateResult> {

@@ -1,7 +1,7 @@
 import type { AppContext } from '../..'
 import { Hono } from 'hono'
-import { upgradeWebSocket } from 'hono/cloudflare-workers'
 import type { CoreMessage } from '../ai'
+import { upgradeWebSocket } from 'hono/cloudflare-workers'
 import { aiGenerateText } from '../ai'
 
 const wsRoute = new Hono<AppContext>()
