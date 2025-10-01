@@ -1,7 +1,7 @@
-import process from 'node:process'
 import type { CoreMessage } from 'ai'
-import { generateText, streamText } from 'ai'
 import { groq as createGroqModel } from '@ai-sdk/groq'
+import { generateText, streamText } from 'ai'
+import process from 'node:process'
 
 export interface AiGenerateOptions {
   model?: GroqModelName
@@ -12,13 +12,13 @@ export interface AiGenerateOptions {
 }
 
 export type GroqModelName = 'llama-3.1-8b-instant'
-    | 'llama-3.1-70b-versatile'
-    | 'llama-3.2-90b-vision-preview'
-    | 'llama-3.2-11b-vision-preview'
-    | 'llama-3.2-3b-preview'
-    | 'llama-3.1-405b-reasoning'
-    | 'llama-3.1-70b-tool-use-preview'
-    | 'llama-3.1-8b-tool-use-preview'
+  | 'llama-3.1-70b-versatile'
+  | 'llama-3.2-90b-vision-preview'
+  | 'llama-3.2-11b-vision-preview'
+  | 'llama-3.2-3b-preview'
+  | 'llama-3.1-405b-reasoning'
+  | 'llama-3.1-70b-tool-use-preview'
+  | 'llama-3.1-8b-tool-use-preview'
 
 function requireGroqApiKey(getEnv?: () => string | undefined): string {
   const read = getEnv ?? (() => process.env.GROQ_API_KEY)
@@ -35,9 +35,9 @@ function getGroqModel(modelName: GroqModelName) {
 }
 
 export interface AiGenerateResult {
-  text: string;
-  finishReason: unknown;
-  usage: unknown;
+  text: string,
+  finishReason: unknown,
+  usage: unknown,
 }
 
 export async function aiGenerateText(options: AiGenerateOptions): Promise<AiGenerateResult> {
