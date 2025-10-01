@@ -1,6 +1,6 @@
 import { Button, Flex, Group, Text } from '@mantine/core'
 import { useCurrentTime } from '@/hooks/useCurrentTime'
-import { ToggleCaptionsButton } from '../captions/ToggleCaptionsButton'
+import { ToggleCaptionsButton } from '../ai/ToggleCaptionsButton'
 import { ControlsMenu } from '../session/components/ControlsMenu'
 import { useZoomSessionActions } from '../zoom/useZoomSessionStore'
 import { EndCallButton } from './buttons/EndCallButton'

@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { CommandChannelContextProvider } from '@/features/interview/captions/CommandChannelContextProvider'
+import { CommandChannelContextProvider } from '../../../features/interview/ai/CommandChannelContextProvider'
 import { ChatContextProvider } from '@/features/interview/chat/ChatContextProvider'
 import { Room } from '@/features/interview/session/Room'
 
