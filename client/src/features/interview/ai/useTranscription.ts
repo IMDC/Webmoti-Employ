@@ -10,7 +10,7 @@ export function useTranscription() {
   const {
     resetTranscript,
     browserSupportsSpeechRecognition,
-    transcript,
+    // transcript,
     finalTranscript,
     listening,
     isMicrophoneAvailable,
@@ -19,7 +19,7 @@ export function useTranscription() {
 
   const [hasNotifiedUser, setHasNotifiedUser] = useState(false)
 
-  useAiWebsocket()
+  const { sendTranscript } = useAiWebsocket()
 
   const startTranscribing = useCallback(async () => {
     if (!browserSupportsSpeechRecognition) {
@@ -75,16 +75,17 @@ export function useTranscription() {
     }
   }, [isAudioEnabled, startTranscribing, stopTranscribing])
 
-  useEffect(() => {
-    if (transcript) {
-      logger.log('in progress:', transcript)
-    }
-  }, [transcript])
+  // useEffect(() => {
+  //   if (transcript) {
+  //     logger.log('in progress:', transcript)
+  //   }
+  // }, [transcript])
 
   useEffect(() => {
     if (finalTranscript) {
       logger.log('final transcript:', finalTranscript)
+      sendTranscript(finalTranscript)
       resetTranscript()
     }
-  }, [finalTranscript, resetTranscript])
+  }, [finalTranscript, resetTranscript, sendTranscript])
 }

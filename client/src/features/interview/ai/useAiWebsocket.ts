@@ -1,4 +1,4 @@
-import type { TranscriptMessage, WebSocketMessage } from '@webmoti-employ/shared'
+import type { WebSocketMessage } from '@webmoti-employ/shared'
 import { useCallback, useEffect } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { logger } from '@/utils/logger'
@@ -26,9 +26,15 @@ export function useAiWebsocket() {
   })
 
   const sendTranscript = useCallback(
-    (msg: TranscriptMessage) => {
+    (transcript: string) => {
       if (readyState === ReadyState.OPEN) {
-        sendJsonMessage({ type: 'transcript', ...msg })
+        const transcriptMsg: WebSocketMessage = {
+          type: 'transcript',
+          payload: {
+            text: transcript,
+          },
+        }
+        sendJsonMessage(transcriptMsg)
       }
       else {
         logger.error('Websocket is not ready to send transcript')

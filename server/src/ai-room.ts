@@ -1,6 +1,6 @@
 // https://dzone.com/articles/serverless-websocket-real-time-apps
 
-import { TranscriptMessage } from '@webmoti-employ/shared'
+import { WebSocketMessage } from '@webmoti-employ/shared'
 
 export class AiRoom {
   private state: DurableObjectState
@@ -24,7 +24,7 @@ export class AiRoom {
     this.state.acceptWebSocket(server)
     this.sessions.add(server)
 
-    console.log(`New WebSocket connection established. Total connections: ${this.sessions.size}`)
+    // console.log(`New WebSocket connection established. Total connections: ${this.sessions.size}`)
 
     // Return the client-side WebSocket back to the client.
     return new Response(null, { status: 101, webSocket: client })
@@ -36,14 +36,28 @@ export class AiRoom {
       return
 
     try {
-      const parsedMessage = TranscriptMessage.parse(JSON.parse(message))
-      console.log(`Received message: ${parsedMessage.text}`)
+      const parsedMsg = JSON.parse(message)
+      const websocketMsg = WebSocketMessage.parse(parsedMsg)
+      // console.log(`Received message: ${parsedMessage.text}`)
 
-      // Broadcast the message to all other connected clients in the room.
-      const serialized = JSON.stringify(parsedMessage)
+      if (websocketMsg.type !== 'transcript') {
+        return
+      }
+
+      // send test message after receiving transcript
+      const notificationMessage: WebSocketMessage = {
+        type: 'notification',
+        payload: {
+          'detail': false,
+          'timer': 30,
+          'filler-count': websocketMsg.payload.text.length,
+        },
+      }
+      const serialized = JSON.stringify(notificationMessage)
+
+      // Broadcast notification to all connected clients in the room.
       this.sessions.forEach((session) => {
-        if (session !== ws)
-          session.send(serialized)
+        session.send(serialized)
       })
     }
     catch (e) {
@@ -53,9 +67,9 @@ export class AiRoom {
 
   // Cleans up a session when a WebSocket connection is closed.
   async webSocketClose(ws: WebSocket): Promise<void> {
-    console.log('WebSocket connection closed.')
+    // console.log('WebSocket connection closed.')
     this.sessions.delete(ws)
-    console.log(`Total connections remaining: ${this.sessions.size}`)
+    // console.log(`Total connections remaining: ${this.sessions.size}`)
   }
 
   // Handles errors on a WebSocket connection.
