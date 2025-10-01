@@ -41,4 +41,3 @@ wsRoute.get('/ai-demo', upgradeWebSocket((_c) => {
 }))
 
 export default wsRoute
-
