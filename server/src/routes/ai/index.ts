@@ -5,7 +5,7 @@ import { upgradeWebSocket } from 'hono/cloudflare-workers'
 const aiRoute = new Hono<AppContext>()
 
 aiRoute.get(
-  '/ws',
+  '/',
   upgradeWebSocket(() => {
     return {
       onMessage(event, ws) {

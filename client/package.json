@@ -39,6 +39,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-speech-recognition": "^4.0.1",
+    "react-use-websocket": "^4.13.0",
     "zod": "^4.1.8",
     "zustand": "^5.0.8"
   },
