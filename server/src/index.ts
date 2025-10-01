@@ -6,6 +6,7 @@ import { cloudflareRateLimiter } from '@hono-rate-limiter/cloudflare'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { useAuth } from './middleware/useAuth'
+import aiRoute from './routes/ai'
 import authRoute from './routes/auth'
 import interviewsRoute from './routes/interviews'
 import profilesRoute from './routes/profiles'
@@ -53,6 +54,7 @@ protectedRoutes.use(cloudflareRateLimiter<AppContext>({
 protectedRoutes.route('/sessions', sessionsRoute)
 protectedRoutes.route('/interviews', interviewsRoute)
 protectedRoutes.route('/profiles', profilesRoute)
+protectedRoutes.route('/ai', aiRoute)
 
 app.route('/', protectedRoutes)
 
