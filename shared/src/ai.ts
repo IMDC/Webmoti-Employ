@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const TranscriptMessage = z.object({
+export const TranscriptMessage = z.object({
   text: z.string(),
 })
 

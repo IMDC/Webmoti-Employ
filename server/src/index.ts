@@ -5,12 +5,13 @@ import type { CloudflareBindings } from './types/env'
 import { cloudflareRateLimiter } from '@hono-rate-limiter/cloudflare'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { AiRoom } from './ai-room'
 import { useAuth } from './middleware/useAuth'
-import aiRoute from './routes/ai'
 import authRoute from './routes/auth'
 import interviewsRoute from './routes/interviews'
 import profilesRoute from './routes/profiles'
 import sessionsRoute from './routes/sessions'
+import wsRoute from './routes/ws'
 
 export interface AppContext {
   Bindings: CloudflareBindings
@@ -39,6 +40,15 @@ app.use('/auth/*', cloudflareRateLimiter<AppContext>({
   keyGenerator: c => c.req.header('cf-connecting-ip') ?? '',
 }))
 
+// TODO
+// websocket can't authenticate with headers
+// const wsProtected = new Hono<AppContext>()
+// wsProtected.use(useQueryAuth)
+// wsProtected.route('/', wsRoute)
+// app.route('/ws', wsProtected)
+app.route('/ws', wsRoute)
+
+// the order matters, need to declare this before applying useAuth middleware
 app.route('/auth', authRoute)
 
 const protectedRoutes = new Hono<AppContext>()
@@ -54,7 +64,6 @@ protectedRoutes.use(cloudflareRateLimiter<AppContext>({
 protectedRoutes.route('/sessions', sessionsRoute)
 protectedRoutes.route('/interviews', interviewsRoute)
 protectedRoutes.route('/profiles', profilesRoute)
-protectedRoutes.route('/ai', aiRoute)
 
 app.route('/', protectedRoutes)
 
@@ -66,5 +75,7 @@ app.onError((err, c) => {
 app.notFound((c) => {
   return c.json({ error: `Route not found: ${c.req.method} ${c.req.path}` }, 404)
 })
+
+export { AiRoom }
 
 export default app

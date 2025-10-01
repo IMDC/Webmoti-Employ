@@ -10,6 +10,20 @@
       "id": "9c4b5d10d2ef4d9dabe0401f631cfb35"
     }
   ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "AI_ROOM",
+        "class_name": "AiRoom"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "new_sqlite_classes": ["AiRoom"],
+      "tag": "v1"
+    }
+  ],
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1
