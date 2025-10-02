@@ -59,6 +59,7 @@ protectedRoutes.use(cloudflareRateLimiter<AppContext>({
 protectedRoutes.route('/sessions', sessionsRoute)
 protectedRoutes.route('/interviews', interviewsRoute)
 protectedRoutes.route('/profiles', profilesRoute)
+protectedRoutes.route('/ws', wsRoute)
 
 app.route('/', protectedRoutes)
 
