@@ -1,7 +1,7 @@
 import type { CoreMessage } from 'ai'
+import process from 'node:process'
 import { groq as createGroqModel } from '@ai-sdk/groq'
 import { generateText, streamText } from 'ai'
-import process from 'node:process'
 
 export interface AiGenerateOptions {
   model?: GroqModelName
@@ -35,9 +35,9 @@ function getGroqModel(modelName: GroqModelName) {
 }
 
 export interface AiGenerateResult {
-  text: string,
-  finishReason: unknown,
-  usage: unknown,
+  text: string
+  finishReason: unknown
+  usage: unknown
 }
 
 export async function aiGenerateText(options: AiGenerateOptions): Promise<AiGenerateResult> {
@@ -70,4 +70,3 @@ export function aiStreamText(options: AiGenerateOptions): any {
 }
 
 export type { CoreMessage } from 'ai'
-
