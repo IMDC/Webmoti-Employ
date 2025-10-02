@@ -10,6 +10,7 @@ import authRoute from './routes/auth'
 import interviewsRoute from './routes/interviews'
 import profilesRoute from './routes/profiles'
 import sessionsRoute from './routes/sessions'
+import wsRoute from './routes/ws'
 
 export interface AppContext {
   Bindings: CloudflareBindings
@@ -53,6 +54,7 @@ protectedRoutes.use(cloudflareRateLimiter<AppContext>({
 protectedRoutes.route('/sessions', sessionsRoute)
 protectedRoutes.route('/interviews', interviewsRoute)
 protectedRoutes.route('/profiles', profilesRoute)
+protectedRoutes.route('/ws', wsRoute)
 
 app.route('/', protectedRoutes)
 
