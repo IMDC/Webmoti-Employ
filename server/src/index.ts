@@ -5,6 +5,7 @@ import type { CloudflareBindings } from './types/env'
 import { cloudflareRateLimiter } from '@hono-rate-limiter/cloudflare'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { AiRoom } from './ai-room'
 import { useAuth } from './middleware/useAuth'
 import authRoute from './routes/auth'
 import interviewsRoute from './routes/interviews'
@@ -39,6 +40,10 @@ app.use('/auth/*', cloudflareRateLimiter<AppContext>({
   keyGenerator: c => c.req.header('cf-connecting-ip') ?? '',
 }))
 
+// websocket can't authenticate with headers
+app.route('/ws', wsRoute)
+
+// the order matters, need to declare this before applying useAuth middleware
 app.route('/auth', authRoute)
 
 const protectedRoutes = new Hono<AppContext>()
@@ -66,5 +71,7 @@ app.onError((err, c) => {
 app.notFound((c) => {
   return c.json({ error: `Route not found: ${c.req.method} ${c.req.path}` }, 404)
 })
+
+export { AiRoom }
 
 export default app

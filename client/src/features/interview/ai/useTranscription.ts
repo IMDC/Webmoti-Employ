@@ -3,13 +3,14 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 import { logger } from '@/utils/logger'
 import { errorNotification } from '@/utils/utils'
 import { useIsAudioOn } from '../zoom/useZoomSessionStore'
+import { useAiWebsocket } from './useAiWebsocket'
 
 export function useTranscription() {
   const isAudioEnabled = useIsAudioOn()
   const {
     resetTranscript,
     browserSupportsSpeechRecognition,
-    transcript,
+    // transcript,
     finalTranscript,
     listening,
     isMicrophoneAvailable,
@@ -17,6 +18,8 @@ export function useTranscription() {
     = useSpeechRecognition()
 
   const [hasNotifiedUser, setHasNotifiedUser] = useState(false)
+
+  const { sendTranscript } = useAiWebsocket()
 
   const startTranscribing = useCallback(async () => {
     if (!browserSupportsSpeechRecognition) {
@@ -72,16 +75,17 @@ export function useTranscription() {
     }
   }, [isAudioEnabled, startTranscribing, stopTranscribing])
 
-  useEffect(() => {
-    if (transcript) {
-      logger.log('in progress:', transcript)
-    }
-  }, [transcript])
+  // useEffect(() => {
+  //   if (transcript) {
+  //     logger.log('in progress:', transcript)
+  //   }
+  // }, [transcript])
 
   useEffect(() => {
     if (finalTranscript) {
       logger.log('final transcript:', finalTranscript)
+      sendTranscript(finalTranscript)
       resetTranscript()
     }
-  }, [finalTranscript, resetTranscript])
+  }, [finalTranscript, resetTranscript, sendTranscript])
 }

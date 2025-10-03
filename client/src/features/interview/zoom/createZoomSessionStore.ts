@@ -44,6 +44,7 @@ export interface ZoomSessionStore {
   // only track local user id and not local participant to avoid stale local participant.
   // we can get the local participant by accessing participants[localUserId].
   localUserId: number | null
+  roomName: string | null
   isAudioOn: boolean
   isVideoOn: boolean
   actions: ZoomSessionActions
@@ -69,6 +70,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       localUserId: null,
       isAudioOn: true,
       isVideoOn: true,
+      roomName: null,
 
       actions: {
         setIsAudioOn: value => set({ isAudioOn: value }),
@@ -93,7 +95,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           ZoomVideo.preloadDependentAssets()
         },
         join: async (name, roomName, token) => {
-          set({ callState: 'joining' })
+          set({ callState: 'joining', roomName })
           logger.log('Joining zoom session...')
 
           try {
