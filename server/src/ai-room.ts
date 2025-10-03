@@ -4,10 +4,12 @@ import { WebSocketMessage } from '@webmoti-employ/shared'
 
 export class AiRoom {
   private state: DurableObjectState
+  private env: CloudflareBindings
   private sessions: Set<WebSocket>
 
-  constructor(state: DurableObjectState) {
+  constructor(state: DurableObjectState, env: CloudflareBindings) {
     this.state = state
+    this.env = env
     this.sessions = new Set()
   }
 
