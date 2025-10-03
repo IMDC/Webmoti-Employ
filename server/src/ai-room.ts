@@ -46,6 +46,10 @@ export class AiRoom {
         return
       }
 
+      // TODO: call ai here with groq key
+      // eslint-disable-next-line ts/no-unused-expressions
+      this.env.GROQ_API_KEY
+
       // send test message after receiving transcript
       const notificationMessage: WebSocketMessage = {
         type: 'notification',
