@@ -1,16 +1,37 @@
 // https://dzone.com/articles/serverless-websocket-real-time-apps
 
+import type { CoreMessage } from 'ai'
 import { WebSocketMessage } from '@webmoti-employ/shared'
 
 export class AiRoom {
   private state: DurableObjectState
   private env: CloudflareBindings
   private sessions: Set<WebSocket>
+  private messages: CoreMessage[]
+
+  private systemPrompt = `
+    Virtual Interview Assistant Notification System
+
+    Notifications are in JSON format. Only provide the notification JSON as your response.
+
+    Rules:
+        Insufficient detail/context: {"detail": true} if insufficient detail provided when responding to a question.
+        Filler words: count and notify with {"filler-count": <count>}. (Like, Um, You know...)
+        Question asked: estimate answer duration and notify with {"timer": <seconds>}.
+        Ongoing response: don't notify (except filler words) if user still talking.
+        No notification: return {"detail": null, "filler-count": null, "timer": null} if no issues. This is important. So if nothing to notify about, just say null for the keys that there is nothing for.
+
+    Notification format: {"detail": [true/null], "filler-count": [count/null], "timer": [seconds/null]}
+  `
 
   constructor(state: DurableObjectState, env: CloudflareBindings) {
     this.state = state
     this.env = env
     this.sessions = new Set()
+    this.messages = []
+
+    // add system prompt to beginning of message list
+    this.messages.push({ role: 'system', content: this.systemPrompt })
   }
 
   // Handles all incoming requests. We only care about WebSocket upgrades here.
@@ -46,9 +67,16 @@ export class AiRoom {
         return
       }
 
+      const transcriptText = websocketMsg.payload.text
+
+      this.messages.push({ role: 'user', content: transcriptText })
+
       // TODO: call ai here with groq key
       // eslint-disable-next-line ts/no-unused-expressions
       this.env.GROQ_API_KEY
+      // const response = await aiGenerateText(this.env.GROQ_API_KEY, this.messages)
+      // we need to store the response text as well so the ai knows what it's responded to
+      // this.messages.push({ role: 'assistant', content: response })
 
       // send test message after receiving transcript
       const notificationMessage: WebSocketMessage = {
