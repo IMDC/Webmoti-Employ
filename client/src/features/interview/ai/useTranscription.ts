@@ -5,12 +5,12 @@ import { errorNotification } from '@/utils/utils'
 import { useIsAudioOn } from '../zoom/useZoomSessionStore'
 import { useAiWebsocket } from './useAiWebsocket'
 
-export function useTranscription() {
+export function useTranscription(maxWordsBuffer: 5) {
   const isAudioEnabled = useIsAudioOn()
   const {
     resetTranscript,
     browserSupportsSpeechRecognition,
-    // transcript,
+    transcript,
     finalTranscript,
     listening,
     isMicrophoneAvailable,
@@ -18,6 +18,9 @@ export function useTranscription() {
     = useSpeechRecognition()
 
   const [hasNotifiedUser, setHasNotifiedUser] = useState(false)
+
+  // track the amount of words sent (useful when partial sending)
+  const [sentWordCount, setSentWordCount] = useState(0)
 
   const { sendTranscript } = useAiWebsocket()
 
@@ -82,10 +85,35 @@ export function useTranscription() {
   // }, [transcript])
 
   useEffect(() => {
+    // this sends the final transcript when the user pauses speech for 2 (?) seconds
     if (finalTranscript) {
-      logger.log('final transcript:', finalTranscript)
-      sendTranscript(finalTranscript)
+      const words = getWords(finalTranscript)
+      const newWords = words.slice(sentWordCount).join(' ') // only unsent part
+      if (newWords) {
+        logger.log('final transcript:', newWords)
+        sendTranscript(newWords)
+      }
+      // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
+      setSentWordCount(0)
       resetTranscript()
     }
-  }, [finalTranscript, resetTranscript, sendTranscript])
+  }, [finalTranscript, sentWordCount, resetTranscript, sendTranscript])
+
+  useEffect(() => {
+    // this sends the transcript when the transcript has 5 or more words in it
+    const words = getWords(transcript)
+    const wordCount = words.length
+
+    if (wordCount - sentWordCount >= maxWordsBuffer) {
+      logger.log('partial transcript:', transcript)
+      sendTranscript(transcript)
+      // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
+      setSentWordCount(wordCount)
+      // don't call reset transcript here since it will interrupt and lose the current word
+    }
+  }, [transcript, sentWordCount, sendTranscript, maxWordsBuffer])
+}
+
+function getWords(text: string): string[] {
+  return text.trim().split(/\s+/).filter(Boolean)
 }

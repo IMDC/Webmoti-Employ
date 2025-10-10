@@ -32,7 +32,7 @@ export function Room() {
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [isCaptionsAreaOpen, setIsCaptionsAreaOpen] = useState(false)
 
-  useTranscription()
+  useTranscription(5)
 
   const permissionState = useAppPermissionState()
 

@@ -4,10 +4,10 @@ export const TranscriptMessage = z.object({
   text: z.string(),
 })
 
-const NotificationMessage = z.object({
-  'detail': z.optional(z.boolean()),
-  'timer': z.optional(z.number()),
-  'filler-count': z.optional(z.number()),
+export const NotificationMessage = z.object({
+  'detail': z.optional(z.boolean().nullable()),
+  'timer': z.optional(z.number().nullable()),
+  'filler-count': z.optional(z.number().nullable()),
 })
 
 export const WebSocketMessage = z.discriminatedUnion('type', [

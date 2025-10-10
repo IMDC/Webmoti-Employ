@@ -1,16 +1,62 @@
 // https://dzone.com/articles/serverless-websocket-real-time-apps
 
-import { WebSocketMessage } from '@webmoti-employ/shared'
+import type { ModelMessage } from 'ai'
+import { groq } from '@ai-sdk/groq'
+import { NotificationMessage, WebSocketMessage } from '@webmoti-employ/shared'
+import { generateText } from 'ai'
 
 export class AiRoom {
   private state: DurableObjectState
-  private env: CloudflareBindings
   private sessions: Set<WebSocket>
+  private messages: ModelMessage[]
 
-  constructor(state: DurableObjectState, env: CloudflareBindings) {
+  private model = groq('meta-llama/llama-4-scout-17b-16e-instruct')
+
+  private systemPrompt = `
+    Virtual Interview Assistant Notification System
+
+    For each transcript:
+
+    1. Provide 1-2 concise sentences explaining the reasoning for the notification.  
+      - Reasoning is based only on the transcript content.  
+      - Ignore greetings or small talk; do not invent roles.  
+      - Only responses to questions are evaluated for "detail". Questions themselves do not trigger "detail".
+
+    2. Then provide a JSON object with three keys:
+      - "detail": null if transcript is a question or irrelevant, false if response to a question lacks detail, true if response provides sufficient detail.
+      - "filler-count": number of filler words (0 if none).
+      - "timer": estimated answer duration in seconds if transcript is a question, null otherwise.
+
+    Always output reasoning first, then JSON on a new line.  
+
+    For testing, assume both participants use the same transcript.
+
+    Example outputs:
+
+    Transcript is a greeting:  
+    "Hello there."  
+    {"detail": null, "filler-count": 0, "timer": null}
+
+    Transcript is a question:  
+    "Tell me about yourself."  
+    {"detail": null, "filler-count": 0, "timer": 120}
+
+    Transcript is a response lacking detail:  
+    "I did some projects."  
+    {"detail": false, "filler-count": 0, "timer": null}
+
+    Transcript is a detailed response:  
+    "I led a project on X, faced Y challenge, and achieved Z outcome."  
+    {"detail": true, "filler-count": 0, "timer": null}
+  `
+
+  constructor(state: DurableObjectState) {
     this.state = state
-    this.env = env
     this.sessions = new Set()
+    this.messages = []
+
+    // add system prompt to beginning of message list
+    this.messages.push({ role: 'system', content: this.systemPrompt })
   }
 
   // Handles all incoming requests. We only care about WebSocket upgrades here.
@@ -32,6 +78,62 @@ export class AiRoom {
     return new Response(null, { status: 101, webSocket: client })
   }
 
+  async broadcastMessage(message: string) {
+    // Broadcast to all connected clients in the room.
+    this.sessions.forEach((session) => {
+      session.send(message)
+    })
+  }
+
+  async aiGenerateText() {
+    const result = await generateText({ model: this.model, messages: this.messages })
+    const responseText = result.text
+
+    // TODO after adding debug logger, make this log instead
+    // eslint-disable-next-line no-console
+    console.log(responseText)
+
+    // we need to store the response text as well so the ai knows what it's responded to
+    this.messages.push({ role: 'assistant', content: responseText })
+    return responseText
+  }
+
+  getResponseObject(response: string) {
+    // match first {...} JSON block
+    const match = response.match(/\{[\s\S]*\}/)
+    if (!match) {
+      throw new Error('No JSON found in response')
+    }
+
+    return JSON.parse(match[0])
+  }
+
+  async handleTranscript(transcript: string) {
+    // TODO same for here as above
+    // eslint-disable-next-line no-console
+    console.log('Transcript:', transcript)
+    this.messages.push({ role: 'user', content: transcript })
+
+    const response = await this.aiGenerateText()
+    const notificationResult = NotificationMessage.safeParse(this.getResponseObject(response))
+    if (!notificationResult.success) {
+      console.error('Failed to parse generated notification:', notificationResult.error)
+      console.error('Invalid generation is:', response)
+      return
+    }
+
+    const notificationMessage: WebSocketMessage = {
+      type: 'notification',
+      payload: {
+        'detail': notificationResult.data.detail,
+        'timer': notificationResult.data.timer,
+        'filler-count': notificationResult.data['filler-count'],
+      },
+    }
+    // console.log('sent notification:', JSON.stringify(notificationMessage))
+    this.broadcastMessage(JSON.stringify(notificationMessage))
+  }
+
   // Handles messages received from any connected client.
   async webSocketMessage(_: WebSocket, message: string | ArrayBuffer): Promise<void> {
     if (typeof message !== 'string')
@@ -42,29 +144,9 @@ export class AiRoom {
       const websocketMsg = WebSocketMessage.parse(parsedMsg)
       // console.log(`Received message: ${parsedMessage.text}`)
 
-      if (websocketMsg.type !== 'transcript') {
-        return
+      if (websocketMsg.type === 'transcript') {
+        await this.handleTranscript(websocketMsg.payload.text)
       }
-
-      // TODO: call ai here with groq key
-      // eslint-disable-next-line ts/no-unused-expressions
-      this.env.GROQ_API_KEY
-
-      // send test message after receiving transcript
-      const notificationMessage: WebSocketMessage = {
-        type: 'notification',
-        payload: {
-          'detail': false,
-          'timer': 30,
-          'filler-count': websocketMsg.payload.text.length,
-        },
-      }
-      const serialized = JSON.stringify(notificationMessage)
-
-      // Broadcast notification to all connected clients in the room.
-      this.sessions.forEach((session) => {
-        session.send(serialized)
-      })
     }
     catch (e) {
       console.error('Failed to parse message:', e)

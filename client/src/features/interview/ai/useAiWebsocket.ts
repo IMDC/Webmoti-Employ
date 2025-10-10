@@ -1,5 +1,5 @@
 import type { WebSocketMessage } from '@webmoti-employ/shared'
-import { useCallback, useEffect } from 'react'
+import { useCallback } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { logger } from '@/utils/logger'
 import { useRoomName } from '../zoom/useZoomSessionStore'
@@ -14,7 +14,6 @@ export function useAiWebsocket() {
   const socketUrl = `${protocol}://${host}/ws`
 
   const {
-    lastJsonMessage,
     sendJsonMessage,
     readyState,
   } = useWebSocket<WebSocketMessage>(socketUrl, {
@@ -23,6 +22,17 @@ export function useAiWebsocket() {
       room: roomName ?? '',
     },
     shouldReconnect: () => true,
+    onMessage: (event) => {
+      try {
+        const msg = JSON.parse(event.data) as WebSocketMessage
+        if (msg.type === 'notification') {
+          logger.log('Received notification:', msg.payload)
+        }
+      }
+      catch (e) {
+        logger.error('Failed to parse WS message', e)
+      }
+    },
   })
 
   const sendTranscript = useCallback(
@@ -42,15 +52,6 @@ export function useAiWebsocket() {
     },
     [sendJsonMessage, readyState],
   )
-
-  useEffect(() => {
-    if (!lastJsonMessage)
-      return
-
-    if (lastJsonMessage.type === 'notification') {
-      logger.log(lastJsonMessage.payload)
-    }
-  }, [lastJsonMessage])
 
   return {
     sendTranscript,
