@@ -1,6 +1,6 @@
-import { notifications } from '@mantine/notifications'
 import { QueryCache, QueryClient } from '@tanstack/react-query'
 import { isHttpError } from './utils/HttpError'
+import { showErrorNotification } from './utils/utils'
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -16,12 +16,7 @@ export const queryClient = new QueryClient({
             ? error.message
             : 'Something went wrong. Please try again.')
 
-      notifications.show({
-        title: errorTitle,
-        message,
-        color: 'red',
-        autoClose: false,
-      })
+      showErrorNotification(errorTitle ?? 'Unexpected Query Error', message)
     },
   }),
 })

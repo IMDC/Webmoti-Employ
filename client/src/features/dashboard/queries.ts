@@ -2,6 +2,7 @@ import type { NewInterview } from '@webmoti-employ/shared'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
 import { HttpError } from '@/utils/HttpError'
+import { getLocalBearerToken } from '@/utils/utils'
 import { InterviewsGetResponse, InterviewsPostResponse } from './schema'
 
 const queryKeys = {
@@ -12,7 +13,7 @@ const queryKeys = {
 // GET from interviews
 
 async function getInterviews() {
-  const authToken = localStorage.getItem('bearer_token')
+  const authToken = getLocalBearerToken()
   const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/interviews`, {
     headers: {
       'Content-Type': 'application/json',
@@ -49,7 +50,7 @@ export function useInterviews() {
 // POST to interviews
 
 async function scheduleInterview(interview: NewInterview) {
-  const authToken = localStorage.getItem('bearer_token')
+  const authToken = getLocalBearerToken()
   const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/interviews`, {
     method: 'POST',
     headers: {
