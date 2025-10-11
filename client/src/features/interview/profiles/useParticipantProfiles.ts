@@ -3,7 +3,7 @@ import { useProfiles } from './useProfiles'
 
 export function useParticipantProfiles(participants: Map<number, Participant>) {
   const userIds = Array.from(participants.values())
-    .map(p => p.displayName)
+    .map(p => p.userId.toString())
     .filter(Boolean)
     .sort()
 

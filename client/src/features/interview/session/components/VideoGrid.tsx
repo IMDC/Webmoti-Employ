@@ -28,7 +28,7 @@ export function VideoGrid({
   return (
     <>
       {Array.from(participants.entries()).map(([userId, participant]) => {
-        const profile = profiles?.[participant.displayName]
+        const profile = profiles?.[userId.toString()]
         return (
           <SessionTile
             key={userId}

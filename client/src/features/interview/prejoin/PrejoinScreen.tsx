@@ -30,7 +30,7 @@ export function PrejoinScreen() {
 
   const userId = user.id
   const userProfileUrl = user.image!
-  const args = buildInterviewSessionArgs(sessionId, user.name)
+  const args = buildInterviewSessionArgs(sessionId, userId)
 
   const { interviewSession, isInterviewSessionPending, interviewSessionError }
     = useInterviewSession(args)
@@ -123,7 +123,7 @@ export function PrejoinScreen() {
               </Group>
               <Button
                 onClick={async () =>
-                  join(userId, interviewSession.sessionId, interviewSession.token)}
+                  join(user.name, interviewSession.sessionId, interviewSession.token)}
               >
                 {`${args.action === 'create' ? 'Start' : 'Join'}`}
               </Button>
