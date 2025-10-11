@@ -41,8 +41,8 @@ export function SpotlightView({
   const mainParticipant = hasRemote ? remoteParticipants[0] : localParticipant
   const secondaryParticipant = hasRemote ? localParticipant : null
 
-  const mainProfile = profiles?.[mainParticipant.displayName]
-  const secondaryProfile = secondaryParticipant ? profiles?.[secondaryParticipant.displayName] : null
+  const mainProfile = profiles?.[mainParticipant.userId.toString()]
+  const secondaryProfile = secondaryParticipant ? profiles?.[secondaryParticipant.userId.toString()] : null
 
   return (
     <>
