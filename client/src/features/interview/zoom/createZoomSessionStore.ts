@@ -37,7 +37,7 @@ export interface ZoomSessionActions {
 export type CallState = 'prejoin' | 'joining' | 'joined' | 'left'
 
 export interface ZoomSessionStore {
-  client: typeof VideoClient
+  client: typeof VideoClient | null
   stream: ReturnType<typeof VideoClient['getMediaStream']> | null
   callState: CallState
   participants: Map<number, Participant>
@@ -51,8 +51,6 @@ export interface ZoomSessionStore {
 }
 
 export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
-  const client = ZoomVideo.createClient()
-
   const zoomSessionStore = createStore<ZoomSessionStore>((set, get) => {
     const stream = () => {
       const s = get().stream
@@ -62,8 +60,41 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       return s
     }
 
+    const client = () => {
+      const c = get().client
+      if (!c) {
+        throw new Error('Client not initialized')
+      }
+      return c
+    }
+
+    async function createClientAndAttachListeners() {
+      const newClient = ZoomVideo.createClient()
+      set({ client: newClient })
+
+      await newClient.init('en-US', 'Global', {
+        patchJsMedia: true,
+        leaveOnPageUnload: true,
+      })
+
+      newClient.on('user-added', handleUserAdded)
+      newClient.on('user-removed', handleUserRemoved)
+      newClient.on('user-updated', handleUserUpdated)
+      newClient.on('peer-video-state-change', handlePeerVideoStateChange)
+
+      // TODO
+      // client.on('device-change', );
+      // client.on('device-permission-change', );
+      // client.on('active-media-failed', );
+      // client.on('active-media-failed', );
+      // client.on('network-quality-change', );
+      // others... https://developers.zoom.us/docs/video-sdk/web/handle-events/
+
+      return newClient
+    }
+
     return {
-      client,
+      client: null,
       stream: null,
       callState: 'prejoin',
       participants: new Map(),
@@ -87,10 +118,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
             return
           }
 
-          await client.init('en-US', 'Global', {
-            patchJsMedia: true,
-            leaveOnPageUnload: true,
-          })
+          await createClientAndAttachListeners()
 
           ZoomVideo.preloadDependentAssets()
         },
@@ -99,8 +127,11 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           logger.log('Joining zoom session...')
 
           try {
-            await client.join(roomName, token, name)
-            const stream = client.getMediaStream()
+            // create client again here because of an issue with vite refresh causing invalid client state
+            await createClientAndAttachListeners()
+
+            await client().join(roomName, token, name)
+            const stream = client().getMediaStream()
 
             const { isAudioOn, isVideoOn } = get()
             const granted = appStore.getState().permissionState === 'granted'
@@ -109,7 +140,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
             if (granted && isAudioOn)
               await stream.startAudio()
 
-            set({ stream, callState: 'joined', localUserId: client.getCurrentUserInfo().userId })
+            set({ stream, callState: 'joined', localUserId: client().getCurrentUserInfo().userId })
             updateParticipants()
           }
           catch (error) {
@@ -121,7 +152,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         leave: async () => {
           logger.log('Leaving zoom session...')
           set({ callState: 'left', participants: new Map() })
-          await client.leave()
+          await client().leave()
         },
         startVideo: async () => {
           logger.log('Starting video...')
@@ -181,11 +212,12 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         },
         cleanup: async () => {
           logger.log('Cleaning up zoom client...')
-          client.off('user-added', handleUserAdded)
-          client.off('user-removed', handleUserRemoved)
-          client.off('user-updated', handleUserUpdated)
-          client.off('peer-video-state-change', handlePeerVideoStateChange)
+          client().off('user-added', handleUserAdded)
+          client().off('user-removed', handleUserRemoved)
+          client().off('user-updated', handleUserUpdated)
+          client().off('peer-video-state-change', handlePeerVideoStateChange)
           await ZoomVideo.destroyClient()
+          set({ client: null, stream: null, participants: new Map(), localUserId: null, callState: 'prejoin' })
         },
       },
     }
@@ -196,6 +228,12 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
   // --------------------------------------------------
 
   function updateParticipants() {
+    const client = zoomSessionStore.getState().client
+    if (!client) {
+      logger.warn('Couldn\'t update participants, client is not initialized')
+      return
+    }
+
     zoomSessionStore.setState({
       participants: new Map(client.getAllUser().map(user => [user.userId, user])),
     })
@@ -223,10 +261,6 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
     updateParticipants()
   }
 
-  client.on('user-added', handleUserAdded)
-  client.on('user-removed', handleUserRemoved)
-  client.on('user-updated', handleUserUpdated)
-
   function handlePeerVideoStateChange({ userId, action }: { userId: number, action: string }) {
     logger.log('peer video state change')
 
@@ -250,16 +284,6 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       console.error(`Error handling peer-video-state-change for user ${userId}`, err)
     }
   }
-
-  client.on('peer-video-state-change', handlePeerVideoStateChange)
-
-  // TODO
-  // client.on('device-change', );
-  // client.on('device-permission-change', );
-  // client.on('active-media-failed', );
-  // client.on('active-media-failed', );
-  // client.on('network-quality-change', );
-  // others... https://developers.zoom.us/docs/video-sdk/web/handle-events/
 
   return zoomSessionStore
 }
