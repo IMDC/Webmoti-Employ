@@ -2,6 +2,7 @@ import type { ProfilesResponse } from '@webmoti-employ/shared'
 import type { Participant } from '@zoom/videosdk'
 import type { Dispatch, RefObject, SetStateAction } from 'react'
 import { AspectRatio } from '@mantine/core'
+import { useUser } from '@/features/auth/hooks/useUserStore'
 import { GALLERY_VIEW_ASPECT_RATIO } from '@/utils/constants'
 import { logger } from '@/utils/logger'
 import { useLocalUserId } from '../../zoom/useZoomSessionStore'
@@ -25,6 +26,7 @@ export function SpotlightView({
 }: SpotlightViewProps) {
   const { width, height } = useSingleLayout(containerRef)
   const localUserId = useLocalUserId()
+  const user = useUser()
 
   const localParticipant = localUserId ? participants.get(localUserId) : undefined
   if (!localParticipant) {
@@ -41,8 +43,10 @@ export function SpotlightView({
   const mainParticipant = hasRemote ? remoteParticipants[0] : localParticipant
   const secondaryParticipant = hasRemote ? localParticipant : null
 
-  const mainProfile = profiles?.[mainParticipant.userId.toString()]
-  const secondaryProfile = secondaryParticipant ? profiles?.[secondaryParticipant.userId.toString()] : null
+  // Use authenticated user ID for local participant profile lookup
+  const mainProfileKey = mainParticipant.userId === localUserId ? user.id : mainParticipant.userId.toString()
+  const mainProfile = profiles?.[mainProfileKey]
+  const secondaryProfile = secondaryParticipant ? profiles?.[user.id] : null
 
   return (
     <>
