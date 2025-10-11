@@ -4,7 +4,7 @@ import { Loading } from '@/components/Loading'
 import { SettingsMenu } from '@/components/SettingsMenu'
 import { UserContextProvider } from '@/features/auth/components/UserContextProvider'
 import { useSession } from '@/lib/auth-client'
-import { clearUrlParam } from '@/utils/utils'
+import { clearUrlParam, getLocalBearerToken, removeLocalBearerToken, setLocalBearerToken, showErrorNotification } from '@/utils/utils'
 
 export const Route = createFileRoute('/(authenticated)')({
   component: AuthedLayout,
@@ -23,7 +23,7 @@ function AuthedLayout() {
     const url = new URL(window.location.href)
     const authToken = url.searchParams.get('authToken')
     if (authToken) {
-      localStorage.setItem('bearer_token', encodeURIComponent(authToken))
+      setLocalBearerToken(authToken)
       clearUrlParam('authToken')
     }
 
@@ -36,8 +36,25 @@ function AuthedLayout() {
     return <Loading />
   }
 
-  if (!data?.user)
+  if (!data?.user) {
+    if (getLocalBearerToken()) {
+      // no session but there is a token
+      // this means the sign in failed
+
+      removeLocalBearerToken()
+
+      showErrorNotification(
+        'Error signing in',
+        'Please try again',
+      )
+    }
+
+    // no session and no token
+    // this means the user probably just signed out
+    // (just return null since redirect will happen)
+
     return null
+  }
 
   return (
     <UserContextProvider session={data}>

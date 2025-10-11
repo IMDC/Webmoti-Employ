@@ -1,5 +1,6 @@
 import type { AppError } from '@/useAppStore'
 import { createAuthClient } from 'better-auth/react'
+import { getLocalBearerToken, removeLocalBearerToken } from '@/utils/utils'
 
 export const authClient = createAuthClient({
   baseURL: `${import.meta.env.VITE_API_BASE_URL}/auth`,
@@ -7,7 +8,7 @@ export const authClient = createAuthClient({
     // include token in all requests
     auth: {
       type: 'Bearer',
-      token: () => localStorage.getItem('bearer_token') || '',
+      token: () => getLocalBearerToken() || '',
     },
     // don't send cookies since we're using bearer token instead
     credentials: 'omit',
@@ -31,7 +32,7 @@ export async function googleSignIn(
 
 export async function signOut() {
   await authClient.signOut()
-  localStorage.removeItem('bearer_token')
+  removeLocalBearerToken()
 }
 
 export const { useSession } = authClient

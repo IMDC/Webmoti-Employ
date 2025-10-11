@@ -4,6 +4,8 @@ import { notifications } from '@mantine/notifications'
 import { HttpError } from './HttpError'
 import { logger } from './logger'
 
+const LOCAL_BEARER_TOKEN_KEY = 'bearer_token'
+
 export function isExecutedFailure(error: unknown): error is ExecutedFailure {
   return typeof error === 'object' && error !== null && 'reason' in error && 'errorCode' in error
 }
@@ -26,6 +28,15 @@ export function handleAppError(
   else {
     setError({ message: defaultMessage })
   }
+}
+
+export function showErrorNotification(title: string, message: string) {
+  notifications.show({
+    title,
+    message,
+    color: 'red',
+    autoClose: false,
+  })
 }
 
 export function errorNotification(title: string, error: unknown) {
@@ -51,11 +62,7 @@ export function errorNotification(title: string, error: unknown) {
 
   const fullTitle = code ? `${title} (${code})` : title
 
-  notifications.show({
-    title: fullTitle,
-    message,
-    color: 'red',
-  })
+  showErrorNotification(fullTitle, message || '')
 }
 
 export function jsonStringifyIndented(json: unknown) {
@@ -108,4 +115,16 @@ export function clearUrlParam(param: string) {
     url.searchParams.delete(param)
     window.history.replaceState({}, document.title, url.toString())
   }
+}
+
+export function removeLocalBearerToken() {
+  localStorage.removeItem(LOCAL_BEARER_TOKEN_KEY)
+}
+
+export function getLocalBearerToken() {
+  return localStorage.getItem(LOCAL_BEARER_TOKEN_KEY)
+}
+
+export function setLocalBearerToken(bearerToken: string) {
+  localStorage.setItem(LOCAL_BEARER_TOKEN_KEY, encodeURIComponent(bearerToken))
 }

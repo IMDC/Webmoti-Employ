@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 import { HttpError } from '@/utils/HttpError'
+import { getLocalBearerToken } from '@/utils/utils'
 import { SessionsGetResponse } from './schema'
 
 interface CreateArgs {
@@ -34,7 +35,7 @@ async function fetchInterviewSession(
     endpoint = `${import.meta.env.VITE_API_BASE_URL}/sessions/${sessionId}?${params.toString()}`
   }
 
-  const authToken = localStorage.getItem('bearer_token')
+  const authToken = getLocalBearerToken()
   const response = await fetch(endpoint, {
     headers: { Authorization: `Bearer ${authToken}` },
   })

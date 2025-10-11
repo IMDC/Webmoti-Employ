@@ -1,6 +1,7 @@
 import { ProfilesResponse } from '@webmoti-employ/shared'
 import z from 'zod'
 import { HttpError } from '@/utils/HttpError'
+import { getLocalBearerToken } from '@/utils/utils'
 
 export async function resolveProfiles(
   input: {
@@ -8,7 +9,7 @@ export async function resolveProfiles(
     userEmails?: string[]
   },
 ) {
-  const authToken = localStorage.getItem('bearer_token')
+  const authToken = getLocalBearerToken()
   const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/profiles`, {
     method: 'POST',
     headers: {

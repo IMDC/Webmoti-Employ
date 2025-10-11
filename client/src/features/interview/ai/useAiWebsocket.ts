@@ -2,6 +2,7 @@ import type { WebSocketMessage } from '@webmoti-employ/shared'
 import { useCallback } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { logger } from '@/utils/logger'
+import { getLocalBearerToken } from '@/utils/utils'
 import { useRoomName } from '../zoom/useZoomSessionStore'
 
 export function useAiWebsocket() {
@@ -18,7 +19,7 @@ export function useAiWebsocket() {
     readyState,
   } = useWebSocket<WebSocketMessage>(socketUrl, {
     queryParams: {
-      token: encodeURIComponent(localStorage.getItem('bearer_token') ?? ''),
+      token: encodeURIComponent(getLocalBearerToken() ?? ''),
       room: roomName ?? '',
     },
     shouldReconnect: () => true,
