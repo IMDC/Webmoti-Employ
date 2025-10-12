@@ -32,7 +32,12 @@ export function PreviewTile({ height, width, name, profileUrl }: PreviewTileProp
     startMic()
   }, [permissionState, startMicrophone])
 
-  const volume = useVolumeLevel(localAudioTrack?.getCurrentVolume)
+  // wait until track is set
+  const volume = useVolumeLevel(
+    localAudioTrack?.getCurrentVolume
+      ? () => localAudioTrack.getCurrentVolume()
+      : undefined,
+  )
 
   return (
     <ParticipantTile height={height} width={width} name={name} profileUrl={profileUrl} isLoadingProfiles={false}>

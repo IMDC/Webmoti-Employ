@@ -1,5 +1,6 @@
 import type {
   event_device_permission_change,
+  event_network_quality_change,
   event_peer_video_state_change,
   event_video_active_change,
   Participant,
@@ -48,6 +49,7 @@ export interface ZoomSessionStore {
   stream: ReturnType<typeof VideoClient.getMediaStream> | null
   callState: CallState
   participants: Map<number, Participant>
+  networkLevels: Map<number, number>
   // only track local user id and not local participant to avoid stale local participant.
   // we can get the local participant by accessing participants[localUserId].
   localUserId: number | null
@@ -92,13 +94,13 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       newClient.on('device-change', handleDeviceChange)
       newClient.on('device-permission-change', handlePermissionChange)
       newClient.on('video-active-change', handleActiveSpeakerChange)
+      newClient.on('network-quality-change', handleNetworkQualityChange)
 
       // TODO
       // client.on('active-media-failed', );
       // client.on('current-audio-change', );
       // client.on('auto-play-audio-failed', );
       // client.on('video-aspect-ratio-change', );
-      // client.on('network-quality-change', );
       // others... https://developers.zoom.us/docs/video-sdk/web/handle-events/
 
       return newClient
@@ -109,6 +111,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       stream: null,
       callState: 'prejoin',
       participants: new Map(),
+      networkLevels: new Map(),
       localUserId: null,
       activeSpeakerUserId: null,
       isAudioOn: true,
@@ -230,6 +233,8 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           client().off('peer-video-state-change', handlePeerVideoStateChange)
           client().off('device-change', handleDeviceChange)
           client().off('device-permission-change', handlePermissionChange)
+          client().on('video-active-change', handleActiveSpeakerChange)
+          client().on('network-quality-change', handleNetworkQualityChange)
           await ZoomVideo.destroyClient()
           set({ client: null, stream: null, participants: new Map(), localUserId: null, callState: 'prejoin' })
         },
@@ -271,6 +276,19 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
   async function handleDeviceChange() {
     // device was maybe unplugged/plugged in, so re-init all devices
     await deviceStore.getState().actions.initDevices()
+  }
+
+  function handleNetworkQualityChange(payload: Parameters<typeof event_network_quality_change>[0]) {
+    const { userId, level, type } = payload
+
+    // uplink is for outgoing
+    if (type === 'uplink') {
+      zoomSessionStore.setState((state) => {
+        const newMap = new Map(state.networkLevels)
+        newMap.set(userId, level)
+        return { networkLevels: newMap }
+      })
+    }
   }
 
   async function handleActiveSpeakerChange(payload: Parameters<typeof event_video_active_change>[0]) {

@@ -22,3 +22,9 @@ export const useZoomSessionClient = () => useZoomSessionStore(s => s.client)
 export const useLocalUserId = () => useZoomSessionStore(s => s.localUserId)
 export const useActiveSpeakerUserId = () => useZoomSessionStore(s => s.activeSpeakerUserId)
 export const useRoomName = () => useZoomSessionStore(s => s.roomName)
+// subscribe to a single participant’s network level
+export function useParticipantNetworkLevel(userId: number | null) {
+  return useZoomSessionStore(state =>
+    userId != null ? state.networkLevels.get(userId) ?? null : null,
+  )
+}
