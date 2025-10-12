@@ -81,12 +81,14 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       newClient.on('user-removed', handleUserRemoved)
       newClient.on('user-updated', handleUserUpdated)
       newClient.on('peer-video-state-change', handlePeerVideoStateChange)
+      newClient.on('device-change', handleDeviceChange)
+      newClient.on('device-permission-change', handlePermissionChange)
 
       // TODO
-      // client.on('device-change', );
-      // client.on('device-permission-change', );
       // client.on('active-media-failed', );
-      // client.on('active-media-failed', );
+      // client.on('current-audio-change', );
+      // client.on('auto-play-audio-failed', );
+      // client.on('video-aspect-ratio-change', );
       // client.on('network-quality-change', );
       // others... https://developers.zoom.us/docs/video-sdk/web/handle-events/
 
@@ -216,6 +218,8 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           client().off('user-removed', handleUserRemoved)
           client().off('user-updated', handleUserUpdated)
           client().off('peer-video-state-change', handlePeerVideoStateChange)
+          client().off('device-change', handleDeviceChange)
+          client().off('device-permission-change', handlePermissionChange)
           await ZoomVideo.destroyClient()
           set({ client: null, stream: null, participants: new Map(), localUserId: null, callState: 'prejoin' })
         },
@@ -230,7 +234,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
   function updateParticipants() {
     const client = zoomSessionStore.getState().client
     if (!client) {
-      logger.warn('Couldn\'t update participants, client is not initialized')
+      logger.warn('Could not update participants, client is not initialized')
       return
     }
 
@@ -252,6 +256,40 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       logger.log(`${user.userId} left the session.`)
     })
     updateParticipants()
+  }
+
+  async function handleDeviceChange() {
+    // device was maybe unplugged/plugged in, so re-init all devices
+    await deviceStore.getState().actions.initDevices()
+  }
+
+  function handlePermissionChange(payload: {
+    name: 'microphone' | 'camera'
+    state: 'denied' | 'granted' | 'prompt'
+  }) {
+    /**
+     * name contains 'microphone' or 'camera'
+     * state contains 'denied', 'granted' or 'prompt'
+     */
+    const { name, state } = payload
+
+    const setPermissionState = appStore.getState().actions.setPermissionState
+    if (state === 'denied') {
+      setPermissionState('denied')
+      if (name === 'camera') {
+        zoomSessionStore.setState({ isVideoOn: false })
+      }
+      else {
+        zoomSessionStore.setState({ isAudioOn: false })
+      }
+    }
+    else if (state === 'granted') {
+      setPermissionState('granted')
+    }
+    else {
+      // prompt
+      setPermissionState('acquiring')
+    }
   }
 
   function handleUserUpdated(payload: Participant[]) {
