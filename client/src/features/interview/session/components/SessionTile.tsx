@@ -38,6 +38,8 @@ export function SessionTile({
     [detachVideoPlayer, participant.userId],
   )
 
+  const isTrackEnabled = participant.audio === 'computer' || participant.audio === 'phone'
+
   return (
     <ParticipantTile
       height={height}
@@ -56,10 +58,12 @@ export function SessionTile({
       )}
 
       <Corner position="bottom-right" yOffset={6} xOffset={8}>
-        <AudioLevelIndicator
-          volume={0}
-          isTrackEnabled={participant.audio === 'computer' || participant.audio === 'phone'}
-        />
+        {!isTrackEnabled && (
+          <AudioLevelIndicator
+            volume={0}
+            isTrackEnabled={false}
+          />
+        )}
       </Corner>
     </ParticipantTile>
   )

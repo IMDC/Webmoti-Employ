@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Corner } from '@/components/Corner'
 import { useLocalAudioTrack, usePreviewActions } from '@/features/interview/prejoin/hooks/usePreviewStore'
 import { useAppPermissionState } from '@/useAppStore'
@@ -6,6 +6,7 @@ import AudioLevelIndicator from '../../components/AudioLevelIndicator'
 import { ParticipantTile } from '../../components/ParticipantTile'
 import { VideoRenderer } from '../../session/components/VideoRenderer'
 import { useIsAudioOn, useIsVideoOn } from '../../zoom/useZoomSessionStore'
+import { useVolumeLevel } from '../hooks/useVolumeLevel'
 
 interface PreviewTileProps {
   height: number
@@ -21,8 +22,6 @@ export function PreviewTile({ height, width, name, profileUrl }: PreviewTileProp
   const isVideoOn = useIsVideoOn()
   const isAudioOn = useIsAudioOn()
 
-  const [volume, setVolume] = useState(0)
-
   useEffect(() => {
     async function startMic() {
       if (permissionState === 'granted') {
@@ -33,19 +32,7 @@ export function PreviewTile({ height, width, name, profileUrl }: PreviewTileProp
     startMic()
   }, [permissionState, startMicrophone])
 
-  // polling to update volume indicator
-  useEffect(() => {
-    let interval: number
-    if (localAudioTrack) {
-      interval = window.setInterval(() => {
-        const volume = localAudioTrack.getCurrentVolume()
-        setVolume(volume)
-      }, 200)
-    }
-    return () => {
-      clearInterval(interval)
-    }
-  }, [localAudioTrack])
+  const volume = useVolumeLevel(localAudioTrack?.getCurrentVolume)
 
   return (
     <ParticipantTile height={height} width={width} name={name} profileUrl={profileUrl} isLoadingProfiles={false}>

@@ -38,7 +38,7 @@ export type CallState = 'prejoin' | 'joining' | 'joined' | 'left'
 
 export interface ZoomSessionStore {
   client: typeof VideoClient | null
-  stream: ReturnType<typeof VideoClient['getMediaStream']> | null
+  stream: ReturnType<typeof VideoClient.getMediaStream> | null
   callState: CallState
   participants: Map<number, Participant>
   // only track local user id and not local participant to avoid stale local participant.
