@@ -9,6 +9,7 @@ interface ParticipantTileProps {
   name: string
   profileUrl: string
   isLoadingProfiles: boolean
+  isActiveSpeaker?: boolean
 }
 
 export function ParticipantTile({
@@ -18,6 +19,7 @@ export function ParticipantTile({
   children,
   profileUrl,
   isLoadingProfiles,
+  isActiveSpeaker,
 }: ParticipantTileProps) {
   return (
     <Card
@@ -27,7 +29,14 @@ export function ParticipantTile({
       p={0}
       radius="lg"
       pos="relative"
-      style={{ overflow: 'hidden' }}
+      style={{
+        overflow: 'hidden',
+        // use box shadow instead of border because border takes up space inside the card
+        // and it makes the video slightly smaller
+        boxShadow: isActiveSpeaker
+          ? '0 0 0 3px green'
+          : undefined,
+      }}
     >
       <NoVideoBackground
         profileUrl={profileUrl}

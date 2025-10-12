@@ -1,7 +1,7 @@
 import type { Participant, VideoPlayer } from '@zoom/videosdk'
 import type { Dispatch, SetStateAction } from 'react'
 import { useCallback } from 'react'
-import { useZoomSessionActions } from '@/features/interview/zoom/useZoomSessionStore'
+import { useActiveSpeakerUserId, useZoomSessionActions } from '@/features/interview/zoom/useZoomSessionStore'
 import { Corner } from '../../../../components/Corner'
 import AudioLevelIndicator from '../../components/AudioLevelIndicator'
 import { ParticipantTile } from '../../components/ParticipantTile'
@@ -40,6 +40,8 @@ export function SessionTile({
 
   const isTrackEnabled = participant.audio === 'computer' || participant.audio === 'phone'
 
+  const activeSpeakerId = useActiveSpeakerUserId()
+
   return (
     <ParticipantTile
       height={height}
@@ -47,6 +49,7 @@ export function SessionTile({
       name={name}
       profileUrl={profileUrl}
       isLoadingProfiles={isLoadingProfiles}
+      isActiveSpeaker={activeSpeakerId === participant.userId && isTrackEnabled}
     >
       {participant.bVideoOn && (
         <VideoRenderer
