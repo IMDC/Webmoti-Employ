@@ -296,8 +296,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
 
     if (state === VideoActiveState.Active) {
       zoomSessionStore.setState({ activeSpeakerUserId: userId })
-    }
-    else {
+    } else if (state === VideoActiveState.Inactive) {
       zoomSessionStore.setState({ activeSpeakerUserId: null })
     }
   }
