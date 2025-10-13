@@ -233,8 +233,8 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           client().off('peer-video-state-change', handlePeerVideoStateChange)
           client().off('device-change', handleDeviceChange)
           client().off('device-permission-change', handlePermissionChange)
-          client().on('video-active-change', handleActiveSpeakerChange)
-          client().on('network-quality-change', handleNetworkQualityChange)
+          client().off('video-active-change', handleActiveSpeakerChange)
+          client().off('network-quality-change', handleNetworkQualityChange)
           await ZoomVideo.destroyClient()
           set({ client: null, stream: null, participants: new Map(), localUserId: null, callState: 'prejoin' })
         },
