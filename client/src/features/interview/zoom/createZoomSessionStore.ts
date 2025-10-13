@@ -1,7 +1,15 @@
-import type { Participant, VideoClient, VideoPlayer } from '@zoom/videosdk'
+import type {
+  event_device_permission_change,
+  event_network_quality_change,
+  event_peer_video_state_change,
+  event_video_active_change,
+  Participant,
+  VideoClient,
+  VideoPlayer,
+} from '@zoom/videosdk'
 import type { StoreApi } from 'zustand'
 import type { DeviceStore } from './createDeviceStore'
-import ZoomVideo, { VideoQuality } from '@zoom/videosdk'
+import ZoomVideo, { VideoActiveState, VideoQuality } from '@zoom/videosdk'
 import { createStore } from 'zustand'
 import { appStore } from '@/useAppStore'
 import { logger } from '@/utils/logger'
@@ -38,12 +46,14 @@ export type CallState = 'prejoin' | 'joining' | 'joined' | 'left'
 
 export interface ZoomSessionStore {
   client: typeof VideoClient | null
-  stream: ReturnType<typeof VideoClient['getMediaStream']> | null
+  stream: ReturnType<typeof VideoClient.getMediaStream> | null
   callState: CallState
   participants: Map<number, Participant>
+  networkLevels: Map<number, number>
   // only track local user id and not local participant to avoid stale local participant.
   // we can get the local participant by accessing participants[localUserId].
   localUserId: number | null
+  activeSpeakerUserId: number | null
   roomName: string | null
   isAudioOn: boolean
   isVideoOn: boolean
@@ -83,13 +93,14 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       newClient.on('peer-video-state-change', handlePeerVideoStateChange)
       newClient.on('device-change', handleDeviceChange)
       newClient.on('device-permission-change', handlePermissionChange)
+      newClient.on('video-active-change', handleActiveSpeakerChange)
+      newClient.on('network-quality-change', handleNetworkQualityChange)
 
       // TODO
       // client.on('active-media-failed', );
       // client.on('current-audio-change', );
       // client.on('auto-play-audio-failed', );
       // client.on('video-aspect-ratio-change', );
-      // client.on('network-quality-change', );
       // others... https://developers.zoom.us/docs/video-sdk/web/handle-events/
 
       return newClient
@@ -100,7 +111,9 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       stream: null,
       callState: 'prejoin',
       participants: new Map(),
+      networkLevels: new Map(),
       localUserId: null,
+      activeSpeakerUserId: null,
       isAudioOn: true,
       isVideoOn: true,
       roomName: null,
@@ -220,8 +233,10 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           client().off('peer-video-state-change', handlePeerVideoStateChange)
           client().off('device-change', handleDeviceChange)
           client().off('device-permission-change', handlePermissionChange)
+          client().off('video-active-change', handleActiveSpeakerChange)
+          client().off('network-quality-change', handleNetworkQualityChange)
           await ZoomVideo.destroyClient()
-          set({ client: null, stream: null, participants: new Map(), localUserId: null, callState: 'prejoin' })
+          set({ client: null, stream: null, participants: new Map(), localUserId: null, callState: 'prejoin', networkLevels: new Map(), activeSpeakerUserId: null })
         },
       },
     }
@@ -263,10 +278,31 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
     await deviceStore.getState().actions.initDevices()
   }
 
-  function handlePermissionChange(payload: {
-    name: 'microphone' | 'camera'
-    state: 'denied' | 'granted' | 'prompt'
-  }) {
+  function handleNetworkQualityChange(payload: Parameters<typeof event_network_quality_change>[0]) {
+    const { userId, level, type } = payload
+
+    // uplink is for outgoing
+    if (type === 'uplink') {
+      zoomSessionStore.setState((state) => {
+        const newMap = new Map(state.networkLevels)
+        newMap.set(userId, level)
+        return { networkLevels: newMap }
+      })
+    }
+  }
+
+  async function handleActiveSpeakerChange(payload: Parameters<typeof event_video_active_change>[0]) {
+    const { state, userId } = payload
+
+    if (state === VideoActiveState.Active) {
+      zoomSessionStore.setState({ activeSpeakerUserId: userId })
+    }
+    else if (state === VideoActiveState.Inactive) {
+      zoomSessionStore.setState({ activeSpeakerUserId: null })
+    }
+  }
+
+  function handlePermissionChange(payload: Parameters<typeof event_device_permission_change>[0]) {
     /**
      * name contains 'microphone' or 'camera'
      * state contains 'denied', 'granted' or 'prompt'
@@ -299,8 +335,9 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
     updateParticipants()
   }
 
-  function handlePeerVideoStateChange({ userId, action }: { userId: number, action: string }) {
+  function handlePeerVideoStateChange(payload: Parameters<typeof event_peer_video_state_change>[0]) {
     logger.log('peer video state change')
+    const { userId, action } = payload
 
     const { stream, actions } = zoomSessionStore.getState()
     if (!stream)

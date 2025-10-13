@@ -13,7 +13,6 @@ import {
 } from '@/features/interview/zoom/useZoomSessionStore'
 import { useAppPermissionState } from '@/useAppStore'
 import { GALLERY_VIEW_MARGIN } from '@/utils/constants'
-import { isElectron } from '@/utils/utils'
 import { CaptionsArea } from '../ai/CaptionsArea'
 import { useTranscription } from '../ai/useTranscription'
 import { Chat } from '../chat/Chat'
@@ -119,14 +118,12 @@ export function Room() {
           {/* chat takes up full width when open on mobile */}
           {!(isMobile && isChatOpen) && (
             <Stack w="100%" gap={0}>
-              {isElectron() && (
-                <Box
-                  w="100%"
-                  h="12%"
-                >
-                  <FeedbackArea />
-                </Box>
-              )}
+              <Box
+                w="100%"
+                h="12%"
+              >
+                <FeedbackArea />
+              </Box>
 
               <Flex
                 ref={participantStageRef}

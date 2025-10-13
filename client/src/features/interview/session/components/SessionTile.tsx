@@ -1,9 +1,15 @@
 import type { Participant, VideoPlayer } from '@zoom/videosdk'
 import type { Dispatch, SetStateAction } from 'react'
+import { Box, Group } from '@mantine/core'
 import { useCallback } from 'react'
-import { useZoomSessionActions } from '@/features/interview/zoom/useZoomSessionStore'
+import {
+  useActiveSpeakerUserId,
+  useParticipantNetworkLevel,
+  useZoomSessionActions,
+} from '@/features/interview/zoom/useZoomSessionStore'
 import { Corner } from '../../../../components/Corner'
 import AudioLevelIndicator from '../../components/AudioLevelIndicator'
+import NetworkQualityIndicator from '../../components/NetworkQualityIndicator'
 import { ParticipantTile } from '../../components/ParticipantTile'
 import { VideoRenderer } from './VideoRenderer'
 
@@ -38,6 +44,12 @@ export function SessionTile({
     [detachVideoPlayer, participant.userId],
   )
 
+  const isTrackEnabled = participant.audio === 'computer' || participant.audio === 'phone'
+
+  const activeSpeakerId = useActiveSpeakerUserId()
+
+  const networkLevel = useParticipantNetworkLevel(participant.userId)
+
   return (
     <ParticipantTile
       height={height}
@@ -45,6 +57,7 @@ export function SessionTile({
       name={name}
       profileUrl={profileUrl}
       isLoadingProfiles={isLoadingProfiles}
+      isActiveSpeaker={activeSpeakerId === participant.userId && isTrackEnabled}
     >
       {participant.bVideoOn && (
         <VideoRenderer
@@ -55,11 +68,21 @@ export function SessionTile({
         />
       )}
 
-      <Corner position="bottom-right" yOffset={6} xOffset={8}>
-        <AudioLevelIndicator
-          volume={0}
-          isTrackEnabled={participant.audio === 'computer' || participant.audio === 'phone'}
-        />
+      <Corner position="bottom-right" yOffset={8} xOffset={12}>
+        <Group gap="xs" align="end">
+          {!isTrackEnabled && (
+            <AudioLevelIndicator
+              volume={0}
+              isTrackEnabled={false}
+            />
+          )}
+
+          {/* container to vertically center the network indicator with the audio one */}
+          <Box h={20}>
+            <NetworkQualityIndicator level={networkLevel} />
+          </Box>
+        </Group>
+
       </Corner>
     </ParticipantTile>
   )

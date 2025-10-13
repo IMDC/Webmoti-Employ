@@ -5,7 +5,6 @@ import {
   IconMaximize,
   IconMenu2,
   IconMinimize,
-  IconScreenShare,
   IconSettings,
 } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
@@ -52,8 +51,6 @@ export function ControlsMenu({ onLayoutOpen, isMobile }: ControlsMenuProps) {
         <Menu.Item leftSection={<IconLayoutGrid size={14} />} onClick={onLayoutOpen}>
           Layout
         </Menu.Item>
-
-        <Menu.Item leftSection={<IconScreenShare size={14} />}>Share screen</Menu.Item>
 
         <Menu.Item
           leftSection={
