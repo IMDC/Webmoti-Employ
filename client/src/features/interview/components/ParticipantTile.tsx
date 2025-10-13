@@ -1,4 +1,4 @@
-import { Card, Skeleton, Text } from '@mantine/core'
+import { Card, Skeleton, Text, useMantineTheme } from '@mantine/core'
 import { Corner } from '@/components/Corner'
 import { NoVideoBackground } from './NoVideoBackground'
 
@@ -21,6 +21,8 @@ export function ParticipantTile({
   isLoadingProfiles,
   isActiveSpeaker,
 }: ParticipantTileProps) {
+  const theme = useMantineTheme()
+
   return (
     <Card
       h={height}
@@ -34,7 +36,7 @@ export function ParticipantTile({
         // use box shadow instead of border because border takes up space inside the card
         // and it makes the video slightly smaller
         boxShadow: isActiveSpeaker
-          ? '0 0 0 3px green'
+          ? `0 0 0 3px ${theme.colors.green[5]}`
           : undefined,
       }}
     >
