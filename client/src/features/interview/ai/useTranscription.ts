@@ -105,11 +105,14 @@ export function useTranscription(maxWordsBuffer: 5) {
     const wordCount = words.length
 
     if (wordCount - sentWordCount >= maxWordsBuffer) {
-      logger.log('partial transcript:', transcript)
-      sendTranscript(transcript)
-      // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
-      setSentWordCount(wordCount)
-      // don't call reset transcript here since it will interrupt and lose the current word
+      const newWords = words.slice(sentWordCount).join(' ')
+      if (newWords) {
+        logger.log('partial transcript:', newWords)
+        sendTranscript(newWords)
+        // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
+        setSentWordCount(wordCount)
+        // don't call reset transcript here since it will interrupt and lose the current word
+      }
     }
   }, [transcript, sentWordCount, sendTranscript, maxWordsBuffer])
 }
