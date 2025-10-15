@@ -27,7 +27,7 @@ export class AiRoom {
 
     2. Then provide a JSON object with three keys:
       - "detail": null if transcript is a question or irrelevant, false if response to a question lacks detail, true if response provides sufficient detail.
-      - "filler-count": number of filler words (0 if none).
+      - "fillerCount": number of filler words (0 if none).
       - "timer": estimated answer duration in seconds if transcript is a question, null otherwise.
 
     Always output reasoning first, then JSON on a new line.
@@ -43,19 +43,19 @@ export class AiRoom {
 
     Transcript is a greeting:  
     "Hello there."  
-    {"detail": null, "filler-count": 0, "timer": null}
+    {"detail": null, "fillerCount": 0, "timer": null}
 
     Transcript is a question:  
     "Tell me about yourself."  
-    {"detail": null, "filler-count": 0, "timer": 120}
+    {"detail": null, "fillerCount": 0, "timer": 120}
 
     Transcript is a response lacking detail:  
     "I did some projects."  
-    {"detail": false, "filler-count": 0, "timer": null}
+    {"detail": false, "fillerCount": 0, "timer": null}
 
     Transcript is a detailed response:  
     "I led a project on X, faced Y challenge, and achieved Z outcome."  
-    {"detail": true, "filler-count": 0, "timer": null}
+    {"detail": true, "fillerCount": 0, "timer": null}
   `
 
   constructor(state: DurableObjectState) {
@@ -141,9 +141,9 @@ export class AiRoom {
     const notificationMessage: WebSocketMessage = {
       type: 'notification',
       payload: {
-        'detail': notificationResult.data.detail,
-        'timer': notificationResult.data.timer,
-        'filler-count': notificationResult.data['filler-count'],
+        detail: notificationResult.data.detail,
+        timer: notificationResult.data.timer,
+        fillerCount: notificationResult.data.fillerCount,
       },
     }
 

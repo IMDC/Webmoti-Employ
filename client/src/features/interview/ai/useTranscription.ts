@@ -3,9 +3,11 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 import { logger } from '@/utils/logger'
 import { errorNotification } from '@/utils/utils'
 import { useIsAudioOn } from '../zoom/useZoomSessionStore'
-import { useAiWebsocket } from './useAiWebsocket'
 
-export function useTranscription(maxWordsBuffer: 5) {
+export function useTranscription(
+  maxWordsBuffer: 5,
+  sendTranscript: (transcript: string) => void,
+) {
   const isAudioEnabled = useIsAudioOn()
   const {
     resetTranscript,
@@ -21,8 +23,6 @@ export function useTranscription(maxWordsBuffer: 5) {
 
   // track the amount of words sent (useful when partial sending)
   const [sentWordCount, setSentWordCount] = useState(0)
-
-  const { sendTranscript } = useAiWebsocket()
 
   const startTranscribing = useCallback(async () => {
     if (!browserSupportsSpeechRecognition) {

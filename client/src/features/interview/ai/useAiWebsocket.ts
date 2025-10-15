@@ -1,5 +1,6 @@
-import type { WebSocketMessage } from '@webmoti-employ/shared'
-import { useCallback } from 'react'
+import type { NotificationMessage } from '@webmoti-employ/shared'
+import { WebSocketMessage } from '@webmoti-employ/shared'
+import { useCallback, useState } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { logger } from '@/utils/logger'
 import { getLocalBearerToken } from '@/utils/utils'
@@ -7,6 +8,12 @@ import { useRoomName } from '../zoom/useZoomSessionStore'
 
 export function useAiWebsocket() {
   const roomName = useRoomName()
+
+  const [notification, setNotification] = useState<NotificationMessage>({
+    detail: null,
+    fillerCount: null,
+    timer: null,
+  })
 
   const protocol = import.meta.env.DEV ? 'ws' : 'wss'
   const host = import.meta.env.DEV
@@ -24,9 +31,24 @@ export function useAiWebsocket() {
     },
     shouldReconnect: () => true,
     onMessage: (event) => {
+      logger.log('received message!')
       try {
-        const msg = JSON.parse(event.data) as WebSocketMessage
+        const parsed = JSON.parse(event.data)
+        const result = WebSocketMessage.safeParse(parsed)
+        if (!result.success) {
+          logger.warn('Invalid WS message:', result.error)
+          return
+        }
+
+        const msg = result.data
         if (msg.type === 'notification') {
+          setNotification((prev) => {
+            // only update if not null
+            const newPayload = Object.fromEntries(
+              Object.entries(msg.payload).filter(([_, v]) => v !== null),
+            )
+            return { ...prev, ...newPayload }
+          })
           logger.log('Received notification:', msg.payload)
         }
       }
@@ -56,5 +78,6 @@ export function useAiWebsocket() {
 
   return {
     sendTranscript,
+    notification,
   }
 }

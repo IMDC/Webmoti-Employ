@@ -14,6 +14,7 @@ import {
 import { useAppPermissionState } from '@/useAppStore'
 import { GALLERY_VIEW_MARGIN } from '@/utils/constants'
 import { CaptionsArea } from '../ai/CaptionsArea'
+import { useAiWebsocket } from '../ai/useAiWebsocket'
 import { useTranscription } from '../ai/useTranscription'
 import { Chat } from '../chat/Chat'
 import { MenuBar } from '../components/MenuBar'
@@ -31,7 +32,8 @@ export function Room() {
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [isCaptionsAreaOpen, setIsCaptionsAreaOpen] = useState(false)
 
-  useTranscription(5)
+  const { sendTranscript, notification } = useAiWebsocket()
+  useTranscription(5, sendTranscript)
 
   const permissionState = useAppPermissionState()
 
@@ -122,7 +124,7 @@ export function Room() {
                 w="100%"
                 h="12%"
               >
-                <FeedbackArea />
+                <FeedbackArea notification={notification} />
               </Box>
 
               <Flex
