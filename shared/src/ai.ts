@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 export const TranscriptMessage = z.object({
   text: z.string(),
+  status: z.enum(['final', 'partial']),
 })
 
 export const NotificationMessage = z.object({

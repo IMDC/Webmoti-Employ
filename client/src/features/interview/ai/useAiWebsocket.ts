@@ -1,4 +1,4 @@
-import type { NotificationMessage } from '@webmoti-employ/shared'
+import type { NotificationMessage, TranscriptMessage } from '@webmoti-employ/shared'
 import { WebSocketMessage } from '@webmoti-employ/shared'
 import { useCallback, useState } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
@@ -68,12 +68,10 @@ export function useAiWebsocket() {
     }
   }, [readyState, sendJsonMessage])
 
-  const sendTranscript = useCallback((transcript: string) => {
+  const sendTranscript = useCallback((transcript: TranscriptMessage) => {
     const transcriptMsg: WebSocketMessage = {
       type: 'transcript',
-      payload: {
-        text: transcript,
-      },
+      payload: { ...transcript },
     }
     sendWebsocketMessage(transcriptMsg)
   }, [sendWebsocketMessage])

@@ -1,3 +1,4 @@
+import type { TranscriptMessage } from '@webmoti-employ/shared'
 import { useCallback, useEffect, useState } from 'react'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 import { logger } from '@/utils/logger'
@@ -6,7 +7,7 @@ import { useIsAudioOn } from '../zoom/useZoomSessionStore'
 
 export function useTranscription(
   maxWordsBuffer: 5,
-  sendTranscript: (transcript: string) => void,
+  sendTranscript: (transcript: TranscriptMessage) => void,
 ) {
   const isAudioEnabled = useIsAudioOn()
   const {
@@ -91,7 +92,7 @@ export function useTranscription(
       const newWords = words.slice(sentWordCount).join(' ') // only unsent part
       if (newWords) {
         logger.log('final transcript:', newWords)
-        sendTranscript(newWords)
+        sendTranscript({ text: newWords, status: 'final' })
       }
       // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
       setSentWordCount(0)
@@ -108,7 +109,7 @@ export function useTranscription(
       const newWords = words.slice(sentWordCount).join(' ')
       if (newWords) {
         logger.log('partial transcript:', newWords)
-        sendTranscript(newWords)
+        sendTranscript({ text: newWords, status: 'partial' })
         // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
         setSentWordCount(wordCount)
         // don't call reset transcript here since it will interrupt and lose the current word

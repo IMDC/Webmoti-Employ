@@ -9,7 +9,7 @@ export class AiRoom {
   private state: DurableObjectState
   private sessions: Set<WebSocket>
   private messages: ModelMessage[]
-  private heartbeatInterval?: ReturnType<typeof setInterval>
+  private pingInterval?: ReturnType<typeof setInterval>
 
   private generating = false
   private transcriptQueue: string[] = []
@@ -37,6 +37,7 @@ export class AiRoom {
     DO NOT MAKE UP TRANSCRIPTS, JUST NOTIFY WITH NULL IF NOT RELEVANT.
 
     NOTE THAT PARTIAL TRANSCRIPTS MAY BE SENT IN REAL TIME. THE CURRENT TRANSCRIPT MAY BE LINKED TO THE ONES ABOVE.
+    IF A FINAL TRANSCRIPT FOLLOWS A PARTIAL, IT IS A CONTINUATION OF THE PREVIOUS PARTIAL MESSAGE.
 
     For testing, assume both participants use the same transcript.
 
@@ -65,23 +66,23 @@ export class AiRoom {
     this.messages = []
     // add system prompt to beginning of message list
     this.messages.push({ role: 'system', content: this.systemPrompt })
-    this.startHeartbeat()
+    this.startPing()
   }
 
-  private startHeartbeat() {
-    if (this.heartbeatInterval)
+  private startPing() {
+    if (this.pingInterval)
       return
 
-    this.heartbeatInterval = setInterval(() => {
+    this.pingInterval = setInterval(() => {
       const pingMessage: WebSocketMessage = { type: 'ping' }
       this.broadcastMessage(pingMessage)
     }, 5000)
   }
 
-  private stopHeartbeat() {
-    if (this.heartbeatInterval) {
-      clearInterval(this.heartbeatInterval)
-      this.heartbeatInterval = undefined
+  private stopPing() {
+    if (this.pingInterval) {
+      clearInterval(this.pingInterval)
+      this.pingInterval = undefined
     }
   }
 
@@ -96,7 +97,7 @@ export class AiRoom {
     // Accept the connection and add the server-side WebSocket to our session list.
     this.state.acceptWebSocket(server)
     this.sessions.add(server)
-    this.startHeartbeat()
+    this.startPing()
     // console.log(`New WebSocket connection established. Total connections: ${this.sessions.size}`)
     // Return the client-side WebSocket back to the client.
     return new Response(null, { status: 101, webSocket: client })
@@ -183,7 +184,8 @@ export class AiRoom {
       // console.log(`Received message: ${parsedMessage.text}`)
 
       if (websocketMsg.type === 'transcript') {
-        this.transcriptQueue.push(websocketMsg.payload.text)
+        const payload = websocketMsg.payload
+        this.transcriptQueue.push(`${payload.status}: ${payload.text}`)
         // don't await this
         void this.processQueue()
       }
@@ -205,7 +207,7 @@ export class AiRoom {
     console.warn('WebSocket connection closed.')
     this.sessions.delete(ws)
     if (this.sessions.size === 0) {
-      this.stopHeartbeat()
+      this.stopPing()
     }
     // console.log(`Total connections remaining: ${this.sessions.size}`)
   }
