@@ -10,6 +10,9 @@ export class AiRoom {
   private sessions: Set<WebSocket>
   private messages: ModelMessage[]
 
+  private generating = false
+  private transcriptQueue: string[] = []
+
   private model = groq('meta-llama/llama-4-scout-17b-16e-instruct')
 
   private systemPrompt = `
@@ -27,7 +30,12 @@ export class AiRoom {
       - "filler-count": number of filler words (0 if none).
       - "timer": estimated answer duration in seconds if transcript is a question, null otherwise.
 
-    Always output reasoning first, then JSON on a new line.  
+    Always output reasoning first, then JSON on a new line.
+    NEVER ACT AS A LANGUAGE MODEL AND ADDRESS THE USER. ONLY PROVIDE REASONING THEN JSON.
+    EVEN IF THE TRANSCRIPT SEEMS IRRELEVANT TO THE INTERVIEW!
+    DO NOT MAKE UP TRANSCRIPTS, JUST NOTIFY WITH NULL IF NOT RELEVANT.
+
+    NOTE THAT PARTIAL TRANSCRIPTS MAY BE SENT IN REAL TIME. THE CURRENT TRANSCRIPT MAY BE LINKED TO THE ONES ABOVE.
 
     For testing, assume both participants use the same transcript.
 
@@ -54,7 +62,6 @@ export class AiRoom {
     this.state = state
     this.sessions = new Set()
     this.messages = []
-
     // add system prompt to beginning of message list
     this.messages.push({ role: 'system', content: this.systemPrompt })
   }
@@ -67,22 +74,12 @@ export class AiRoom {
     }
 
     const { 0: client, 1: server } = new WebSocketPair()
-
     // Accept the connection and add the server-side WebSocket to our session list.
     this.state.acceptWebSocket(server)
     this.sessions.add(server)
-
     // console.log(`New WebSocket connection established. Total connections: ${this.sessions.size}`)
-
     // Return the client-side WebSocket back to the client.
     return new Response(null, { status: 101, webSocket: client })
-  }
-
-  async broadcastMessage(message: string) {
-    // Broadcast to all connected clients in the room.
-    this.sessions.forEach((session) => {
-      session.send(message)
-    })
   }
 
   async aiGenerateText() {
@@ -98,24 +95,43 @@ export class AiRoom {
     return responseText
   }
 
-  getResponseObject(response: string) {
-    // match first {...} JSON block
-    const match = response.match(/\{[\s\S]*\}/)
-    if (!match) {
-      throw new Error('No JSON found in response')
-    }
+  private async processQueue() {
+    if (this.generating || this.transcriptQueue.length === 0)
+      return
 
-    return JSON.parse(match[0])
-  }
+    this.generating = true
 
-  async handleTranscript(transcript: string) {
-    // TODO same for here as above
+    // combine all queued transcripts into one message
+    const transcript = this.transcriptQueue.join(' ')
+    this.transcriptQueue = [] // clear the queue immediately
     // eslint-disable-next-line no-console
     console.log('Transcript:', transcript)
-    this.messages.push({ role: 'user', content: transcript })
 
-    const response = await this.aiGenerateText()
-    const notificationResult = NotificationMessage.safeParse(this.getResponseObject(response))
+    try {
+      this.messages.push({ role: 'user', content: transcript })
+      const response = await this.aiGenerateText()
+      await this.handleAiResponse(response)
+    }
+    finally {
+      this.generating = false
+      // recursively process any new transcripts that arrived during generation
+      if (this.transcriptQueue.length > 0)
+        await this.processQueue()
+    }
+  }
+
+  private async handleAiResponse(response: string) {
+    function getResponseObject(response: string) {
+    // match first {...} JSON block
+      const match = response.match(/\{[\s\S]*\}/)
+      if (!match) {
+        throw new Error('No JSON found in response')
+      }
+      return JSON.parse(match[0])
+    }
+
+    const notificationResult = NotificationMessage.safeParse(getResponseObject(response))
+
     if (!notificationResult.success) {
       console.error('Failed to parse generated notification:', notificationResult.error)
       console.error('Invalid generation is:', response)
@@ -130,7 +146,9 @@ export class AiRoom {
         'filler-count': notificationResult.data['filler-count'],
       },
     }
-    // console.log('sent notification:', JSON.stringify(notificationMessage))
+
+    // eslint-disable-next-line no-console
+    console.log('Notification:', notificationMessage)
     this.broadcastMessage(JSON.stringify(notificationMessage))
   }
 
@@ -145,12 +163,21 @@ export class AiRoom {
       // console.log(`Received message: ${parsedMessage.text}`)
 
       if (websocketMsg.type === 'transcript') {
-        await this.handleTranscript(websocketMsg.payload.text)
+        this.transcriptQueue.push(websocketMsg.payload.text)
+        // don't await this
+        void this.processQueue()
       }
     }
     catch (e) {
       console.error('Failed to parse message:', e)
     }
+  }
+
+  // Broadcast to all connected clients in the room.
+  async broadcastMessage(message: string) {
+    this.sessions.forEach((session) => {
+      session.send(message)
+    })
   }
 
   // Cleans up a session when a WebSocket connection is closed.
