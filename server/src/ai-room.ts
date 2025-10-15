@@ -168,8 +168,6 @@ export class AiRoom {
       },
     }
 
-    // eslint-disable-next-line no-console
-    console.log('Notification:', notificationMessage)
     this.broadcastMessage(notificationMessage)
   }
 
