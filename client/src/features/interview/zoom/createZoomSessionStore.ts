@@ -46,6 +46,7 @@ export type CallState = 'prejoin' | 'joining' | 'joined' | 'left'
 
 export interface ZoomSessionStore {
   client: typeof VideoClient | null
+  isInitializing: boolean
   stream: ReturnType<typeof VideoClient.getMediaStream> | null
   callState: CallState
   participants: Map<number, Participant>
@@ -79,6 +80,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
     }
 
     async function createClientAndAttachListeners() {
+      set({ isInitializing: true })
       const newClient = ZoomVideo.createClient()
       set({ client: newClient })
 
@@ -86,6 +88,8 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         patchJsMedia: true,
         leaveOnPageUnload: true,
       })
+
+      set({ isInitializing: false })
 
       newClient.on('user-added', handleUserAdded)
       newClient.on('user-removed', handleUserRemoved)
@@ -108,6 +112,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
 
     return {
       client: null,
+      isInitializing: false,
       stream: null,
       callState: 'prejoin',
       participants: new Map(),
@@ -235,8 +240,17 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           client().off('device-permission-change', handlePermissionChange)
           client().off('video-active-change', handleActiveSpeakerChange)
           client().off('network-quality-change', handleNetworkQualityChange)
+
           await ZoomVideo.destroyClient()
-          set({ client: null, stream: null, participants: new Map(), localUserId: null, callState: 'prejoin', networkLevels: new Map(), activeSpeakerUserId: null })
+          set({
+            client: null,
+            stream: null,
+            participants: new Map(),
+            localUserId: null,
+            callState: 'prejoin',
+            networkLevels: new Map(),
+            activeSpeakerUserId: null,
+          })
         },
       },
     }

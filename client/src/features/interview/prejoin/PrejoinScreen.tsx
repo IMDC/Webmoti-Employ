@@ -7,8 +7,8 @@ import { MyCopyButton } from '@/components/MyCopyButton'
 import { RightHeader } from '@/components/RightHeader'
 import { useUser } from '@/features/auth/hooks/useUserStore'
 import { useDeviceStoreActions } from '@/features/interview/zoom/useDeviceStore'
-import { useAppActions } from '@/useAppStore'
-import { useZoomCallState, useZoomSessionActions } from '../zoom/useZoomSessionStore'
+import { useAppActions, useAppPermissionState } from '@/useAppStore'
+import { useIsZoomInitializing, useZoomCallState, useZoomSessionActions } from '../zoom/useZoomSessionStore'
 import { ErrorScreen } from './components/ErrorScreen'
 import { JoiningScreen } from './components/JoiningScreen'
 import { PrejoinMenuBar } from './components/PrejoinMenuBar'
@@ -21,9 +21,11 @@ export function PrejoinScreen() {
   const { initDevices } = useDeviceStoreActions()
 
   const callState = useZoomCallState()
+  const isInitializing = useIsZoomInitializing()
   const { join, setIsVideoOn, setIsAudioOn } = useZoomSessionActions()
 
   const { setPermissionState } = useAppActions()
+  const permissionState = useAppPermissionState()
 
   const user = useUser()
   const { id: sessionId } = useParams({ strict: false })
@@ -122,6 +124,11 @@ export function PrejoinScreen() {
                 <Text ff="monospace" fz={{ base: 'xs', sm: 'sm', lg: 'lg' }}>{interviewSession.sessionId}</Text>
               </Group>
               <Button
+                // it's very important to disable the button since if the client is still initializing, you can't join
+                // this might still be a bug in the zoom store
+                // Also for some reason you have to wait until permission is finalized,
+                // otherwise client will be null. This is probably a bug.
+                disabled={isInitializing || permissionState === 'acquiring'}
                 onClick={async () =>
                   join(user.name, interviewSession.sessionId, interviewSession.token)}
               >
