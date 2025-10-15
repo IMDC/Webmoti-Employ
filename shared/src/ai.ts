@@ -13,6 +13,7 @@ export const NotificationMessage = z.object({
 export const WebSocketMessage = z.discriminatedUnion('type', [
   z.object({ type: z.literal('transcript'), payload: TranscriptMessage }),
   z.object({ type: z.literal('notification'), payload: NotificationMessage }),
+  z.object({ type: z.literal('ping') }),
 ])
 
 export type WebSocketMessage = z.infer<typeof WebSocketMessage>

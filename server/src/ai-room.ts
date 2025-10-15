@@ -9,6 +9,7 @@ export class AiRoom {
   private state: DurableObjectState
   private sessions: Set<WebSocket>
   private messages: ModelMessage[]
+  private heartbeatInterval?: ReturnType<typeof setInterval>
 
   private generating = false
   private transcriptQueue: string[] = []
@@ -64,6 +65,24 @@ export class AiRoom {
     this.messages = []
     // add system prompt to beginning of message list
     this.messages.push({ role: 'system', content: this.systemPrompt })
+    this.startHeartbeat()
+  }
+
+  private startHeartbeat() {
+    if (this.heartbeatInterval)
+      return
+
+    this.heartbeatInterval = setInterval(() => {
+      const pingMessage: WebSocketMessage = { type: 'ping' }
+      this.broadcastMessage(pingMessage)
+    }, 5000)
+  }
+
+  private stopHeartbeat() {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval)
+      this.heartbeatInterval = undefined
+    }
   }
 
   // Handles all incoming requests. We only care about WebSocket upgrades here.
@@ -77,6 +96,7 @@ export class AiRoom {
     // Accept the connection and add the server-side WebSocket to our session list.
     this.state.acceptWebSocket(server)
     this.sessions.add(server)
+    this.startHeartbeat()
     // console.log(`New WebSocket connection established. Total connections: ${this.sessions.size}`)
     // Return the client-side WebSocket back to the client.
     return new Response(null, { status: 101, webSocket: client })
@@ -149,7 +169,7 @@ export class AiRoom {
 
     // eslint-disable-next-line no-console
     console.log('Notification:', notificationMessage)
-    this.broadcastMessage(JSON.stringify(notificationMessage))
+    this.broadcastMessage(notificationMessage)
   }
 
   // Handles messages received from any connected client.
@@ -174,16 +194,19 @@ export class AiRoom {
   }
 
   // Broadcast to all connected clients in the room.
-  async broadcastMessage(message: string) {
+  async broadcastMessage(message: WebSocketMessage) {
     this.sessions.forEach((session) => {
-      session.send(message)
+      session.send(JSON.stringify(message))
     })
   }
 
   // Cleans up a session when a WebSocket connection is closed.
   async webSocketClose(ws: WebSocket): Promise<void> {
-    // console.log('WebSocket connection closed.')
+    console.warn('WebSocket connection closed.')
     this.sessions.delete(ws)
+    if (this.sessions.size === 0) {
+      this.stopHeartbeat()
+    }
     // console.log(`Total connections remaining: ${this.sessions.size}`)
   }
 

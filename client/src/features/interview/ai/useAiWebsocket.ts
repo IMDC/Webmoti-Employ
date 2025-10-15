@@ -32,6 +32,7 @@ export function useAiWebsocket() {
     shouldReconnect: () => true,
     onMessage: (event) => {
       logger.log('received message!')
+
       try {
         const parsed = JSON.parse(event.data)
         const result = WebSocketMessage.safeParse(parsed)
@@ -58,23 +59,24 @@ export function useAiWebsocket() {
     },
   })
 
-  const sendTranscript = useCallback(
-    (transcript: string) => {
-      if (readyState === ReadyState.OPEN) {
-        const transcriptMsg: WebSocketMessage = {
-          type: 'transcript',
-          payload: {
-            text: transcript,
-          },
-        }
-        sendJsonMessage(transcriptMsg)
-      }
-      else {
-        logger.error('Websocket is not ready to send transcript')
-      }
-    },
-    [sendJsonMessage, readyState],
-  )
+  const sendWebsocketMessage = useCallback((msg: WebSocketMessage) => {
+    if (readyState === ReadyState.OPEN) {
+      sendJsonMessage(msg)
+    }
+    else {
+      logger.error('Websocket is not ready to send transcript')
+    }
+  }, [readyState, sendJsonMessage])
+
+  const sendTranscript = useCallback((transcript: string) => {
+    const transcriptMsg: WebSocketMessage = {
+      type: 'transcript',
+      payload: {
+        text: transcript,
+      },
+    }
+    sendWebsocketMessage(transcriptMsg)
+  }, [sendWebsocketMessage])
 
   return {
     sendTranscript,
