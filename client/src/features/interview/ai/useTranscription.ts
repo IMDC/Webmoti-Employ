@@ -1,11 +1,14 @@
+import type { TranscriptMessage } from '@webmoti-employ/shared'
 import { useCallback, useEffect, useState } from 'react'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 import { logger } from '@/utils/logger'
 import { errorNotification } from '@/utils/utils'
 import { useIsAudioOn } from '../zoom/useZoomSessionStore'
-import { useAiWebsocket } from './useAiWebsocket'
 
-export function useTranscription(maxWordsBuffer: 5) {
+export function useTranscription(
+  maxWordsBuffer: 5,
+  sendTranscript: (transcript: TranscriptMessage) => void,
+) {
   const isAudioEnabled = useIsAudioOn()
   const {
     resetTranscript,
@@ -21,8 +24,6 @@ export function useTranscription(maxWordsBuffer: 5) {
 
   // track the amount of words sent (useful when partial sending)
   const [sentWordCount, setSentWordCount] = useState(0)
-
-  const { sendTranscript } = useAiWebsocket()
 
   const startTranscribing = useCallback(async () => {
     if (!browserSupportsSpeechRecognition) {
@@ -91,7 +92,7 @@ export function useTranscription(maxWordsBuffer: 5) {
       const newWords = words.slice(sentWordCount).join(' ') // only unsent part
       if (newWords) {
         logger.log('final transcript:', newWords)
-        sendTranscript(newWords)
+        sendTranscript({ text: newWords, status: 'final' })
       }
       // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
       setSentWordCount(0)
@@ -105,11 +106,14 @@ export function useTranscription(maxWordsBuffer: 5) {
     const wordCount = words.length
 
     if (wordCount - sentWordCount >= maxWordsBuffer) {
-      logger.log('partial transcript:', transcript)
-      sendTranscript(transcript)
-      // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
-      setSentWordCount(wordCount)
-      // don't call reset transcript here since it will interrupt and lose the current word
+      const newWords = words.slice(sentWordCount).join(' ')
+      if (newWords) {
+        logger.log('partial transcript:', newWords)
+        sendTranscript({ text: newWords, status: 'partial' })
+        // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
+        setSentWordCount(wordCount)
+        // don't call reset transcript here since it will interrupt and lose the current word
+      }
     }
   }, [transcript, sentWordCount, sendTranscript, maxWordsBuffer])
 }

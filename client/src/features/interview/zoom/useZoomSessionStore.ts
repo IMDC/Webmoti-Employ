@@ -28,3 +28,4 @@ export function useParticipantNetworkLevel(userId: number | null) {
     userId != null ? state.networkLevels.get(userId) ?? null : null,
   )
 }
+export const useIsZoomInitializing = () => useZoomSessionStore(s => s.isInitializing)
