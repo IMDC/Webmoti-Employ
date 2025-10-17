@@ -44,7 +44,7 @@ export function SpotlightView({
   const secondaryParticipant = hasRemote ? localParticipant : null
 
   // Use authenticated user ID for local participant profile lookup
-  const mainProfileKey = mainParticipant.userId === localUserId ? user.id : mainParticipant.userId.toString()
+  const mainProfileKey = mainParticipant.userId === localUserId ? user.id : mainParticipant.displayName
   const mainProfile = profiles?.[mainProfileKey]
   const secondaryProfile = secondaryParticipant ? profiles?.[user.id] : null
 
@@ -56,7 +56,7 @@ export function SpotlightView({
         height={height}
         width={width}
         participant={mainParticipant}
-        name={mainParticipant.displayName}
+        name={mainProfile?.displayName || mainParticipant.displayName}
         profileUrl={mainProfile?.profilePic || ''}
         isLoadingProfiles={isLoadingProfiles}
       />
@@ -75,7 +75,7 @@ export function SpotlightView({
             height="100%"
             width="100%"
             participant={secondaryParticipant}
-            name={secondaryParticipant.displayName}
+            name={secondaryProfile?.displayName || secondaryParticipant.displayName}
             profileUrl={secondaryProfile?.profilePic || ''}
             isLoadingProfiles={isLoadingProfiles}
           />

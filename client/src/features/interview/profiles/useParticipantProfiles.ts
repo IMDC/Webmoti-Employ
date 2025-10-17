@@ -5,7 +5,7 @@ import { useProfiles } from './useProfiles'
 export function useParticipantProfiles(participants: Map<number, Participant>) {
   const user = useUser()
   const userIds = Array.from(participants.values())
-    .map(p => p.userId.toString())
+    .map(p => p.displayName)
     .filter(Boolean)
     .sort()
 

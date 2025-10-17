@@ -33,7 +33,7 @@ export function VideoGrid({
     <>
       {Array.from(participants.entries()).map(([userId, participant]) => {
         // Use authenticated user ID for local participant profile lookup
-        const profileKey = userId === localUserId ? user.id : userId.toString()
+        const profileKey = userId === localUserId ? user.id : participant.displayName
         const profile = profiles?.[profileKey]
         return (
           <SessionTile
