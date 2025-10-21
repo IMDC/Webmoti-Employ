@@ -2,6 +2,7 @@ import type { ProfilesResponse } from '@webmoti-employ/shared'
 import type { Participant } from '@zoom/videosdk'
 import type { Dispatch, RefObject, SetStateAction } from 'react'
 import { AspectRatio } from '@mantine/core'
+import { useUser } from '@/features/auth/hooks/useUserStore'
 import { GALLERY_VIEW_ASPECT_RATIO } from '@/utils/constants'
 import { logger } from '@/utils/logger'
 import { useLocalUserId } from '../../zoom/useZoomSessionStore'
@@ -25,6 +26,7 @@ export function SpotlightView({
 }: SpotlightViewProps) {
   const { width, height } = useSingleLayout(containerRef)
   const localUserId = useLocalUserId()
+  const user = useUser()
 
   const localParticipant = localUserId ? participants.get(localUserId) : undefined
   if (!localParticipant) {
@@ -41,12 +43,10 @@ export function SpotlightView({
   const mainParticipant = hasRemote ? remoteParticipants[0] : localParticipant
   const secondaryParticipant = hasRemote ? localParticipant : null
 
-  // Look up profiles using participant.displayName (which contains the database user ID)
-  // The profiles object is keyed by database user IDs, so we can do a direct lookup
-  // Example: profiles["user-id-123"] => { displayName: "John Doe", profilePic: "https://..." }
-  // This works for ALL participants (local and remote) because everyone has their user ID in displayName
-  const mainProfile = profiles?.[mainParticipant.displayName]
-  const secondaryProfile = secondaryParticipant ? profiles?.[secondaryParticipant.displayName] : null
+  // Use authenticated user ID for local participant profile lookup
+  const mainProfileKey = mainParticipant.userId === localUserId ? user.id : mainParticipant.userId.toString()
+  const mainProfile = profiles?.[mainProfileKey]
+  const secondaryProfile = secondaryParticipant ? profiles?.[user.id] : null
 
   return (
     <>
@@ -56,7 +56,7 @@ export function SpotlightView({
         height={height}
         width={width}
         participant={mainParticipant}
-        name={mainProfile?.displayName || mainParticipant.displayName}
+        name={mainParticipant.displayName}
         profileUrl={mainProfile?.profilePic || ''}
         isLoadingProfiles={isLoadingProfiles}
       />
@@ -75,7 +75,7 @@ export function SpotlightView({
             height="100%"
             width="100%"
             participant={secondaryParticipant}
-            name={secondaryProfile?.displayName || secondaryParticipant.displayName}
+            name={secondaryParticipant.displayName}
             profileUrl={secondaryProfile?.profilePic || ''}
             isLoadingProfiles={isLoadingProfiles}
           />

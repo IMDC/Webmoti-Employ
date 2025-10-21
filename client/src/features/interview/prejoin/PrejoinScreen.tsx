@@ -130,7 +130,7 @@ export function PrejoinScreen() {
                 // otherwise client will be null. This is probably a bug.
                 disabled={isInitializing || permissionState === 'acquiring'}
                 onClick={async () =>
-                  join(user.id, interviewSession.sessionId, interviewSession.token)}
+                  join(user.name, interviewSession.sessionId, interviewSession.token)}
               >
                 {`${args.action === 'create' ? 'Start' : 'Join'}`}
               </Button>
