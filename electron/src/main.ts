@@ -20,7 +20,13 @@ const FeedbackSchema = z.array(z.object({
   isActive: z.boolean(),
 }))
 
+const GazeStatsSchema = z.object({
+  gazeOnInterviewerRatio: z.number().min(0).max(1),
+  windowSeconds: z.number().positive(),
+})
+
 let socket: ReturnType<typeof io>
+let lastFeedbackLog = 0
 
 function setupSocket(mainWindow: BrowserWindow) {
   socket = io('http://localhost:65432', {
@@ -44,7 +50,14 @@ function setupSocket(mainWindow: BrowserWindow) {
     }
     const feedback = parsed.data
 
-    // console.log('feedback:', feedback)
+    if (isDev) {
+      const now = Date.now()
+      if (now - lastFeedbackLog > 1000) {
+        // eslint-disable-next-line no-console
+        console.log('Feedback received:', feedback)
+        lastFeedbackLog = now
+      }
+    }
 
     ipcWebContentsSend('feedback', mainWindow.webContents, feedback)
   })
@@ -55,6 +68,23 @@ function setupSocket(mainWindow: BrowserWindow) {
 
   socket.on('connect_error', (error) => {
     console.error('Connection Error:', error.message)
+  })
+
+  socket.on('gaze_stats', (data) => {
+    const parsed = GazeStatsSchema.safeParse(data)
+    if (!parsed.success) {
+      console.error('Invalid gaze_stats payload:', z.flattenError(parsed.error))
+      return
+    }
+    const stats = parsed.data
+    if (isDev) {
+      const now = Date.now()
+      if (now - lastFeedbackLog > 1000) {
+        // eslint-disable-next-line no-console
+        console.log('Gaze stats:', stats)
+      }
+    }
+    ipcWebContentsSend('gazeStats', mainWindow.webContents, stats)
   })
 }
 

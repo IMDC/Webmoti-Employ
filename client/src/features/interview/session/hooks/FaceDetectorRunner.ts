@@ -70,27 +70,39 @@ export class FaceDetectorRunner {
     const scaleX = videoRect.width / videoWidth
     const scaleY = videoRect.height / videoHeight
 
-    const defaultBox = {
-      x: videoRect.left,
-      y: videoRect.top,
+    // Convert element rect to screen pixel coords (account for window position)
+    const winOffsetX = window.screenX || 0
+    const winOffsetY = window.screenY || 0
+    const rectLeftScreen = winOffsetX + videoRect.left
+    const rectTopScreen = winOffsetY + videoRect.top
+
+    const toScreenBox = () => ({
+      x: rectLeftScreen,
+      y: rectTopScreen,
       width: videoRect.width,
       height: videoRect.height,
+    })
+
+    const screenBox = faceBox
+      ? {
+          x: rectLeftScreen + faceBox.originX * scaleX,
+          y: rectTopScreen + faceBox.originY * scaleY,
+          width: faceBox.width * scaleX,
+          height: faceBox.height * scaleY,
+        }
+      : toScreenBox()
+
+    // Normalize to screen [0,1] coordinates to match Tobii on_display_area
+    const screenW = window.screen.width
+    const screenH = window.screen.height
+    const norm = {
+      x: screenBox.x / screenW,
+      y: screenBox.y / screenH,
+      width: screenBox.width / screenW,
+      height: screenBox.height / screenH,
     }
 
-    // the bounding box is screen relative. So (0, 0) is the top left
-    const payload = {
-      found: !!faceBox,
-      boundingBox: faceBox
-        ? {
-            x: videoRect.left + faceBox.originX * scaleX,
-            y: videoRect.top + faceBox.originY * scaleY,
-            width: faceBox.width * scaleX,
-            height: faceBox.height * scaleY,
-          }
-        : defaultBox,
-    }
-
-    window.electron.sendInterviewerCoordinates(payload)
+    window.electron.sendInterviewerCoordinates({ found: !!faceBox, boundingBox: norm })
   }
 
   stop() {

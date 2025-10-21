@@ -18,10 +18,16 @@ declare global {
     boundingBox: FaceDetectionBoundingBox
   }
 
+  interface GazeStats {
+    gazeOnInterviewerRatio: number
+    windowSeconds: number
+  }
+
   interface EventPayloadMapping {
     feedback: Feedback[]
     coordinates: InterviewerCoordinates
     getModelBuffer: ArrayBuffer
+    gazeStats: GazeStats
   }
 
   type UnsubscribeFunction = () => void
@@ -29,6 +35,7 @@ declare global {
   interface Window {
     electron: {
       subscribeToFeedback: (callback: (feedback: Feedback[]) => void) => UnsubscribeFunction
+      subscribeToGazeStats: (callback: (stats: GazeStats) => void) => UnsubscribeFunction
       sendInterviewerCoordinates: (coordinates: InterviewerCoordinates) => void
       getModelBuffer: () => Promise<ArrayBuffer>
     }

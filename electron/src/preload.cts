@@ -7,6 +7,10 @@ electron.contextBridge.exposeInMainWorld('electron', {
     ipcOn('feedback', (feedback) => {
       callback(feedback)
     }),
+  subscribeToGazeStats: callback =>
+    ipcOn('gazeStats', (stats) => {
+      callback(stats)
+    }),
   sendInterviewerCoordinates: coordinates => ipcSend('coordinates', coordinates),
   getModelBuffer: () => ipcInvoke('getModelBuffer'),
 } satisfies Window['electron'])
