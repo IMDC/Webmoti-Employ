@@ -6,7 +6,7 @@ export const ResolvedProfile = z.object({
   // This is important because users may not have profile pictures (e.g., no Google photo)
   // The server returns '' when user.image is null/undefined
   // Without .or(z.literal('')), validation would fail and the entire profile would be rejected
-  profilePic: z.string().url().or(z.literal('')),
+  profilePic: z.url().or(z.literal('')),
 })
 
 // ProfilesResponse is an object keyed by user IDs (strings from database)
