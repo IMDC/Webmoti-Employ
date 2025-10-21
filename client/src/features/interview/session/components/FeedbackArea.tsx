@@ -32,6 +32,7 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
       notLookingTimerRef.current = null
     }
     if (looking || !fixation) {
+      // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
       setShowLookPrompt(false)
       return
     }
@@ -45,7 +46,7 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
         notLookingTimerRef.current = null
       }
     }
-  }, [looking])
+  }, [looking, fixation])
 
   const [currentTimer, setCurrentTimer] = useState<number | null>(timer ?? null)
   const intervalRef = useRef<number | null>(null)
@@ -89,8 +90,15 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
       <Group gap={70}>
         {gazeStats && (
           <Stack align="center" gap={0}>
-            <Text size="xs" fw={500}>{Math.round(gazeStats.gazeOnInterviewerRatio * 100)}% on interviewer</Text>
-            <Text size="xs" c="dimmed">last {gazeStats.windowSeconds}s</Text>
+            <Text size="xs" fw={500}>
+              {Math.round(gazeStats.gazeOnInterviewerRatio * 100)}
+              % on interviewer
+            </Text>
+            <Text size="xs" c="dimmed">
+              last
+              {gazeStats.windowSeconds}
+              s
+            </Text>
           </Stack>
         )}
         <FeedbackIcon

@@ -14,4 +14,3 @@ export function useGazeStats() {
 
   return stats
 }
-
