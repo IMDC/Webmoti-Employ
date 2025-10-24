@@ -8,6 +8,7 @@ import {
   IconHelpHexagonFilled,
 } from '@tabler/icons-react'
 import { useEffect, useRef, useState } from 'react'
+import { useCountdown } from '../hooks/useCountdown'
 import { useFeedback } from '../hooks/useFeedback'
 import { useGazeStats } from '../hooks/useGazeStats'
 
@@ -31,6 +32,17 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
   const NOT_LOOKING_DELAY_MS = 1200
   const gazeStats = useGazeStats()
 
+  const { secondsLeft, startCountdown, stopCountdown } = useCountdown()
+
+  useEffect(() => {
+    if (timer === null) {
+      stopCountdown()
+      return
+    }
+
+    startCountdown(timer)
+  }, [timer, stopCountdown, startCountdown])
+
   useEffect(() => {
     if (notLookingTimerRef.current) {
       clearTimeout(notLookingTimerRef.current)
@@ -52,43 +64,6 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
       }
     }
   }, [looking, fixation])
-
-  const [currentTimer, setCurrentTimer] = useState<number | null>(timer ?? null)
-  const intervalRef = useRef<number | null>(null)
-
-  useEffect(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current)
-      intervalRef.current = null
-    }
-    if (notification.timer == null) {
-      // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
-      setCurrentTimer(null)
-      return
-    }
-
-    // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
-    setCurrentTimer(notification.timer)
-    intervalRef.current = window.setInterval(() => {
-      setCurrentTimer((prev) => {
-        if (prev == null || prev <= 0) {
-          if (intervalRef.current) {
-            clearInterval(intervalRef.current)
-            intervalRef.current = null
-          }
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-        intervalRef.current = null
-      }
-    }
-  }, [notification])
 
   return (
     <Center h="100%">
@@ -113,8 +88,8 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
         />
         <FeedbackIcon
           icon={<IconClockHour4Filled size={iconSize} />}
-          label={currentTimer != null ? String(currentTimer) : ''}
-          isActive={currentTimer != null && currentTimer > 0}
+          label={secondsLeft != null ? String(secondsLeft) : ''}
+          isActive={secondsLeft != null && secondsLeft > 0}
         />
         <FeedbackIcon
           icon={<IconHelpHexagonFilled size={iconSize} />}
