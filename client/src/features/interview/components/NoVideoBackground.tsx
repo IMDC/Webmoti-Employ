@@ -1,4 +1,5 @@
-import { Avatar, Box, Center, Skeleton } from '@mantine/core'
+import { Box, Center, Skeleton } from '@mantine/core'
+import { GoogleAvatar } from '@/components/GoogleAvatar'
 
 interface NoVideoBackgroundProps {
   profileUrl: string
@@ -21,7 +22,7 @@ export function NoVideoBackground({ profileUrl, isLoadingProfiles }: NoVideoBack
       />
       <Center pos="absolute" w="100%" h="100%">
         {!isLoadingProfiles
-          ? <Avatar src={profileUrl} w="15%" h="auto" draggable={false} />
+          ? (<GoogleAvatar src={profileUrl} w="15%" h="auto" />)
           : <Skeleton circle w="15%" h="auto" />}
       </Center>
     </>

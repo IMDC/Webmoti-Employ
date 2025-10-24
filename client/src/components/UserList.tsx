@@ -1,6 +1,7 @@
 import type { InterviewInviteResponse, ProfilesResponse } from '@webmoti-employ/shared'
-import { ActionIcon, Avatar, Group, Popover, Skeleton, Stack, Text } from '@mantine/core'
+import { ActionIcon, Group, Popover, Skeleton, Stack, Text } from '@mantine/core'
 import { IconUserFilled } from '@tabler/icons-react'
+import { GoogleAvatar } from './GoogleAvatar'
 
 interface DisplayUserProps {
   name: string
@@ -12,7 +13,7 @@ function DisplayUser({ name, avatarUrl, isLoading }: DisplayUserProps) {
   return (
     <Skeleton visible={isLoading}>
       <Group>
-        <Avatar src={avatarUrl} size={16} />
+        <GoogleAvatar src={avatarUrl} size={16} />
 
         <Text size="sm" fw={500}>
           {name}
