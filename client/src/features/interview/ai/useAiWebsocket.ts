@@ -31,7 +31,7 @@ export function useAiWebsocket() {
     },
     shouldReconnect: () => true,
     onMessage: (event) => {
-      logger.log('received message!')
+      // logger.log('received message!')
 
       try {
         const parsed = JSON.parse(event.data)
@@ -43,13 +43,14 @@ export function useAiWebsocket() {
 
         const msg = result.data
         if (msg.type === 'notification') {
-          setNotification((prev) => {
-            // only update if not null
-            const newPayload = Object.fromEntries(
-              Object.entries(msg.payload).filter(([_, v]) => v !== null),
-            )
-            return { ...prev, ...newPayload }
-          })
+          setNotification({ ...notification, ...msg.payload })
+          // setNotification((prev) => {
+          //   // only update if not null
+          //   const newPayload = Object.fromEntries(
+          //     Object.entries(msg.payload).filter(([_, v]) => v !== null),
+          //   )
+          //   return { ...prev, ...newPayload }
+          // })
           logger.log('Received notification:', msg.payload)
         }
       }

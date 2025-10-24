@@ -86,32 +86,43 @@ export function useTranscription(
   // }, [transcript])
 
   useEffect(() => {
-    // this sends the final transcript when the user pauses speech for 2 (?) seconds
-    if (finalTranscript) {
-      const words = getWords(finalTranscript)
-      const newWords = words.slice(sentWordCount).join(' ') // only unsent part
-      if (newWords) {
-        logger.log('final transcript:', newWords)
-        sendTranscript({ text: newWords, status: 'final' })
-      }
-      // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
-      setSentWordCount(0)
-      resetTranscript()
+    // handle final transcript when the user stops speaking for 2 seconds
+    if (!finalTranscript) {
+      return
     }
+
+    const words = getWords(finalTranscript)
+    const unsentWords = words.slice(sentWordCount)
+    const textToSend = unsentWords.join(' ')
+
+    if (textToSend) {
+      logger.log('final transcript:', textToSend)
+      sendTranscript({ text: textToSend, status: 'final' })
+    }
+
+    // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
+    setSentWordCount(0)
+    resetTranscript()
   }, [finalTranscript, sentWordCount, resetTranscript, sendTranscript])
 
   useEffect(() => {
-    // this sends the transcript when the transcript has 5 or more words in it
+    // handle partial transcript sending
+    // this sends the transcript when the transcript has maxWordsBuffer + 1 words
+    // this is due to how google speech to text works with isFinal.
+    // since if you're in the process of saying the last word, it will update transcript, but it might not be final
     const words = getWords(transcript)
-    const wordCount = words.length
+    const unsentWordCount = words.length - sentWordCount
 
-    if (wordCount - sentWordCount >= maxWordsBuffer) {
-      const newWords = words.slice(sentWordCount).join(' ')
-      if (newWords) {
-        logger.log('partial transcript:', newWords)
-        sendTranscript({ text: newWords, status: 'partial' })
+    if (unsentWordCount >= maxWordsBuffer + 1) {
+      // send exactly maxWordsBuffer words at a time
+      const nextIndex = sentWordCount + maxWordsBuffer
+      const wordsToSend = words.slice(sentWordCount, nextIndex).join(' ')
+
+      if (wordsToSend) {
+        logger.log('partial transcript:', wordsToSend)
+        sendTranscript({ text: wordsToSend, status: 'partial' })
         // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
-        setSentWordCount(wordCount)
+        setSentWordCount(nextIndex)
         // don't call reset transcript here since it will interrupt and lose the current word
       }
     }
