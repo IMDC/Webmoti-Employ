@@ -1,5 +1,6 @@
-import type { NotificationMessage, TranscriptMessage } from '@webmoti-employ/shared'
-import { WebSocketMessage } from '@webmoti-employ/shared'
+import type { TranscriptMessage } from '@webmoti-employ/shared'
+import { NotificationMessage, WebSocketMessage } from '@webmoti-employ/shared'
+
 import { useCallback, useState } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { logger } from '@/utils/logger'
@@ -9,11 +10,10 @@ import { useRoomName } from '../zoom/useZoomSessionStore'
 export function useAiWebsocket() {
   const roomName = useRoomName()
 
-  const [notification, setNotification] = useState<NotificationMessage>({
-    hint: [],
-    fillerCount: 0,
-    timer: null,
-  })
+  const [notification, setNotification] = useState<NotificationMessage>(
+    // make empty message using defaults
+    NotificationMessage.parse({}),
+  )
 
   const protocol = import.meta.env.DEV ? 'ws' : 'wss'
   const host = import.meta.env.DEV

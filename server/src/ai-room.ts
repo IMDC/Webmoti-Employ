@@ -32,6 +32,7 @@ export class AiRoom {
       - "fillerCount": number of filler words (0 if none, never null).
       - "timer": variable estimated answer duration in seconds if transcript is a question, null otherwise. This timer should vary based on the complexity of the question.
       - "hint": list of hints as described above (always a list, never null). The hints should vary based on the question.
+      - "answered": boolean, true if the candidate has answered the current question meaningfully, false otherwise.
 
     Always output reasoning first, then JSON on a new line.
     NEVER ACT AS A LANGUAGE MODEL AND ADDRESS THE USER. ONLY PROVIDE REASONING THEN JSON.
@@ -176,6 +177,7 @@ export class AiRoom {
         hint: notificationResult.data.hint,
         timer: notificationResult.data.timer,
         fillerCount: notificationResult.data.fillerCount,
+        isQuestionAnswered: notificationResult.data.isQuestionAnswered,
       },
     }
 
