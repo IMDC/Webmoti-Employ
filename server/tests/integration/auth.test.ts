@@ -2,9 +2,15 @@ import { env } from 'cloudflare:test'
 import { describe, expect, it } from 'vitest'
 import app from '../../src'
 
+// Add minimal test environment configuration
+const testEnv = {
+  ...env,
+  CORS_ORIGIN: 'http://localhost:5173',
+}
+
 export function protectedRouteTest(path: string, method: string = 'GET') {
   it(`returns 401 for unauthenticated ${method} to ${path}`, async () => {
-    const res = await app.request(path, { method }, env)
+    const res = await app.request(path, { method }, testEnv)
     expect(res.status).toBe(401)
   })
 }
@@ -22,7 +28,7 @@ describe('/interviews POST route', () => protectedRouteTest('/interviews', 'POST
 
 describe('/auth route', () => {
   it('allows unauthenticated access to /auth', async () => {
-    const res = await app.request('/auth', {}, env)
+    const res = await app.request('/auth', {}, testEnv)
     expect(res.status).not.toBe(401)
   })
 })
