@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { DateTime } from 'luxon'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   formatAppError,
   getFirstName,
@@ -134,7 +134,7 @@ describe('utility functions', () => {
       })
 
       it('should return null if token is expired', async () => {
-        const { setLocalBearerToken, getLocalBearerToken } = await import('../utils')
+        const { getLocalBearerToken } = await import('../utils')
 
         // Mock an expired token by manually setting it with old expiry
         const expiredDate = DateTime.now().minus({ days: 8 }).toISO()

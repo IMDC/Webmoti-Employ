@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { HttpError, isHttpError } from '../HttpError'
 
-describe('HttpError', () => {
+describe('httpError', () => {
   it('should create an HttpError with message and status', () => {
     const error = new HttpError('Not found', 404)
 

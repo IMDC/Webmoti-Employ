@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest'
 import { jwtVerify } from 'jose'
+import { describe, expect, it } from 'vitest'
 import { generateZoomApiJwt, generateZoomVideoJwt } from '../../src/routes/sessions/jwt'
 
-describe('JWT generation', () => {
+describe('jwt generation', () => {
   describe('generateZoomApiJwt', () => {
     it('should generate a valid Zoom API JWT', async () => {
       const apiKey = 'test-api-key'
