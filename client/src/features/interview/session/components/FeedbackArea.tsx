@@ -1,5 +1,6 @@
 import type { NotificationMessage } from '@webmoti-employ/shared'
-import { Center, Group, Stack, Text } from '@mantine/core'
+import { Center, Group, Stack, Text, useMantineTheme } from '@mantine/core'
+import { useMediaQuery } from '@mantine/hooks'
 import {
   IconBubbleTextFilled,
   IconClockHour4Filled,
@@ -15,6 +16,10 @@ interface FeedbackAreaProps {
 }
 
 export function FeedbackArea({ notification }: FeedbackAreaProps) {
+  const theme = useMantineTheme()
+  const isXL = useMediaQuery(`(min-width: ${theme.breakpoints.xl})`)
+  const iconSize = isXL ? 48 : 24
+
   const feedback = useFeedback()
 
   const { hint, timer, fillerCount } = notification
@@ -102,22 +107,22 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
           </Stack>
         )}
         <FeedbackIcon
-          icon={<IconEyeCheck size={24} />}
+          icon={<IconEyeCheck size={iconSize} />}
           label="Look at Interviewer"
           isActive={showLookPrompt}
         />
         <FeedbackIcon
-          icon={<IconClockHour4Filled size={24} />}
+          icon={<IconClockHour4Filled size={iconSize} />}
           label={currentTimer != null ? String(currentTimer) : ''}
           isActive={currentTimer != null && currentTimer > 0}
         />
         <FeedbackIcon
-          icon={<IconHelpHexagonFilled size={24} />}
+          icon={<IconHelpHexagonFilled size={iconSize} />}
           label={hint.join(', ')}
           isActive={hint.length > 0}
         />
         <FeedbackIcon
-          icon={<IconBubbleTextFilled size={24} />}
+          icon={<IconBubbleTextFilled size={iconSize} />}
           label={`${fillerCount} Filler Words`}
           isActive={fillerCount != null && fillerCount > 0}
         />
@@ -138,7 +143,7 @@ function FeedbackIcon({ icon, label, isActive }: {
   return (
     <Stack align="center" gap={0}>
       {icon}
-      <Text size="xs" c="dimmed">{label}</Text>
+      <Text fz={{ base: 'sm', xl: 'lg' }} c="dimmed" fw="bold">{label}</Text>
     </Stack>
   )
 }

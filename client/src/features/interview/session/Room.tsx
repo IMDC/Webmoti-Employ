@@ -122,7 +122,7 @@ export function Room() {
             <Stack w="100%" gap={0}>
               <Box
                 w="100%"
-                h="12%"
+                h={{ base: '12%', xl: '15%' }}
               >
                 <FeedbackArea notification={notification} />
               </Box>
