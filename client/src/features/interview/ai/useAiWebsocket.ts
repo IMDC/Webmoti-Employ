@@ -43,14 +43,12 @@ export function useAiWebsocket() {
 
         const msg = result.data
         if (msg.type === 'notification') {
-          setNotification({ ...notification, ...msg.payload })
-          // setNotification((prev) => {
-          //   // only update if not null
-          //   const newPayload = Object.fromEntries(
-          //     Object.entries(msg.payload).filter(([_, v]) => v !== null),
-          //   )
-          //   return { ...prev, ...newPayload }
-          // })
+          setNotification((prev) => {
+            const newPayload = Object.fromEntries(
+              Object.entries(msg.payload).filter(([_, v]) => v !== null),
+            )
+            return { ...prev, ...newPayload }
+          })
           logger.log('Received notification:', msg.payload)
         }
       }
