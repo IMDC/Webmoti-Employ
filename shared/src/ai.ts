@@ -6,9 +6,9 @@ export const TranscriptMessage = z.object({
 })
 
 export const NotificationMessage = z.object({
-  detail: z.optional(z.boolean().nullable()),
-  timer: z.optional(z.number().nullable()),
-  fillerCount: z.optional(z.number().nullable()),
+  hint: z.array(z.string()),
+  timer: z.number().nullable(),
+  fillerCount: z.number(),
 })
 
 export const WebSocketMessage = z.discriminatedUnion('type', [

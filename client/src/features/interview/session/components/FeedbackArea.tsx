@@ -17,7 +17,7 @@ interface FeedbackAreaProps {
 export function FeedbackArea({ notification }: FeedbackAreaProps) {
   const feedback = useFeedback()
 
-  const { detail, timer, fillerCount } = notification
+  const { hint, timer, fillerCount } = notification
 
   const looking = feedback.find(f => f.feedbackType === 'lookingAtInterviewer')?.isActive
   const [showLookPrompt, setShowLookPrompt] = useState(false)
@@ -113,8 +113,8 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
         />
         <FeedbackIcon
           icon={<IconHelpHexagonFilled size={24} />}
-          label="More Detail"
-          isActive={detail === false}
+          label={hint.join(', ')}
+          isActive={hint.length > 0}
         />
         <FeedbackIcon
           icon={<IconBubbleTextFilled size={24} />}

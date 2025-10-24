@@ -23,13 +23,15 @@ export class AiRoom {
 
     1. Provide 1-2 concise sentences explaining the reasoning for the notification.  
       - Reasoning is based only on the transcript content.  
-      - Ignore greetings or small talk; do not invent roles.  
-      - Only responses to questions are evaluated for "detail". Questions themselves do not trigger "detail".
+      - Ignore greetings or small talk; do not invent roles.
+      - If the interviewer is asking for a definition, provide two 1-word hints.
+      - If the interviewer is asking for an example question, provide ["provide one example"].
+      - Otherwise, hint is [].
 
-    2. Then provide a JSON object with three keys:
-      - "detail": null if transcript is a question or irrelevant, false if response to a question lacks detail, true if response provides sufficient detail.
-      - "fillerCount": number of filler words (0 if none).
-      - "timer": estimated answer duration in seconds if transcript is a question, null otherwise.
+    2. Then provide a JSON object with these keys always:
+      - "fillerCount": number of filler words (0 if none, never null).
+      - "timer": variable estimated answer duration in seconds if transcript is a question, null otherwise. This timer should vary based on the complexity of the question.
+      - "hint": list of hints as described above (always a list, never null). The hints should vary based on the question.
 
     Always output reasoning first, then JSON on a new line.
     NEVER ACT AS A LANGUAGE MODEL AND ADDRESS THE USER. ONLY PROVIDE REASONING THEN JSON.
@@ -45,19 +47,27 @@ export class AiRoom {
 
     Transcript is a greeting:  
     "Hello there."  
-    {"detail": null, "fillerCount": 0, "timer": null}
+    {"timer": null, "hint": [], "fillerCount": 0}
 
     Transcript is a question:  
     "Tell me about yourself."  
-    {"detail": null, "fillerCount": 0, "timer": 120}
+    {"timer": 60, "hint": [], "fillerCount": 0}
 
-    Transcript is a response lacking detail:  
-    "I did some projects."  
-    {"detail": false, "fillerCount": 0, "timer": null}
+    Transcript is a question asking for a definition:
+    "What is polymorphism?"
+    {"timer": 45, "hint": ["object", "behavior"], "fillerCount": 0}
 
-    Transcript is a detailed response:  
-    "I led a project on X, faced Y challenge, and achieved Z outcome."  
-    {"detail": true, "fillerCount": 0, "timer": null}
+    Transcript is a response:
+    "I led a project on X and achieved Z outcome."
+    {"timer": null, "hint": [], "fillerCount": 0}
+
+    Transcript is a general question:
+    "Tell me about your project."
+    {"timer": 120, "hint": [], "fillerCount": 0}
+
+    Transcript is a question asking for an example:
+    "Tell me about a time when you resolved a conflict."
+    {"timer": 120, "hint": ["provide one example"], "fillerCount": 0}
   `
 
   constructor(state: DurableObjectState) {
@@ -162,7 +172,7 @@ export class AiRoom {
     const notificationMessage: WebSocketMessage = {
       type: 'notification',
       payload: {
-        detail: notificationResult.data.detail,
+        hint: notificationResult.data.hint,
         timer: notificationResult.data.timer,
         fillerCount: notificationResult.data.fillerCount,
       },

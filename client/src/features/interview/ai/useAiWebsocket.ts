@@ -10,8 +10,8 @@ export function useAiWebsocket() {
   const roomName = useRoomName()
 
   const [notification, setNotification] = useState<NotificationMessage>({
-    detail: null,
-    fillerCount: null,
+    hint: [],
+    fillerCount: 0,
     timer: null,
   })
 
