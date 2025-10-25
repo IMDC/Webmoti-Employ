@@ -29,7 +29,7 @@ export class AiRoom {
       - Otherwise, hint is [].
 
     2. Then provide a JSON object with these keys always:
-      - "fillerCount": number of filler words (0 if none, never null).
+      - "fillerCount": number of filler words for this topic (0 if none, never null).
       - "timer": variable estimated answer duration in seconds if transcript is a question, null otherwise. This timer should vary based on the complexity of the question.
       - "hint": list of hints as described above (always a list, never null). The hints should vary based on the question and stay until the question starts to be answered properly.
       - "newTopic": boolean, true if the interviewer has started a new topic/question, false otherwise.
@@ -187,12 +187,7 @@ export class AiRoom {
 
     const notificationMessage: WebSocketMessage = {
       type: 'notification',
-      payload: {
-        hint: notificationResult.data.hint,
-        timer: notificationResult.data.timer,
-        fillerCount: notificationResult.data.fillerCount,
-        newTopic: notificationResult.data.newTopic,
-      },
+      payload: notificationResult.data,
     }
 
     this.broadcastMessage(notificationMessage)

@@ -39,16 +39,16 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
     if (newTopic && timer === null) {
       logger.log('Stopping timer because null and new topic')
       stopCountdown()
-      return
     }
+  }, [timer, stopCountdown, newTopic])
 
+  useEffect(() => {
     if (timer === null) {
       return
     }
-
-    logger.log(`Starting ${timer}s timer`)
+    logger.log(`Starting ${timer}s countdown`)
     startCountdown(timer)
-  }, [timer, stopCountdown, startCountdown, newTopic])
+  }, [timer, startCountdown])
 
   useEffect(() => {
     if (notLookingTimerRef.current) {
