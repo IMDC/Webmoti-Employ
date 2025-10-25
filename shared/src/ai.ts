@@ -9,7 +9,7 @@ export const NotificationMessage = z.object({
   hint: z.array(z.string()).default([]),
   timer: z.number().nullable().default(null),
   fillerCount: z.number().default(0),
-  isQuestionAnswered: z.boolean().default(false),
+  newTopic: z.boolean().default(false),
 })
 
 export const WebSocketMessage = z.discriminatedUnion('type', [

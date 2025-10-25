@@ -31,8 +31,8 @@ export class AiRoom {
     2. Then provide a JSON object with these keys always:
       - "fillerCount": number of filler words (0 if none, never null).
       - "timer": variable estimated answer duration in seconds if transcript is a question, null otherwise. This timer should vary based on the complexity of the question.
-      - "hint": list of hints as described above (always a list, never null). The hints should vary based on the question.
-      - "answered": boolean, true if the candidate has answered the current question meaningfully, false otherwise.
+      - "hint": list of hints as described above (always a list, never null). The hints should vary based on the question and stay until the question starts to be answered properly.
+      - "newTopic": boolean, true if the interviewer has moved on to the next topic/question, false otherwise.
 
     Always output reasoning first, then JSON on a new line.
     NEVER ACT AS A LANGUAGE MODEL AND ADDRESS THE USER. ONLY PROVIDE REASONING THEN JSON.
@@ -40,34 +40,50 @@ export class AiRoom {
     DO NOT MAKE UP TRANSCRIPTS, JUST NOTIFY WITH NULL IF NOT RELEVANT.
 
     NOTE THAT PARTIAL TRANSCRIPTS MAY BE SENT IN REAL TIME. THE CURRENT TRANSCRIPT MAY BE LINKED TO THE ONES ABOVE.
-    IF A FINAL TRANSCRIPT FOLLOWS A PARTIAL, IT IS A CONTINUATION OF THE PREVIOUS PARTIAL MESSAGE.
-    IF THE PARTIAL TRANSCRIPT DOES NOT PROVIDE ENOUGH INFORMATION TO CREATE A HINT, DO NOT CREATE A HINT.
+    SO BE SURE TO CONSIDER IF THE CURRENT TRANSCRIPT IS LINKED TO THE PREVIOUS ONE.
+
+    IF TRANSCRIPTS HAVE DIFFERENT NAMES THEN ONE IS THE INTERVIEWER AND ONE IS THE INTERVIEWEE. IMPORTANT!!!
+    IF THEY HAVE THE SAME NAME, IT IS THE SAME PERSON AND CANNOT BE BOTH THE INTERVIEWER AND CANDIDATE.
+
+    Make sure to keep the hints active while the candidate is answering the question until they have partly sufficiently answered it.
+
+    ONLY SET newTopic TO TRUE WHEN IT SEEMS LIKE THE INTERVIEWER HAS MOVED ON FROM THAT TOPIC AND IS NOW ASKING ANOTHER QUESTION OR SOMETHING ELSE. THEN ONLY NOTIFY WITH newTopic TRUE ONCE.
 
     Example outputs:
 
     Transcript is a greeting:  
     "Hello there."  
-    {"timer": null, "hint": [], "fillerCount": 0}
+    {"timer": null, "hint": [], "fillerCount": 0, "newTopic": false}
 
     Transcript is a question:  
     "Tell me about yourself."  
-    {"timer": 60, "hint": [], "fillerCount": 0}
+    {"timer": 60, "hint": [], "fillerCount": 0, "newTopic": false}
 
     Transcript is a question asking for a definition:
     "What is polymorphism?"
-    {"timer": 45, "hint": ["object", "behavior"], "fillerCount": 0}
+    {"timer": 45, "hint": ["object", "behavior"], "fillerCount": 0, "newTopic": false}
 
     Transcript is a response:
     "I led a project on X and achieved Z outcome."
-    {"timer": null, "hint": [], "fillerCount": 0}
+    {"timer": null, "hint": [], "fillerCount": 0, "newTopic": false}
 
     Transcript is a general question:
     "Tell me about your project."
-    {"timer": 120, "hint": [], "fillerCount": 0}
+    {"timer": 120, "hint": [], "fillerCount": 0, "newTopic": false}
 
     Transcript is a question asking for an example:
     "Tell me about a time when you resolved a conflict."
-    {"timer": 120, "hint": ["provide one example"], "fillerCount": 0}
+    {"timer": 120, "hint": ["provide one example"], "fillerCount": 0, "newTopic": false}
+
+    Transcript is made up of two separate transcripts:
+    "Define"
+    {"timer": null, "hint": [], "fillerCount": 0, "newTopic": false}
+    "top down parsing"
+    {"timer": 45, "hint": ["recursive", "grammar"], "fillerCount": 0, "newTopic": false}
+
+    Transcript is incomplete:
+    "Define"
+    {"timer": null, "hint": [], "fillerCount": 0, "newTopic": false}
   `
 
   constructor(state: DurableObjectState) {
@@ -175,7 +191,7 @@ export class AiRoom {
         hint: notificationResult.data.hint,
         timer: notificationResult.data.timer,
         fillerCount: notificationResult.data.fillerCount,
-        isQuestionAnswered: notificationResult.data.isQuestionAnswered,
+        newTopic: notificationResult.data.newTopic,
       },
     }
 
@@ -194,7 +210,8 @@ export class AiRoom {
 
       if (websocketMsg.type === 'transcript') {
         const payload = websocketMsg.payload
-        this.transcriptQueue.push(`${payload.status}: ${payload.text}`)
+        // right now we're not using the payload.status since it doesn't help ai analysis
+        this.transcriptQueue.push(payload.text)
         // don't await this
         void this.processQueue()
       }

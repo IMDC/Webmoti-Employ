@@ -8,6 +8,7 @@ import {
   IconHelpHexagonFilled,
 } from '@tabler/icons-react'
 import { useEffect, useRef, useState } from 'react'
+import { logger } from '@/utils/logger'
 import { useCountdown } from '../hooks/useCountdown'
 import { useFeedback } from '../hooks/useFeedback'
 import { useGazeStats } from '../hooks/useGazeStats'
@@ -35,11 +36,15 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
   const { secondsLeft, startCountdown, stopCountdown } = useCountdown()
 
   useEffect(() => {
+    // TODO potential bug here because only non null notification keys are merged into the notification variable
+    // so timer is never null
     if (timer === null) {
+      logger.log('Stopping timer because null')
       stopCountdown()
       return
     }
 
+    logger.log(`Starting ${timer}s timer`)
     startCountdown(timer)
   }, [timer, stopCountdown, startCountdown])
 
