@@ -24,7 +24,7 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
 
   const feedback = useFeedback()
 
-  const { hint, timer, fillerCount } = notification
+  const { hint, timer, fillerCount, newTopic } = notification
 
   const looking = feedback.find(f => f.feedbackType === 'lookingAtInterviewer')?.isActive
   const [showLookPrompt, setShowLookPrompt] = useState(false)
@@ -36,17 +36,19 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
   const { secondsLeft, startCountdown, stopCountdown } = useCountdown()
 
   useEffect(() => {
-    // TODO potential bug here because only non null notification keys are merged into the notification variable
-    // so timer is never null
-    if (timer === null) {
-      logger.log('Stopping timer because null')
+    if (newTopic && timer === null) {
+      logger.log('Stopping timer because null and new topic')
       stopCountdown()
+      return
+    }
+
+    if (timer === null) {
       return
     }
 
     logger.log(`Starting ${timer}s timer`)
     startCountdown(timer)
-  }, [timer, stopCountdown, startCountdown])
+  }, [timer, stopCountdown, startCountdown, newTopic])
 
   useEffect(() => {
     if (notLookingTimerRef.current) {
