@@ -13,7 +13,6 @@ import {
 } from '@/features/interview/zoom/useZoomSessionStore'
 import { useAppPermissionState } from '@/useAppStore'
 import { GALLERY_VIEW_MARGIN } from '@/utils/constants'
-import { CaptionsArea } from '../ai/CaptionsArea'
 import { useAiWebsocket } from '../ai/useAiWebsocket'
 import { useTranscription } from '../ai/useTranscription'
 import { Chat } from '../chat/Chat'
@@ -30,7 +29,7 @@ export function Room() {
   const participantStageRef = useRef<HTMLDivElement>(null)
 
   const [isChatOpen, setIsChatOpen] = useState(false)
-  const [isCaptionsAreaOpen, setIsCaptionsAreaOpen] = useState(false)
+  // const [isCaptionsAreaOpen, setIsCaptionsAreaOpen] = useState(false)
 
   const { sendTranscript, notification } = useAiWebsocket()
   useTranscription(5, sendTranscript)
@@ -162,14 +161,14 @@ export function Room() {
                     )}
               </Flex>
 
-              {isCaptionsAreaOpen && (
+              {/* {isCaptionsAreaOpen && (
                 <Box
                   w="100%"
                   h="25%"
                 >
                   <CaptionsArea />
                 </Box>
-              )}
+              )} */}
             </Stack>
           )}
 
@@ -202,8 +201,8 @@ export function Room() {
               <MenuBar
                 onToggleMic={onToggleMic}
                 onToggleVideo={onToggleVideo}
-                isCaptionsAreaOpen={isCaptionsAreaOpen}
-                toggleCaptionsArea={() => setIsCaptionsAreaOpen(o => !o)}
+                // isCaptionsAreaOpen={isCaptionsAreaOpen}
+                // toggleCaptionsArea={() => setIsCaptionsAreaOpen(o => !o)}
                 isChatOpen={isChatOpen}
                 onToggleChat={() => {
                   setIsChatOpen(!isChatOpen)

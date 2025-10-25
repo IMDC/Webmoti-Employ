@@ -1,6 +1,5 @@
 import { Button, Flex, Group, Text } from '@mantine/core'
 import { useCurrentTime } from '@/hooks/useCurrentTime'
-import { ToggleCaptionsButton } from '../ai/ToggleCaptionsButton'
 import { ControlsMenu } from '../session/components/ControlsMenu'
 import { useZoomSessionActions } from '../zoom/useZoomSessionStore'
 import { EndCallButton } from './buttons/EndCallButton'
@@ -13,8 +12,8 @@ import { ChangeVideoPopover } from './popovers/ChangeVideoPopover'
 interface MenuBarProps {
   onToggleMic: () => Promise<void>
   onToggleVideo: () => Promise<void>
-  isCaptionsAreaOpen: boolean
-  toggleCaptionsArea: () => void
+  // isCaptionsAreaOpen: boolean
+  // toggleCaptionsArea: () => void
   isChatOpen: boolean
   onToggleChat?: () => void
   onToggleLayoutModal?: () => void
@@ -25,8 +24,8 @@ export function MenuBar({
   onToggleVideo,
   onToggleChat,
   isChatOpen,
-  isCaptionsAreaOpen,
-  toggleCaptionsArea,
+  // isCaptionsAreaOpen,
+  // toggleCaptionsArea,
   onToggleLayoutModal,
 }: MenuBarProps) {
   const { switchCamera, switchMicrophone } = useZoomSessionActions()
@@ -54,10 +53,10 @@ export function MenuBar({
           <ToggleVideoButton onToggleVideo={onToggleVideo} />
         </Button.Group>
 
-        <ToggleCaptionsButton
+        {/* <ToggleCaptionsButton
           isCaptionsAreaOpen={isCaptionsAreaOpen}
           toggleCaptionsArea={toggleCaptionsArea}
-        />
+        /> */}
       </Flex>
 
       {/* right section */}
