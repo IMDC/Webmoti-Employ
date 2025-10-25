@@ -105,7 +105,7 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
         />
         <FeedbackIcon
           icon={<IconBubbleTextFilled size={iconSize} />}
-          label={`${fillerCount} Filler Words`}
+          label={`${fillerCount} Filler Word${fillerCount === 1 ? '' : 's'}`}
           isActive={fillerCount != null && fillerCount > 0}
         />
       </Group>

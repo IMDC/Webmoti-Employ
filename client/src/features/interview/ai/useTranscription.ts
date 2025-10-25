@@ -6,7 +6,7 @@ import { errorNotification } from '@/utils/utils'
 import { useIsAudioOn } from '../zoom/useZoomSessionStore'
 
 export function useTranscription(
-  maxWordsBuffer: 5,
+  maxWordsBuffer: number,
   sendTranscript: (transcript: TranscriptMessage) => void,
 ) {
   const isAudioEnabled = useIsAudioOn()
