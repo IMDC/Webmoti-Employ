@@ -15,3 +15,5 @@ function useUserStore<T>(selector: (state: UserStore) => T): T {
 
 export const useUser = () => useUserStore(s => s.user)
 export const useSession = () => useUserStore(s => s.session)
+export const useDevIsJohnDoNotUseThis = () => useUserStore(s => s.devIsJohnDoNotUseThis)
+export const useUserActions = () => useUserStore(s => s.actions)

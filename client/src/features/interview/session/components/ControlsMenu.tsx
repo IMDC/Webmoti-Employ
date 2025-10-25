@@ -6,8 +6,10 @@ import {
   IconMenu2,
   IconMinimize,
   IconSettings,
+  IconUserFilled,
 } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
+import { useDevIsJohnDoNotUseThis, useUserActions } from '@/features/auth/hooks/useUserStore'
 import { useAppActions } from '@/useAppStore'
 
 interface ControlsMenuProps {
@@ -19,6 +21,9 @@ export function ControlsMenu({ onLayoutOpen, isMobile }: ControlsMenuProps) {
   const { setIsSettingsOpen } = useAppActions()
 
   const [isFullscreen, setIsFullscreen] = useState(false)
+
+  const { setDevIsJohnDoNotUseThis } = useUserActions()
+  const isJohn = useDevIsJohnDoNotUseThis()
 
   useEffect(() => {
     const handleChange = () => setIsFullscreen(!!document.fullscreenElement)
@@ -63,6 +68,17 @@ export function ControlsMenu({ onLayoutOpen, isMobile }: ControlsMenuProps) {
 
         <Menu.Item onClick={() => setIsSettingsOpen(true)} leftSection={<IconSettings size={14} />}>
           Settings
+        </Menu.Item>
+
+        <Menu.Item
+          closeMenuOnClick={false}
+          onMouseDown={() => setDevIsJohnDoNotUseThis(true)}
+          onMouseUp={() => setDevIsJohnDoNotUseThis(false)}
+          onMouseLeave={() => setDevIsJohnDoNotUseThis(false)}
+          leftSection={<IconUserFilled size={14} />}
+          bg={isJohn ? 'blue' : ''}
+        >
+          DEV: John
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>
