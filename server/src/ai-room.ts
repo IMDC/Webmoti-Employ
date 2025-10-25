@@ -43,8 +43,6 @@ export class AiRoom {
     IF A FINAL TRANSCRIPT FOLLOWS A PARTIAL, IT IS A CONTINUATION OF THE PREVIOUS PARTIAL MESSAGE.
     IF THE PARTIAL TRANSCRIPT DOES NOT PROVIDE ENOUGH INFORMATION TO CREATE A HINT, DO NOT CREATE A HINT.
 
-    For testing, assume both participants use the same transcript.
-
     Example outputs:
 
     Transcript is a greeting:  
