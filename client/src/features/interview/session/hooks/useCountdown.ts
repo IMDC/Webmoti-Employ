@@ -14,7 +14,7 @@ export function useCountdown() {
 
     intervalRef.current = window.setInterval(() => {
       setSecondsLeft((prev) => {
-        if (prev == null || prev <= 0) {
+        if (prev === null || prev <= 0) {
           clearInterval(intervalRef.current!)
           intervalRef.current = null
           return 0
