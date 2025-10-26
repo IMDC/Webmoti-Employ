@@ -1,5 +1,6 @@
 import type { NotificationMessage } from '@webmoti-employ/shared'
-import { Center, Group, Stack, Text } from '@mantine/core'
+import { Center, Group, Stack, Text, useMantineTheme } from '@mantine/core'
+import { useMediaQuery } from '@mantine/hooks'
 import {
   IconBubbleTextFilled,
   IconClockHour4Filled,
@@ -7,6 +8,8 @@ import {
   IconHelpHexagonFilled,
 } from '@tabler/icons-react'
 import { useEffect, useRef, useState } from 'react'
+import { logger } from '@/utils/logger'
+import { useCountdown } from '../hooks/useCountdown'
 import { useFeedback } from '../hooks/useFeedback'
 import { useGazeStats } from '../hooks/useGazeStats'
 
@@ -15,9 +18,13 @@ interface FeedbackAreaProps {
 }
 
 export function FeedbackArea({ notification }: FeedbackAreaProps) {
+  const theme = useMantineTheme()
+  const isXL = useMediaQuery(`(min-width: ${theme.breakpoints.xl})`)
+  const iconSize = isXL ? 48 : 24
+
   const feedback = useFeedback()
 
-  const { detail, timer, fillerCount } = notification
+  const { hint, timer, fillerCount, newTopic } = notification
 
   const looking = feedback.find(f => f.feedbackType === 'lookingAtInterviewer')?.isActive
   const [showLookPrompt, setShowLookPrompt] = useState(false)
@@ -25,6 +32,23 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
   const notLookingTimerRef = useRef<number | null>(null)
   const NOT_LOOKING_DELAY_MS = 1200
   const gazeStats = useGazeStats()
+
+  const { secondsLeft, startCountdown, stopCountdown } = useCountdown()
+
+  useEffect(() => {
+    if (newTopic && timer === null) {
+      logger.log('Stopping timer because null and new topic')
+      stopCountdown()
+    }
+  }, [timer, stopCountdown, newTopic])
+
+  useEffect(() => {
+    if (timer === null) {
+      return
+    }
+    logger.log(`Starting ${timer}s countdown`)
+    startCountdown(timer)
+  }, [timer, startCountdown])
 
   useEffect(() => {
     if (notLookingTimerRef.current) {
@@ -48,43 +72,6 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
     }
   }, [looking, fixation])
 
-  const [currentTimer, setCurrentTimer] = useState<number | null>(timer ?? null)
-  const intervalRef = useRef<number | null>(null)
-
-  useEffect(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current)
-      intervalRef.current = null
-    }
-    if (notification.timer == null) {
-      // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
-      setCurrentTimer(null)
-      return
-    }
-
-    // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
-    setCurrentTimer(notification.timer)
-    intervalRef.current = window.setInterval(() => {
-      setCurrentTimer((prev) => {
-        if (prev == null || prev <= 0) {
-          if (intervalRef.current) {
-            clearInterval(intervalRef.current)
-            intervalRef.current = null
-          }
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-        intervalRef.current = null
-      }
-    }
-  }, [notification])
-
   return (
     <Center h="100%">
       <Group gap={70}>
@@ -102,23 +89,23 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
           </Stack>
         )}
         <FeedbackIcon
-          icon={<IconEyeCheck size={24} />}
+          icon={<IconEyeCheck size={iconSize} />}
           label="Look at Interviewer"
           isActive={showLookPrompt}
         />
         <FeedbackIcon
-          icon={<IconClockHour4Filled size={24} />}
-          label={currentTimer != null ? String(currentTimer) : ''}
-          isActive={currentTimer != null && currentTimer > 0}
+          icon={<IconClockHour4Filled size={iconSize} />}
+          label={secondsLeft != null ? String(secondsLeft) : ''}
+          isActive={secondsLeft != null && secondsLeft > 0}
         />
         <FeedbackIcon
-          icon={<IconHelpHexagonFilled size={24} />}
-          label="More Detail"
-          isActive={detail === false}
+          icon={<IconHelpHexagonFilled size={iconSize} />}
+          label={hint.join(', ')}
+          isActive={hint.length > 0}
         />
         <FeedbackIcon
-          icon={<IconBubbleTextFilled size={24} />}
-          label={`${fillerCount} Filler Words`}
+          icon={<IconBubbleTextFilled size={iconSize} />}
+          label={`${fillerCount} Filler Word${fillerCount === 1 ? '' : 's'}`}
           isActive={fillerCount != null && fillerCount > 0}
         />
       </Group>
@@ -138,7 +125,7 @@ function FeedbackIcon({ icon, label, isActive }: {
   return (
     <Stack align="center" gap={0}>
       {icon}
-      <Text size="xs" c="dimmed">{label}</Text>
+      <Text fz={{ base: 'sm', xl: 'lg' }} c="dimmed" fw="bold">{label}</Text>
     </Stack>
   )
 }

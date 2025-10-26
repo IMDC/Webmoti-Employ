@@ -1,5 +1,6 @@
-import { Avatar, Button, Flex, Group, ScrollArea, Space, Stack, Text } from '@mantine/core'
+import { Button, Flex, Group, ScrollArea, Space, Stack, Text } from '@mantine/core'
 import { useEffect, useRef, useState } from 'react'
+import { GoogleAvatar } from '@/components/GoogleAvatar'
 import { useUser } from '@/features/auth/hooks/useUserStore'
 import { useCommandChannelActions, useCommandChannelMessages } from './useCommandChannelStore'
 
@@ -8,7 +9,7 @@ function Caption({ message, isOwn }: { message: any, isOwn: boolean }) {
 
   return (
     <Group>
-      <Avatar src={isOwn ? user.image : undefined} />
+      <GoogleAvatar src={isOwn ? user.image : undefined} />
 
       <Stack gap={0}>
         <Text>{isOwn ? 'You' : message.senderName || `User ${message.senderId}`}</Text>

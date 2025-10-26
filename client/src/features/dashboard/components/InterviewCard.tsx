@@ -3,6 +3,7 @@ import { ActionIcon, Avatar, Badge, Button, Card, Divider, Flex, Group, Stack, T
 import { IconPlus, IconReport, IconTie, IconVideoFilled } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
+import { GoogleAvatar } from '@/components/GoogleAvatar'
 import { MyCopyButton } from '@/components/MyCopyButton'
 import { UserList } from '@/components/UserList'
 import { useInviteProfiles } from '@/features/interview/profiles/useInviteProfiles'
@@ -90,7 +91,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
               <Avatar.Group spacing="sm">
                 {pics.slice(0, 3).map((src, i) => (
                   // eslint-disable-next-line react/no-array-index-key
-                  <Avatar key={i} src={src} radius="xl" />
+                  <GoogleAvatar key={i} src={src} radius="xl" />
                 ))}
                 {pics.length > 3 && (
                   <Avatar radius="xl">

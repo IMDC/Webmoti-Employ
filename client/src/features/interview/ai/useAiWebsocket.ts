@@ -1,7 +1,9 @@
-import type { NotificationMessage, TranscriptMessage } from '@webmoti-employ/shared'
-import { WebSocketMessage } from '@webmoti-employ/shared'
+import type { TranscriptMessage } from '@webmoti-employ/shared'
+import { NotificationMessage, WebSocketMessage } from '@webmoti-employ/shared'
+
 import { useCallback, useState } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
+import { useDevIsJohnDoNotUseThis, useUser } from '@/features/auth/hooks/useUserStore'
 import { logger } from '@/utils/logger'
 import { getLocalBearerToken } from '@/utils/utils'
 import { useRoomName } from '../zoom/useZoomSessionStore'
@@ -9,11 +11,13 @@ import { useRoomName } from '../zoom/useZoomSessionStore'
 export function useAiWebsocket() {
   const roomName = useRoomName()
 
-  const [notification, setNotification] = useState<NotificationMessage>({
-    detail: null,
-    fillerCount: null,
-    timer: null,
-  })
+  const user = useUser()
+  const isJohn = useDevIsJohnDoNotUseThis()
+
+  const [notification, setNotification] = useState<NotificationMessage>(
+    // make empty message using defaults
+    NotificationMessage.parse({}),
+  )
 
   const protocol = import.meta.env.DEV ? 'ws' : 'wss'
   const host = import.meta.env.DEV
@@ -31,7 +35,7 @@ export function useAiWebsocket() {
     },
     shouldReconnect: () => true,
     onMessage: (event) => {
-      logger.log('received message!')
+      // logger.log('received message!')
 
       try {
         const parsed = JSON.parse(event.data)
@@ -44,7 +48,6 @@ export function useAiWebsocket() {
         const msg = result.data
         if (msg.type === 'notification') {
           setNotification((prev) => {
-            // only update if not null
             const newPayload = Object.fromEntries(
               Object.entries(msg.payload).filter(([_, v]) => v !== null),
             )
@@ -69,12 +72,18 @@ export function useAiWebsocket() {
   }, [readyState, sendJsonMessage])
 
   const sendTranscript = useCallback((transcript: TranscriptMessage) => {
+    const modifiedTranscript: TranscriptMessage = {
+      ...transcript,
+      // dev override
+      text: `${isJohn ? 'John Smith' : user.name}: ${transcript.text}`,
+    }
+
     const transcriptMsg: WebSocketMessage = {
       type: 'transcript',
-      payload: { ...transcript },
+      payload: modifiedTranscript,
     }
     sendWebsocketMessage(transcriptMsg)
-  }, [sendWebsocketMessage])
+  }, [sendWebsocketMessage, user, isJohn])
 
   return {
     sendTranscript,

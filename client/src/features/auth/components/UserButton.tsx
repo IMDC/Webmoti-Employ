@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Box,
   Divider,
   Group,
@@ -10,6 +9,7 @@ import {
 } from '@mantine/core'
 import { IconLogout } from '@tabler/icons-react'
 import { useState } from 'react'
+import { GoogleAvatar } from '@/components/GoogleAvatar'
 import { signOut } from '@/lib/auth-client'
 import { useUser } from '../hooks/useUserStore'
 
@@ -27,13 +27,13 @@ export function UserButton() {
     >
       <Menu.Target>
         <UnstyledButton>
-          <Avatar src={user.image} size="md" />
+          <GoogleAvatar src={user.image} size="md" />
         </UnstyledButton>
       </Menu.Target>
 
       <Menu.Dropdown>
         <Group px="md" py="sm">
-          <Avatar src={user.image} size="md" />
+          <GoogleAvatar src={user.image} size="md" />
           <Box>
             <Text size="sm" fw={500}>
               {user.name}
