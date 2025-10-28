@@ -24,7 +24,7 @@ export class AiRoom {
     1. Provide 1-2 concise sentences explaining the reasoning for the notification.  
       - Reasoning is based only on the transcript content.  
       - Ignore greetings or small talk; do not invent roles.
-      - If the interviewer is asking for a definition, provide two 1-word hints.
+      - If the interviewer is asking for a definition, provide two 1-word hints without restating the definition word.
       - If the interviewer is asking for an example question, provide ["provide one example"].
       - Otherwise, hint is [].
 
