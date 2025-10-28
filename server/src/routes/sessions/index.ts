@@ -3,7 +3,7 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { requireDb, useDb } from '../../middleware/useDb'
 import { zValidator } from '../../validator-wrapper'
-import { getInterviews } from '../interviews/db-queries'
+import { getUserInterviews } from '../interviews/db-queries'
 import { generateZoomApiJwt, generateZoomVideoJwt } from './jwt'
 import { ZoomClient } from './ZoomClient'
 
@@ -68,7 +68,7 @@ sessionsRoute.get(
     // First check if this session is a scheduled session
     // ----------------------------------------------------
 
-    const hasScheduledAccess = await getInterviews(
+    const hasScheduledAccess = await getUserInterviews(
       db,
       user.id,
       userEmail,
@@ -80,7 +80,7 @@ sessionsRoute.get(
 
     // check if user is unauthorized
 
-    const scheduledButNotYou = await getInterviews(
+    const scheduledButNotYou = await getUserInterviews(
       db,
       undefined,
       undefined,

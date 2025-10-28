@@ -1,16 +1,16 @@
-import type { NewInterviewInvite } from '@webmoti-employ/shared'
+import type { InterviewResponse, NewInterviewInvite } from '@webmoti-employ/shared'
 import type { Expression, Kysely, SqlBool } from 'kysely'
 import type { DB } from '../../db/schema'
 import { sql } from 'kysely'
 
-export async function getInterviews(
+export async function getUserInterviews(
   db: Kysely<DB>,
   userId?: string,
   userEmail?: string,
   sessionId?: string,
   isUpcoming?: boolean,
 ) {
-  return await db
+  const interviewRows = await db
     .with('relevant_interviews', db =>
       // -----------------------------------------------------------------
       // first find all interviews the user is a creator of or invited to
@@ -64,6 +64,37 @@ export async function getInterviews(
       'interviewInvite.isInterviewer as inviteIsInterviewer',
     ])
     .execute()
+
+  // collapse flat rows into nested interviews
+  // this is needed because the above joins will return a row for each invite.
+  function nestInterviews(rows: typeof interviewRows) {
+    const interviewMap = new Map<number, InterviewResponse>()
+
+    for (const row of rows) {
+      let interview = interviewMap.get(row.id)
+      // if this interview hasn't been added to the map yet
+      if (!interview) {
+        const { id, creatorId, startTime, endTime, sessionId, createdAt, updatedAt } = row
+        interview = { id, creatorId, startTime, endTime, sessionId, invites: [], createdAt, updatedAt }
+        interviewMap.set(row.id, interview)
+      }
+
+      // then add the invite to the interview in the map
+      if (row.inviteId && row.inviteEmail) {
+        // interview either has an empty or non empty invites array at this point, so assert with !
+        interview.invites!.push({
+          id: row.inviteId,
+          interviewId: row.id,
+          email: row.inviteEmail,
+          isInterviewer: row.inviteIsInterviewer ?? false,
+        })
+      }
+    }
+
+    return Array.from(interviewMap.values()) as InterviewResponse[]
+  }
+
+  return nestInterviews(interviewRows)
 }
 
 export async function createInterview(

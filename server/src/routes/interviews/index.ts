@@ -1,4 +1,3 @@
-import type { InterviewResponse } from '@webmoti-employ/shared'
 import type { AppContext } from '../..'
 import { NewInterview, NewInterviewInvite } from '@webmoti-employ/shared'
 
@@ -6,7 +5,7 @@ import { Hono } from 'hono'
 import z from 'zod'
 import { requireDb, useDb } from '../../middleware/useDb'
 import { zValidator } from '../../validator-wrapper'
-import { createInterview, getInterviews } from './db-queries'
+import { createInterview, getUserInterviews } from './db-queries'
 
 const interviewsRoute = new Hono<AppContext>()
 interviewsRoute.use(useDb)
@@ -16,36 +15,9 @@ interviewsRoute.get('/', async (c) => {
   const user = c.var.user
   const userEmail = user.email.toLowerCase()
 
-  const interviewRows = await getInterviews(db, user.id, userEmail)
+  const interviewRows = await getUserInterviews(db, user.id, userEmail)
 
-  function nestInterviews(rows: typeof interviewRows) {
-    const interviewMap = new Map<number, InterviewResponse>()
-
-    for (const row of rows) {
-      let interview = interviewMap.get(row.id)
-      // if this interview hasn't been added to the map yet
-      if (!interview) {
-        const { id, creatorId, startTime, endTime, sessionId, createdAt, updatedAt } = row
-        interview = { id, creatorId, startTime, endTime, sessionId, invites: [], createdAt, updatedAt }
-        interviewMap.set(row.id, interview)
-      }
-
-      // then add the invite to the interview in the map
-      if (row.inviteId && row.inviteEmail) {
-        // interview either has an empty or non empty invites array at this point, so assert with !
-        interview.invites!.push({
-          id: row.inviteId,
-          interviewId: row.id,
-          email: row.inviteEmail,
-          isInterviewer: row.inviteIsInterviewer ?? false,
-        })
-      }
-    }
-
-    return Array.from(interviewMap.values()) as InterviewResponse[]
-  }
-
-  return c.json({ interviews: nestInterviews(interviewRows) })
+  return c.json({ interviews: interviewRows })
 })
 
 export const PostNewInterview = NewInterview.extend({
