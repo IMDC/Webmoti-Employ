@@ -19,7 +19,7 @@ interviewsRoute.get('/', async (c) => {
   const interviewRows = await getInterviews(db, user.id, userEmail)
 
   function nestInterviews(rows: typeof interviewRows) {
-    const interviewMap = new Map<number, Partial<InterviewResponse>>()
+    const interviewMap = new Map<number, InterviewResponse>()
 
     for (const row of rows) {
       let interview = interviewMap.get(row.id)

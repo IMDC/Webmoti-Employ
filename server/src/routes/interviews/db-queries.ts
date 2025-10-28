@@ -70,7 +70,7 @@ export async function createInterview(
   db: Kysely<DB>,
   creatorId: string,
   startTime: Date,
-  endTime: Date,
+  endTime: Date | null,
   invites: Array<NewInterviewInvite> = [],
 ): Promise<string> {
   return await db.transaction().execute(async (trx) => {

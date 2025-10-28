@@ -50,7 +50,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
 
   // const { displayLine, pics, youAreInterviewer } = counterpartInfo(interview, profiles)
 
-  const isEnded = interview.endTime < DateTime.local().toJSDate()
+  const isEnded = interview.endTime ? interview.endTime < DateTime.local().toJSDate() : false
 
   const formattedInterviewTime = DateTime.fromJSDate(interview.startTime)
     .setZone('local')
