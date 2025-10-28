@@ -134,7 +134,6 @@ The database is postgres deployed with the Neon service. We also use Cloudflare 
       "interview_id" integer NOT NULL,
       "email" text NOT NULL,
       "is_interviewer" boolean NOT NULL DEFAULT false,
-      "is_interview_creator" boolean NOT NULL DEFAULT false,
       "created_at" timestamp with time zone NOT NULL DEFAULT now(),
       CONSTRAINT "interview_id_fkey" FOREIGN KEY ("interview_id") REFERENCES "public"."interview" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
       CONSTRAINT "interview_invite_interview_id_email_key" UNIQUE ("interview_id", "email")

@@ -18,7 +18,7 @@ interviewsRoute.get('/', async (c) => {
 
   const interviewRows = await getInterviews(db, user.id, userEmail)
 
-  function nestInterviews(rows: typeof interviewRows, userEmail: string) {
+  function nestInterviews(rows: typeof interviewRows) {
     const interviewMap = new Map<number, Partial<InterviewResponse>>()
 
     for (const row of rows) {
@@ -32,40 +32,24 @@ interviewsRoute.get('/', async (c) => {
 
       // then add the invite to the interview in the map
       if (row.inviteId && row.inviteEmail) {
-        const isYou = row.inviteEmail.toLowerCase() === userEmail
-
         // interview either has an empty or non empty invites array at this point, so assert with !
         interview.invites!.push({
           id: row.inviteId,
           interviewId: row.id,
           email: row.inviteEmail,
           isInterviewer: row.inviteIsInterviewer ?? false,
-          isInterviewCreator: row.inviteIsInterviewCreator ?? false,
-          isYou: isYou ? true : undefined,
         })
-
-        if (isYou) {
-          interview.yourRole
-            = row.inviteIsInterviewCreator
-              ? 'creator'
-              : row.inviteIsInterviewer
-                ? 'interviewer'
-                : 'interviewee'
-        }
       }
     }
 
     return Array.from(interviewMap.values()) as InterviewResponse[]
   }
 
-  return c.json({ interviews: nestInterviews(interviewRows, userEmail) })
+  return c.json({ interviews: nestInterviews(interviewRows) })
 })
 
-export const PostNewInterviewInvite = NewInterviewInvite.omit({
-  isInterviewCreator: true,
-})
 export const PostNewInterview = NewInterview.extend({
-  invites: z.array(PostNewInterviewInvite).optional(),
+  invites: z.array(NewInterviewInvite).optional(),
 })
 
 interviewsRoute.post('/', zValidator('json', PostNewInterview), async (c) => {
@@ -85,7 +69,6 @@ interviewsRoute.post('/', zValidator('json', PostNewInterview), async (c) => {
     {
       email: userEmail,
       isInterviewer: true,
-      isInterviewCreator: true,
     },
   ]
 
