@@ -4,44 +4,23 @@ import { HttpError } from '@/utils/HttpError'
 import { getLocalBearerToken } from '@/utils/utils'
 import { SessionsGetResponse } from './schema'
 
-interface CreateArgs {
-  action: 'create'
-  userIdentity: string
-}
-
-interface JoinArgs {
-  action: 'join'
-  userIdentity: string
-  sessionId: string
-}
-
-export type InterviewSessionArgs = CreateArgs | JoinArgs
-
 // ----------------------------------------------------------------
 // GET /sessions
 
-async function fetchInterviewSession(
-  args: InterviewSessionArgs,
-): Promise<SessionsGetResponse> {
-  const { action, userIdentity } = args
-
-  const params = new URLSearchParams({ userIdentity })
-  let endpoint: string
-  if (action === 'create') {
-    endpoint = `${import.meta.env.VITE_API_BASE_URL}/sessions?${params.toString()}`
-  }
-  else {
-    const { sessionId } = args
-    endpoint = `${import.meta.env.VITE_API_BASE_URL}/sessions/${sessionId}?${params.toString()}`
-  }
-
+async function fetchInterviewSession(sessionId?: string): Promise<SessionsGetResponse> {
+  const endpoint = `${import.meta.env.VITE_API_BASE_URL}/sessions${sessionId ? `/${sessionId}` : ''}`
   const authToken = getLocalBearerToken()
   const response = await fetch(endpoint, {
     headers: { Authorization: `Bearer ${authToken}` },
   })
   const json = await response.json()
+
   if (!response.ok) {
-    throw new HttpError(`Failed to ${action} session`, response.status, json)
+    throw new HttpError(
+      sessionId ? 'Failed to join session' : 'Failed to create session',
+      response.status,
+      json,
+    )
   }
 
   const result = SessionsGetResponse.safeParse(json)
@@ -52,27 +31,25 @@ async function fetchInterviewSession(
   return result.data
 }
 
-function getInterviewSessionKey(args: InterviewSessionArgs) {
-  if (args.action === 'create') {
-    return ['interviewSession', 'create', args.userIdentity]
-  }
-
-  return ['interviewSession', 'join', args.userIdentity, args.sessionId]
-}
-
-export function useInterviewSession(args: InterviewSessionArgs) {
+export function useInterviewSession(sessionId?: string) {
   const {
     data: interviewSession,
     isPending: isInterviewSessionPending,
     error: interviewSessionError,
   } = useQuery({
-    queryKey: getInterviewSessionKey(args),
-    queryFn: async () => {
-      return fetchInterviewSession(args)
-    },
+    queryKey: ['interviewSession', sessionId ? 'join' : 'create', sessionId],
+    queryFn: () => fetchInterviewSession(sessionId),
     refetchInterval: 1000 * 60 * 105, // 1 hour 45 minutes (15 less than jwt exp)
     refetchIntervalInBackground: true,
   })
+
+  // change url after creating a new session
+  // useEffect(() => {
+  //   if (!sessionId && interviewSession?.sessionId) {
+  //     const newUrl = `/interview/prejoin/${interviewSession.sessionId}`
+  //     window.history.replaceState(null, '', newUrl)
+  //   }
+  // }, [sessionId, interviewSession])
 
   return {
     interviewSession,

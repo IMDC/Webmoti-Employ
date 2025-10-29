@@ -16,6 +16,7 @@ export const DbInterview = z.object({
   creatorId: z.string(),
   startTime: z.coerce.date(),
   endTime: z.coerce.date().nullable(),
+  isInstant: z.boolean(),
   invites: z.array(DbInterviewInvite).optional(),
   sessionId: z.uuidv4(),
   createdAt: z.coerce.date(),

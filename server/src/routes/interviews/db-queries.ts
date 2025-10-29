@@ -59,6 +59,7 @@ export async function getUserInterviews(
       'interview.sessionId',
       'interview.createdAt',
       'interview.updatedAt',
+      'interview.isInstant',
       'interviewInvite.id as inviteId',
       'interviewInvite.email as inviteEmail',
       'interviewInvite.isInterviewer as inviteIsInterviewer',
@@ -74,8 +75,8 @@ export async function getUserInterviews(
       let interview = interviewMap.get(row.id)
       // if this interview hasn't been added to the map yet
       if (!interview) {
-        const { id, creatorId, startTime, endTime, sessionId, createdAt, updatedAt } = row
-        interview = { id, creatorId, startTime, endTime, sessionId, invites: [], createdAt, updatedAt }
+        const { id, creatorId, startTime, endTime, sessionId, createdAt, updatedAt, isInstant } = row
+        interview = { id, creatorId, startTime, endTime, sessionId, invites: [], createdAt, updatedAt, isInstant }
         interviewMap.set(row.id, interview)
       }
 

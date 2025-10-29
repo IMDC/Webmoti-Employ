@@ -1,4 +1,3 @@
-import type { InterviewSessionArgs } from './queries'
 import { AppShell, Button, Flex, Group, Stack, Text, Title } from '@mantine/core'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect } from 'react'
@@ -30,12 +29,9 @@ export function PrejoinScreen() {
   const user = useUser()
   const { id: sessionId } = useParams({ strict: false })
 
-  const userId = user.id
   const userProfileUrl = user.image!
-  const args = buildInterviewSessionArgs(sessionId, userId)
-
   const { interviewSession, isInterviewSessionPending, interviewSessionError }
-    = useInterviewSession(args)
+    = useInterviewSession(sessionId)
 
   useEffect(() => {
     // wait until the interview session query is successful before init devices
@@ -59,6 +55,7 @@ export function PrejoinScreen() {
     setIsAudioOn,
     setIsVideoOn,
     setPermissionState,
+    sessionId,
   ])
 
   useEffect(() => {
@@ -117,7 +114,7 @@ export function PrejoinScreen() {
 
             <Stack>
               <Title ta={{ base: 'center', sm: 'start' }}>
-                {`${args.action === 'create' ? 'New' : 'Join'} Interview`}
+                {`${sessionId ? 'Join' : 'New'} Interview`}
               </Title>
               <Group>
                 <MyCopyButton copyText={interviewSession.sessionId} />
@@ -132,7 +129,7 @@ export function PrejoinScreen() {
                 onClick={async () =>
                   join(user.id, interviewSession.sessionId, interviewSession.token)}
               >
-                {`${args.action === 'create' ? 'Start' : 'Join'}`}
+                {sessionId ? 'Join' : 'Start'}
               </Button>
             </Stack>
           </Group>
@@ -140,13 +137,4 @@ export function PrejoinScreen() {
       </AppShell.Main>
     </AppShell>
   )
-}
-
-function buildInterviewSessionArgs(
-  sessionId: string | undefined,
-  userIdentity: string,
-): InterviewSessionArgs {
-  return sessionId
-    ? { action: 'join', sessionId, userIdentity }
-    : { action: 'create', userIdentity }
 }

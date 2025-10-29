@@ -3,20 +3,27 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { requireDb, useDb } from '../../middleware/useDb'
 import { zValidator } from '../../validator-wrapper'
-import { getUserInterviews } from '../interviews/db-queries'
+import { createInterview, getUserInterviews } from '../interviews/db-queries'
 import { generateZoomApiJwt, generateZoomVideoJwt } from './jwt'
 import { ZoomClient } from './ZoomClient'
 
 const sessionsRoute = new Hono<AppContext>()
+sessionsRoute.use(useDb)
 
-const SessionsCreateRequestQuery = z.object({
-  userIdentity: z.string().max(34),
-})
+sessionsRoute.get('/', async (c) => {
+  const db = requireDb(c)
+  const user = c.var.user
+  const userEmail = user.email.toLowerCase()
+  const userIdentity = user.id
 
-sessionsRoute.get('/', zValidator('query', SessionsCreateRequestQuery), async (c) => {
-  const { userIdentity } = c.req.valid('query')
-
-  const sessionId = crypto.randomUUID()
+  // add instant meeting to database, making it a "joinable" meeting
+  const sessionId = await createInterview(
+    db,
+    userIdentity,
+    new Date(), // start time is current time
+    null,
+    [{ email: userEmail, isInterviewer: true }],
+  )
 
   const token = await generateZoomVideoJwt({
     zoomVideoSdkKey: c.env.ZOOM_VIDEO_SDK_KEY,
@@ -30,26 +37,20 @@ sessionsRoute.get('/', zValidator('query', SessionsCreateRequestQuery), async (c
   return c.json({ sessionId, token })
 })
 
-const SessionsJoinRequestQuery = z.object({
-  userIdentity: z.string().max(34),
-})
-
 const SessionsJoinRequestParams = z.object({
   sessionId: z.uuidv4(),
 })
 
 sessionsRoute.get(
   '/:sessionId',
-  useDb,
   zValidator('param', SessionsJoinRequestParams),
-  zValidator('query', SessionsJoinRequestQuery),
   async (c) => {
     const { sessionId } = c.req.valid('param')
-    const { userIdentity } = c.req.valid('query')
 
     const db = requireDb(c)
     const user = c.var.user
     const userEmail = user.email.toLowerCase()
+    const userIdentity = user.id
 
     async function returnJoinToken() {
       const token = await generateZoomVideoJwt({
