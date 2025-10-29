@@ -112,6 +112,8 @@ export async function createInterview(
   isInstant: boolean,
   invites: Array<NewInterviewInvite> = [],
 ): Promise<string> {
+  await cleanupInstantInterviews(db)
+
   return await db.transaction().execute(async (trx) => {
     // first add the interview to the table
     const newInterview = await trx
@@ -142,4 +144,15 @@ export async function deleteInterview(db: Kysely<DB>, interviewId: number) {
     .deleteFrom('interview')
     .where('interview.id', '=', interviewId)
     .executeTakeFirstOrThrow()
+}
+
+export async function cleanupInstantInterviews(db: Kysely<DB>) {
+  // 24 hours ago
+  const cutoff = new Date(Date.now() - 1000 * 60 * 60 * 24)
+
+  await db
+    .deleteFrom('interview')
+    .where('isInstant', '=', true)
+    .where('createdAt', '<', cutoff)
+    .execute()
 }
