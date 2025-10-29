@@ -45,6 +45,12 @@ export function useInterviewSession(sessionId?: string) {
     queryFn: () => fetchInterviewSession(sessionId),
     refetchInterval: 1000 * 60 * 105, // 1 hour 45 minutes (15 less than jwt exp)
     refetchIntervalInBackground: true,
+    retry: (failureCount, error) => {
+      // if session not found, immediately return so user can be notified
+      if (error instanceof HttpError && error.status === 404)
+        return false
+      return failureCount < 3
+    },
   })
 
   // update url after creating a new session
