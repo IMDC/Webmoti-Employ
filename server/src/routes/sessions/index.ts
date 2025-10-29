@@ -22,6 +22,7 @@ sessionsRoute.get('/', async (c) => {
     userIdentity,
     new Date(), // start time is current time
     null,
+    true,
     [{ email: userEmail, isInterviewer: true }],
   )
 

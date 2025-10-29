@@ -34,7 +34,13 @@ export async function getUserInterviews(
 
           if (isUpcoming) {
             // filter using endTime since you could still join an interview after startTime
-            filters.push(eb('interview.endTime', '>=', sql<Date>`now()`))
+            // also allow instant interviews since they have no endTime
+            filters.push(
+              eb.or([
+                eb('interview.endTime', '>=', sql<Date>`now()`),
+                eb('interview.isInstant', '=', true),
+              ]),
+            )
           }
 
           if (sessionId) {
@@ -103,13 +109,14 @@ export async function createInterview(
   creatorId: string,
   startTime: Date,
   endTime: Date | null,
+  isInstant: boolean,
   invites: Array<NewInterviewInvite> = [],
 ): Promise<string> {
   return await db.transaction().execute(async (trx) => {
     // first add the interview to the table
     const newInterview = await trx
       .insertInto('interview')
-      .values({ creatorId, startTime, endTime })
+      .values({ creatorId, startTime, endTime, isInstant })
       .returning(['interview.id', 'interview.sessionId'])
       .executeTakeFirstOrThrow()
 

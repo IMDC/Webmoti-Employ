@@ -56,6 +56,7 @@ interviewsRoute.post('/', zValidator('json', PostNewInterview), async (c) => {
     data.creatorId,
     data.startTime,
     data.endTime,
+    false,
     invites,
   )
 
