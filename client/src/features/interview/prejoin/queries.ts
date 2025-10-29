@@ -1,4 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
+import { useEffect } from 'react'
 import { z } from 'zod'
 import { HttpError } from '@/utils/HttpError'
 import { getLocalBearerToken } from '@/utils/utils'
@@ -32,6 +34,8 @@ async function fetchInterviewSession(sessionId?: string): Promise<SessionsGetRes
 }
 
 export function useInterviewSession(sessionId?: string) {
+  const navigate = useNavigate()
+
   const {
     data: interviewSession,
     isPending: isInterviewSessionPending,
@@ -43,13 +47,16 @@ export function useInterviewSession(sessionId?: string) {
     refetchIntervalInBackground: true,
   })
 
-  // change url after creating a new session
-  // useEffect(() => {
-  //   if (!sessionId && interviewSession?.sessionId) {
-  //     const newUrl = `/interview/prejoin/${interviewSession.sessionId}`
-  //     window.history.replaceState(null, '', newUrl)
-  //   }
-  // }, [sessionId, interviewSession])
+  // update url after creating a new session
+  useEffect(() => {
+    if (!sessionId && interviewSession?.sessionId) {
+      navigate({
+        to: '/interview/prejoin/$id',
+        params: { id: interviewSession.sessionId },
+        replace: true,
+      })
+    }
+  }, [sessionId, interviewSession, navigate])
 
   return {
     interviewSession,

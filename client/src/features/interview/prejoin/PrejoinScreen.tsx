@@ -35,7 +35,8 @@ export function PrejoinScreen() {
 
   useEffect(() => {
     // wait until the interview session query is successful before init devices
-    if (!interviewSession || interviewSessionError) {
+    // also wait until the sessionId is set in url
+    if (!interviewSession || interviewSessionError || !sessionId) {
       return
     }
 
@@ -68,7 +69,8 @@ export function PrejoinScreen() {
     }
   }, [callState, interviewSession, navigate])
 
-  if (isInterviewSessionPending) {
+  // by adding !sessionId, it doesn't flicker in the moment before navigation
+  if (isInterviewSessionPending || !sessionId) {
     return <Loading />
   }
 
