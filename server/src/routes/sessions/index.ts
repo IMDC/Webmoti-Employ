@@ -72,10 +72,12 @@ sessionsRoute.get(
 
     const hasScheduledAccess = await getUserInterviews(
       db,
-      user.id,
-      userEmail,
-      sessionId,
-      true,
+      {
+        userId: user.id,
+        userEmail,
+        sessionId,
+        isUpcoming: true,
+      },
     )
     if (hasScheduledAccess.length > 0)
       return returnJoinToken()
@@ -84,10 +86,7 @@ sessionsRoute.get(
 
     const scheduledButNotYou = await getUserInterviews(
       db,
-      undefined,
-      undefined,
-      sessionId,
-      true,
+      { sessionId, isUpcoming: true },
     )
     if (scheduledButNotYou.length)
       return c.json({ error: 'Unauthorized' }, 401)

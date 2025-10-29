@@ -5,11 +5,22 @@ import { sql } from 'kysely'
 
 export async function getUserInterviews(
   db: Kysely<DB>,
-  userId?: string,
-  userEmail?: string,
-  sessionId?: string,
-  isUpcoming?: boolean,
+  options?: {
+    userId?: string
+    userEmail?: string
+    sessionId?: string
+    isUpcoming?: boolean
+    onlyScheduledInterviews?: boolean
+  },
 ) {
+  const {
+    userId,
+    userEmail,
+    sessionId,
+    isUpcoming = false,
+    onlyScheduledInterviews = false,
+  } = options ?? {}
+
   const interviewRows = await db
     .with('relevant_interviews', db =>
       // -----------------------------------------------------------------
@@ -30,6 +41,10 @@ export async function getUserInterviews(
               orConditions.push(eb('interviewInvite.email', '=', userEmail))
             }
             filters.push(eb.or(orConditions))
+          }
+
+          if (onlyScheduledInterviews) {
+            filters.push(eb('interview.isInstant', '=', false))
           }
 
           if (isUpcoming) {

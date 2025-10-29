@@ -15,7 +15,14 @@ interviewsRoute.get('/', async (c) => {
   const user = c.var.user
   const userEmail = user.email.toLowerCase()
 
-  const interviewRows = await getUserInterviews(db, user.id, userEmail)
+  const interviewRows = await getUserInterviews(
+    db,
+    {
+      userId: user.id,
+      userEmail,
+      onlyScheduledInterviews: true,
+    },
+  )
 
   return c.json({ interviews: interviewRows })
 })
