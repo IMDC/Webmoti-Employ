@@ -229,6 +229,9 @@ export class AiRoom {
         const payload = websocketMsg.payload
         this.devIsJohnDoNotUseThis = payload.isJohn
       }
+      // else if (websocketMsg.type === 'pong') {
+      //   console.log('client sent pong')
+      // }
     }
     catch (e) {
       console.error('Failed to parse message:', e)

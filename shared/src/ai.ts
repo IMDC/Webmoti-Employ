@@ -20,6 +20,7 @@ export const WebSocketMessage = z.discriminatedUnion('type', [
   z.object({ type: z.literal('transcript'), payload: TranscriptMessage }),
   z.object({ type: z.literal('notification'), payload: NotificationMessage }),
   z.object({ type: z.literal('ping') }),
+  z.object({ type: z.literal('pong') }),
   z.object({ type: z.literal('devIsJohnDoNotUseThis'), payload: DevIsJohnDoNotUseThisMessage }),
 ])
 

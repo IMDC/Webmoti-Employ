@@ -30,32 +30,7 @@ export function useAiWebsocket() {
       sessionId: roomName ?? '',
     },
     shouldReconnect: () => true,
-    onMessage: (event) => {
-      // logger.log('received message!')
-
-      try {
-        const parsed = JSON.parse(event.data)
-        const result = WebSocketMessage.safeParse(parsed)
-        if (!result.success) {
-          logger.warn('Invalid WS message:', result.error)
-          return
-        }
-
-        const msg = result.data
-        if (msg.type === 'notification') {
-          setNotification((prev) => {
-            const newPayload = Object.fromEntries(
-              Object.entries(msg.payload).filter(([_, v]) => v !== null),
-            )
-            return { ...prev, ...newPayload }
-          })
-          logger.log('Received notification:', msg.payload)
-        }
-      }
-      catch (e) {
-        logger.error('Failed to parse WS message', e)
-      }
-    },
+    onMessage: event => handleMessage(event),
   })
 
   const sendWebsocketMessage = useCallback((msg: WebSocketMessage) => {
@@ -82,6 +57,38 @@ export function useAiWebsocket() {
     }
     sendWebsocketMessage(websocketMsg)
   }, [sendWebsocketMessage])
+
+  function handleMessage(event: MessageEvent) {
+    // logger.log('received message!')
+
+    try {
+      const parsed = JSON.parse(event.data)
+      const result = WebSocketMessage.safeParse(parsed)
+      if (!result.success) {
+        logger.warn('Invalid WS message:', result.error)
+        return
+      }
+
+      const msg = result.data
+      if (msg.type === 'notification') {
+        setNotification((prev) => {
+          const newPayload = Object.fromEntries(
+            Object.entries(msg.payload).filter(([_, v]) => v !== null),
+          )
+          return { ...prev, ...newPayload }
+        })
+        logger.log('Received notification:', msg.payload)
+      }
+      else if (msg.type === 'ping') {
+        // send back after receiving it.
+        // this should keep the connection warm to prevent delays
+        sendWebsocketMessage({ type: 'pong' })
+      }
+    }
+    catch (e) {
+      logger.error('Failed to parse WS message', e)
+    }
+  }
 
   return {
     sendTranscript,
