@@ -1,44 +1,41 @@
 import type { InterviewResponse } from '@webmoti-employ/shared'
-import { Button, Card, Divider, Group, Stack, Text } from '@mantine/core'
-import { IconVideoFilled } from '@tabler/icons-react'
+import { ActionIcon, Avatar, Badge, Button, Card, Divider, Flex, Group, Stack, Text } from '@mantine/core'
+import { IconPlus, IconReport, IconTie, IconVideoFilled } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
+import { GoogleAvatar } from '@/components/GoogleAvatar'
 import { MyCopyButton } from '@/components/MyCopyButton'
 import { UserList } from '@/components/UserList'
+import { useUser } from '@/features/auth/hooks/useUserStore'
 import { useInviteProfiles } from '@/features/interview/profiles/useInviteProfiles'
 import { getInterviewLink } from '@/utils/utils'
 
-// function counterpartInfo(
-//   interview: InterviewResponse,
-//   profiles: Record<string, { displayName: string, profilePic: string } | null> | undefined,
-// ) {
-//   const youAreInterviewer
-//     = interview.yourRole === 'creator' || interview.yourRole === 'interviewer'
+function counterpartInfo(
+  interview: InterviewResponse,
+  profiles: Record<string, { displayName: string, profilePic: string } | null> | undefined,
+  userEmail: string,
+) {
+  const youAreInterviewer = interview.invites.find(i => i.email === userEmail)?.isInterviewer
+  const others = interview.invites.filter(i => i.isInterviewer !== youAreInterviewer)
 
-//   const others = interview.invites.filter(i =>
-//     youAreInterviewer
-//       ? !i.isInterviewer && !i.isInterviewCreator
-//       : i.isInterviewer || i.isInterviewCreator,
-//   )
+  const names: string[] = []
+  const pics: string[] = []
 
-//   const names: string[] = []
-//   const pics: string[] = []
+  for (const { email } of others) {
+    const profile = profiles?.[email] ?? null
+    const name = profile?.displayName ?? email.split('@')[0]
+    const pic = profile?.profilePic ?? ''
 
-//   for (const { email } of others) {
-//     const profile = profiles?.[email] ?? null
-//     const name = profile?.displayName ?? email.split('@')[0]
-//     const pic = profile?.profilePic ?? ''
+    names.push(name)
+    pics.push(pic)
+  }
 
-//     names.push(name)
-//     pics.push(pic)
-//   }
-
-//   return {
-//     displayLine: names.length ? `Interview with ${names.join(', ')}` : 'Interview',
-//     pics,
-//     youAreInterviewer,
-//   }
-// }
+  return {
+    displayLine: names.length ? `Interview with ${names.join(', ')}` : 'Interview',
+    pics,
+    youAreInterviewer,
+  }
+}
 
 interface InterviewCardProps {
   interview: InterviewResponse
@@ -48,7 +45,8 @@ export function InterviewCard({ interview }: InterviewCardProps) {
   const emailArray = [...new Set((interview.invites ?? []).map(user => user.email))]
   const { profiles, isLoadingProfiles } = useInviteProfiles(emailArray)
 
-  // const { displayLine, pics, youAreInterviewer } = counterpartInfo(interview, profiles)
+  const user = useUser()
+  const { displayLine, pics, youAreInterviewer } = counterpartInfo(interview, profiles, user.email)
 
   const isEnded = interview.endTime ? interview.endTime < DateTime.local().toJSDate() : false
 
@@ -59,7 +57,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
   return (
     <Card key={interview.id} shadow="sm" padding="sm" withBorder>
       <Group justify="space-between">
-        {/* <Group>
+        <Group>
           <Badge
             variant="gradient"
             gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
@@ -67,7 +65,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
           >
             { youAreInterviewer ? 'Interviewer' : 'Interviewee' }
           </Badge>
-        </Group> */}
+        </Group>
         <UserList
           users={interview.invites ?? []}
           profiles={profiles}
@@ -80,7 +78,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
           {formattedInterviewTime}
         </Text>
 
-        {/* <Flex
+        <Flex
           direction={{ base: 'column', sm: 'row' }}
           align="center"
           gap="xs"
@@ -111,7 +109,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
                 </Group>
               )
             : <Text fw="bold">{displayLine}</Text>}
-        </Flex> */}
+        </Flex>
 
         <Link to="/interview/prejoin/$id" params={{ id: interview.sessionId }}>
           <Button
