@@ -33,13 +33,15 @@ wsRoute.get(
     const invites = interview[0].invites
     const isInterviewer = invites.find(i => i.email === userEmail)?.isInterviewer ?? false
 
-    // create a new request with the role included as a header
+    // create a new request with extra information included as headers
     const req = new Request(c.req.raw.url, {
       method: c.req.raw.method,
       headers: new Headers(c.req.raw.headers),
       body: c.req.raw.body,
     })
+    // extra information
     req.headers.set('x-is-interviewer', String(isInterviewer))
+    req.headers.set('x-name', user.name)
 
     // Forward that request to the Durable Object stub.
     return durableObjectStub.fetch(req)

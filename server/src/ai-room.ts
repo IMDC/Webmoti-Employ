@@ -7,8 +7,7 @@ import { generateText } from 'ai'
 
 export class AiRoom {
   private state: DurableObjectState
-  // map websocket to role (isInterviewer)
-  private sessions: Map<WebSocket, boolean>
+  private sessions: Map<WebSocket, { name: string, isInterviewer: boolean }>
   private messages: ModelMessage[]
   private pingInterval?: ReturnType<typeof setInterval>
 
@@ -125,7 +124,8 @@ export class AiRoom {
     this.state.acceptWebSocket(server)
 
     const isInterviewer = request.headers.get('x-is-interviewer') === 'true'
-    this.sessions.set(server, isInterviewer)
+    const name = request.headers.get('x-name') ?? ''
+    this.sessions.set(server, { name, isInterviewer })
 
     this.startPing()
     // console.log(`New WebSocket connection established. Total connections: ${this.sessions.size}`)
@@ -198,7 +198,7 @@ export class AiRoom {
   }
 
   // Handles messages received from any connected client.
-  async webSocketMessage(_: WebSocket, message: string | ArrayBuffer): Promise<void> {
+  async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
     if (typeof message !== 'string')
       return
 
@@ -208,9 +208,12 @@ export class AiRoom {
       // console.log(`Received message: ${parsedMessage.text}`)
 
       if (websocketMsg.type === 'transcript') {
+        const role = this.sessions.get(ws)?.isInterviewer ? 'interviewer' : 'interviewee'
+        const name = this.sessions.get(ws)?.name ?? ''
+
         const payload = websocketMsg.payload
         // right now we're not using the payload.status since it doesn't help ai analysis
-        this.transcriptQueue.push(payload.text)
+        this.transcriptQueue.push(`[${role}] ${name}: ${payload.text}`)
         // don't await this
         void this.processQueue()
       }

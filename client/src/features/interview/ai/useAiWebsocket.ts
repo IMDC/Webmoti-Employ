@@ -3,7 +3,6 @@ import { NotificationMessage, WebSocketMessage } from '@webmoti-employ/shared'
 
 import { useCallback, useState } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
-import { useDevIsJohnDoNotUseThis, useUser } from '@/features/auth/hooks/useUserStore'
 import { logger } from '@/utils/logger'
 import { getLocalBearerToken } from '@/utils/utils'
 import { useRoomName } from '../zoom/useZoomSessionStore'
@@ -11,8 +10,8 @@ import { useRoomName } from '../zoom/useZoomSessionStore'
 export function useAiWebsocket() {
   const roomName = useRoomName()
 
-  const user = useUser()
-  const isJohn = useDevIsJohnDoNotUseThis()
+  // const user = useUser()
+  // const isJohn = useDevIsJohnDoNotUseThis()
 
   const [notification, setNotification] = useState<NotificationMessage>(
     // make empty message using defaults
@@ -72,18 +71,12 @@ export function useAiWebsocket() {
   }, [readyState, sendJsonMessage])
 
   const sendTranscript = useCallback((transcript: TranscriptMessage) => {
-    const modifiedTranscript: TranscriptMessage = {
-      ...transcript,
-      // dev override
-      text: `${isJohn ? 'John Smith' : user.name}: ${transcript.text}`,
-    }
-
     const transcriptMsg: WebSocketMessage = {
       type: 'transcript',
-      payload: modifiedTranscript,
+      payload: transcript,
     }
     sendWebsocketMessage(transcriptMsg)
-  }, [sendWebsocketMessage, user, isJohn])
+  }, [sendWebsocketMessage])
 
   return {
     sendTranscript,
