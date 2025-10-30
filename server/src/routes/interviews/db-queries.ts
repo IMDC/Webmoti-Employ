@@ -3,7 +3,8 @@ import type { Expression, Kysely, SqlBool } from 'kysely'
 import type { DB } from '../../db/schema'
 import { sql } from 'kysely'
 
-export async function getUserInterviews(
+// this is a multi purpose function and can be used to get all user interviews or to get a specific interview
+export async function getInterviews(
   db: Kysely<DB>,
   options?: {
     userId?: string

@@ -5,7 +5,7 @@ import { Hono } from 'hono'
 import z from 'zod'
 import { requireDb, useDb } from '../../middleware/useDb'
 import { zValidator } from '../../validator-wrapper'
-import { createInterview, getUserInterviews } from './db-queries'
+import { createInterview, getInterviews } from './db-queries'
 
 const interviewsRoute = new Hono<AppContext>()
 interviewsRoute.use(useDb)
@@ -15,7 +15,7 @@ interviewsRoute.get('/', async (c) => {
   const user = c.var.user
   const userEmail = user.email.toLowerCase()
 
-  const interviewRows = await getUserInterviews(
+  const interviewRows = await getInterviews(
     db,
     {
       userId: user.id,

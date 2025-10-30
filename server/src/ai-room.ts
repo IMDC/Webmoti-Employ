@@ -7,7 +7,8 @@ import { generateText } from 'ai'
 
 export class AiRoom {
   private state: DurableObjectState
-  private sessions: Set<WebSocket>
+  // map websocket to role (isInterviewer)
+  private sessions: Map<WebSocket, boolean>
   private messages: ModelMessage[]
   private pingInterval?: ReturnType<typeof setInterval>
 
@@ -88,7 +89,7 @@ export class AiRoom {
 
   constructor(state: DurableObjectState) {
     this.state = state
-    this.sessions = new Set()
+    this.sessions = new Map()
     this.messages = []
     // add system prompt to beginning of message list
     this.messages.push({ role: 'system', content: this.systemPrompt })
@@ -122,7 +123,10 @@ export class AiRoom {
     const { 0: client, 1: server } = new WebSocketPair()
     // Accept the connection and add the server-side WebSocket to our session list.
     this.state.acceptWebSocket(server)
-    this.sessions.add(server)
+
+    const isInterviewer = request.headers.get('x-is-interviewer') === 'true'
+    this.sessions.set(server, isInterviewer)
+
     this.startPing()
     // console.log(`New WebSocket connection established. Total connections: ${this.sessions.size}`)
     // Return the client-side WebSocket back to the client.
@@ -218,7 +222,7 @@ export class AiRoom {
 
   // Broadcast to all connected clients in the room.
   async broadcastMessage(message: WebSocketMessage) {
-    this.sessions.forEach((session) => {
+    this.sessions.forEach((_, session) => {
       session.send(JSON.stringify(message))
     })
   }

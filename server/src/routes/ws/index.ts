@@ -2,28 +2,47 @@ import type { AppContext } from '@/index'
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import z from 'zod'
+import { requireDb, useDb } from '@/middleware/useDb'
 import { useQueryAuth } from '@/middleware/useQueryAuth'
+import { getInterviews } from '../interviews/db-queries'
 
 const wsRoute = new Hono<AppContext>()
 
 wsRoute.use(useQueryAuth)
+wsRoute.use(useDb)
 
 const WsRequestQuery = z.object({
   token: z.string(),
-  room: z.string(),
+  sessionId: z.string(),
 })
 
 wsRoute.get(
   '/',
   zValidator('query', WsRequestQuery),
-  (c) => {
-    const { room } = c.req.query()
+  async (c) => {
+    const { sessionId } = c.req.query()
+    const db = requireDb(c)
+    const user = c.var.user
+    const userEmail = user.email.toLowerCase()
 
-    const objectId = c.env.AI_ROOM.idFromName(room)
+    const objectId = c.env.AI_ROOM.idFromName(sessionId)
     const durableObjectStub = c.env.AI_ROOM.get(objectId)
 
-    // Forward the original request to the Durable Object stub.
-    return durableObjectStub.fetch(c.req.raw)
+    const interview = await getInterviews(db, { userId: c.var.user.id, sessionId })
+    // assume since we're using sessionId there will be only 1 interview returned
+    const invites = interview[0].invites
+    const isInterviewer = invites.find(i => i.email === userEmail)?.isInterviewer ?? false
+
+    // create a new request with the role included as a header
+    const req = new Request(c.req.raw.url, {
+      method: c.req.raw.method,
+      headers: new Headers(c.req.raw.headers),
+      body: c.req.raw.body,
+    })
+    req.headers.set('x-is-interviewer', String(isInterviewer))
+
+    // Forward that request to the Durable Object stub.
+    return durableObjectStub.fetch(req)
   },
 )
 

@@ -31,7 +31,7 @@ export function useAiWebsocket() {
   } = useWebSocket<WebSocketMessage>(socketUrl, {
     queryParams: {
       token: encodeURIComponent(getLocalBearerToken() ?? ''),
-      room: roomName ?? '',
+      sessionId: roomName ?? '',
     },
     shouldReconnect: () => true,
     onMessage: (event) => {
