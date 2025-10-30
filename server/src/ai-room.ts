@@ -11,6 +11,8 @@ export class AiRoom {
   private messages: ModelMessage[]
   private pingInterval?: ReturnType<typeof setInterval>
 
+  private devIsJohnDoNotUseThis = false
+
   private generating = false
   private transcriptQueue: string[] = []
 
@@ -208,14 +210,24 @@ export class AiRoom {
       // console.log(`Received message: ${parsedMessage.text}`)
 
       if (websocketMsg.type === 'transcript') {
-        const role = this.sessions.get(ws)?.isInterviewer ? 'interviewer' : 'interviewee'
-        const name = this.sessions.get(ws)?.name ?? ''
+        let role: 'interviewer' | 'interviewee'
+          = this.sessions.get(ws)?.isInterviewer ? 'interviewer' : 'interviewee'
+        let name = this.sessions.get(ws)?.name ?? ''
+        if (this.devIsJohnDoNotUseThis) {
+          // dev override
+          role = 'interviewee'
+          name = 'John Smith'
+        }
 
         const payload = websocketMsg.payload
         // right now we're not using the payload.status since it doesn't help ai analysis
         this.transcriptQueue.push(`[${role}] ${name}: ${payload.text}`)
         // don't await this
         void this.processQueue()
+      }
+      else if (websocketMsg.type === 'devIsJohnDoNotUseThis') {
+        const payload = websocketMsg.payload
+        this.devIsJohnDoNotUseThis = payload.isJohn
       }
     }
     catch (e) {

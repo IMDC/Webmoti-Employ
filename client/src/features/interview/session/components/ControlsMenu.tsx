@@ -9,21 +9,20 @@ import {
   IconUserFilled,
 } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
-import { useDevIsJohnDoNotUseThis, useUserActions } from '@/features/auth/hooks/useUserStore'
 import { useAppActions } from '@/useAppStore'
 
 interface ControlsMenuProps {
   onLayoutOpen?: () => void
   isMobile?: boolean
+  sendDevIsJohnDoNotUseThis?: (isJohn: boolean) => void
 }
 
-export function ControlsMenu({ onLayoutOpen, isMobile }: ControlsMenuProps) {
+export function ControlsMenu({ onLayoutOpen, isMobile, sendDevIsJohnDoNotUseThis }: ControlsMenuProps) {
   const { setIsSettingsOpen } = useAppActions()
 
   const [isFullscreen, setIsFullscreen] = useState(false)
 
-  const { setDevIsJohnDoNotUseThis } = useUserActions()
-  const isJohn = useDevIsJohnDoNotUseThis()
+  const [isJohnPressed, setIsJohnPressed] = useState(false)
 
   useEffect(() => {
     const handleChange = () => setIsFullscreen(!!document.fullscreenElement)
@@ -72,13 +71,22 @@ export function ControlsMenu({ onLayoutOpen, isMobile }: ControlsMenuProps) {
 
         <Menu.Item
           closeMenuOnClick={false}
-          onMouseDown={() => setDevIsJohnDoNotUseThis(true)}
-          onMouseUp={() => setDevIsJohnDoNotUseThis(false)}
-          onMouseLeave={() => setDevIsJohnDoNotUseThis(false)}
+          onMouseDown={() => {
+            setIsJohnPressed(true)
+            sendDevIsJohnDoNotUseThis?.(true)
+          }}
+          onMouseUp={() => {
+            setIsJohnPressed(false)
+            sendDevIsJohnDoNotUseThis?.(false)
+          }}
+          onMouseLeave={() => {
+            setIsJohnPressed(false)
+            sendDevIsJohnDoNotUseThis?.(false)
+          }}
           leftSection={<IconUserFilled size={14} />}
-          bg={isJohn ? 'blue' : ''}
+          bg={isJohnPressed ? 'blue' : undefined}
         >
-          DEV: John
+          DEV: John (interviewee)
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>

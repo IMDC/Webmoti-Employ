@@ -10,9 +10,6 @@ import { useRoomName } from '../zoom/useZoomSessionStore'
 export function useAiWebsocket() {
   const roomName = useRoomName()
 
-  // const user = useUser()
-  // const isJohn = useDevIsJohnDoNotUseThis()
-
   const [notification, setNotification] = useState<NotificationMessage>(
     // make empty message using defaults
     NotificationMessage.parse({}),
@@ -71,15 +68,24 @@ export function useAiWebsocket() {
   }, [readyState, sendJsonMessage])
 
   const sendTranscript = useCallback((transcript: TranscriptMessage) => {
-    const transcriptMsg: WebSocketMessage = {
+    const websocketMsg: WebSocketMessage = {
       type: 'transcript',
       payload: transcript,
     }
-    sendWebsocketMessage(transcriptMsg)
+    sendWebsocketMessage(websocketMsg)
+  }, [sendWebsocketMessage])
+
+  const sendDevIsJohnDoNotUseMessage = useCallback((isJohn: boolean) => {
+    const websocketMsg: WebSocketMessage = {
+      type: 'devIsJohnDoNotUseThis',
+      payload: { isJohn },
+    }
+    sendWebsocketMessage(websocketMsg)
   }, [sendWebsocketMessage])
 
   return {
     sendTranscript,
+    sendDevIsJohnDoNotUseMessage,
     notification,
   }
 }

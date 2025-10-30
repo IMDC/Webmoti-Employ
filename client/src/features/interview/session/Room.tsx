@@ -31,7 +31,7 @@ export function Room() {
   const [isChatOpen, setIsChatOpen] = useState(false)
   // const [isCaptionsAreaOpen, setIsCaptionsAreaOpen] = useState(false)
 
-  const { sendTranscript, notification } = useAiWebsocket()
+  const { sendTranscript, notification, sendDevIsJohnDoNotUseMessage } = useAiWebsocket()
   useTranscription(5, sendTranscript)
 
   const permissionState = useAppPermissionState()
@@ -208,6 +208,7 @@ export function Room() {
                   setIsChatOpen(!isChatOpen)
                 }}
                 onToggleLayoutModal={openLayoutModal}
+                sendDevIsJohnDoNotUseThis={sendDevIsJohnDoNotUseMessage}
               />
             )
           : (
