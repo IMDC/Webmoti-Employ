@@ -10,6 +10,7 @@ export const NotificationMessage = z.object({
   timer: z.number().nullable().default(null),
   fillerCount: z.number().default(0),
   newTopic: z.boolean().default(false),
+  countUp: z.boolean().optional(),
 })
 
 export const DevIsJohnDoNotUseThisMessage = z.object({

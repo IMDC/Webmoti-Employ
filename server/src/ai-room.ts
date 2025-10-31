@@ -191,12 +191,7 @@ export class AiRoom {
       return
     }
 
-    const notificationMessage: WebSocketMessage = {
-      type: 'notification',
-      payload: notificationResult.data,
-    }
-
-    this.broadcastMessage(notificationMessage)
+    this.notifyClients(notificationResult.data)
   }
 
   // Handles messages received from any connected client.
@@ -242,6 +237,25 @@ export class AiRoom {
   async broadcastMessage(message: WebSocketMessage) {
     this.sessions.forEach((_, session) => {
       session.send(JSON.stringify(message))
+    })
+  }
+
+  async notifyClients(payload: NotificationMessage) {
+    this.sessions.forEach(({ isInterviewer }, session) => {
+      const sessionPayload: NotificationMessage = {
+        ...payload,
+        // if timer is to be set, make interviewee count up
+        // (interviewer has countdown timer)
+        countUp: !isInterviewer && !!payload.timer,
+        timer: !isInterviewer ? null : payload.timer,
+      }
+
+      const notificationMessage: WebSocketMessage = {
+        type: 'notification',
+        payload: sessionPayload,
+      }
+
+      session.send(JSON.stringify(notificationMessage))
     })
   }
 

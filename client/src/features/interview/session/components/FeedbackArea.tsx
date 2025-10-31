@@ -6,10 +6,12 @@ import {
   IconClockHour4Filled,
   IconEyeCheck,
   IconHelpHexagonFilled,
+  IconHourglassFilled,
 } from '@tabler/icons-react'
 import { useEffect, useRef, useState } from 'react'
 import { logger } from '@/utils/logger'
 import { useCountdown } from '../hooks/useCountdown'
+import { useCountup } from '../hooks/useCountup'
 import { useFeedback } from '../hooks/useFeedback'
 import { useGazeStats } from '../hooks/useGazeStats'
 
@@ -24,7 +26,7 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
 
   const feedback = useFeedback()
 
-  const { hint, timer, fillerCount, newTopic } = notification
+  const { hint, timer, fillerCount, newTopic, countUp } = notification
 
   const looking = feedback.find(f => f.feedbackType === 'lookingAtInterviewer')?.isActive
   const [showLookPrompt, setShowLookPrompt] = useState(false)
@@ -33,7 +35,15 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
   const NOT_LOOKING_DELAY_MS = 1200
   const gazeStats = useGazeStats()
 
-  const { secondsLeft, startCountdown, stopCountdown } = useCountdown()
+  const { countdownSeconds, startCountdown, stopCountdown } = useCountdown()
+  const { countupSeconds, startCountup, stopCountup } = useCountup()
+
+  useEffect(() => {
+    if (timer) {
+      logger.log(`Starting ${timer}s countdown`)
+      startCountdown(timer)
+    }
+  }, [timer, startCountdown])
 
   useEffect(() => {
     if (newTopic && timer === null) {
@@ -43,12 +53,16 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
   }, [timer, stopCountdown, newTopic])
 
   useEffect(() => {
-    if (timer === null) {
-      return
+    if (countUp) {
+      startCountup()
     }
-    logger.log(`Starting ${timer}s countdown`)
-    startCountdown(timer)
-  }, [timer, startCountdown])
+  }, [startCountup, countUp])
+
+  useEffect(() => {
+    if (newTopic && !countUp) {
+      stopCountup()
+    }
+  }, [newTopic, countUp, stopCountup])
 
   useEffect(() => {
     if (notLookingTimerRef.current) {
@@ -94,9 +108,14 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
           isActive={showLookPrompt}
         />
         <FeedbackIcon
+          icon={<IconHourglassFilled size={iconSize} />}
+          label={String(countdownSeconds)}
+          isActive={countdownSeconds > 0}
+        />
+        <FeedbackIcon
           icon={<IconClockHour4Filled size={iconSize} />}
-          label={secondsLeft != null ? String(secondsLeft) : ''}
-          isActive={secondsLeft != null && secondsLeft > 0}
+          label={String(countupSeconds)}
+          isActive={countupSeconds > 0}
         />
         <FeedbackIcon
           icon={<IconHelpHexagonFilled size={iconSize} />}

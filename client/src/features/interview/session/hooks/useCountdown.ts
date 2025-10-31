@@ -1,36 +1,31 @@
 import { useCallback, useRef, useState } from 'react'
 
 export function useCountdown() {
-  const [secondsLeft, setSecondsLeft] = useState<number | null>(null)
+  const [seconds, setSeconds] = useState(0)
   const intervalRef = useRef<number | null>(null)
-
-  const start = useCallback((seconds: number) => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current)
-      intervalRef.current = null
-    }
-
-    setSecondsLeft(seconds)
-
-    intervalRef.current = window.setInterval(() => {
-      setSecondsLeft((prev) => {
-        if (prev === null || prev <= 0) {
-          clearInterval(intervalRef.current!)
-          intervalRef.current = null
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-  }, [])
 
   const stop = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
       intervalRef.current = null
     }
-    setSecondsLeft(null)
+    setSeconds(0)
   }, [])
 
-  return { secondsLeft, startCountdown: start, stopCountdown: stop }
+  const start = useCallback((seconds: number) => {
+    stop()
+    setSeconds(seconds)
+
+    intervalRef.current = window.setInterval(() => {
+      setSeconds((prev) => {
+        if (prev <= 1) {
+          stop()
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+  }, [stop])
+
+  return { countdownSeconds: seconds, startCountdown: start, stopCountdown: stop }
 }
