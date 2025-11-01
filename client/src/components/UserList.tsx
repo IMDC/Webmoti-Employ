@@ -1,4 +1,4 @@
-import type { InterviewInviteResponse, ProfilesResponse } from '@webmoti-employ/shared'
+import type { DbInterviewInvite, ProfilesResponse } from '@webmoti-employ/shared'
 import { ActionIcon, Group, Popover, Skeleton, Stack, Text } from '@mantine/core'
 import { IconUserFilled } from '@tabler/icons-react'
 import { GoogleAvatar } from './GoogleAvatar'
@@ -24,7 +24,7 @@ function DisplayUser({ name, avatarUrl, isLoading }: DisplayUserProps) {
 }
 
 interface UserListProps {
-  users: InterviewInviteResponse[]
+  users: DbInterviewInvite[]
   profiles: ProfilesResponse | undefined
   isLoadingProfiles: boolean
 }

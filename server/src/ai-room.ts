@@ -7,9 +7,12 @@ import { generateText } from 'ai'
 
 export class AiRoom {
   private state: DurableObjectState
-  private sessions: Set<WebSocket>
+  private sessions: Map<WebSocket, { name: string, isInterviewer: boolean }>
   private messages: ModelMessage[]
   private pingInterval?: ReturnType<typeof setInterval>
+
+  private devIsJohnDoNotUseThis = false
+  private devIsJohnInterviewer = false
 
   private generating = false
   private transcriptQueue: string[] = []
@@ -24,7 +27,7 @@ export class AiRoom {
     1. Provide 1-2 concise sentences explaining the reasoning for the notification.  
       - Reasoning is based only on the transcript content.  
       - Ignore greetings or small talk; do not invent roles.
-      - If the interviewer is asking for a definition, provide two 1-word hints.
+      - If the interviewer is asking for a definition, provide two 1-word hints without restating the definition word.
       - If the interviewer is asking for an example question, provide ["provide one example"].
       - Otherwise, hint is [].
 
@@ -88,7 +91,7 @@ export class AiRoom {
 
   constructor(state: DurableObjectState) {
     this.state = state
-    this.sessions = new Set()
+    this.sessions = new Map()
     this.messages = []
     // add system prompt to beginning of message list
     this.messages.push({ role: 'system', content: this.systemPrompt })
@@ -122,7 +125,11 @@ export class AiRoom {
     const { 0: client, 1: server } = new WebSocketPair()
     // Accept the connection and add the server-side WebSocket to our session list.
     this.state.acceptWebSocket(server)
-    this.sessions.add(server)
+
+    const isInterviewer = request.headers.get('x-is-interviewer') === 'true'
+    const name = request.headers.get('x-name') ?? ''
+    this.sessions.set(server, { name, isInterviewer })
+
     this.startPing()
     // console.log(`New WebSocket connection established. Total connections: ${this.sessions.size}`)
     // Return the client-side WebSocket back to the client.
@@ -185,16 +192,11 @@ export class AiRoom {
       return
     }
 
-    const notificationMessage: WebSocketMessage = {
-      type: 'notification',
-      payload: notificationResult.data,
-    }
-
-    this.broadcastMessage(notificationMessage)
+    this.notifyClients(notificationResult.data)
   }
 
   // Handles messages received from any connected client.
-  async webSocketMessage(_: WebSocket, message: string | ArrayBuffer): Promise<void> {
+  async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
     if (typeof message !== 'string')
       return
 
@@ -204,12 +206,29 @@ export class AiRoom {
       // console.log(`Received message: ${parsedMessage.text}`)
 
       if (websocketMsg.type === 'transcript') {
+        let role: 'interviewer' | 'interviewee'
+          = this.sessions.get(ws)?.isInterviewer ? 'interviewer' : 'interviewee'
+        let name = this.sessions.get(ws)?.name ?? ''
+        if (this.devIsJohnDoNotUseThis) {
+          // dev override
+          role = this.devIsJohnInterviewer ? 'interviewer' : 'interviewee'
+          name = 'John Smith'
+        }
+
         const payload = websocketMsg.payload
         // right now we're not using the payload.status since it doesn't help ai analysis
-        this.transcriptQueue.push(payload.text)
+        this.transcriptQueue.push(`[${role}] ${name}: ${payload.text}`)
         // don't await this
         void this.processQueue()
       }
+      else if (websocketMsg.type === 'devIsJohnDoNotUseThis') {
+        const payload = websocketMsg.payload
+        this.devIsJohnDoNotUseThis = payload.isJohn
+        this.devIsJohnInterviewer = payload.isInterviewer
+      }
+      // else if (websocketMsg.type === 'pong') {
+      //   console.log('client sent pong')
+      // }
     }
     catch (e) {
       console.error('Failed to parse message:', e)
@@ -218,8 +237,31 @@ export class AiRoom {
 
   // Broadcast to all connected clients in the room.
   async broadcastMessage(message: WebSocketMessage) {
-    this.sessions.forEach((session) => {
+    this.sessions.forEach((_, session) => {
       session.send(JSON.stringify(message))
+    })
+  }
+
+  async notifyClients(payload: NotificationMessage) {
+    this.sessions.forEach(({ isInterviewer }, session) => {
+      // if override is active, use the opposite role as john
+      const devIsInterviewer
+        = this.devIsJohnDoNotUseThis ? !this.devIsJohnInterviewer : isInterviewer
+
+      const sessionPayload: NotificationMessage = {
+        ...payload,
+        // if timer is to be set, make interviewee count up
+        // (interviewer has countdown timer)
+        countUp: !devIsInterviewer && !!payload.timer,
+        timer: !devIsInterviewer ? null : payload.timer,
+      }
+
+      const notificationMessage: WebSocketMessage = {
+        type: 'notification',
+        payload: sessionPayload,
+      }
+
+      session.send(JSON.stringify(notificationMessage))
     })
   }
 

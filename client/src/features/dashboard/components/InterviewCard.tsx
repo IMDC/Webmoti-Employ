@@ -6,21 +6,17 @@ import { DateTime } from 'luxon'
 import { GoogleAvatar } from '@/components/GoogleAvatar'
 import { MyCopyButton } from '@/components/MyCopyButton'
 import { UserList } from '@/components/UserList'
+import { useUser } from '@/features/auth/hooks/useUserStore'
 import { useInviteProfiles } from '@/features/interview/profiles/useInviteProfiles'
 import { getInterviewLink } from '@/utils/utils'
 
 function counterpartInfo(
   interview: InterviewResponse,
   profiles: Record<string, { displayName: string, profilePic: string } | null> | undefined,
+  userEmail: string,
 ) {
-  const youAreInterviewer
-    = interview.yourRole === 'creator' || interview.yourRole === 'interviewer'
-
-  const others = interview.invites.filter(i =>
-    youAreInterviewer
-      ? !i.isInterviewer && !i.isInterviewCreator
-      : i.isInterviewer || i.isInterviewCreator,
-  )
+  const youAreInterviewer = interview.invites.find(i => i.email === userEmail)?.isInterviewer
+  const others = interview.invites.filter(i => i.isInterviewer !== youAreInterviewer)
 
   const names: string[] = []
   const pics: string[] = []
@@ -49,9 +45,10 @@ export function InterviewCard({ interview }: InterviewCardProps) {
   const emailArray = [...new Set((interview.invites ?? []).map(user => user.email))]
   const { profiles, isLoadingProfiles } = useInviteProfiles(emailArray)
 
-  const { displayLine, pics, youAreInterviewer } = counterpartInfo(interview, profiles)
+  const user = useUser()
+  const { displayLine, pics, youAreInterviewer } = counterpartInfo(interview, profiles, user.email)
 
-  const isEnded = interview.endTime < DateTime.local().toJSDate()
+  const isEnded = interview.endTime ? interview.endTime < DateTime.local().toJSDate() : false
 
   const formattedInterviewTime = DateTime.fromJSDate(interview.startTime)
     .setZone('local')

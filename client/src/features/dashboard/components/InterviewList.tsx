@@ -15,15 +15,15 @@ export function InterviewList() {
 
   const filtered = interviews?.filter((i) => {
     const start = DateTime.fromJSDate(i.startTime).setZone('local')
-    const end = DateTime.fromJSDate(i.endTime).setZone('local')
+    const end = i.endTime ? DateTime.fromJSDate(i.endTime).setZone('local') : undefined
 
     if (tab === 'today') {
       return start.hasSame(now, 'day')
     }
     if (tab === 'upcoming') {
-      return end > now && !start.hasSame(now, 'day')
+      return end ? end > now && !start.hasSame(now, 'day') : false
     }
-    return end <= now && !start.hasSame(now, 'day')
+    return end ? end <= now && !start.hasSame(now, 'day') : false
   }) || []
 
   if (isPending) {

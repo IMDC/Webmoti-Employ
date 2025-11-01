@@ -30,8 +30,9 @@ export interface Account {
 export interface Interview {
   createdAt: Generated<Timestamp>;
   creatorId: string;
-  endTime: Timestamp;
+  endTime: Timestamp | null;
   id: Generated<number>;
+  isInstant: Generated<boolean>;
   sessionId: Generated<string>;
   startTime: Timestamp;
   updatedAt: Generated<Timestamp>;
@@ -42,7 +43,6 @@ export interface InterviewInvite {
   email: string;
   id: Generated<number>;
   interviewId: number;
-  isInterviewCreator: Generated<boolean>;
   isInterviewer: Generated<boolean>;
 }
 

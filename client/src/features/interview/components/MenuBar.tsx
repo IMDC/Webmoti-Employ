@@ -17,6 +17,7 @@ interface MenuBarProps {
   isChatOpen: boolean
   onToggleChat?: () => void
   onToggleLayoutModal?: () => void
+  sendDevIsJohnDoNotUseThis?: (isJohn: boolean, isInterviewer: boolean) => void
 }
 
 export function MenuBar({
@@ -27,6 +28,7 @@ export function MenuBar({
   // isCaptionsAreaOpen,
   // toggleCaptionsArea,
   onToggleLayoutModal,
+  sendDevIsJohnDoNotUseThis,
 }: MenuBarProps) {
   const { switchCamera, switchMicrophone } = useZoomSessionActions()
 
@@ -64,7 +66,7 @@ export function MenuBar({
         <>
           <ToggleChatButton isChatOpen={isChatOpen} onToggleChat={onToggleChat} />
 
-          <ControlsMenu onLayoutOpen={onToggleLayoutModal} />
+          <ControlsMenu onLayoutOpen={onToggleLayoutModal} sendDevIsJohnDoNotUseThis={sendDevIsJohnDoNotUseThis} />
 
           <EndCallButton />
         </>

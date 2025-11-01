@@ -1,16 +1,28 @@
-import type { NewInterviewInvite } from '@webmoti-employ/shared'
+import type { InterviewResponse, NewInterviewInvite } from '@webmoti-employ/shared'
 import type { Expression, Kysely, SqlBool } from 'kysely'
 import type { DB } from '../../db/schema'
 import { sql } from 'kysely'
 
+// this is a multi purpose function and can be used to get all user interviews or to get a specific interview
 export async function getInterviews(
   db: Kysely<DB>,
-  userId?: string,
-  userEmail?: string,
-  sessionId?: string,
-  isUpcoming?: boolean,
+  options?: {
+    userId?: string
+    userEmail?: string
+    sessionId?: string
+    isUpcoming?: boolean
+    onlyScheduledInterviews?: boolean
+  },
 ) {
-  return await db
+  const {
+    userId,
+    userEmail,
+    sessionId,
+    isUpcoming = false,
+    onlyScheduledInterviews = false,
+  } = options ?? {}
+
+  const interviewRows = await db
     .with('relevant_interviews', db =>
       // -----------------------------------------------------------------
       // first find all interviews the user is a creator of or invited to
@@ -32,9 +44,19 @@ export async function getInterviews(
             filters.push(eb.or(orConditions))
           }
 
+          if (onlyScheduledInterviews) {
+            filters.push(eb('interview.isInstant', '=', false))
+          }
+
           if (isUpcoming) {
             // filter using endTime since you could still join an interview after startTime
-            filters.push(eb('interview.endTime', '>=', sql<Date>`now()`))
+            // also allow instant interviews since they have no endTime
+            filters.push(
+              eb.or([
+                eb('interview.endTime', '>=', sql<Date>`now()`),
+                eb('interview.isInstant', '=', true),
+              ]),
+            )
           }
 
           if (sessionId) {
@@ -59,27 +81,60 @@ export async function getInterviews(
       'interview.sessionId',
       'interview.createdAt',
       'interview.updatedAt',
+      'interview.isInstant',
       'interviewInvite.id as inviteId',
       'interviewInvite.email as inviteEmail',
       'interviewInvite.isInterviewer as inviteIsInterviewer',
-      'interviewInvite.isInterviewCreator as inviteIsInterviewCreator',
-
     ])
     .execute()
+
+  // collapse flat rows into nested interviews
+  // this is needed because the above joins will return a row for each invite.
+  function nestInterviews(rows: typeof interviewRows) {
+    const interviewMap = new Map<number, InterviewResponse>()
+
+    for (const row of rows) {
+      let interview = interviewMap.get(row.id)
+      // if this interview hasn't been added to the map yet
+      if (!interview) {
+        const { id, creatorId, startTime, endTime, sessionId, createdAt, updatedAt, isInstant } = row
+        interview = { id, creatorId, startTime, endTime, sessionId, invites: [], createdAt, updatedAt, isInstant }
+        interviewMap.set(row.id, interview)
+      }
+
+      // then add the invite to the interview in the map
+      if (row.inviteId && row.inviteEmail) {
+        // interview either has an empty or non empty invites array at this point, so assert with !
+        interview.invites!.push({
+          id: row.inviteId,
+          interviewId: row.id,
+          email: row.inviteEmail,
+          isInterviewer: row.inviteIsInterviewer ?? false,
+        })
+      }
+    }
+
+    return Array.from(interviewMap.values()) as InterviewResponse[]
+  }
+
+  return nestInterviews(interviewRows)
 }
 
 export async function createInterview(
   db: Kysely<DB>,
   creatorId: string,
   startTime: Date,
-  endTime: Date,
+  endTime: Date | null,
+  isInstant: boolean,
   invites: Array<NewInterviewInvite> = [],
 ): Promise<string> {
+  await cleanupInstantInterviews(db)
+
   return await db.transaction().execute(async (trx) => {
     // first add the interview to the table
     const newInterview = await trx
       .insertInto('interview')
-      .values({ creatorId, startTime, endTime })
+      .values({ creatorId, startTime, endTime, isInstant })
       .returning(['interview.id', 'interview.sessionId'])
       .executeTakeFirstOrThrow()
 
@@ -91,7 +146,6 @@ export async function createInterview(
           email: invite.email,
           interviewId: newInterview.id,
           isInterviewer: invite.isInterviewer,
-          isInterviewCreator: invite.isInterviewCreator,
         })
         .executeTakeFirstOrThrow()
     }
@@ -106,4 +160,15 @@ export async function deleteInterview(db: Kysely<DB>, interviewId: number) {
     .deleteFrom('interview')
     .where('interview.id', '=', interviewId)
     .executeTakeFirstOrThrow()
+}
+
+export async function cleanupInstantInterviews(db: Kysely<DB>) {
+  // 24 hours ago
+  const cutoff = new Date(Date.now() - 1000 * 60 * 60 * 24)
+
+  await db
+    .deleteFrom('interview')
+    .where('isInstant', '=', true)
+    .where('createdAt', '<', cutoff)
+    .execute()
 }

@@ -102,6 +102,7 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
         startTime: startTimeDate,
         endTime: endTimeDate,
         invites,
+        isInstant: false,
       })
 
       if (openGoogleCalendar) {

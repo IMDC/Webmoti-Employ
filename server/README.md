@@ -122,7 +122,8 @@ The database is postgres deployed with the Neon service. We also use Cloudflare 
       "id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
       "creator_id" varchar(128) NOT NULL,
       "start_time" timestamp with time zone NOT NULL,
-      "end_time" timestamp with time zone NOT NULL,
+      "end_time" timestamp with time zone,
+      "is_instant" BOOLEAN NOT NULL DEFAULT false,
       "session_id" uuid UNIQUE NOT NULL DEFAULT gen_random_uuid (),
       "created_at" timestamp with time zone NOT NULL DEFAULT now(),
       "updated_at" timestamp with time zone NOT NULL DEFAULT now()
@@ -133,7 +134,6 @@ The database is postgres deployed with the Neon service. We also use Cloudflare 
       "interview_id" integer NOT NULL,
       "email" text NOT NULL,
       "is_interviewer" boolean NOT NULL DEFAULT false,
-      "is_interview_creator" boolean NOT NULL DEFAULT false,
       "created_at" timestamp with time zone NOT NULL DEFAULT now(),
       CONSTRAINT "interview_id_fkey" FOREIGN KEY ("interview_id") REFERENCES "public"."interview" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
       CONSTRAINT "interview_invite_interview_id_email_key" UNIQUE ("interview_id", "email")
