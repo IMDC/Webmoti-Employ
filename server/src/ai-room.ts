@@ -12,6 +12,7 @@ export class AiRoom {
   private pingInterval?: ReturnType<typeof setInterval>
 
   private devIsJohnDoNotUseThis = false
+  private devIsJohnInterviewer = false
 
   private generating = false
   private transcriptQueue: string[] = []
@@ -210,7 +211,7 @@ export class AiRoom {
         let name = this.sessions.get(ws)?.name ?? ''
         if (this.devIsJohnDoNotUseThis) {
           // dev override
-          role = 'interviewee'
+          role = this.devIsJohnInterviewer ? 'interviewer' : 'interviewee'
           name = 'John Smith'
         }
 
@@ -223,6 +224,7 @@ export class AiRoom {
       else if (websocketMsg.type === 'devIsJohnDoNotUseThis') {
         const payload = websocketMsg.payload
         this.devIsJohnDoNotUseThis = payload.isJohn
+        this.devIsJohnInterviewer = payload.isInterviewer
       }
       // else if (websocketMsg.type === 'pong') {
       //   console.log('client sent pong')
@@ -242,12 +244,16 @@ export class AiRoom {
 
   async notifyClients(payload: NotificationMessage) {
     this.sessions.forEach(({ isInterviewer }, session) => {
+      // if override is active, use the opposite role as john
+      const devIsInterviewer
+        = this.devIsJohnDoNotUseThis ? !this.devIsJohnInterviewer : isInterviewer
+
       const sessionPayload: NotificationMessage = {
         ...payload,
         // if timer is to be set, make interviewee count up
         // (interviewer has countdown timer)
-        countUp: !isInterviewer && !!payload.timer,
-        timer: !isInterviewer ? null : payload.timer,
+        countUp: !devIsInterviewer && !!payload.timer,
+        timer: !devIsInterviewer ? null : payload.timer,
       }
 
       const notificationMessage: WebSocketMessage = {

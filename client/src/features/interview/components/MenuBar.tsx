@@ -17,7 +17,7 @@ interface MenuBarProps {
   isChatOpen: boolean
   onToggleChat?: () => void
   onToggleLayoutModal?: () => void
-  sendDevIsJohnDoNotUseThis?: (isJohn: boolean) => void
+  sendDevIsJohnDoNotUseThis?: (isJohn: boolean, isInterviewer: boolean) => void
 }
 
 export function MenuBar({

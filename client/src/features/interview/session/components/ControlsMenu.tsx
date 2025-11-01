@@ -14,7 +14,7 @@ import { useAppActions } from '@/useAppStore'
 interface ControlsMenuProps {
   onLayoutOpen?: () => void
   isMobile?: boolean
-  sendDevIsJohnDoNotUseThis?: (isJohn: boolean) => void
+  sendDevIsJohnDoNotUseThis?: (isJohn: boolean, isInterviewer: boolean) => void
 }
 
 export function ControlsMenu({ onLayoutOpen, isMobile, sendDevIsJohnDoNotUseThis }: ControlsMenuProps) {
@@ -22,7 +22,8 @@ export function ControlsMenu({ onLayoutOpen, isMobile, sendDevIsJohnDoNotUseThis
 
   const [isFullscreen, setIsFullscreen] = useState(false)
 
-  const [isJohnPressed, setIsJohnPressed] = useState(false)
+  const [isJohnInterviewerPressed, setIsJohnInterviewerPressed] = useState(false)
+  const [isJohnCandidatePressed, setIsJohnCandidatePressed] = useState(false)
 
   useEffect(() => {
     const handleChange = () => setIsFullscreen(!!document.fullscreenElement)
@@ -72,21 +73,40 @@ export function ControlsMenu({ onLayoutOpen, isMobile, sendDevIsJohnDoNotUseThis
         <Menu.Item
           closeMenuOnClick={false}
           onMouseDown={() => {
-            setIsJohnPressed(true)
-            sendDevIsJohnDoNotUseThis?.(true)
+            setIsJohnInterviewerPressed(true)
+            sendDevIsJohnDoNotUseThis?.(true, true)
           }}
           onMouseUp={() => {
-            setIsJohnPressed(false)
-            sendDevIsJohnDoNotUseThis?.(false)
+            setIsJohnInterviewerPressed(false)
+            sendDevIsJohnDoNotUseThis?.(false, true)
           }}
           onMouseLeave={() => {
-            setIsJohnPressed(false)
-            sendDevIsJohnDoNotUseThis?.(false)
+            setIsJohnInterviewerPressed(false)
+            sendDevIsJohnDoNotUseThis?.(false, true)
           }}
           leftSection={<IconUserFilled size={14} />}
-          bg={isJohnPressed ? 'blue' : undefined}
+          bg={isJohnInterviewerPressed ? 'blue' : undefined}
         >
-          DEV: John (interviewee)
+          DEV: John (interviewer)
+        </Menu.Item>
+        <Menu.Item
+          closeMenuOnClick={false}
+          onMouseDown={() => {
+            setIsJohnCandidatePressed(true)
+            sendDevIsJohnDoNotUseThis?.(true, false)
+          }}
+          onMouseUp={() => {
+            setIsJohnCandidatePressed(false)
+            sendDevIsJohnDoNotUseThis?.(false, false)
+          }}
+          onMouseLeave={() => {
+            setIsJohnCandidatePressed(false)
+            sendDevIsJohnDoNotUseThis?.(false, false)
+          }}
+          leftSection={<IconUserFilled size={14} />}
+          bg={isJohnCandidatePressed ? 'blue' : undefined}
+        >
+          DEV: John (candidate)
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>

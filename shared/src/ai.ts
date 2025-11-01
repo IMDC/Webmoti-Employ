@@ -15,6 +15,7 @@ export const NotificationMessage = z.object({
 
 export const DevIsJohnDoNotUseThisMessage = z.object({
   isJohn: z.boolean(),
+  isInterviewer: z.boolean(),
 })
 
 export const WebSocketMessage = z.discriminatedUnion('type', [

@@ -50,10 +50,10 @@ export function useAiWebsocket() {
     sendWebsocketMessage(websocketMsg)
   }, [sendWebsocketMessage])
 
-  const sendDevIsJohnDoNotUseMessage = useCallback((isJohn: boolean) => {
+  const sendDevIsJohnDoNotUseMessage = useCallback((isJohn: boolean, isInterviewer: boolean) => {
     const websocketMsg: WebSocketMessage = {
       type: 'devIsJohnDoNotUseThis',
-      payload: { isJohn },
+      payload: { isJohn, isInterviewer },
     }
     sendWebsocketMessage(websocketMsg)
   }, [sendWebsocketMessage])

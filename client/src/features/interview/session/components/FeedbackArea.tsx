@@ -42,8 +42,9 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
     if (timer) {
       logger.log(`Starting ${timer}s countdown`)
       startCountdown(timer)
+      stopCountup()
     }
-  }, [timer, startCountdown])
+  }, [timer, startCountdown, stopCountup])
 
   useEffect(() => {
     if (newTopic && timer === null) {
@@ -55,8 +56,9 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
   useEffect(() => {
     if (countUp) {
       startCountup()
+      stopCountdown()
     }
-  }, [startCountup, countUp])
+  }, [startCountup, countUp, stopCountdown])
 
   useEffect(() => {
     if (newTopic && !countUp) {
