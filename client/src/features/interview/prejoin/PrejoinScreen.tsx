@@ -116,7 +116,7 @@ export function PrejoinScreen() {
 
             <Stack>
               <Title ta={{ base: 'center', sm: 'start' }}>
-                {`${sessionId ? 'Join' : 'New'} Interview`}
+                Join Interview
               </Title>
               <Group>
                 <MyCopyButton copyText={interviewSession.sessionId} />
@@ -131,7 +131,7 @@ export function PrejoinScreen() {
                 onClick={async () =>
                   join(user.id, interviewSession.sessionId, interviewSession.token)}
               >
-                {sessionId ? 'Join' : 'Start'}
+                Join
               </Button>
             </Stack>
           </Group>
