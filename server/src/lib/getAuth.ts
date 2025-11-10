@@ -11,7 +11,7 @@ import { socialBearer } from './socialBearerPlugin'
  * This is separate from the better-auth.config.ts files since you need to pass in env at runtime
  */
 export function getAuth(env: CloudflareBindings): ReturnType<typeof betterAuth> {
-  const IS_DEV = !!env.LOCAL_DATABASE_URL
+  const IS_DEV = env.IS_DEV
 
   return betterAuth({
     ...betterAuthOptions,
