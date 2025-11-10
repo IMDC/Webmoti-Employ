@@ -4,9 +4,12 @@ import type { ModelMessage } from 'ai'
 import { groq } from '@ai-sdk/groq'
 import { NotificationMessage, WebSocketMessage } from '@webmoti-employ/shared'
 import { generateText } from 'ai'
+import { debugLog } from '@/utils/logger'
 
 export class AiRoom {
   private state: DurableObjectState
+  private env: CloudflareBindings
+
   private sessions: Map<WebSocket, { name: string, isInterviewer: boolean }>
   private messages: ModelMessage[]
   private pingInterval?: ReturnType<typeof setInterval>
@@ -89,8 +92,9 @@ export class AiRoom {
     {"timer": null, "hint": [], "fillerCount": 0, "newTopic": false}
   `
 
-  constructor(state: DurableObjectState) {
+  constructor(state: DurableObjectState, env: CloudflareBindings) {
     this.state = state
+    this.env = env
     this.sessions = new Map()
     this.messages = []
     // add system prompt to beginning of message list
@@ -140,9 +144,7 @@ export class AiRoom {
     const result = await generateText({ model: this.model, messages: this.messages })
     const responseText = result.text
 
-    // TODO after adding debug logger, make this log instead
-    // eslint-disable-next-line no-console
-    console.log(responseText)
+    debugLog(this.env.IS_DEV, responseText)
 
     // we need to store the response text as well so the ai knows what it's responded to
     this.messages.push({ role: 'assistant', content: responseText })
@@ -158,8 +160,7 @@ export class AiRoom {
     // combine all queued transcripts into one message
     const transcript = this.transcriptQueue.join(' ')
     this.transcriptQueue = [] // clear the queue immediately
-    // eslint-disable-next-line no-console
-    console.log('Transcript:', transcript)
+    debugLog(this.env.IS_DEV, 'Transcript:', transcript)
 
     try {
       this.messages.push({ role: 'user', content: transcript })
