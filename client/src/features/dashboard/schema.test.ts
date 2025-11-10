@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { JoinCodeInput, ScheduleInterviewForm } from './schema'
 
 describe('dashboard schemas', () => {
-  describe('ScheduleInterviewForm', () => {
+  describe('scheduleInterviewForm', () => {
     it('should validate a valid schedule interview form', () => {
       const validForm = {
         date: '2025-01-15',
@@ -75,7 +75,7 @@ describe('dashboard schemas', () => {
     })
   })
 
-  describe('JoinCodeInput', () => {
+  describe('joinCodeInput', () => {
     it('should validate a valid UUID v4', () => {
       const validUuid = '550e8400-e29b-41d4-a716-446655440000'
       const result = JoinCodeInput.safeParse(validUuid)

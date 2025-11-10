@@ -2,7 +2,7 @@ import { render, screen, userEvent } from '@test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { TimeTabs } from './TimeTabs'
 
-describe('TimeTabs', () => {
+describe('timeTabs', () => {
   it('should render all three tabs', () => {
     const mockOnChange = vi.fn()
     render(<TimeTabs value="today" onChange={mockOnChange} />)

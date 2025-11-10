@@ -91,7 +91,7 @@ describe('useCountup', () => {
   })
 
   it('should clear interval on stop', () => {
-    const clearIntervalSpy = vi.spyOn(global, 'clearInterval')
+    const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval')
     const { result } = renderHook(() => useCountup())
 
     act(() => {

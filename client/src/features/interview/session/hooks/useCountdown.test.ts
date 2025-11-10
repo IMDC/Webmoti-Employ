@@ -107,7 +107,7 @@ describe('useCountdown', () => {
   })
 
   it('should clear interval when stopped', () => {
-    const clearIntervalSpy = vi.spyOn(global, 'clearInterval')
+    const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval')
     const { result } = renderHook(() => useCountdown())
 
     act(() => {
@@ -155,7 +155,7 @@ describe('useCountdown', () => {
   })
 
   it('should automatically clear interval when countdown reaches 0', () => {
-    const clearIntervalSpy = vi.spyOn(global, 'clearInterval')
+    const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval')
     const { result } = renderHook(() => useCountdown())
 
     act(() => {

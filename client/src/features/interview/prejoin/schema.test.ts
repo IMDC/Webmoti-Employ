@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { SessionsGetResponse } from './schema'
 
 describe('prejoin schemas', () => {
-  describe('SessionsGetResponse', () => {
+  describe('sessionsGetResponse', () => {
     it('should validate a valid sessions response', () => {
       const validResponse = {
         sessionId: '550e8400-e29b-41d4-a716-446655440000',
