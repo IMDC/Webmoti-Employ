@@ -4,7 +4,7 @@ import { NewInterview, NewInterviewInvite } from '@webmoti-employ/shared'
 import { Hono } from 'hono'
 import z from 'zod'
 import { requireDb, useDb } from '../../middleware/useDb'
-import { zValidator } from '../../validator-wrapper'
+import { zValidator } from '../../utils/validator-wrapper'
 import { createInterview, getInterviews } from './db-queries'
 
 const interviewsRoute = new Hono<AppContext>()
