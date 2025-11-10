@@ -140,8 +140,6 @@ export class AiRoom {
     const result = await generateText({ model: this.model, messages: this.messages })
     const responseText = result.text
 
-    // TODO after adding debug logger, make this log instead
-    // eslint-disable-next-line no-console
     console.log(responseText)
 
     // we need to store the response text as well so the ai knows what it's responded to
@@ -158,7 +156,6 @@ export class AiRoom {
     // combine all queued transcripts into one message
     const transcript = this.transcriptQueue.join(' ')
     this.transcriptQueue = [] // clear the queue immediately
-    // eslint-disable-next-line no-console
     console.log('Transcript:', transcript)
 
     try {
