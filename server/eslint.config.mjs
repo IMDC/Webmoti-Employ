@@ -9,7 +9,4 @@ export default antfu({
     '**/worker-configuration.d.ts',
     '**/.wrangler',
   ],
-  rules: {
-    'no-console': 'off',
-  },
 })
