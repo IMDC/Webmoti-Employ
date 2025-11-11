@@ -24,37 +24,10 @@ import { zod4Resolver } from 'mantine-form-zod-resolver'
 import z from 'zod'
 import { useUser } from '@/features/auth/hooks/useUserStore'
 import { useAppActions, useAppIsColorblindModeOn } from '@/useAppStore'
-import { getHighlightColor, getInterviewLink, handleAppError } from '@/utils/utils'
+import { openGoogleCalendarTab } from '@/utils/calendar'
+import { getHighlightColor, handleAppError } from '@/utils/utils'
 import { useScheduleInterview } from '../queries'
 import { ScheduleInterviewForm } from '../schema'
-
-function openGoogleCalendarTab(
-  startTime: Date,
-  endTime: Date,
-  invites: string[],
-  sessionId: string,
-) {
-  const formatDate = (dt: DateTime) =>
-    dt.toUTC().toFormat('yyyyLLdd\'T\'HHmmss\'Z\'')
-
-  const start = DateTime.fromJSDate(startTime)
-  const end = DateTime.fromJSDate(endTime)
-
-  const startDateTime = formatDate(start)
-  const endDateTime = formatDate(end)
-
-  const title = encodeURIComponent('WebMoti-Employ Interview')
-  const description = encodeURIComponent(
-    'You are invited to a virtual interview on the WebMoti-Employ platform.'
-    + `\nJoin link: ${getInterviewLink(sessionId)}`,
-  )
-  const location = encodeURIComponent(window.location.origin)
-  const guests = encodeURIComponent(invites.join(','))
-
-  const url = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}&details=${description}&location=${location}&dates=${startDateTime}/${endDateTime}&add=${guests}`
-
-  window.open(url, '_blank')
-}
 
 interface ScheduleFormProps {
   onSuccess: () => void
