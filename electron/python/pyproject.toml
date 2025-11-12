@@ -1,7 +1,7 @@
 [project]
-name = "eyetracking-script"
+name = "eyetracker"
 version = "0.1.0"
-description = "@webmoti-employ/electron eyetracking script"
+description = "@webmoti-employ/electron eyetracker"
 requires-python = "==3.10.*"
 dependencies = [
   "aiohttp>=3.12.15",
@@ -11,13 +11,16 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = [ "ruff>=0.12.4", ]
+dev = [
+  "ruff>=0.12.4",
+  "pyinstaller>=6.16.0"
+]
 
 [tool.ruff.lint]
 select = [ "ALL" ]
 ignore = [
   "D103", # https://docs.astral.sh/ruff/rules/undocumented-public-function
-  "D100" # https://docs.astral.sh/ruff/rules/undocumented-public-module
+  "D100", # https://docs.astral.sh/ruff/rules/undocumented-public-module
 ]
 
 [tool.ruff.format]
