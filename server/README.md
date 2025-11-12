@@ -13,6 +13,7 @@ The server uses the Hono framework so it can run on serverless environments. Thi
   - [Database](#database)
     - [Neon](#neon)
     - [Cloudflare Hyperdrive](#cloudflare-hyperdrive)
+    - [Migrations](#migrations)
   - [Authentication](#authentication)
     - [Better Auth Setup](#better-auth-setup)
     - [Google OAuth Setup](#google-oauth-setup)
@@ -185,6 +186,10 @@ The database is postgres deployed with the Neon service. We also use Cloudflare 
     ```bash
     pnpm dlx wrangler hyperdrive update my-hyperdrive-id --origin-password my-db-password --caching-disabled true
     ```
+
+#### Migrations
+
+Run `pnpm migrate` to run the latest migrations
 
 ### Authentication
 
