@@ -23,7 +23,7 @@
     "deploy": "pnpm build && pnpm run -r deploy",
     "migrate": "pnpm --filter @webmoti-employ/server migrate",
     "cf-typegen": "pnpm --filter @webmoti-employ/server cf-typegen",
-    "db-typegen": "pnpm --filter @webmoti-employ/server cf-typegen"
+    "db-typegen": "pnpm --filter @webmoti-employ/server db:typegen"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.2.1",
