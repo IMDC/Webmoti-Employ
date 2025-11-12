@@ -17,7 +17,8 @@
     "postinstall": "node scripts/postinstall.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "migrate": "kysely migrate latest"
   },
   "dependencies": {
     "@ai-sdk/groq": "^2.0.22",
