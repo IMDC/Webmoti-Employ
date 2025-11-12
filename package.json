@@ -20,7 +20,10 @@
     "check": "pnpm -r run typecheck & pnpm -r run lint",
     "lint:fix": "pnpm run -r --parallel lint:fix",
     "lint:root": "eslint tsconfig.json README.md .github",
-    "deploy": "pnpm build && pnpm run -r deploy"
+    "deploy": "pnpm build && pnpm run -r deploy",
+    "migrate": "pnpm --filter @webmoti-employ/server migrate",
+    "cf-typegen": "pnpm --filter @webmoti-employ/server cf-typegen",
+    "db-typegen": "pnpm --filter @webmoti-employ/server db:typegen"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.2.1",
