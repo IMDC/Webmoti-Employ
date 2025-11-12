@@ -12,7 +12,8 @@
     "dist:win": "pnpm run build:electron && electron-builder --win --x64",
     "dist:linux": "pnpm run build:electron && electron-builder --linux --arm64",
     "dist:mac": "pnpm run build:electron && electron-builder --mac --x64",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "build:python": "uv run pyinstaller python/main.py --onefile --name eyetracker --distpath python/dist --workpath python/build --hidden-import engineio.async_drivers.aiohttp --hidden-import engineio.async_aiohttp"
   },
   "dependencies": {
     "socket.io-client": "^4.8.1",
