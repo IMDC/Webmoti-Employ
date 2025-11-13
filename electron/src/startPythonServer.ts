@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { app } from 'electron'
 import treeKill from 'tree-kill'
+import { logger } from './logger'
 
 const PYTHON_SRC_FOLDER_NAME = 'python'
 const PYTHON_EXE_NAME = 'eyetracker.exe'
@@ -14,8 +15,7 @@ export function stopPythonServer() {
 
   const pid = pythonProcess.pid
   if (pid) {
-    // eslint-disable-next-line no-console
-    console.log('Stopping Python server...')
+    logger.log('Stopping Python server...')
     // need to kill all processes in the tree since the parent is uv, not python
     treeKill(pid)
   }
@@ -36,8 +36,7 @@ function spawnPythonServer(cwd: string, command: string[]): Promise<void> {
 
     pythonProcess.stdout?.on('data', (data) => {
       const line = data.toString().trim()
-      // eslint-disable-next-line no-console
-      console.log(`[PYTHON] ${line}`)
+      logger.log(`[PYTHON] ${line}`)
       if (line.includes('Socket.IO server running'))
         resolve()
     })

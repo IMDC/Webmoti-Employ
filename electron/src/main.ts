@@ -3,6 +3,7 @@ import process from 'node:process'
 import { app, BrowserWindow } from 'electron'
 import { io } from 'socket.io-client'
 import z from 'zod'
+import { logger } from './logger'
 import { startLocalPythonServer, startPackagedPythonServer, stopPythonServer } from './startPythonServer'
 import {
   getLocalDomain,
@@ -39,8 +40,7 @@ function setupSocket(mainWindow: BrowserWindow) {
   })
 
   socket.on('connect', () => {
-    // eslint-disable-next-line no-console
-    console.log('Connected to Python Socket.IO server')
+    logger.log('Connected to Python Socket.IO server')
   })
 
   socket.on('feedback', (data) => {
@@ -54,8 +54,7 @@ function setupSocket(mainWindow: BrowserWindow) {
     if (isDev) {
       const now = Date.now()
       if (now - lastFeedbackLog > 1000) {
-        // eslint-disable-next-line no-console
-        console.log('Feedback received:', feedback)
+        logger.log('Feedback received:', feedback)
         lastFeedbackLog = now
       }
     }
@@ -81,8 +80,7 @@ function setupSocket(mainWindow: BrowserWindow) {
     if (isDev) {
       const now = Date.now()
       if (now - lastFeedbackLog > 1000) {
-        // eslint-disable-next-line no-console
-        console.log('Gaze stats:', stats)
+        logger.log('Gaze stats:', stats)
       }
     }
     ipcWebContentsSend('gazeStats', mainWindow.webContents, stats)
