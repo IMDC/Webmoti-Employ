@@ -9,8 +9,13 @@ node_modules/
 dist/
 
 # environment variables
-.env
-.dev.vars
+.env*
+.dev.vars*
+
+# keep example files
+!.env.example
+!.dev.vars.example
+!.env.electron.example
 
 # client
 .tanstack/
