@@ -7,7 +7,7 @@ import {
   getLocalDomain,
   getModelBuffer,
   getPreloadPath,
-  getUiPath,
+  HOSTED_URL,
   ipcHandle,
   ipcOnMain,
   ipcWebContentsSend,
@@ -103,7 +103,7 @@ async function createWindow() {
     mainWindow.webContents.openDevTools()
   }
   else {
-    mainWindow.loadFile(getUiPath())
+    mainWindow.loadURL(HOSTED_URL)
   }
 
   ipcHandle('getModelBuffer', getModelBuffer)

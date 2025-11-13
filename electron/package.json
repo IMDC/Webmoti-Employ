@@ -16,6 +16,7 @@
     "build:python": "uv run pyinstaller python/main.py --onefile --name eyetracker --distpath python/dist --workpath python/build --hidden-import engineio.async_drivers.aiohttp --hidden-import engineio.async_aiohttp"
   },
   "dependencies": {
+    "dotenv": "^17.2.3",
     "socket.io-client": "^4.8.1",
     "zod": "^4.1.8"
   },

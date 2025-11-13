@@ -5,6 +5,7 @@
   "appId": "com.imdc.webmoti-employ",
   "files": [
     "package.json",
+    ".env.electron",
     {
       "from": "dist",
       "to": "dist"
