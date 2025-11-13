@@ -13,11 +13,13 @@
     "dist:linux": "pnpm run build:electron && electron-builder --linux --arm64",
     "dist:mac": "pnpm run build:electron && electron-builder --mac --x64",
     "lint": "eslint .",
-    "build:python": "uv run pyinstaller python/main.py --onefile --name eyetracker --distpath python/dist --workpath python/build --hidden-import engineio.async_drivers.aiohttp --hidden-import engineio.async_aiohttp"
+    "build:python": "uv run pyinstaller python/main.py --onefile --name eyetracker --distpath python/dist --workpath python/build --hidden-import engineio.async_drivers.aiohttp --hidden-import engineio.async_aiohttp",
+    "kill:python": "taskkill /F /IM python.exe"
   },
   "dependencies": {
     "dotenv": "^17.2.3",
     "socket.io-client": "^4.8.1",
+    "tree-kill": "^1.2.2",
     "zod": "^4.1.8"
   },
   "devDependencies": {

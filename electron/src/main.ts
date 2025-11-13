@@ -3,6 +3,7 @@ import process from 'node:process'
 import { app, BrowserWindow } from 'electron'
 import { io } from 'socket.io-client'
 import z from 'zod'
+import { startLocalPythonServer, stopPythonServer } from './startPythonServer'
 import {
   getLocalDomain,
   getModelBuffer,
@@ -118,10 +119,12 @@ async function createWindow() {
 
 app.on('ready', async () => {
   const mainWindow = await createWindow()
+  await startLocalPythonServer()
   setupSocket(mainWindow)
 })
 
 app.on('window-all-closed', () => {
+  stopPythonServer()
   if (process.platform !== 'darwin') {
     app.quit()
   }
