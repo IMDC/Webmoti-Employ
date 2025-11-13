@@ -10,10 +10,45 @@ import tobii_research as tr
 from aiohttp import web
 from loguru import logger
 
+# ===== SERVER =========================================================================
+
 # Setup Socket.IO Server
 sio = socketio.AsyncServer(cors_allowed_origins="*")
 app = web.Application()
 sio.attach(app)
+
+
+@sio.event
+async def connect(sid: str, _: dict) -> None:
+    logger.info(f"Electron connected: {sid}")
+
+
+@sio.event
+async def disconnect(sid: str) -> None:
+    logger.info(f"Electron disconnected: {sid}")
+
+
+class AOIBoundingBox(TypedDict):
+    """AOI data structure from Electron."""
+
+    x: float
+    y: float
+    width: float
+    height: float
+
+
+@sio.event
+async def update_aoi(_: str, data: AOIBoundingBox) -> None:
+    global current_aoi_bbox  # noqa: PLW0603
+    current_aoi_bbox = data
+    logger.debug(f"Updated AOI: {data}")
+
+
+# ======================================================================================
+
+
+# ===== STATE ==========================================================================
+
 
 # Global state
 current_aoi_bbox = None
@@ -24,10 +59,16 @@ PUBLISH_HZ = 5  # rate-limit feedback emits to avoid spamming UI
 GAZE_RATIO_WINDOW_S = 30  # rolling window for gaze-on-interviewer ratio
 
 # latest gaze sample storage (set from Tobii callback, consumed by publisher loop)
-_LATEST_GAZE_ARGS: tuple[int, float, float, float, float, float, float, int, int] | None = None
+_LATEST_GAZE_ARGS: (
+    tuple[int, float, float, float, float, float, float, int, int] | None
+) = None
 _LAST_SENT_STATE: tuple[bool, bool] | None = None  # (looking_at_interviewer, fixation)
 _LOOK_HISTORY: deque[bool] = deque(maxlen=int(GAZE_RATIO_WINDOW_S * PUBLISH_HZ))
 _LAST_RATIO_EMIT = 0.0
+_LAST_RATIO: float | None = None
+
+RATIO_CHANGE_THRESHOLD = 0.01
+FIXATION_THRESHOLD_RATIO = 0.6
 
 # Eye movement classification setup
 gaze_history = deque(maxlen=5)
@@ -35,13 +76,24 @@ fixation_history = deque(maxlen=7)
 FIXATION_VELOCITY_THRESHOLD = 100  # pixels per second
 MIN_GAZE_POINTS = 2
 
+# ======================================================================================
 
-# AOI data structure from Electron
-class AOIBoundingBox(TypedDict):
-    x: float
-    y: float
-    width: float
-    height: float
+
+# ===== EYETRACKING ====================================================================
+
+
+class GazeSample(TypedDict):
+    """Tobii gaze sample (simplified subset)."""
+
+    timestamp: int
+    gaze_x_left: float
+    gaze_y_left: float
+    gaze_x_right: float
+    gaze_y_right: float
+    pupil_left: float
+    pupil_right: float
+    validity_left: int
+    validity_right: int
 
 
 def classify_eye_movement(
@@ -63,8 +115,9 @@ def classify_eye_movement(
     return "Fixation" if velocity < FIXATION_VELOCITY_THRESHOLD else "Saccade"
 
 
-# Tobii gaze data format
 class GazeData(TypedDict):
+    """Tobii gaze data format."""
+
     device_time_stamp: int
     left_gaze_point_on_display_area: tuple[float, float]
     right_gaze_point_on_display_area: tuple[float, float]
@@ -74,28 +127,22 @@ class GazeData(TypedDict):
     right_gaze_point_validity: int
 
 
-async def handle_gaze_data(
-    timestamp: int,
-    gaze_x_left: float,
-    gaze_y_left: float,
-    gaze_x_right: float,
-    gaze_y_right: float,
-    pupil_left: float,
-    pupil_right: float,
-    validity_left: int,
-    validity_right: int,
-) -> None:
-    global current_aoi_bbox, start_timestamp
+async def handle_gaze_data(sample: GazeSample) -> None:
+    global start_timestamp  # noqa: PLW0603
 
     # Proceed if at least one eye is valid
-    if not (validity_left or validity_right):
+    if not (sample["validity_left"] or sample["validity_right"]):
         return
 
     if start_timestamp is None:
-        start_timestamp = timestamp
+        start_timestamp = sample["timestamp"]
 
-    gaze_coords_x = [x for x in [gaze_x_left, gaze_x_right] if x is not None]
-    gaze_coords_y = [y for y in [gaze_y_left, gaze_y_right] if y is not None]
+    gaze_coords_x = [
+        x for x in [sample["gaze_x_left"], sample["gaze_x_right"]] if x is not None
+    ]
+    gaze_coords_y = [
+        y for y in [sample["gaze_y_left"], sample["gaze_y_right"]] if y is not None
+    ]
 
     if not gaze_coords_x or not gaze_coords_y:
         return
@@ -117,10 +164,13 @@ async def handle_gaze_data(
     else:
         logger.warning("No bounding box found")
 
-    movement_type = classify_eye_movement((gaze_x_avg, gaze_y_avg), timestamp)
+    movement_type = classify_eye_movement((gaze_x_avg, gaze_y_avg), sample["timestamp"])
     # Smooth fixation signal to reduce rapid flipping
     fixation_history.append(movement_type == "Fixation")
-    fixation_active = sum(1 for v in fixation_history if v) >= max(1, int(0.6 * len(fixation_history)))
+    fixation_active = sum(1 for v in fixation_history if v) >= max(
+        1,
+        int(FIXATION_THRESHOLD_RATIO * len(fixation_history)),
+    )
 
     # see shared/src/electron.d.ts and electron/src/main.ts for feedback structure
     feedback = [
@@ -132,9 +182,9 @@ async def handle_gaze_data(
     ]
 
     # Deduplicate: only emit on change to reduce traffic
-    global _LAST_SENT_STATE
+    global _LAST_SENT_STATE  # noqa: PLW0603
     current_state = (looking_at_interviewer, fixation_active)
-    if _LAST_SENT_STATE != current_state:
+    if current_state != _LAST_SENT_STATE:
         _LAST_SENT_STATE = current_state
         await sio.emit("feedback", feedback)
         logger.info(f"Sent feedback: {feedback}")
@@ -145,103 +195,82 @@ async def handle_gaze_data(
         ratio = sum(1 for v in _LOOK_HISTORY if v) / len(_LOOK_HISTORY)
         # Emit at most ~1 Hz and when change >= 1%
         now_sec = time.time()
-        global _LAST_RATIO_EMIT
-        if now_sec - _LAST_RATIO_EMIT >= 1.0 or getattr(handle_gaze_data, "_last_ratio", None) is None or abs(getattr(handle_gaze_data, "_last_ratio") - ratio) >= 0.01:
-            setattr(handle_gaze_data, "_last_ratio", ratio)
+        global _LAST_RATIO_EMIT  # noqa: PLW0603
+        global _LAST_RATIO  # noqa: PLW0603
+        if (
+            _LAST_RATIO is None
+            or abs(_LAST_RATIO - ratio) >= RATIO_CHANGE_THRESHOLD
+            or now_sec - _LAST_RATIO_EMIT >= 1.0
+        ):
+            _LAST_RATIO = ratio
             _LAST_RATIO_EMIT = now_sec
-            await sio.emit("gaze_stats", {"gazeOnInterviewerRatio": ratio, "windowSeconds": GAZE_RATIO_WINDOW_S})
+            await sio.emit(
+                "gaze_stats",
+                {"gazeOnInterviewerRatio": ratio, "windowSeconds": GAZE_RATIO_WINDOW_S},
+            )
             logger.debug(f"Gaze ratio: {ratio:.2%} over {GAZE_RATIO_WINDOW_S}s")
 
 
-def _store_latest_gaze_args(
-    timestamp: int,
-    gaze_x_left: float,
-    gaze_y_left: float,
-    gaze_x_right: float,
-    gaze_y_right: float,
-    pupil_left: float,
-    pupil_right: float,
-    validity_left: int,
-    validity_right: int,
-) -> None:
-    global _LATEST_GAZE_ARGS
-    _LATEST_GAZE_ARGS = (
-        timestamp,
-        gaze_x_left,
-        gaze_y_left,
-        gaze_x_right,
-        gaze_y_right,
-        pupil_left,
-        pupil_right,
-        validity_left,
-        validity_right,
-    )
+def _store_latest_gaze_args(sample: GazeSample) -> None:
+    global _LATEST_GAZE_ARGS  # noqa: PLW0603
+    _LATEST_GAZE_ARGS = sample
 
 
 def gaze_callback(gaze_data: GazeData) -> None:
-    # Tobii invokes callbacks on a background thread; forward latest sample to loop thread
+    # Tobii invokes callbacks on a background thread;
+    # forward latest sample to loop thread
     if ASYNC_LOOP is not None:
-        ASYNC_LOOP.call_soon_threadsafe(
-            _store_latest_gaze_args,
-            gaze_data["device_time_stamp"],
-            *gaze_data["left_gaze_point_on_display_area"],
-            *gaze_data["right_gaze_point_on_display_area"],
-            gaze_data["left_pupil_diameter"],
-            gaze_data["right_pupil_diameter"],
-            gaze_data["left_gaze_point_validity"],
-            gaze_data["right_gaze_point_validity"],
-        )
+        sample: GazeSample = {
+            "timestamp": gaze_data["device_time_stamp"],
+            "gaze_x_left": gaze_data["left_gaze_point_on_display_area"][0],
+            "gaze_y_left": gaze_data["left_gaze_point_on_display_area"][1],
+            "gaze_x_right": gaze_data["right_gaze_point_on_display_area"][0],
+            "gaze_y_right": gaze_data["right_gaze_point_on_display_area"][1],
+            "pupil_left": gaze_data["left_pupil_diameter"],
+            "pupil_right": gaze_data["right_pupil_diameter"],
+            "validity_left": gaze_data["left_gaze_point_validity"],
+            "validity_right": gaze_data["right_gaze_point_validity"],
+        }
+
+        ASYNC_LOOP.call_soon_threadsafe(_store_latest_gaze_args, sample)
     else:
         # Loop not ready yet; drop silently
         return
 
 
-@sio.event
-async def connect(sid, environ):
-    logger.info(f"Electron connected: {sid}")
-
-
-@sio.event
-async def disconnect(sid):
-    logger.info(f"Electron disconnected: {sid}")
-
-
-@sio.event
-async def update_aoi(sid, data: AOIBoundingBox):
-    global current_aoi_bbox
-    current_aoi_bbox = data
-    logger.debug(f"Updated AOI: {data}")
-
-
-async def simulate_gaze_data():
-    global TEST_MODE
+async def simulate_gaze_data() -> None:
     while TEST_MODE:
         timestamp = int(time.time() * 1e6)
         _store_latest_gaze_args(
-            timestamp,
-            random.uniform(0.3, 0.7),
-            random.uniform(0.3, 0.7),
-            random.uniform(0.3, 0.7),
-            random.uniform(0.3, 0.7),
-            random.uniform(2.5, 3.5),
-            random.uniform(2.5, 3.5),
-            1,
-            1,
+            {
+                "timestamp": timestamp,
+                "gaze_x_left": random.uniform(0.3, 0.7),  # noqa: S311
+                "gaze_y_left": random.uniform(0.3, 0.7),  # noqa: S311
+                "gaze_x_right": random.uniform(0.3, 0.7),  # noqa: S311
+                "gaze_y_right": random.uniform(0.3, 0.7),  # noqa: S311
+                "pupil_left": random.uniform(2.5, 3.5),  # noqa: S311
+                "pupil_right": random.uniform(2.5, 3.5),  # noqa: S311
+                "validity_left": 1,
+                "validity_right": 1,
+            },
         )
         await asyncio.sleep(0.05)
 
 
-async def feedback_publisher_loop():
+async def feedback_publisher_loop() -> None:
     """Publish feedback at a steady rate using the most recent gaze sample."""
     period = 1.0 / PUBLISH_HZ
     while True:
         if _LATEST_GAZE_ARGS is not None:
-            await handle_gaze_data(*_LATEST_GAZE_ARGS)
+            await handle_gaze_data(_LATEST_GAZE_ARGS)
         await asyncio.sleep(period)
 
 
-async def main():
-    global TEST_MODE, ASYNC_LOOP
+# ======================================================================================
+
+
+async def main() -> None:
+    global TEST_MODE, ASYNC_LOOP  # noqa: PLW0603
     ASYNC_LOOP = asyncio.get_running_loop()
     trackers = tr.find_all_eyetrackers()
     if trackers:
@@ -251,7 +280,7 @@ async def main():
     else:
         logger.warning("No Tobii tracker found. Using TEST_MODE.")
         TEST_MODE = True
-        asyncio.create_task(simulate_gaze_data())
+        asyncio.create_task(simulate_gaze_data())  # noqa: RUF006
 
     web_runner = web.AppRunner(app)
     await web_runner.setup()
@@ -260,10 +289,10 @@ async def main():
     logger.info("Socket.IO server running at http://localhost:65432")
 
     # start periodic publisher
-    asyncio.create_task(feedback_publisher_loop())
+    asyncio.create_task(feedback_publisher_loop())  # noqa: RUF006
 
-    while True:
-        await asyncio.sleep(3600)  # Keep running
+    stop_event = asyncio.Event()
+    await stop_event.wait()  # Keep running
 
 
 if __name__ == "__main__":
