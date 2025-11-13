@@ -4,6 +4,7 @@ import { app } from 'electron'
 import treeKill from 'tree-kill'
 
 const PYTHON_SRC_FOLDER_NAME = 'python'
+const PYTHON_EXE_NAME = 'eyetracker.exe'
 
 let pythonProcess: ReturnType<typeof spawn> | null = null
 
@@ -59,6 +60,7 @@ export function startLocalPythonServer() {
 }
 
 export function startPackagedPythonServer() {
-  const basePath = path.join(app.getAppPath(), PYTHON_SRC_FOLDER_NAME)
-  return spawnPythonServer(basePath, ['python', 'main.py'])
+  const resourcesDir = path.join(app.getAppPath(), '..', 'resources')
+  const exePath = path.join(resourcesDir, PYTHON_EXE_NAME)
+  return spawnPythonServer(path.dirname(exePath), [exePath])
 }

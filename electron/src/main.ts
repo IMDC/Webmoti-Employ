@@ -3,7 +3,7 @@ import process from 'node:process'
 import { app, BrowserWindow } from 'electron'
 import { io } from 'socket.io-client'
 import z from 'zod'
-import { startLocalPythonServer, stopPythonServer } from './startPythonServer'
+import { startLocalPythonServer, startPackagedPythonServer, stopPythonServer } from './startPythonServer'
 import {
   getLocalDomain,
   getModelBuffer,
@@ -102,9 +102,11 @@ async function createWindow() {
     mainWindow.setIcon(path.join(app.getAppPath(), 'icon.png'))
     mainWindow.loadURL(`http://${getLocalDomain()}`)
     mainWindow.webContents.openDevTools()
+    await startLocalPythonServer()
   }
   else {
     mainWindow.loadURL(HOSTED_URL)
+    await startPackagedPythonServer()
   }
 
   ipcHandle('getModelBuffer', getModelBuffer)
@@ -119,7 +121,6 @@ async function createWindow() {
 
 app.on('ready', async () => {
   const mainWindow = await createWindow()
-  await startLocalPythonServer()
   setupSocket(mainWindow)
 })
 
