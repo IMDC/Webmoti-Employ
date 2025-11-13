@@ -6,10 +6,6 @@
   "files": [
     "package.json",
     {
-      "from": "../client/dist",
-      "to": "client/dist"
-    },
-    {
       "from": "dist",
       "to": "dist"
     }
