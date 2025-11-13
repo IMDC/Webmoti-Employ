@@ -11,7 +11,7 @@
     "build:electron": "vite build --mode electron",
     "install:deploy": "pnpm install --filter @webmoti-employ/shared --filter @webmoti-employ/client",
     "build:deploy": "pnpm -r --filter @webmoti-employ/shared --filter @webmoti-employ/client build",
-    "build:deploy:electron": "pnpm -r --filter @webmoti-employ/shared --filter build && pnpm --filter @webmoti-employ/client run build:electron",
+    "build:deploy:electron": "pnpm --filter @webmoti-employ/shared build && pnpm --filter @webmoti-employ/client build:electron",
     "lint": "eslint . && pnpm run stylelint",
     "lint:fix": "eslint . --fix",
     "stylelint": "stylelint **/*.css",

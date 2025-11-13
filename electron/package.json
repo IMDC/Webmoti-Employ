@@ -8,7 +8,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "dev:electron": "rimraf dist && tsc && electron .",
-    "build:electron": "rimraf dist && tsc && pnpm --filter @webmoti-employ/client build:deploy",
+    "build:electron": "rimraf dist && tsc && cross-env VITE_IS_ELECTRON=true pnpm --filter @webmoti-employ/client build:deploy:electron",
     "dist:win": "pnpm run build:electron && electron-builder --win --x64",
     "dist:linux": "pnpm run build:electron && electron-builder --linux --arm64",
     "dist:mac": "pnpm run build:electron && electron-builder --mac --x64",
@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.2.1",
+    "cross-env": "^10.1.0",
     "electron": "38.1.0",
     "electron-builder": "^26.0.12",
     "eslint": "^9.35.0",
