@@ -50,23 +50,19 @@ app.on('ready', async () => {
   const mainWindow = await createWindow()
   setupSocket(mainWindow)
 
-  if (isDev) {
-    try {
+  addLog(mainWindow, 'Starting python server...')
+  try {
+    if (isDev) {
       await startLocalPythonServer()
       addLog(mainWindow, 'Local Python server started successfully.')
     }
-    catch (err) {
-      addLog(mainWindow, `Failed to start local Python server: ${err}`)
-    }
-  }
-  else {
-    try {
+    else {
       await startPackagedPythonServer()
       addLog(mainWindow, 'Packaged Python server started successfully.')
     }
-    catch (err) {
-      addLog(mainWindow, `Failed to start packaged Python server: ${err}`)
-    }
+  }
+  catch (error) {
+    addLog(mainWindow, `Failed to start local Python server: ${error}`)
   }
 })
 

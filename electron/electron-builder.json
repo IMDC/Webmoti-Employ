@@ -14,7 +14,10 @@
   "extraResources": [
     "dist/preload.cjs",
     "models",
-    "python/dist/eyetracker.exe"
+    {
+      "from": "python/dist/eyetracker.exe",
+      "to": "eyetracker.exe"
+    }
   ],
   "mac": {
     "target": "dmg",

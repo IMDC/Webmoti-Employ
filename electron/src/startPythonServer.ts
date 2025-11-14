@@ -62,5 +62,5 @@ export function startLocalPythonServer() {
 export function startPackagedPythonServer() {
   const resourcesDir = path.join(app.getAppPath(), '..', 'resources')
   const exePath = path.join(resourcesDir, PYTHON_EXE_NAME)
-  return spawnPythonServer(path.dirname(exePath), [exePath])
+  return spawnPythonServer(resourcesDir, [exePath])
 }
