@@ -1,6 +1,7 @@
 import asyncio
 import math
 import random
+import sys
 import time
 from collections import deque
 from typing import Literal, TypedDict
@@ -9,6 +10,66 @@ import socketio
 import tobii_research as tr
 from aiohttp import web
 from loguru import logger
+
+# ===== LOGGER CONFIG ==================================================================
+
+# https://loguru.readthedocs.io/en/stable/resources/migration.html#fundamental-differences-between-logging-and-loguru
+# by default loguru logs all logs to sys.stderr and not to sys.stdout
+# this makes it hard to differentiate logs in electron, so here we separate the logs
+
+logger.remove()
+# Send INFO and DEBUG logs to stdout
+logger.add(
+    sys.stdout,
+    level="DEBUG",
+    filter=lambda record: record["level"].no <= logger.level("INFO").no,
+    colorize=True,
+    format="<green>{time:HH:mm:ss}</green> | <level>{level: <8}</level> | {message}",
+)
+# Send WARNING and above to stderr
+logger.add(
+    sys.stderr,
+    level="WARNING",
+    colorize=True,
+    format="<red>{time:HH:mm:ss}</red> | <level>{level: <8}</level> | {message}",
+)
+
+
+# ===== CONSTANTS ======================================================================
+
+STARTED_OUTPUT_STRING = "STARTED_PYTHON_SERVER"
+
+PUBLISH_HZ = 5  # rate-limit feedback emits to avoid spamming UI
+GAZE_RATIO_WINDOW_S = 30  # rolling window for gaze-on-interviewer ratio
+RATIO_CHANGE_THRESHOLD = 0.01
+FIXATION_THRESHOLD_RATIO = 0.6
+
+FIXATION_VELOCITY_THRESHOLD = 100  # pixels per second
+MIN_GAZE_POINTS = 2
+
+# ===== STATE ==========================================================================
+
+
+# Global state
+current_aoi_bbox = None
+start_timestamp = None
+TEST_MODE = False  # Auto-set if no tracker
+ASYNC_LOOP: asyncio.AbstractEventLoop | None = None
+
+# latest gaze sample storage (set from Tobii callback, consumed by publisher loop)
+_LATEST_GAZE_ARGS: (
+    tuple[int, float, float, float, float, float, float, int, int] | None
+) = None
+_LAST_SENT_STATE: tuple[bool, bool] | None = None  # (looking_at_interviewer, fixation)
+_LOOK_HISTORY: deque[bool] = deque(maxlen=int(GAZE_RATIO_WINDOW_S * PUBLISH_HZ))
+_LAST_RATIO_EMIT = 0.0
+_LAST_RATIO: float | None = None
+
+
+# Eye movement classification setup
+gaze_history = deque(maxlen=5)
+fixation_history = deque(maxlen=7)
+
 
 # ===== SERVER =========================================================================
 
@@ -42,41 +103,6 @@ async def update_aoi(_: str, data: AOIBoundingBox) -> None:
     global current_aoi_bbox  # noqa: PLW0603
     current_aoi_bbox = data
     logger.debug(f"Updated AOI: {data}")
-
-
-# ======================================================================================
-
-
-# ===== STATE ==========================================================================
-
-
-# Global state
-current_aoi_bbox = None
-start_timestamp = None
-TEST_MODE = False  # Auto-set if no tracker
-ASYNC_LOOP: asyncio.AbstractEventLoop | None = None
-PUBLISH_HZ = 5  # rate-limit feedback emits to avoid spamming UI
-GAZE_RATIO_WINDOW_S = 30  # rolling window for gaze-on-interviewer ratio
-
-# latest gaze sample storage (set from Tobii callback, consumed by publisher loop)
-_LATEST_GAZE_ARGS: (
-    tuple[int, float, float, float, float, float, float, int, int] | None
-) = None
-_LAST_SENT_STATE: tuple[bool, bool] | None = None  # (looking_at_interviewer, fixation)
-_LOOK_HISTORY: deque[bool] = deque(maxlen=int(GAZE_RATIO_WINDOW_S * PUBLISH_HZ))
-_LAST_RATIO_EMIT = 0.0
-_LAST_RATIO: float | None = None
-
-RATIO_CHANGE_THRESHOLD = 0.01
-FIXATION_THRESHOLD_RATIO = 0.6
-
-# Eye movement classification setup
-gaze_history = deque(maxlen=5)
-fixation_history = deque(maxlen=7)
-FIXATION_VELOCITY_THRESHOLD = 100  # pixels per second
-MIN_GAZE_POINTS = 2
-
-# ======================================================================================
 
 
 # ===== EYETRACKING ====================================================================
@@ -286,7 +312,7 @@ async def main() -> None:
     await web_runner.setup()
     site = web.TCPSite(web_runner, "localhost", 65432)
     await site.start()
-    logger.info("Socket.IO server running at http://localhost:65432")
+    logger.info(STARTED_OUTPUT_STRING)
 
     # start periodic publisher
     asyncio.create_task(feedback_publisher_loop())  # noqa: RUF006

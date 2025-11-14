@@ -6,6 +6,7 @@ import { logger } from './logger'
 
 const PYTHON_SRC_FOLDER_NAME = 'python'
 const PYTHON_EXE_NAME = 'eyetracker.exe'
+const PYTHON_STARTED_OUTPUT_STRING = 'STARTED_PYTHON_SERVER'
 
 let pythonProcess: ReturnType<typeof spawn> | null = null
 
@@ -37,17 +38,17 @@ function spawnPythonServer(cwd: string, command: string[]): Promise<void> {
     pythonProcess.stdout?.on('data', (data) => {
       const line = data.toString().trim()
       logger.log(`[PYTHON] ${line}`)
-      if (line.includes('Socket.IO server running'))
+      if (line.includes(PYTHON_STARTED_OUTPUT_STRING))
         resolve()
     })
 
     pythonProcess.stderr?.on('data', (data) => {
-      console.error(`[PYTHON ERROR] ${data.toString().trim()}`)
+      logger.error(`[PYTHON ERROR] ${data.toString().trim()}`)
     })
 
     pythonProcess.on('error', reject)
     pythonProcess.on('exit', (code) => {
-      console.warn(`Python server exited with code ${code}`)
+      logger.warn(`Python server exited with code ${code}`)
       pythonProcess = null
     })
   })

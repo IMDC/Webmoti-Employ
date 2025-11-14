@@ -11,8 +11,13 @@ electron.contextBridge.exposeInMainWorld('electron', {
     ipcOn('gazeStats', (stats) => {
       callback(stats)
     }),
+  subscribeToLogs: callback =>
+    ipcOn('log', (log) => {
+      callback(log)
+    }),
   sendInterviewerCoordinates: coordinates => ipcSend('coordinates', coordinates),
   getModelBuffer: () => ipcInvoke('getModelBuffer'),
+  setRendererReady: () => ipcSend('setRendererReady', undefined),
 } satisfies Window['electron'])
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(

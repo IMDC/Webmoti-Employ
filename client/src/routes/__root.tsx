@@ -2,6 +2,7 @@ import { Center, Divider, Group, Stack, Text, Title } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { ErrorDialog } from '@/components/ErrorDialog'
+import { useElectronLogs } from '@/features/interview/session/hooks/useElectronLogs'
 
 export const Route = createRootRoute({
   component: RootRoute,
@@ -27,6 +28,8 @@ function NotFound() {
 }
 
 function RootRoute() {
+  useElectronLogs()
+
   return (
     <>
       <Outlet />

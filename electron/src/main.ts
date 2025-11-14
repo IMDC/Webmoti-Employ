@@ -4,6 +4,7 @@ import { app, BrowserWindow } from 'electron'
 import { io } from 'socket.io-client'
 import z from 'zod'
 import { logger } from './logger'
+import { addLog, setRendererReady } from './logQueue'
 import { startLocalPythonServer, startPackagedPythonServer, stopPythonServer } from './startPythonServer'
 import {
   getLocalDomain,
@@ -46,7 +47,7 @@ function setupSocket(mainWindow: BrowserWindow) {
   socket.on('feedback', (data) => {
     const parsed = FeedbackSchema.safeParse(data)
     if (!parsed.success) {
-      console.error('Invalid feedback payload:', z.flattenError(parsed.error))
+      logger.error('Invalid feedback payload:', z.flattenError(parsed.error))
       return
     }
     const feedback = parsed.data
@@ -63,17 +64,23 @@ function setupSocket(mainWindow: BrowserWindow) {
   })
 
   socket.on('disconnect', () => {
-    console.warn('Disconnected from Python server')
+    logger.warn('Disconnected from Python server')
   })
 
   socket.on('connect_error', (error) => {
-    console.error('Connection Error:', error.message)
+    if (error.message.includes('xhr poll error')) {
+      // suppress these messages because they only appear when socket isn't open yet
+      logger.error('Connecting to socket...')
+    }
+    else {
+      logger.error('Connection Error:', error.message)
+    }
   })
 
   socket.on('gaze_stats', (data) => {
     const parsed = GazeStatsSchema.safeParse(data)
     if (!parsed.success) {
-      console.error('Invalid gaze_stats payload:', z.flattenError(parsed.error))
+      logger.error('Invalid gaze_stats payload:', z.flattenError(parsed.error))
       return
     }
     const stats = parsed.data
@@ -100,11 +107,9 @@ async function createWindow() {
     mainWindow.setIcon(path.join(app.getAppPath(), 'icon.png'))
     mainWindow.loadURL(`http://${getLocalDomain()}`)
     mainWindow.webContents.openDevTools()
-    await startLocalPythonServer()
   }
   else {
     mainWindow.loadURL(HOSTED_URL)
-    await startPackagedPythonServer()
   }
 
   ipcHandle('getModelBuffer', getModelBuffer)
@@ -114,12 +119,35 @@ async function createWindow() {
     socket.emit('update_aoi', coordinates.boundingBox)
   })
 
+  ipcOnMain('setRendererReady', (_event) => {
+    setRendererReady(mainWindow)
+  })
+
   return mainWindow
 }
 
 app.on('ready', async () => {
   const mainWindow = await createWindow()
   setupSocket(mainWindow)
+
+  if (isDev) {
+    try {
+      await startLocalPythonServer()
+      addLog(mainWindow, 'Local Python server started successfully.')
+    }
+    catch (err) {
+      addLog(mainWindow, `Failed to start local Python server: ${err}`)
+    }
+  }
+  else {
+    try {
+      await startPackagedPythonServer()
+      addLog(mainWindow, 'Packaged Python server started successfully.')
+    }
+    catch (err) {
+      addLog(mainWindow, `Failed to start packaged Python server: ${err}`)
+    }
+  }
 })
 
 app.on('window-all-closed', () => {
