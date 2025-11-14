@@ -41,5 +41,7 @@ __pycache__/
 *.spec
 build/
 
+.ruff_cache/
+
 test.py
 .vercel
