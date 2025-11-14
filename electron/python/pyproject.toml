@@ -8,12 +8,13 @@ dependencies = [
   "loguru>=0.7.3",
   "python-socketio>=5.13.0",
   "tobii-research>=2.1.0",
+  "watchfiles>=1.1.1",
 ]
 
 [dependency-groups]
 dev = [
   "ruff>=0.12.4",
-  "pyinstaller>=6.16.0"
+  "pyinstaller>=6.16.0",
 ]
 
 [tool.ruff.lint]

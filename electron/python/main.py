@@ -10,6 +10,7 @@ import socketio
 import tobii_research as tr
 from aiohttp import web
 from loguru import logger
+from watchfiles import run_process
 
 # ===== LOGGER CONFIG ==================================================================
 
@@ -321,5 +322,33 @@ async def main() -> None:
     await stop_event.wait()  # Keep running
 
 
+def run_main_sync() -> None:
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    try:
+        loop.run_until_complete(main())
+    except KeyboardInterrupt:
+        logger.info("Ctrl+C pressed, shutting down...")
+    finally:
+        # cancel all remaining tasks
+        tasks = asyncio.all_tasks(loop)
+        for t in tasks:
+            t.cancel()
+        loop.run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
+        loop.close()
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    # pyinstaller sets this attribute
+    is_dev = not getattr(sys, "frozen", False)
+
+    if is_dev:
+        logger.info("Running dev Python server")
+        try:
+            # enable hot reload so any change to files in this directory will rerun main
+            run_process(".", target=run_main_sync)
+        except KeyboardInterrupt:
+            logger.info("Ctrl+C pressed, shutting down dev server...")
+    else:
+        logger.info("Running packaged Python server")
+        run_main_sync()
