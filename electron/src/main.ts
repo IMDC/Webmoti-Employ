@@ -18,6 +18,9 @@ async function createWindow() {
   const mainWindow = new BrowserWindow({
     webPreferences: {
       preload: getPreloadPath(),
+      contextIsolation: true,
+      nodeIntegration: false,
+      // sandbox: false,
     },
     show: false,
   })
