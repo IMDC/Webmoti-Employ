@@ -11,7 +11,7 @@ export function useElectronLogs() {
     window.electron.setRendererReady()
 
     const unsubscribe = window.electron.subscribeToLogs((msg) => {
-      logger.log('[Electron]', msg)
+      logger.info('[Electron]', msg)
     })
 
     return () => unsubscribe()
