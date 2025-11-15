@@ -29,7 +29,6 @@ export function Room() {
   const participantStageRef = useRef<HTMLDivElement>(null)
 
   const [isChatOpen, setIsChatOpen] = useState(false)
-  // const [isCaptionsAreaOpen, setIsCaptionsAreaOpen] = useState(false)
 
   const { sendTranscript, notification, sendDevIsJohnDoNotUseMessage } = useAiWebsocket()
   useTranscription(5, sendTranscript)
@@ -160,15 +159,6 @@ export function Room() {
                       />
                     )}
               </Flex>
-
-              {/* {isCaptionsAreaOpen && (
-                <Box
-                  w="100%"
-                  h="25%"
-                >
-                  <CaptionsArea />
-                </Box>
-              )} */}
             </Stack>
           )}
 
@@ -201,8 +191,6 @@ export function Room() {
               <MenuBar
                 onToggleMic={onToggleMic}
                 onToggleVideo={onToggleVideo}
-                // isCaptionsAreaOpen={isCaptionsAreaOpen}
-                // toggleCaptionsArea={() => setIsCaptionsAreaOpen(o => !o)}
                 isChatOpen={isChatOpen}
                 onToggleChat={() => {
                   setIsChatOpen(!isChatOpen)

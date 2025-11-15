@@ -12,8 +12,6 @@ import { ChangeVideoPopover } from './popovers/ChangeVideoPopover'
 interface MenuBarProps {
   onToggleMic: () => Promise<void>
   onToggleVideo: () => Promise<void>
-  // isCaptionsAreaOpen: boolean
-  // toggleCaptionsArea: () => void
   isChatOpen: boolean
   onToggleChat?: () => void
   onToggleLayoutModal?: () => void
@@ -25,8 +23,6 @@ export function MenuBar({
   onToggleVideo,
   onToggleChat,
   isChatOpen,
-  // isCaptionsAreaOpen,
-  // toggleCaptionsArea,
   onToggleLayoutModal,
   sendDevIsJohnDoNotUseThis,
 }: MenuBarProps) {
@@ -54,11 +50,6 @@ export function MenuBar({
           <ChangeVideoPopover switchCamera={switchCamera} />
           <ToggleVideoButton onToggleVideo={onToggleVideo} />
         </Button.Group>
-
-        {/* <ToggleCaptionsButton
-          isCaptionsAreaOpen={isCaptionsAreaOpen}
-          toggleCaptionsArea={toggleCaptionsArea}
-        /> */}
       </Flex>
 
       {/* right section */}
