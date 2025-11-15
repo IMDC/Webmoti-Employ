@@ -5,8 +5,12 @@ import treeKill from 'tree-kill'
 import { logger } from './logger'
 
 const PYTHON_SRC_FOLDER_NAME = 'python'
-const PYTHON_EXE_NAME = 'eyetracker.exe'
+const PYTHON_BINARY_PREFIX = 'eyetracker'
 const PYTHON_STARTED_OUTPUT_STRING = 'STARTED_PYTHON_SERVER'
+
+function getPythonBinaryName() {
+  return process.platform === 'win32' ? `${PYTHON_BINARY_PREFIX}.exe` : PYTHON_BINARY_PREFIX
+}
 
 let pythonProcess: ReturnType<typeof spawn> | null = null
 
@@ -61,6 +65,6 @@ export function startLocalPythonServer() {
 
 export function startPackagedPythonServer() {
   const resourcesDir = path.join(app.getAppPath(), '..', 'resources')
-  const exePath = path.join(resourcesDir, PYTHON_EXE_NAME)
+  const exePath = path.join(resourcesDir, getPythonBinaryName())
   return spawnPythonServer(resourcesDir, [exePath])
 }

@@ -13,23 +13,37 @@
   ],
   "extraResources": [
     "dist/preload.cjs",
-    "models",
-    {
-      "from": "python/dist/eyetracker.exe",
-      "to": "eyetracker.exe"
-    }
+    "models"
   ],
-  "mac": {
-    "target": "dmg",
-    "forceCodeSigning": false
+  "win": {
+    "target": ["portable"],
+    "forceCodeSigning": false,
+    "extraResources": [
+      {
+        "from": "python/dist/eyetracker.exe",
+        "to": "eyetracker.exe"
+      }
+    ]
   },
   "linux": {
     "target": "AppImage",
     "category": "Telephony",
-    "forceCodeSigning": false
+    "forceCodeSigning": false,
+    "extraResources": [
+      {
+        "from": "python/dist/eyetracker",
+        "to": "eyetracker"
+      }
+    ]
   },
-  "win": {
-    "target": ["portable"],
-    "forceCodeSigning": false
+  "mac": {
+    "target": "dmg",
+    "forceCodeSigning": false,
+    "extraResources": [
+      {
+        "from": "python/dist/eyetracker",
+        "to": "eyetracker"
+      }
+    ]
   }
 }
