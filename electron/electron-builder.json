@@ -16,7 +16,7 @@
     "models"
   ],
   "win": {
-    "target": ["portable"],
+    "target": ["nsis"],
     "forceCodeSigning": false,
     "extraResources": [
       {

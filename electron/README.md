@@ -84,6 +84,8 @@ Packaging the app is automated using Github actions:
 2. Commit this change
 3. Github actions will detect this and automatically create a new release with the packaged app files (this can take 5-10 minutes)
 
+Also make sure to set the `CLIENT_HOSTED_URL` Github Actions secret which is needed for electron packaging.
+
 ### Local packaging
 
 You might want to package it locally for debugging purposes since you can inspect what files get packaged. To do this, open `electron/dist` after packaging the app.

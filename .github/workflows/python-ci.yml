@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - '**'
-    # only run when files in python folder change
+    # only run when files in python folder or workflow file changes
     paths:
       - electron/python/**
       - .github/workflows/python-ci.yml

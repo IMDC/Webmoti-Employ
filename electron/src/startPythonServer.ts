@@ -82,7 +82,8 @@ export function startLocalPythonServer() {
 }
 
 export function startPackagedPythonServer() {
-  const resourcesDir = path.join(app.getAppPath(), '..', 'resources')
+  // the app path is inside the resources directory, so just go one level up
+  const resourcesDir = path.join(app.getAppPath(), '..')
   const exePath = path.join(resourcesDir, getPythonBinaryName())
   return spawnPythonServer(resourcesDir, [exePath])
 }
