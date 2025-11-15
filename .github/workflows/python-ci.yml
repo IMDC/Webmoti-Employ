@@ -38,3 +38,7 @@ jobs:
       - name: Lint
         working-directory: electron/python/
         run: uv run ruff check
+
+      - name: Run tests
+        working-directory: electron/python/
+        run: uv run pytest tests
