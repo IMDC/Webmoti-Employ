@@ -28,7 +28,7 @@ jobs:
       NPM_CONFIG_IGNORE_SCRIPTS: true
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # this copies the example .dev.vars so typegen populates CloudflareBindings properly
       - name: Mock env for server typegen
