@@ -38,16 +38,19 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          run_install: true
-
-      - name: Generate Cloudflare types
-        working-directory: server
-        run: pnpm run cf-typegen
+          run_install: false
 
       - uses: actions/setup-node@v6
         with:
           node-version-file: package.json
           cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Generate Cloudflare types
+        working-directory: server
+        run: pnpm run cf-typegen
 
       - name: Run lint
         run: pnpm lint
@@ -61,6 +64,9 @@ jobs:
       - name: Run build
         run: pnpm run build
 
+      - name: Check types
+        run: pnpm typecheck
+
       - name: Install Playwright browser
         run: pnpm --filter @webmoti-employ/client exec playwright install chromium
 
@@ -69,9 +75,6 @@ jobs:
 
       - name: Run vitest tests
         run: pnpm test
-
-      - name: Check types
-        run: pnpm typecheck
 
   # only deploy when pushing to main, not other branches (like dependabot)
   deploy-vercel:
