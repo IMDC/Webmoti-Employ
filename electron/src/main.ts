@@ -65,7 +65,7 @@ app.on('ready', async () => {
     }
   }
   catch (error) {
-    addLog(mainWindow, `Failed to start local Python server: ${error}`)
+    addLog(mainWindow, `Failed to start Python server: ${error}`)
   }
 })
 

@@ -48,6 +48,44 @@ FIXATION_THRESHOLD_RATIO = 0.6
 FIXATION_VELOCITY_THRESHOLD = 100  # pixels per second
 MIN_GAZE_POINTS = 2
 
+# ===== TYPES ==========================================================================
+
+
+class GazeSample(TypedDict):
+    """Tobii gaze sample (simplified subset)."""
+
+    timestamp: int
+    gaze_x_left: float
+    gaze_y_left: float
+    gaze_x_right: float
+    gaze_y_right: float
+    pupil_left: float
+    pupil_right: float
+    validity_left: int
+    validity_right: int
+
+
+class AOIBoundingBox(TypedDict):
+    """AOI data structure from Electron."""
+
+    x: float
+    y: float
+    width: float
+    height: float
+
+
+class GazeData(TypedDict):
+    """Tobii gaze data format."""
+
+    device_time_stamp: int
+    left_gaze_point_on_display_area: tuple[float, float]
+    right_gaze_point_on_display_area: tuple[float, float]
+    left_pupil_diameter: float
+    right_pupil_diameter: float
+    left_gaze_point_validity: int
+    right_gaze_point_validity: int
+
+
 # ===== STATE ==========================================================================
 
 
@@ -58,9 +96,7 @@ TEST_MODE = False  # Auto-set if no tracker
 ASYNC_LOOP: asyncio.AbstractEventLoop | None = None
 
 # latest gaze sample storage (set from Tobii callback, consumed by publisher loop)
-_LATEST_GAZE_ARGS: (
-    tuple[int, float, float, float, float, float, float, int, int] | None
-) = None
+_LATEST_GAZE_ARGS: GazeSample | None = None
 _LAST_SENT_STATE: tuple[bool, bool] | None = None  # (looking_at_interviewer, fixation)
 _LOOK_HISTORY: deque[bool] = deque(maxlen=int(GAZE_RATIO_WINDOW_S * PUBLISH_HZ))
 _LAST_RATIO_EMIT = 0.0
@@ -90,15 +126,6 @@ async def disconnect(sid: str) -> None:
     logger.info(f"Electron disconnected: {sid}")
 
 
-class AOIBoundingBox(TypedDict):
-    """AOI data structure from Electron."""
-
-    x: float
-    y: float
-    width: float
-    height: float
-
-
 @sio.event
 async def update_aoi(_: str, data: AOIBoundingBox) -> None:
     global current_aoi_bbox  # noqa: PLW0603
@@ -107,20 +134,6 @@ async def update_aoi(_: str, data: AOIBoundingBox) -> None:
 
 
 # ===== EYETRACKING ====================================================================
-
-
-class GazeSample(TypedDict):
-    """Tobii gaze sample (simplified subset)."""
-
-    timestamp: int
-    gaze_x_left: float
-    gaze_y_left: float
-    gaze_x_right: float
-    gaze_y_right: float
-    pupil_left: float
-    pupil_right: float
-    validity_left: int
-    validity_right: int
 
 
 def classify_eye_movement(
@@ -140,18 +153,6 @@ def classify_eye_movement(
         return "Unknown"
     velocity = dist / delta_t
     return "Fixation" if velocity < FIXATION_VELOCITY_THRESHOLD else "Saccade"
-
-
-class GazeData(TypedDict):
-    """Tobii gaze data format."""
-
-    device_time_stamp: int
-    left_gaze_point_on_display_area: tuple[float, float]
-    right_gaze_point_on_display_area: tuple[float, float]
-    left_pupil_diameter: float
-    right_pupil_diameter: float
-    left_gaze_point_validity: int
-    right_gaze_point_validity: int
 
 
 async def handle_gaze_data(sample: GazeSample) -> None:

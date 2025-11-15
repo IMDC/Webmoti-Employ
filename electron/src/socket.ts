@@ -57,7 +57,7 @@ export function setupSocket(mainWindow: BrowserWindow) {
   socket.on('connect_error', (error) => {
     if (error.message.includes('xhr poll error')) {
       // suppress these messages because they only appear when socket isn't open yet
-      logger.error('Connecting to socket...')
+      logger.warn('Connecting to socket...')
     }
     else {
       logger.error('Connection Error:', error.message)
