@@ -135,7 +135,7 @@ export class AiRoom {
     this.sessions.set(server, { name, isInterviewer })
 
     this.startPing()
-    // console.log(`New WebSocket connection established. Total connections: ${this.sessions.size}`)
+    // debugLog(`New WebSocket connection established. Total connections: ${this.sessions.size}`)
     // Return the client-side WebSocket back to the client.
     return new Response(null, { status: 101, webSocket: client })
   }
@@ -204,7 +204,7 @@ export class AiRoom {
     try {
       const parsedMsg = JSON.parse(message)
       const websocketMsg = WebSocketMessage.parse(parsedMsg)
-      // console.log(`Received message: ${parsedMessage.text}`)
+      // debugLog(`Received message: ${parsedMessage.text}`)
 
       if (websocketMsg.type === 'transcript') {
         let role: 'interviewer' | 'interviewee'
@@ -228,7 +228,7 @@ export class AiRoom {
         this.devIsJohnInterviewer = payload.isInterviewer
       }
       // else if (websocketMsg.type === 'pong') {
-      //   console.log('client sent pong')
+      //   debugLog('client sent pong')
       // }
     }
     catch (e) {
@@ -273,7 +273,7 @@ export class AiRoom {
     if (this.sessions.size === 0) {
       this.stopPing()
     }
-    // console.log(`Total connections remaining: ${this.sessions.size}`)
+    // debugLog(`Total connections remaining: ${this.sessions.size}`)
   }
 
   // Handles errors on a WebSocket connection.

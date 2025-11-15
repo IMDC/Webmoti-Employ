@@ -1,0 +1,45 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - '**'
+    # only run when files in python folder change
+    paths:
+      - electron/python/**
+      - .github/workflows/python-ci.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-test:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version-file: electron/python/.python-version
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: 0.9.9
+          enable-cache: true
+
+      - name: Install the project
+        working-directory: electron/python/
+        run: uv sync --locked --all-extras --dev
+
+      - name: Lint
+        working-directory: electron/python/
+        run: uv run ruff check
+
+      - name: Run tests
+        working-directory: electron/python/
+        run: uv run pytest tests

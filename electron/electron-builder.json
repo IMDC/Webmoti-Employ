@@ -5,10 +5,7 @@
   "appId": "com.imdc.webmoti-employ",
   "files": [
     "package.json",
-    {
-      "from": "../client/dist",
-      "to": "client/dist"
-    },
+    ".env.electron",
     {
       "from": "dist",
       "to": "dist"
@@ -18,17 +15,35 @@
     "dist/preload.cjs",
     "models"
   ],
-  "mac": {
-    "target": "dmg",
-    "forceCodeSigning": false
+  "win": {
+    "target": ["portable"],
+    "forceCodeSigning": false,
+    "extraResources": [
+      {
+        "from": "python/dist/eyetracker.exe",
+        "to": "eyetracker.exe"
+      }
+    ]
   },
   "linux": {
     "target": "AppImage",
     "category": "Telephony",
-    "forceCodeSigning": false
+    "forceCodeSigning": false,
+    "extraResources": [
+      {
+        "from": "python/dist/eyetracker",
+        "to": "eyetracker"
+      }
+    ]
   },
-  "win": {
-    "target": ["portable"],
-    "forceCodeSigning": false
+  "mac": {
+    "target": "dmg",
+    "forceCodeSigning": false,
+    "extraResources": [
+      {
+        "from": "python/dist/eyetracker",
+        "to": "eyetracker"
+      }
+    ]
   }
 }

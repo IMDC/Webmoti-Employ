@@ -19,10 +19,10 @@ export async function googleSignIn(
   redirectTo: string | undefined,
   setError: (error: AppError | null) => void,
 ) {
-  const base = window.location.origin
+  const clientBase = window.location.origin
   // redirectTo is not always set
-  const callbackURL = redirectTo ? `${base}${redirectTo}` : base
-  const errorCallbackURL = `${base}/sign-in${redirectTo ? `?redirectTo=${redirectTo}` : ''}`
+  const callbackURL = redirectTo ? `${clientBase}${redirectTo}` : clientBase
+  const errorCallbackURL = `${clientBase}/sign-in${redirectTo ? `?redirectTo=${redirectTo}` : ''}`
 
   await authClient.signIn.social(
     { provider: 'google', callbackURL, errorCallbackURL },

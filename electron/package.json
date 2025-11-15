@@ -8,19 +8,22 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "dev:electron": "rimraf dist && tsc && electron .",
-    "build:electron": "rimraf dist && tsc && cross-env VITE_IS_ELECTRON=true pnpm --filter @webmoti-employ/client build:deploy",
-    "dist:win": "pnpm run build:electron && electron-builder --win --x64",
-    "dist:linux": "pnpm run build:electron && electron-builder --linux --arm64",
-    "dist:mac": "pnpm run build:electron && electron-builder --mac --x64",
-    "lint": "eslint ."
+    "build:electron": "rimraf dist && tsc",
+    "dist:win": "pnpm build:python && pnpm build:electron && electron-builder --win --x64",
+    "dist:linux": "pnpm build:python && pnpm build:electron && electron-builder --linux --arm64",
+    "dist:mac": "pnpm build:python && pnpm build:electron && electron-builder --mac --x64",
+    "lint": "eslint .",
+    "build:python": "cd python && uv sync && uv run pyinstaller main.py --onefile --name eyetracker --distpath dist --workpath build --hidden-import engineio.async_drivers.aiohttp --hidden-import engineio.async_aiohttp",
+    "kill:python": "taskkill /F /IM python.exe"
   },
   "dependencies": {
+    "dotenv": "^17.2.3",
     "socket.io-client": "^4.8.1",
+    "tree-kill": "^1.2.2",
     "zod": "^4.1.8"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.2.1",
-    "cross-env": "^10.0.0",
     "electron": "38.1.0",
     "electron-builder": "^26.0.12",
     "eslint": "^9.35.0",

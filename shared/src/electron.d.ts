@@ -27,7 +27,9 @@ declare global {
     feedback: Feedback[]
     coordinates: InterviewerCoordinates
     getModelBuffer: ArrayBuffer
+    setRendererReady: undefined
     gazeStats: GazeStats
+    log: string
   }
 
   type UnsubscribeFunction = () => void
@@ -38,6 +40,8 @@ declare global {
       subscribeToGazeStats: (callback: (stats: GazeStats) => void) => UnsubscribeFunction
       sendInterviewerCoordinates: (coordinates: InterviewerCoordinates) => void
       getModelBuffer: () => Promise<ArrayBuffer>
+      subscribeToLogs: (callback: (message: string) => void) => UnsubscribeFunction
+      setRendererReady: () => void
     }
   }
 }

@@ -25,6 +25,7 @@ jobs:
             changed:
               - 'client/**'
               - 'shared/**'
+              - .github/workflows/deploy-vercel.yml
 
   deploy:
     needs: check-client-changes

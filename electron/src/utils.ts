@@ -1,17 +1,21 @@
 import type { WebContents, WebFrameMain } from 'electron'
 import fs from 'node:fs'
 import path from 'node:path'
-import { pathToFileURL } from 'node:url'
+import dotenv from 'dotenv'
 import { app, ipcMain } from 'electron'
+
+const envPath = path.join(app.getAppPath(), '.env.electron')
+dotenv.config({ path: envPath })
+const envHostedUrl = process.env.CLIENT_HOSTED_URL
+if (!envHostedUrl)
+  throw new Error('CLIENT_HOSTED_URL not set in .env.electron')
+
+export const HOSTED_URL: string = envHostedUrl
 
 export const isDev = !app.isPackaged
 
 export function getPreloadPath() {
   return path.join(app.getAppPath(), isDev ? '.' : '..', '/dist/preload.cjs')
-}
-
-export function getUiPath() {
-  return path.join(app.getAppPath(), 'client', 'dist', 'index.html')
 }
 
 function getModelPath() {
@@ -33,8 +37,7 @@ function validateEventFrame(frame: WebFrameMain) {
   if (isDev && new URL(frame.url).host === getLocalDomain()) {
     return
   }
-  const uiPath = pathToFileURL(getUiPath()).toString()
-  if (!frame.url.startsWith(uiPath)) {
+  if (!frame.url.startsWith(HOSTED_URL)) {
     throw new Error('Not valid event')
   }
 }

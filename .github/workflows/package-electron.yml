@@ -7,6 +7,7 @@ on:
     # only run when electron package.json version changes
     paths:
       - electron/package.json
+      - .github/workflows/package-electron.yml
 
 permissions:
   contents: write
