@@ -50,6 +50,8 @@ jobs:
         with:
           version: 0.9.9
           enable-cache: true
+      - name: Create .env.electron
+        run: echo "CLIENT_HOSTED_URL=${{ secrets.CLIENT_HOSTED_URL }}" > electron/.env.electron
 
       - name: Package for linux
         run: pnpm run dist:linux
@@ -78,6 +80,8 @@ jobs:
         with:
           version: 0.9.9
           enable-cache: true
+      - name: Create .env.electron
+        run: echo "CLIENT_HOSTED_URL=${{ secrets.CLIENT_HOSTED_URL }}" > electron/.env.electron
 
       - name: Package for windows
         run: pnpm run dist:win
@@ -106,6 +110,8 @@ jobs:
         with:
           version: 0.9.9
           enable-cache: true
+      - name: Create .env.electron
+        run: echo "CLIENT_HOSTED_URL=${{ secrets.CLIENT_HOSTED_URL }}" > electron/.env.electron
 
       - name: Package for macos
         run: pnpm run dist:mac
