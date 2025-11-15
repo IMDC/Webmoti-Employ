@@ -10,6 +10,12 @@ updates:
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-minor', 'version-update:semver-patch']
+    groups:
+      eslint-config:
+        patterns:
+          - '@antfu/eslint-config'
+          - '@eslint-react/eslint-plugin'
+          - 'eslint-plugin*'
 
   - package-ecosystem: uv
     directory: /electron/python/
