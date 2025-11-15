@@ -22,7 +22,11 @@ export function stopPythonServer() {
   if (pid) {
     logger.log('Stopping Python server...')
     // need to kill all processes in the tree since the parent is uv, not python
-    treeKill(pid)
+    treeKill(pid, (err) => {
+      if (err) {
+        logger.error('Failed to kill Python server:', err)
+      }
+    })
   }
 
   pythonProcess = null
@@ -33,6 +37,12 @@ function spawnPythonServer(cwd: string, command: string[]): Promise<void> {
     return Promise.resolve()
 
   return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      logger.error('Python server failed to start within 30 seconds')
+      reject(new Error('Python server startup timed out after 30 seconds'))
+      stopPythonServer()
+    }, 30000)
+
     pythonProcess = spawn(command[0], command.slice(1), {
       cwd,
       env: { ...process.env, PYTHONUNBUFFERED: '1' },
@@ -42,18 +52,26 @@ function spawnPythonServer(cwd: string, command: string[]): Promise<void> {
     pythonProcess.stdout?.on('data', (data) => {
       const line = data.toString().trim()
       logger.log(`[PYTHON] ${line}`)
-      if (line.includes(PYTHON_STARTED_OUTPUT_STRING))
+      if (line.includes(PYTHON_STARTED_OUTPUT_STRING)) {
+        clearTimeout(timeout)
         resolve()
+      }
     })
 
     pythonProcess.stderr?.on('data', (data) => {
       logger.error(`[PYTHON ERROR] ${data.toString().trim()}`)
     })
 
-    pythonProcess.on('error', reject)
+    pythonProcess.on('error', (err) => {
+      clearTimeout(timeout)
+      reject(err)
+    })
+
     pythonProcess.on('exit', (code) => {
+      clearTimeout(timeout)
       logger.warn(`Python server exited with code ${code}`)
       pythonProcess = null
+      reject(new Error(`Python server exited with code ${code}`))
     })
   })
 }

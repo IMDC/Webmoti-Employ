@@ -20,6 +20,7 @@ async function createWindow() {
       preload: getPreloadPath(),
       contextIsolation: true,
       nodeIntegration: false,
+      // TODO is this needed?
       // sandbox: false,
     },
     show: false,

@@ -7,6 +7,7 @@ on:
     # only run when files in python folder change
     paths:
       - electron/python/**
+      - .github/workflows/python-ci.yml
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}

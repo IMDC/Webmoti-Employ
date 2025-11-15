@@ -28,7 +28,7 @@ function flushQueue(window: BrowserWindow) {
   logQueue.length = 0
 }
 
-async function sendLog(window: BrowserWindow, log: string) {
+function sendLog(window: BrowserWindow, log: string) {
   // this function prints the log in the electron browser console
   logger.log(log)
   ipcWebContentsSend('log', window.webContents, log)

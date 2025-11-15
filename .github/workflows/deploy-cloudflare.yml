@@ -17,6 +17,7 @@ jobs:
             changed:
               - 'server/**'
               - 'shared/**'
+              - .github/workflows/deploy-cloudflare.yml
 
   deploy:
     needs: check-server-changes
