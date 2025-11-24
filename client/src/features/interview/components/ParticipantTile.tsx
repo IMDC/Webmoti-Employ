@@ -9,6 +9,7 @@ interface ParticipantTileProps {
   name: string
   profileUrl: string
   isLoadingProfiles: boolean
+  isVideoOn: boolean
   isActiveSpeaker?: boolean
 }
 
@@ -20,6 +21,7 @@ export function ParticipantTile({
   profileUrl,
   isLoadingProfiles,
   isActiveSpeaker,
+  isVideoOn,
 }: ParticipantTileProps) {
   const theme = useMantineTheme()
 
@@ -40,10 +42,12 @@ export function ParticipantTile({
           : undefined,
       }}
     >
-      <NoVideoBackground
-        profileUrl={profileUrl}
-        isLoadingProfiles={isLoadingProfiles}
-      />
+      {!isVideoOn && (
+        <NoVideoBackground
+          profileUrl={profileUrl}
+          isLoadingProfiles={isLoadingProfiles}
+        />
+      )}
 
       {children}
 
