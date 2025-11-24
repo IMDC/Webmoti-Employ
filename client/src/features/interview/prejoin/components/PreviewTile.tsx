@@ -40,7 +40,14 @@ export function PreviewTile({ height, width, name, profileUrl }: PreviewTileProp
   )
 
   return (
-    <ParticipantTile height={height} width={width} name={name} profileUrl={profileUrl} isLoadingProfiles={false}>
+    <ParticipantTile
+      height={height}
+      width={width}
+      name={name}
+      profileUrl={profileUrl}
+      isLoadingProfiles={false}
+      isVideoOn={isVideoOn}
+    >
       {permissionState === 'granted' && isVideoOn && (
         <VideoRenderer attach={startCamera} detach={stopCamera} />
       )}
