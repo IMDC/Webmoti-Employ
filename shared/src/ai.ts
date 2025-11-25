@@ -3,6 +3,7 @@ import { z } from 'zod'
 export const TranscriptMessage = z.object({
   text: z.string(),
   status: z.enum(['final', 'partial']),
+  speaker: z.enum(['interviewer', 'candidate']).optional(),
 })
 
 export const NotificationMessage = z.object({

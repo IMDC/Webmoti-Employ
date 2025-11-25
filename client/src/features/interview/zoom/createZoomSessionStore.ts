@@ -155,13 +155,55 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
 
             const { isAudioOn, isVideoOn } = get()
             const granted = appStore.getState().permissionState === 'granted'
-            if (granted && isVideoOn)
-              await stream.startVideo()
-            if (granted && isAudioOn)
-              await stream.startAudio()
-
+            
+            logger.log('Starting media after join:', { isVideoOn, isAudioOn, granted })
+            
             set({ stream, callState: 'joined', localUserId: client().getCurrentUserInfo().userId })
             updateParticipants()
+            
+            if (granted && isVideoOn) {
+              try {
+                await stream.startVideo()
+                logger.log('✅ Video started successfully')
+                // Force immediate update
+                updateParticipants()
+                // Wait longer for Zoom to stabilize, then update again
+                setTimeout(() => {
+                  updateParticipants()
+                  const localId = get().localUserId
+                  if (localId) {
+                    const localParticipant = get().participants.get(localId)
+                    logger.log('After startVideo - bVideoOn:', localParticipant?.bVideoOn)
+                  }
+                }, 500)
+              }
+              catch (error) {
+                logger.error('Failed to start video:', error)
+                set({ isVideoOn: false })
+              }
+            }
+            
+            if (granted && isAudioOn) {
+              try {
+                await stream.startAudio()
+                logger.log('✅ Audio started successfully')
+              }
+              catch (error) {
+                logger.error('Failed to start audio:', error)
+                set({ isAudioOn: false })
+              }
+            }
+            
+            // Debug: Log participant state after joining
+            setTimeout(() => {
+              const updatedParticipants = client().getAllUser()
+              logger.log('Participants after join:', updatedParticipants.map(p => ({
+                userId: p.userId,
+                displayName: p.displayName,
+                bVideoOn: p.bVideoOn,
+                isHost: p.isHost,
+              })))
+            }, 1000)
           }
           catch (error) {
             set({ callState: 'prejoin', stream: null })
@@ -178,6 +220,19 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           logger.log('Starting video...')
           await stream().startVideo()
           updateParticipants()
+          
+          // Debug: Check if bVideoOn is updated after starting video
+          setTimeout(() => {
+            const localId = get().localUserId
+            if (localId) {
+              const localParticipant = get().participants.get(localId)
+              logger.log('After startVideo - local participant:', {
+                userId: localId,
+                bVideoOn: localParticipant?.bVideoOn,
+                isVideoOn: get().isVideoOn,
+              })
+            }
+          }, 500)
         },
         stopVideo: async () => {
           logger.log('Stopping video...')
@@ -267,9 +322,35 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       return
     }
 
+    const currentParticipants = zoomSessionStore.getState().participants
+    const allUsers = client.getAllUser()
+    
+    logger.log('updateParticipants called, getAllUser returned:', allUsers.map(u => ({
+      userId: u.userId,
+      bVideoOn: u.bVideoOn,
+      displayName: u.displayName,
+    })))
+    
+    const newParticipants = new Map(
+      allUsers.map(user => {
+        const existingUser = currentParticipants.get(user.userId)
+        // Preserve bVideoOn if the new value is undefined but we had a previous value
+        if (existingUser && user.bVideoOn === undefined && existingUser.bVideoOn !== undefined) {
+          logger.log(`Preserving bVideoOn for user ${user.userId}: ${existingUser.bVideoOn}`)
+          return [user.userId, { ...user, bVideoOn: existingUser.bVideoOn }]
+        }
+        return [user.userId, user]
+      })
+    )
+
     zoomSessionStore.setState({
-      participants: new Map(client.getAllUser().map(user => [user.userId, user])),
+      participants: newParticipants,
     })
+    
+    logger.log('Participants map updated:', Array.from(newParticipants.values()).map(u => ({
+      userId: u.userId,
+      bVideoOn: u.bVideoOn,
+    })))
   }
 
   // todo change this to show notification about user join/leave
@@ -344,14 +425,15 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
 
   function handleUserUpdated(payload: Participant[]) {
     payload.forEach((user) => {
-      logger.log(`${user.userId} was updated.`)
+      logger.log(`User ${user.userId} updated: bVideoOn=${user.bVideoOn}, bAudioOn=${user.bAudioOn}`)
     })
     updateParticipants()
   }
 
   function handlePeerVideoStateChange(payload: Parameters<typeof event_peer_video_state_change>[0]) {
-    logger.log('peer video state change')
     const { userId, action } = payload
+    logger.log(`Video state change for user ${userId}: ${action}`)
+    updateParticipants()
 
     const { stream, actions } = zoomSessionStore.getState()
     if (!stream)

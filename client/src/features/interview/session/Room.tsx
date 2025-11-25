@@ -14,7 +14,7 @@ import {
 import { useAppPermissionState } from '@/useAppStore'
 import { GALLERY_VIEW_MARGIN } from '@/utils/constants'
 import { useAiWebsocket } from '../ai/useAiWebsocket'
-import { useTranscription } from '../ai/useTranscription'
+import { useSpeechmaticsTranscription } from '../ai/useSpeechmaticsTranscription'
 import { Chat } from '../chat/Chat'
 import { MenuBar } from '../components/MenuBar'
 import { MobileMenuBar } from '../components/MobileMenuBar'
@@ -31,7 +31,7 @@ export function Room() {
   const [isChatOpen, setIsChatOpen] = useState(false)
 
   const { sendTranscript, notification, sendDevIsJohnDoNotUseMessage } = useAiWebsocket()
-  useTranscription(5, sendTranscript)
+  useSpeechmaticsTranscription(5, sendTranscript)
 
   const permissionState = useAppPermissionState()
 
