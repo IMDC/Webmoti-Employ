@@ -1,10 +1,10 @@
-import path from 'node:path'
 import process from 'node:process'
 import { app, BrowserWindow } from 'electron'
 import { addLog, setRendererReady } from './logQueue'
 import { setupSocket, socketSendBoundingBox } from './socket'
 import { startLocalPythonServer, startPackagedPythonServer, stopPythonServer } from './startPythonServer'
 import {
+  getAppIconPath,
   getLocalDomain,
   getModelBuffer,
   getPreloadPath,
@@ -20,15 +20,13 @@ async function createWindow() {
       preload: getPreloadPath(),
       contextIsolation: true,
       nodeIntegration: false,
-      // TODO is this needed?
-      // sandbox: false,
     },
     show: false,
   })
   mainWindow.maximize()
 
   if (isDev) {
-    mainWindow.setIcon(path.join(app.getAppPath(), 'icon.png'))
+    mainWindow.setIcon(getAppIconPath())
     mainWindow.loadURL(`http://${getLocalDomain()}`)
     mainWindow.webContents.openDevTools()
   }

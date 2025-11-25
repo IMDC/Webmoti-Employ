@@ -1,6 +1,5 @@
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "icon": "./icon.png",
   "productName": "WebMoti-Employ",
   "appId": "com.imdc.webmoti-employ",
   "files": [
@@ -17,6 +16,7 @@
   ],
   "win": {
     "target": ["nsis"],
+    "icon": "./icon/icon.ico",
     "forceCodeSigning": false,
     "extraResources": [
       {
@@ -28,6 +28,7 @@
   "linux": {
     "target": "AppImage",
     "category": "Telephony",
+    "icon": "./icon/icon.png",
     "forceCodeSigning": false,
     "extraResources": [
       {
@@ -38,6 +39,7 @@
   },
   "mac": {
     "target": "dmg",
+    "icon": "./icon/icon.icns",
     "forceCodeSigning": false,
     "extraResources": [
       {

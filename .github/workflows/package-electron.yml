@@ -3,7 +3,7 @@ name: Electron Package
 on:
   push:
     branches:
-      - '**'
+      - master
     # only run when electron package.json version changes
     paths:
       - electron/package.json
