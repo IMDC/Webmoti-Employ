@@ -86,6 +86,7 @@ jobs:
         with:
           name: ${{ matrix.platform }}-dist
           path: ${{ steps.artifact.outputs.path }}
+          retention-days: 1
 
   release:
     if: needs.check-version.outputs.changed == 'true'
