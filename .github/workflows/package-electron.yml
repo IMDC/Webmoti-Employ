@@ -86,6 +86,7 @@ jobs:
         with:
           name: ${{ matrix.platform }}-dist
           path: ${{ steps.artifact.outputs.path }}
+          retention-days: 1
 
   release:
     if: needs.check-version.outputs.changed == 'true'
@@ -107,3 +108,11 @@ jobs:
           tag_name: ${{ needs.check-version.outputs.version }}
           name: Release ${{ needs.check-version.outputs.version }}
           files: release/**
+
+      # since we don't need artifacts after the workflow, we delete them all.
+      # this is because of the github artifact storage limit (recalculated every 6-12 hours)
+      - name: Delete artifacts
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: '*-dist'
+          failOnError: false
