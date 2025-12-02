@@ -19,7 +19,9 @@ WebMoti-Employ is an app that uses eyetracking to deliver real-time feedback dur
 - [Desktop App](#desktop-app)
 - [Deploying](#deploying)
 - [VSCode Auto Formatting Code](#vscode-auto-formatting-code)
-- [Firefox Dev WebRTC error](#firefox-dev-webrtc-error)
+- [Possible errors and solutions](#possible-errors-and-solutions)
+  - [Firefox Dev WebRTC error](#firefox-dev-webrtc-error)
+  - [Problem with pnpm lockfile](#problem-with-pnpm-lockfile)
 
 ![Dashboard](img/dashboard.png)
 
@@ -211,12 +213,19 @@ The client and server are deployed separately.
 }
 ```
 
-## Firefox Dev WebRTC error
+## Possible errors and solutions
 
+### Firefox Dev WebRTC error
 When you run the Vite dev server in Firefox and you join an interview, it will fail with this error in the console:
 
 ```text
 WebRTC: ICE failed, add a STUN server and see about:webrtc for more details
 ```
 
-Use Chrome instead for developing.
+Solution: Use Chrome instead for developing.
+
+### Problem with pnpm lockfile
+
+This problem could manifest in many different ways, for example zoom video not working or a strange error in the console. Usually this will happen after the dependencies were changed, maybe with dependabot or manually.
+
+Solution: Delete `pnpm-lock.yaml` and run `pnpm i` to regenerate the lockfile.
