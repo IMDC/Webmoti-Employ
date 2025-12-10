@@ -28,6 +28,10 @@ export function getAuth(env: CloudflareBindings): ReturnType<typeof betterAuth> 
         clientSecret: env.GOOGLE_CLIENT_SECRET,
       },
     },
+    account: {
+      // this is a workaround to fix "state_mismatch" error when signing in with better-auth@1.4 and above
+      skipStateCookieCheck: true,
+    },
     database: {
       // use local db when provided
       db: getDb(IS_DEV
