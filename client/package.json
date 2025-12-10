@@ -31,7 +31,7 @@
     "@tanstack/react-virtual": "^3.13.12",
     "@webmoti-employ/shared": "workspace:^",
     "@zoom/videosdk": "^2.2.12",
-    "better-auth": "1.4.5",
+    "better-auth": "catalog:",
     "linkify-react": "^4.3.2",
     "linkifyjs": "^4.3.2",
     "luxon": "^3.7.2",
@@ -40,7 +40,7 @@
     "react-dom": "^19.1.1",
     "react-speech-recognition": "^4.0.1",
     "react-use-websocket": "^4.13.0",
-    "zod": "^4.1.8",
+    "zod": "catalog:",
     "zustand": "^5.0.8"
   },
   "devDependencies": {

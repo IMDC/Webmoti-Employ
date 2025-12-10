@@ -4,6 +4,10 @@ packages:
   - shared
   - electron
 
+catalog:
+  better-auth: 1.4.5
+  zod: 4.1.8
+
 onlyBuiltDependencies:
   - electron
   - electron-winstaller
