@@ -26,6 +26,7 @@ jobs:
       # don't run postinstall scripts for security
       PNPM_CONFIG_IGNORE_SCRIPTS: true
       NPM_CONFIG_IGNORE_SCRIPTS: true
+      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
 
     steps:
       - uses: actions/checkout@v5
@@ -35,6 +36,7 @@ jobs:
         working-directory: server
         run: |
           cp .dev.vars.example .dev.vars
+          echo "BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }}" >> .dev.vars
 
       - uses: pnpm/action-setup@v4
         with:

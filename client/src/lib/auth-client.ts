@@ -2,7 +2,7 @@ import type { AppError } from '@/useAppStore'
 import { createAuthClient } from 'better-auth/react'
 import { getLocalBearerToken, removeLocalBearerToken } from '@/utils/utils'
 
-export const authClient = createAuthClient({
+export const authClient: ReturnType<typeof createAuthClient> = createAuthClient({
   baseURL: `${import.meta.env.VITE_API_BASE_URL}/auth`,
   fetchOptions: {
     // include token in all requests

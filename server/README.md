@@ -201,9 +201,10 @@ Set environment variables: <https://www.better-auth.com/docs/installation#set-en
 
 A good resource for this is: <https://hono.dev/examples/better-auth-on-cloudflare>
 
-1. Use the site to generate the `BETTER_AUTH_SECRET`. For the `BETTER_AUTH_URL`, you can set this to `http://localhost:8787` for dev (assuming the hono app runs on port `8787`). For production you can set this to the actual url of the Cloudflare deployed hono app.
-2. Create Better Auth Tables: `pnpm run db:better-auth-gen`. This will generate `src/db/better-auth-schema.sql` which we don't use, but it's useful to use for creating local tables in the local Postgresql database.
-3. Add Better Auth Tables to the database: `pnpm run:db:better-auth-migrate`. This will connect to the Neon database and add the tables.
+1. Use the site to generate the `BETTER_AUTH_SECRET` (or `npx @better-auth/cli secret`). Also generate a second one to put in the GitHub repo secrets so it works in the CI.
+2. For the `BETTER_AUTH_URL`, you can set this to `http://localhost:8787` for dev (assuming the hono app runs on port `8787`). For production you can set this to the actual url of the Cloudflare deployed hono app.
+3. Create Better Auth Tables: `pnpm run db:better-auth-gen`. This will generate `src/db/better-auth-schema.sql` which we don't use, but it's useful to use for creating local tables in the local Postgresql database.
+4. Add Better Auth Tables to the database: `pnpm run:db:better-auth-migrate`. This will connect to the Neon database and add the tables.
 4.
 
 #### Google OAuth Setup
