@@ -5,9 +5,10 @@ import { ChangeMediaDevice } from '../ChangeMediaDevice'
 
 interface ChangeAudioPopoverProps {
   switchMicrophone: (deviceId: string) => Promise<void>
+  switchSpeaker: (deviceId: string) => Promise<void>
 }
 
-export function ChangeAudioPopover({ switchMicrophone }: ChangeAudioPopoverProps) {
+export function ChangeAudioPopover({ switchMicrophone, switchSpeaker }: ChangeAudioPopoverProps) {
   const permissionState = useAppPermissionState()
   const disableMediaButtons = permissionState === 'idle' || permissionState === 'acquiring'
 
@@ -25,6 +26,7 @@ export function ChangeAudioPopover({ switchMicrophone }: ChangeAudioPopoverProps
           mediaType="audio"
           variant="radio"
           onSwitchMicrophone={switchMicrophone}
+          onSwitchSpeaker={switchSpeaker}
         />
       </Popover.Dropdown>
     </Popover>

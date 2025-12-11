@@ -26,7 +26,7 @@ export function MenuBar({
   onToggleLayoutModal,
   sendDevIsJohnDoNotUseThis,
 }: MenuBarProps) {
-  const { switchCamera, switchMicrophone } = useZoomSessionActions()
+  const { switchCamera, switchMicrophone, switchSpeaker } = useZoomSessionActions()
 
   const time = useCurrentTime()
 
@@ -42,7 +42,7 @@ export function MenuBar({
       {/* center section */}
       <Flex align="center" gap="md">
         <Button.Group>
-          <ChangeAudioPopover switchMicrophone={switchMicrophone} />
+          <ChangeAudioPopover switchMicrophone={switchMicrophone} switchSpeaker={switchSpeaker} />
           <ToggleAudioButton onToggleMic={onToggleMic} />
         </Button.Group>
 

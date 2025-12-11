@@ -71,6 +71,7 @@ interface ChangeMediaDeviceProps {
   variant?: Variant
   onSwitchCamera?: (deviceId: string) => void
   onSwitchMicrophone?: (deviceId: string) => void
+  onSwitchSpeaker?: (deviceId: string) => void
 }
 
 export function ChangeMediaDevice({
@@ -78,6 +79,7 @@ export function ChangeMediaDevice({
   variant = 'dropdown',
   onSwitchCamera,
   onSwitchMicrophone,
+  onSwitchSpeaker,
 }: ChangeMediaDeviceProps) {
   const permissionState = useAppPermissionState()
   const videoDevices = useVideoDevices()
@@ -107,7 +109,7 @@ export function ChangeMediaDevice({
           icon={<IconVolume size={18} />}
           devices={audioOutputDevices}
           selected={selectedAudioOutputDevice}
-          onChange={() => {}}
+          onChange={onSwitchSpeaker ?? (() => {})}
           variant={variant}
         />
       </Stack>

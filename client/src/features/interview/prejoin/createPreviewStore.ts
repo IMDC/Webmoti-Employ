@@ -19,6 +19,7 @@ export interface PreviewStoreActions {
   muteMicrophone: () => Promise<void>
   toggleMuteMicrophone: () => Promise<void>
   switchMicrophone: (microphoneId: string) => Promise<void>
+  switchSpeaker: (speakerId: string) => Promise<void>
 }
 
 export interface PreviewStore {
@@ -119,6 +120,12 @@ export function createPreviewStore(
         newLocalAudioTrack.unmute()
         set({ localAudioTrack: newLocalAudioTrack })
         deviceStore.setState({ selectedAudioInputDevice: microphoneId })
+      },
+
+      switchSpeaker: async (speakerId) => {
+        // this method doesn't actually change speakers because there's no point in doing that in prejoin.
+        // it just saves the selection.
+        deviceStore.setState({ selectedAudioOutputDevice: speakerId })
       },
     },
   }))

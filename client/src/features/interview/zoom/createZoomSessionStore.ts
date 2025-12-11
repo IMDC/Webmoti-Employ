@@ -38,6 +38,7 @@ export interface ZoomSessionActions {
   muteAudio: () => Promise<void>
   unmuteAudio: () => Promise<void>
   switchMicrophone: (deviceId: string) => Promise<void>
+  switchSpeaker: (deviceId: string) => Promise<void>
 
   cleanup: () => Promise<void>
 }
@@ -229,6 +230,10 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         switchMicrophone: async (deviceId) => {
           stream().switchMicrophone(deviceId)
           deviceStore.setState({ selectedAudioInputDevice: deviceId })
+        },
+        switchSpeaker: async (deviceId) => {
+          stream().switchSpeaker(deviceId)
+          deviceStore.setState({ selectedAudioOutputDevice: deviceId })
         },
         cleanup: async () => {
           logger.log('Cleaning up zoom client...')

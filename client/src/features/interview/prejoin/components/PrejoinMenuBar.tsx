@@ -12,7 +12,12 @@ export function PrejoinMenuBar() {
   const { toggleIsVideoOn } = useZoomSessionActions()
   const permissionState = useAppPermissionState()
   const { initDevices } = useDeviceStoreActions()
-  const { toggleMuteMicrophone, switchCamera, switchMicrophone } = usePreviewActions()
+  const {
+    toggleMuteMicrophone,
+    switchCamera,
+    switchMicrophone,
+    switchSpeaker,
+  } = usePreviewActions()
 
   async function onToggleMic() {
     if (permissionState !== 'granted') {
@@ -32,7 +37,7 @@ export function PrejoinMenuBar() {
   return (
     <Group justify="center" align="center" h="100%" gap="sm">
       <Button.Group>
-        <ChangeAudioPopover switchMicrophone={switchMicrophone} />
+        <ChangeAudioPopover switchMicrophone={switchMicrophone} switchSpeaker={switchSpeaker} />
         <ToggleAudioButton onToggleMic={onToggleMic} />
       </Button.Group>
 
