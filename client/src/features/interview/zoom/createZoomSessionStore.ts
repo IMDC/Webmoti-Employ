@@ -186,8 +186,14 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           updateParticipants()
         },
         switchCamera: async (deviceId) => {
-          await stream().switchCamera(deviceId)
-          deviceStore.setState({ selectedVideoDevice: deviceId })
+          try {
+            await stream().switchCamera(deviceId)
+            deviceStore.setState({ selectedVideoDevice: deviceId })
+          }
+          catch (error) {
+            const { setError } = appStore.getState().actions
+            handleAppError(error, setError, 'Failed to switch camera')
+          }
         },
         attachVideoPlayer: async (userId: number, element: VideoPlayer) => {
         // need to detach first to ensure it works properly (this matters in strict mode)
@@ -228,12 +234,24 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           await stream().unmuteAudio()
         },
         switchMicrophone: async (deviceId) => {
-          stream().switchMicrophone(deviceId)
-          deviceStore.setState({ selectedAudioInputDevice: deviceId })
+          try {
+            await stream().switchMicrophone(deviceId)
+            deviceStore.setState({ selectedAudioInputDevice: deviceId })
+          }
+          catch (error) {
+            const { setError } = appStore.getState().actions
+            handleAppError(error, setError, 'Failed to switch microphone')
+          }
         },
         switchSpeaker: async (deviceId) => {
-          stream().switchSpeaker(deviceId)
-          deviceStore.setState({ selectedAudioOutputDevice: deviceId })
+          try {
+            await stream().switchSpeaker(deviceId)
+            deviceStore.setState({ selectedAudioOutputDevice: deviceId })
+          }
+          catch (error) {
+            const { setError } = appStore.getState().actions
+            handleAppError(error, setError, 'Failed to switch speaker')
+          }
         },
         cleanup: async () => {
           logger.log('Cleaning up zoom client...')
