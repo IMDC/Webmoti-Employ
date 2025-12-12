@@ -43,13 +43,28 @@ export function createDeviceStore() {
         // try catch doesn't work on this function
         const devices = await ZoomVideo.getDevices()
 
-        const videoDevices = devices.filter(d => d.kind === 'videoinput')
-        const audioInputDevices = devices.filter(d => d.kind === 'audioinput')
-        const audioOutputDevices = devices.filter(d => d.kind === 'audiooutput')
+        const isUsableDevice = (d: MediaDeviceInfo) =>
+          !!d.deviceId
+          && !!d.label
+          // some audio devices are duplicated and have fake device ids.
+          // these devices are not able to be switched to, so we exclude them here.
+          && d.deviceId !== 'default'
+          && d.deviceId !== 'communications'
+
+        const videoDevices = devices
+          .filter(d => d.kind === 'videoinput')
+          .filter(isUsableDevice)
+
+        const audioInputDevices = devices
+          .filter(d => d.kind === 'audioinput')
+          .filter(isUsableDevice)
+
+        const audioOutputDevices = devices
+          .filter(d => d.kind === 'audiooutput')
+          .filter(isUsableDevice)
 
         // need to check for dummy devices when permission denied
-        const isValidDevice = (d: MediaDeviceInfo) => d.deviceId && d.label
-        const hasPermission = [...videoDevices, ...audioInputDevices].some(isValidDevice)
+        const hasPermission = [...videoDevices, ...audioInputDevices].length > 0
 
         if (!hasPermission) {
           appActions.setError({ message: 'Could not access media devices' })

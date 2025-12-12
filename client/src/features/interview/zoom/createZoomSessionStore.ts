@@ -67,7 +67,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
     const stream = () => {
       const s = get().stream
       if (!s) {
-        throw new Error('Stream not initialized')
+        throw new Error('Stream is null (not initialized)')
       }
       return s
     }
