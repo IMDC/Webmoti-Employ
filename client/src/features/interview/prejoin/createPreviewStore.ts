@@ -126,16 +126,20 @@ export function createPreviewStore(
           return
 
         await oldTrack.stop()
-        const newTrack = ZoomVideo.createLocalAudioTrack(microphoneId)
 
+        let newTrack
         try {
+          newTrack = ZoomVideo.createLocalAudioTrack(microphoneId)
+
           deviceStore.setState({ selectedAudioInputDevice: microphoneId })
           await newTrack.start()
           await newTrack.unmute()
           set({ localAudioTrack: newTrack })
         }
         catch (error) {
-          // keep old track running if new one fails
+          // cleanup new track if it failed
+          if (newTrack)
+            await newTrack.stop()
           deviceStore.setState({ selectedAudioInputDevice: oldDeviceId })
           await oldTrack.start()
           await oldTrack.unmute()
