@@ -45,6 +45,8 @@ export function createDeviceStore() {
         const devices = await ZoomVideo.getDevices()
 
         const isUsableDevice = (d: MediaDevice) =>
+          // valid devices have a device id and a label.
+          // sometimes dummy devices are added without these when permission isn't granted yet.
           !!d.deviceId
           && !!d.label
           // some audio devices are duplicated and have fake device ids.
