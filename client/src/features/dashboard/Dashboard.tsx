@@ -7,7 +7,6 @@ import {
   Divider,
   Flex,
   Group,
-  Image,
   Modal,
   Popover,
   Stack,
@@ -65,12 +64,12 @@ export function Dashboard() {
         <Flex justify="space-between" align="center" w="100vw" h="100%" p="lg">
           <Anchor component={Link} to="/" underline="never">
             <Group gap="xs">
-              <Image
+              {/* <Image
                 src="/favicon.svg"
                 h={{ base: 15, sm: 25 }}
                 w="auto"
                 fit="contain"
-              />
+              /> */}
               <Text
                 fz={{ base: 15, sm: 25 }}
                 fw={900}
