@@ -19,12 +19,6 @@ export function DeviceSelect({
   onChange,
   variant,
 }: DeviceSelectProps) {
-  // change to null when selected device is missing to avoid controlled/uncontrolled error
-  const value
-    = selected && devices.some(d => d.deviceId === selected)
-      ? selected
-      : null
-
   return variant === 'dropdown'
     ? (
         <Select
@@ -33,7 +27,7 @@ export function DeviceSelect({
             value: d.deviceId,
             label: d.label || `${label}: ${d.deviceId.slice(0, 4)}`,
           }))}
-          value={value}
+          value={selected}
           onChange={val => val && onChange(val)}
           leftSection={icon}
           leftSectionPointerEvents="none"
@@ -44,7 +38,7 @@ export function DeviceSelect({
     : (
         <Radio.Group
           label={label}
-          value={value}
+          value={selected}
           onChange={onChange}
           styles={{ label: { paddingBottom: 8 } }}
         >
