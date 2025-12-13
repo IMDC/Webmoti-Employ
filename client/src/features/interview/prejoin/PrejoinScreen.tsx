@@ -7,6 +7,7 @@ import { RightHeader } from '@/components/RightHeader'
 import { useUser } from '@/features/auth/hooks/useUserStore'
 import { useDeviceStoreActions } from '@/features/interview/zoom/useDeviceStore'
 import { useAppActions, useAppPermissionState } from '@/useAppStore'
+import { HEADER_HEIGHT, OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
 import { useIsZoomInitializing, useZoomCallState, useZoomSessionActions } from '../zoom/useZoomSessionStore'
 import { ErrorScreen } from './components/ErrorScreen'
 import { JoiningScreen } from './components/JoiningScreen'
@@ -84,10 +85,13 @@ export function PrejoinScreen() {
 
   return (
     <AppShell
-      header={{ height: 60 }}
+      header={{ height: HEADER_HEIGHT }}
       styles={{
-        header: { border: 'none' },
-        main: { overflowX: 'hidden', height: 'calc(100vh - 60px)' },
+        header: { border: 'none', marginTop: OUTER_TOOLBAR_HEIGHT },
+        main: {
+          overflowX: 'hidden',
+          height: `calc(100vh - ${HEADER_HEIGHT}px)`,
+        },
       }}
     >
       <AppShell.Header>

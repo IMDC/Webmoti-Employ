@@ -1,8 +1,10 @@
-import { Center, Divider, Group, Stack, Text, Title } from '@mantine/core'
+import { AppShell, Center, Divider, Group, Stack, Text, Title } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import { createRootRoute, Outlet } from '@tanstack/react-router'
+import { ElectronToolbar } from '@/components/ElectronToolbar'
 import { ErrorDialog } from '@/components/ErrorDialog'
 import { useElectronLogs } from '@/features/interview/session/hooks/useElectronLogs'
+import { OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
 
 export const Route = createRootRoute({
   component: RootRoute,
@@ -32,7 +34,23 @@ function RootRoute() {
 
   return (
     <>
-      <Outlet />
+      <AppShell
+        header={{ height: OUTER_TOOLBAR_HEIGHT }}
+        styles={{
+          header: { border: 'none' },
+          // remove default padding from main
+          main: { padding: 0 },
+        }}
+      >
+        <AppShell.Header>
+          <ElectronToolbar />
+        </AppShell.Header>
+
+        <AppShell.Main>
+          <Outlet />
+        </AppShell.Main>
+      </AppShell>
+
       <ErrorDialog />
       <Notifications />
     </>

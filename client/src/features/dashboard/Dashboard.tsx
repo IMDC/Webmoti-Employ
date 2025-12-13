@@ -27,6 +27,7 @@ import {
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { RightHeader } from '@/components/RightHeader'
+import { HEADER_HEIGHT, OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
 import { getFirstName } from '@/utils/utils'
 import { useUser } from '../auth/hooks/useUserStore'
 import { InterviewList } from './components/InterviewList'
@@ -50,11 +51,13 @@ export function Dashboard() {
 
   return (
     <AppShell
-      header={{ height: 60 }}
+      header={{ height: HEADER_HEIGHT }}
       styles={{
-        header: { border: 'none' },
+        header: { border: 'none', marginTop: OUTER_TOOLBAR_HEIGHT },
         // hide horizontal scrollbar
-        main: { height: 'calc(100vh - 60px)' },
+        main: {
+          height: `calc(100vh - ${HEADER_HEIGHT}px)`,
+        },
       }}
     >
       <AppShell.Header>
