@@ -64,12 +64,14 @@ export function createPreviewStore(
       },
 
       switchCamera: async (deviceId) => {
+        const oldDeviceId = deviceStore.getState().selectedVideoDevice
         const localVideoTrack = get().localVideoTrack
         try {
-          await localVideoTrack?.switchCamera(deviceId)
           deviceStore.setState({ selectedVideoDevice: deviceId })
+          await localVideoTrack?.switchCamera(deviceId)
         }
         catch (error) {
+          deviceStore.setState({ selectedVideoDevice: oldDeviceId })
           const { setError } = appStore.getState().actions
           handleAppError(error, setError, 'Failed to switch camera')
         }
@@ -118,6 +120,7 @@ export function createPreviewStore(
         zoomSessionStore.getState().actions.toggleIsAudioOn()
       },
       switchMicrophone: async (microphoneId) => {
+        const oldDeviceId = deviceStore.getState().selectedAudioInputDevice
         const oldTrack = get().localAudioTrack
         if (!oldTrack)
           return
@@ -126,13 +129,14 @@ export function createPreviewStore(
         const newTrack = ZoomVideo.createLocalAudioTrack(microphoneId)
 
         try {
+          deviceStore.setState({ selectedAudioInputDevice: microphoneId })
           await newTrack.start()
           await newTrack.unmute()
           set({ localAudioTrack: newTrack })
-          deviceStore.setState({ selectedAudioInputDevice: microphoneId })
         }
         catch (error) {
           // keep old track running if new one fails
+          deviceStore.setState({ selectedAudioInputDevice: oldDeviceId })
           await oldTrack.start()
           await oldTrack.unmute()
 

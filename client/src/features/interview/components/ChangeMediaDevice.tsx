@@ -19,7 +19,7 @@ interface DeviceSelectProps {
   icon: React.ReactNode
   devices: MediaDevice[]
   selected: string | null
-  onChange: (val: string) => void
+  onChange: (val: string) => Promise<void>
   variant: Variant
 }
 
@@ -31,6 +31,12 @@ function DeviceSelect({
   onChange,
   variant,
 }: DeviceSelectProps) {
+  // change to null when selected device is missing to avoid controlled/uncontrolled error
+  const value
+    = selected && devices.some(d => d.deviceId === selected)
+      ? selected
+      : null
+
   return variant === 'dropdown'
     ? (
         <Select
@@ -39,7 +45,7 @@ function DeviceSelect({
             value: d.deviceId,
             label: d.label || `${label}: ${d.deviceId.slice(0, 4)}`,
           }))}
-          value={selected}
+          value={value}
           onChange={val => val && onChange(val)}
           leftSection={icon}
           leftSectionPointerEvents="none"
@@ -50,7 +56,7 @@ function DeviceSelect({
     : (
         <Radio.Group
           label={label}
-          value={selected || ''}
+          value={value}
           onChange={onChange}
           styles={{ label: { paddingBottom: 8 } }}
         >
@@ -70,10 +76,12 @@ function DeviceSelect({
 interface ChangeMediaDeviceProps {
   mediaType: MediaType
   variant?: Variant
-  onSwitchCamera?: (deviceId: string) => void
-  onSwitchMicrophone?: (deviceId: string) => void
-  onSwitchSpeaker?: (deviceId: string) => void
+  onSwitchCamera?: (deviceId: string) => Promise<void>
+  onSwitchMicrophone?: (deviceId: string) => Promise<void>
+  onSwitchSpeaker?: (deviceId: string) => Promise<void>
 }
+
+async function noopAsync(_?: any) {}
 
 export function ChangeMediaDevice({
   mediaType,
@@ -102,7 +110,7 @@ export function ChangeMediaDevice({
           icon={<IconMicrophone size={18} />}
           devices={audioInputDevices}
           selected={selectedAudioInputDevice}
-          onChange={onSwitchMicrophone ?? (() => {})}
+          onChange={onSwitchMicrophone ?? noopAsync}
           variant={variant}
         />
         <DeviceSelect
@@ -110,7 +118,7 @@ export function ChangeMediaDevice({
           icon={<IconVolume size={18} />}
           devices={audioOutputDevices}
           selected={selectedAudioOutputDevice}
-          onChange={onSwitchSpeaker ?? (() => {})}
+          onChange={onSwitchSpeaker ?? noopAsync}
           variant={variant}
         />
       </Stack>
@@ -123,7 +131,7 @@ export function ChangeMediaDevice({
       icon={<IconVideo size={18} />}
       devices={videoDevices}
       selected={selectedVideoDevice}
-      onChange={onSwitchCamera ?? (() => {})}
+      onChange={onSwitchCamera ?? noopAsync}
       variant={variant}
     />
   )

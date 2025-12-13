@@ -3,6 +3,7 @@ import type {
   event_network_quality_change,
   event_peer_video_state_change,
   event_video_active_change,
+  MediaDevice,
   Participant,
   VideoClient,
   VideoPlayer,
@@ -186,11 +187,15 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           updateParticipants()
         },
         switchCamera: async (deviceId) => {
+          const oldDeviceId = deviceStore.getState().selectedVideoDevice
           try {
-            await stream().switchCamera(deviceId)
+            // setting the state before the async function call makes it appear instant.
+            // it also prevents a weird bug where the state flips back right after changing.
             deviceStore.setState({ selectedVideoDevice: deviceId })
+            await stream().switchCamera(deviceId)
           }
           catch (error) {
+            deviceStore.setState({ selectedVideoDevice: oldDeviceId })
             const { setError } = appStore.getState().actions
             handleAppError(error, setError, 'Failed to switch camera')
           }
@@ -234,21 +239,25 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           await stream().unmuteAudio()
         },
         switchMicrophone: async (deviceId) => {
+          const oldDeviceId = deviceStore.getState().selectedAudioInputDevice
           try {
-            await stream().switchMicrophone(deviceId)
             deviceStore.setState({ selectedAudioInputDevice: deviceId })
+            await stream().switchMicrophone(deviceId)
           }
           catch (error) {
+            deviceStore.setState({ selectedAudioInputDevice: oldDeviceId })
             const { setError } = appStore.getState().actions
             handleAppError(error, setError, 'Failed to switch microphone')
           }
         },
         switchSpeaker: async (deviceId) => {
+          const oldDeviceId = deviceStore.getState().selectedAudioOutputDevice
           try {
-            await stream().switchSpeaker(deviceId)
             deviceStore.setState({ selectedAudioOutputDevice: deviceId })
+            await stream().switchSpeaker(deviceId)
           }
           catch (error) {
+            deviceStore.setState({ selectedAudioInputDevice: oldDeviceId })
             const { setError } = appStore.getState().actions
             handleAppError(error, setError, 'Failed to switch speaker')
           }
@@ -316,10 +325,15 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
     if (!stream)
       return
 
+    const filterRealDevices = (devices: MediaDevice[]) =>
+      devices.filter(
+        d => d.deviceId !== 'default' && d.deviceId !== 'communications',
+      )
+
     // update state with new data
-    const cameras = stream.getCameraList()
-    const microphones = stream.getMicList()
-    const audioSpeakers = stream.getSpeakerList()
+    const cameras = filterRealDevices(stream.getCameraList())
+    const microphones = filterRealDevices(stream.getMicList())
+    const audioSpeakers = filterRealDevices(stream.getSpeakerList())
 
     const activeCamera = stream.getActiveCamera()
     const activeMic = stream.getActiveMicrophone()
