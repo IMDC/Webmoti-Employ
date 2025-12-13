@@ -155,12 +155,23 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
             await client().join(roomName, token, name)
             const stream = client().getMediaStream()
 
+            // use selected devices from prejoin
+            const {
+              selectedVideoDevice,
+              selectedAudioInputDevice,
+              selectedAudioOutputDevice,
+            } = deviceStore.getState()
+
             const { isAudioOn, isVideoOn } = get()
             const granted = appStore.getState().permissionState === 'granted'
             if (granted && isVideoOn)
-              await stream.startVideo()
-            if (granted && isAudioOn)
-              await stream.startAudio()
+              await stream.startVideo({ cameraId: selectedVideoDevice ?? undefined })
+            if (granted && isAudioOn) {
+              await stream.startAudio({
+                microphoneId: selectedAudioInputDevice ?? undefined,
+                speakerId: selectedAudioOutputDevice ?? undefined,
+              })
+            }
 
             set({ stream, callState: 'joined', localUserId: client().getCurrentUserInfo().userId })
             updateParticipants()
