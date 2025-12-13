@@ -1,3 +1,4 @@
+import type { MediaDevice } from '@zoom/videosdk'
 import { Radio, Select, Stack, Text } from '@mantine/core'
 import { IconMicrophone, IconVideo, IconVolume } from '@tabler/icons-react'
 import {
@@ -16,7 +17,7 @@ type Variant = 'dropdown' | 'radio'
 interface DeviceSelectProps {
   label: string
   icon: React.ReactNode
-  devices: MediaDeviceInfo[]
+  devices: MediaDevice[]
   selected: string | null
   onChange: (val: string) => void
   variant: Variant

@@ -1,3 +1,4 @@
+import type { MediaDevice } from '@zoom/videosdk'
 import ZoomVideo from '@zoom/videosdk'
 import { createStore } from 'zustand'
 import { logger } from '@/utils/logger'
@@ -9,9 +10,9 @@ export interface DeviceStoreActions {
 }
 
 export interface DeviceStore {
-  videoDevices: MediaDeviceInfo[]
-  audioInputDevices: MediaDeviceInfo[]
-  audioOutputDevices: MediaDeviceInfo[]
+  videoDevices: MediaDevice[]
+  audioInputDevices: MediaDevice[]
+  audioOutputDevices: MediaDevice[]
 
   selectedVideoDevice: string | null
   selectedAudioInputDevice: string | null
@@ -43,7 +44,7 @@ export function createDeviceStore() {
         // try catch doesn't work on this function
         const devices = await ZoomVideo.getDevices()
 
-        const isUsableDevice = (d: MediaDeviceInfo) =>
+        const isUsableDevice = (d: MediaDevice) =>
           !!d.deviceId
           && !!d.label
           // some audio devices are duplicated and have fake device ids.

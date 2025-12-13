@@ -311,8 +311,28 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
   }
 
   async function handleDeviceChange() {
-    // device was maybe unplugged/plugged in, so re-init all devices
-    await deviceStore.getState().actions.initDevices()
+    // device was maybe unplugged/plugged in
+    const { stream } = zoomSessionStore.getState()
+    if (!stream)
+      return
+
+    // update state with new data
+    const cameras = stream.getCameraList()
+    const microphones = stream.getMicList()
+    const audioSpeakers = stream.getSpeakerList()
+
+    const activeCamera = stream.getActiveCamera()
+    const activeMic = stream.getActiveMicrophone()
+    const activeSpeaker = stream.getActiveSpeaker()
+
+    deviceStore.setState({
+      videoDevices: cameras,
+      audioInputDevices: microphones,
+      audioOutputDevices: audioSpeakers,
+      selectedVideoDevice: activeCamera,
+      selectedAudioInputDevice: activeMic,
+      selectedAudioOutputDevice: activeSpeaker,
+    })
   }
 
   function handleNetworkQualityChange(payload: Parameters<typeof event_network_quality_change>[0]) {
