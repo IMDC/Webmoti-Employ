@@ -268,7 +268,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
             await stream().switchSpeaker(deviceId)
           }
           catch (error) {
-            deviceStore.setState({ selectedAudioInputDevice: oldDeviceId })
+            deviceStore.setState({ selectedAudioOutputDevice: oldDeviceId })
             const { setError } = appStore.getState().actions
             handleAppError(error, setError, 'Failed to switch speaker')
           }
