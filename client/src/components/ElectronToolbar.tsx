@@ -1,4 +1,4 @@
-import { ActionIcon, Group, Image } from '@mantine/core'
+import { ActionIcon, Group, Image, Space, Text } from '@mantine/core'
 import {
   IconArrowLeft,
   IconArrowRight,
@@ -8,7 +8,7 @@ import {
   IconWindowMinimize,
   IconX,
 } from '@tabler/icons-react'
-import { OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
+import { HEADER_SIDE_PADDING, OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
 
 function ToolbarIcon({ icon: IconComponent }: { icon: React.ElementType }) {
   return (
@@ -24,8 +24,8 @@ export function ElectronToolbar() {
       justify="space-between"
       align="center"
       h={OUTER_TOOLBAR_HEIGHT}
-      pl={5}
-      pr={5}
+      pl={HEADER_SIDE_PADDING}
+      pr={HEADER_SIDE_PADDING}
     >
       {/* left group */}
       <Group gap={5}>
@@ -35,6 +35,17 @@ export function ElectronToolbar() {
           w="auto"
           fit="contain"
         />
+        <Text
+          fz={15}
+          fw={900}
+          variant="gradient"
+          gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
+          draggable={false}
+        >
+          WebMoti-Employ
+        </Text>
+
+        <Space w="xs" />
 
         <ToolbarIcon icon={IconArrowLeft} />
         <ToolbarIcon icon={IconArrowRight} />

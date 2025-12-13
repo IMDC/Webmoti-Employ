@@ -1,7 +1,6 @@
 import {
   ActionIcon,
   Affix,
-  Anchor,
   AppShell,
   Button,
   Divider,
@@ -26,7 +25,7 @@ import {
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { RightHeader } from '@/components/RightHeader'
-import { HEADER_HEIGHT, OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
+import { HEADER_HEIGHT, HEADER_SIDE_PADDING, OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
 import { getFirstName } from '@/utils/utils'
 import { useUser } from '../auth/hooks/useUserStore'
 import { InterviewList } from './components/InterviewList'
@@ -52,7 +51,12 @@ export function Dashboard() {
     <AppShell
       header={{ height: HEADER_HEIGHT }}
       styles={{
-        header: { border: 'none', marginTop: OUTER_TOOLBAR_HEIGHT },
+        header: {
+          border: 'none',
+          marginTop: OUTER_TOOLBAR_HEIGHT,
+          paddingLeft: HEADER_SIDE_PADDING,
+          paddingRight: HEADER_SIDE_PADDING,
+        },
         // hide horizontal scrollbar
         main: {
           height: `calc(100vh - ${HEADER_HEIGHT}px)`,
@@ -62,25 +66,7 @@ export function Dashboard() {
       <AppShell.Header>
         {/* 100vw makes it so the scrollbar doesn't shift the layout */}
         <Flex justify="space-between" align="center" w="100vw" h="100%" p="lg">
-          <Anchor component={Link} to="/" underline="never">
-            <Group gap="xs">
-              {/* <Image
-                src="/favicon.svg"
-                h={{ base: 15, sm: 25 }}
-                w="auto"
-                fit="contain"
-              /> */}
-              <Text
-                fz={{ base: 15, sm: 25 }}
-                fw={900}
-                variant="gradient"
-                gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
-                draggable={false}
-              >
-                WebMoti-Employ
-              </Text>
-            </Group>
-          </Anchor>
+          <div></div>
 
           <RightHeader />
         </Flex>
