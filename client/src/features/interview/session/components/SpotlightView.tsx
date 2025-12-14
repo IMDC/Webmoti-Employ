@@ -48,6 +48,11 @@ export function SpotlightView({
   const mainProfile = profiles?.[mainParticipant.displayName]
   const secondaryProfile = secondaryParticipant ? profiles?.[secondaryParticipant.displayName] : null
 
+  // wait for the containers to have real dimensions.
+  // this also fixes bug where active speaker highlight shows on a tile of 0 size
+  if (width === 0 || height === 0)
+    return null
+
   return (
     <>
       <SessionTile

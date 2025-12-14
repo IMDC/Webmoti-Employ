@@ -3,13 +3,14 @@ import path from 'node:path'
 import { app } from 'electron'
 import treeKill from 'tree-kill'
 import { logger } from './logger'
+import { isWindows } from './utils'
 
 const PYTHON_SRC_FOLDER_NAME = 'python'
 const PYTHON_BINARY_PREFIX = 'eyetracker'
 const PYTHON_STARTED_OUTPUT_STRING = 'STARTED_PYTHON_SERVER'
 
 function getPythonBinaryName() {
-  return process.platform === 'win32' ? `${PYTHON_BINARY_PREFIX}.exe` : PYTHON_BINARY_PREFIX
+  return isWindows() ? `${PYTHON_BINARY_PREFIX}.exe` : PYTHON_BINARY_PREFIX
 }
 
 let pythonProcess: ReturnType<typeof spawn> | null = null

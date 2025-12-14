@@ -36,6 +36,32 @@ export function getLocalDomain() {
   return 'localhost:5173'
 }
 
+export function isWindows() {
+  return process.platform === 'win32'
+}
+export function isMac() {
+  return process.platform === 'darwin'
+}
+export function isLinux() {
+  return process.platform === 'linux'
+}
+
+export function getAppIconPath() {
+  const iconBase = path.join(app.getAppPath(), 'icon')
+
+  if (isWindows()) {
+    return path.join(iconBase, 'icon.ico')
+  }
+  else if (isMac()) {
+    return path.join(iconBase, 'icon.icns')
+  }
+  else if (isLinux()) {
+    return path.join(iconBase, 'icon.png')
+  }
+
+  return path.join(iconBase, 'icon.png')
+}
+
 function validateEventFrame(frame: WebFrameMain) {
   if (isDev && new URL(frame.url).host === getLocalDomain()) {
     return

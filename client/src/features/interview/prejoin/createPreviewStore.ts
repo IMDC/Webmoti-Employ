@@ -19,6 +19,7 @@ export interface PreviewStoreActions {
   muteMicrophone: () => Promise<void>
   toggleMuteMicrophone: () => Promise<void>
   switchMicrophone: (microphoneId: string) => Promise<void>
+  switchSpeaker: (speakerId: string) => Promise<void>
 }
 
 export interface PreviewStore {
@@ -63,9 +64,17 @@ export function createPreviewStore(
       },
 
       switchCamera: async (deviceId) => {
+        const oldDeviceId = deviceStore.getState().selectedVideoDevice
         const localVideoTrack = get().localVideoTrack
-        localVideoTrack?.switchCamera(deviceId)
-        deviceStore.setState({ selectedVideoDevice: deviceId })
+        try {
+          deviceStore.setState({ selectedVideoDevice: deviceId })
+          await localVideoTrack?.switchCamera(deviceId)
+        }
+        catch (error) {
+          deviceStore.setState({ selectedVideoDevice: oldDeviceId })
+          const { setError } = appStore.getState().actions
+          handleAppError(error, setError, 'Failed to switch camera')
+        }
       },
 
       startMicrophone: async () => {
@@ -111,14 +120,39 @@ export function createPreviewStore(
         zoomSessionStore.getState().actions.toggleIsAudioOn()
       },
       switchMicrophone: async (microphoneId) => {
-        const localAudioTrack = get().localAudioTrack
-        await localAudioTrack?.stop()
+        const oldDeviceId = deviceStore.getState().selectedAudioInputDevice
+        const oldTrack = get().localAudioTrack
+        if (!oldTrack)
+          return
 
-        const newLocalAudioTrack = ZoomVideo.createLocalAudioTrack(microphoneId)
-        await newLocalAudioTrack.start()
-        newLocalAudioTrack.unmute()
-        set({ localAudioTrack: newLocalAudioTrack })
-        deviceStore.setState({ selectedAudioInputDevice: microphoneId })
+        await oldTrack.stop()
+
+        let newTrack
+        try {
+          newTrack = ZoomVideo.createLocalAudioTrack(microphoneId)
+
+          deviceStore.setState({ selectedAudioInputDevice: microphoneId })
+          await newTrack.start()
+          await newTrack.unmute()
+          set({ localAudioTrack: newTrack })
+        }
+        catch (error) {
+          // cleanup new track if it failed
+          if (newTrack)
+            await newTrack.stop()
+          deviceStore.setState({ selectedAudioInputDevice: oldDeviceId })
+          await oldTrack.start()
+          await oldTrack.unmute()
+
+          const { setError } = appStore.getState().actions
+          handleAppError(error, setError, 'Failed to switch microphone')
+        }
+      },
+
+      switchSpeaker: async (speakerId) => {
+        // this method doesn't actually change speakers because there's no point in doing that in prejoin.
+        // it just saves the selection.
+        deviceStore.setState({ selectedAudioOutputDevice: speakerId })
       },
     },
   }))

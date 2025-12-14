@@ -1,7 +1,7 @@
 {
   "name": "@webmoti-employ/electron",
   "productName": "WebMoti-Employ",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "WebMoti-Employ desktop app",
   "author": "IMDC",
   "main": "dist/main.js",
@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.2.1",
-    "electron": "38.1.0",
+    "electron": "39.0.0",
     "electron-builder": "^26.0.12",
     "eslint": "^9.35.0",
     "rimraf": "^6.0.1",

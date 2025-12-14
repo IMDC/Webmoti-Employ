@@ -61,6 +61,7 @@ export function SessionTile({
       profileUrl={profileUrl}
       isLoadingProfiles={isLoadingProfiles}
       isActiveSpeaker={activeSpeakerId === participant.userId && isTrackEnabled}
+      isVideoOn={participant.bVideoOn}
     >
       {participant.bVideoOn && (
         <VideoRenderer

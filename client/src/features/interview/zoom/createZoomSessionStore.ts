@@ -3,6 +3,7 @@ import type {
   event_network_quality_change,
   event_peer_video_state_change,
   event_video_active_change,
+  MediaDevice,
   Participant,
   VideoClient,
   VideoPlayer,
@@ -38,6 +39,7 @@ export interface ZoomSessionActions {
   muteAudio: () => Promise<void>
   unmuteAudio: () => Promise<void>
   switchMicrophone: (deviceId: string) => Promise<void>
+  switchSpeaker: (deviceId: string) => Promise<void>
 
   cleanup: () => Promise<void>
 }
@@ -66,7 +68,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
     const stream = () => {
       const s = get().stream
       if (!s) {
-        throw new Error('Stream not initialized')
+        throw new Error('Stream is null (not initialized)')
       }
       return s
     }
@@ -153,6 +155,13 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
             await client().join(roomName, token, name)
             const stream = client().getMediaStream()
 
+            // use selected devices from prejoin
+            const {
+              selectedVideoDevice,
+              selectedAudioInputDevice,
+              selectedAudioOutputDevice,
+            } = deviceStore.getState()
+
             const { isAudioOn, isVideoOn } = get()
             const granted = appStore.getState().permissionState === 'granted'
             
@@ -163,7 +172,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
             
             if (granted && isVideoOn) {
               try {
-                await stream.startVideo()
+                await stream.startVideo({ cameraId: selectedVideoDevice ?? undefined })
                 logger.log('✅ Video started successfully')
                 // Force immediate update
                 updateParticipants()
@@ -185,7 +194,10 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
             
             if (granted && isAudioOn) {
               try {
-                await stream.startAudio()
+                await stream.startAudio({
+                  microphoneId: selectedAudioInputDevice ?? undefined,
+                  speakerId: selectedAudioOutputDevice ?? undefined,
+                })
                 logger.log('✅ Audio started successfully')
               }
               catch (error) {
@@ -240,8 +252,18 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           updateParticipants()
         },
         switchCamera: async (deviceId) => {
-          await stream().switchCamera(deviceId)
-          deviceStore.setState({ selectedVideoDevice: deviceId })
+          const oldDeviceId = deviceStore.getState().selectedVideoDevice
+          try {
+            // setting the state before the async function call makes it appear instant.
+            // it also prevents a weird bug where the state flips back right after changing.
+            deviceStore.setState({ selectedVideoDevice: deviceId })
+            await stream().switchCamera(deviceId)
+          }
+          catch (error) {
+            deviceStore.setState({ selectedVideoDevice: oldDeviceId })
+            const { setError } = appStore.getState().actions
+            handleAppError(error, setError, 'Failed to switch camera')
+          }
         },
         attachVideoPlayer: async (userId: number, element: VideoPlayer) => {
         // need to detach first to ensure it works properly (this matters in strict mode)
@@ -282,8 +304,28 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           await stream().unmuteAudio()
         },
         switchMicrophone: async (deviceId) => {
-          stream().switchMicrophone(deviceId)
-          deviceStore.setState({ selectedAudioInputDevice: deviceId })
+          const oldDeviceId = deviceStore.getState().selectedAudioInputDevice
+          try {
+            deviceStore.setState({ selectedAudioInputDevice: deviceId })
+            await stream().switchMicrophone(deviceId)
+          }
+          catch (error) {
+            deviceStore.setState({ selectedAudioInputDevice: oldDeviceId })
+            const { setError } = appStore.getState().actions
+            handleAppError(error, setError, 'Failed to switch microphone')
+          }
+        },
+        switchSpeaker: async (deviceId) => {
+          const oldDeviceId = deviceStore.getState().selectedAudioOutputDevice
+          try {
+            deviceStore.setState({ selectedAudioOutputDevice: deviceId })
+            await stream().switchSpeaker(deviceId)
+          }
+          catch (error) {
+            deviceStore.setState({ selectedAudioOutputDevice: oldDeviceId })
+            const { setError } = appStore.getState().actions
+            handleAppError(error, setError, 'Failed to switch speaker')
+          }
         },
         cleanup: async () => {
           logger.log('Cleaning up zoom client...')
@@ -369,8 +411,33 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
   }
 
   async function handleDeviceChange() {
-    // device was maybe unplugged/plugged in, so re-init all devices
-    await deviceStore.getState().actions.initDevices()
+    // device was maybe unplugged/plugged in
+    const { stream } = zoomSessionStore.getState()
+    if (!stream)
+      return
+
+    const filterRealDevices = (devices: MediaDevice[]) =>
+      devices.filter(
+        d => d.deviceId !== 'default' && d.deviceId !== 'communications',
+      )
+
+    // update state with new data
+    const cameras = filterRealDevices(stream.getCameraList())
+    const microphones = filterRealDevices(stream.getMicList())
+    const audioSpeakers = filterRealDevices(stream.getSpeakerList())
+
+    const activeCamera = stream.getActiveCamera()
+    const activeMic = stream.getActiveMicrophone()
+    const activeSpeaker = stream.getActiveSpeaker()
+
+    deviceStore.setState({
+      videoDevices: cameras,
+      audioInputDevices: microphones,
+      audioOutputDevices: audioSpeakers,
+      selectedVideoDevice: activeCamera,
+      selectedAudioInputDevice: activeMic,
+      selectedAudioOutputDevice: activeSpeaker,
+    })
   }
 
   function handleNetworkQualityChange(payload: Parameters<typeof event_network_quality_change>[0]) {
