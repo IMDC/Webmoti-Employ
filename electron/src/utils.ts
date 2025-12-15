@@ -5,11 +5,8 @@ import dotenv from 'dotenv'
 import { app, ipcMain } from 'electron'
 
 const envPath = path.join(app.getAppPath(), '.env.electron')
-console.log('[DEBUG] Loading .env.electron from:', envPath)
-console.log('[DEBUG] File exists:', fs.existsSync(envPath))
 dotenv.config({ path: envPath })
 const envHostedUrl = process.env.CLIENT_HOSTED_URL
-console.log('[DEBUG] CLIENT_HOSTED_URL value:', envHostedUrl)
 if (!envHostedUrl)
   throw new Error(`CLIENT_HOSTED_URL not set in .env.electron. Tried to load from: ${envPath}`)
 
