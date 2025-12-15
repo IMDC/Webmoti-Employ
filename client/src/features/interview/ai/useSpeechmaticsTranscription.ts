@@ -1,3 +1,26 @@
+/**
+ * Speechmatics Real-Time Transcription Hook
+ *
+ * SETUP REQUIRED:
+ * 1. Install dependencies: pnpm install
+ * 2. Set up your Speechmatics API key in client/.env.local:
+ *    VITE_SPEECHMATICS_API_KEY=your_api_key_here
+ *
+ * See SPEECHMATICS_SETUP.md for complete setup instructions.
+ *
+ * IMPLEMENTATION:
+ * - Uses @speechmatics/auth for JWT token generation
+ * - Connects directly to Speechmatics WebSocket API (wss://eu2.rt.speechmatics.com/v2)
+ * - Sends raw PCM audio data and receives JSON transcript messages
+ *
+ * FEATURES:
+ * - Real-time audio transcription using Speechmatics API
+ * - Automatic filler word detection (um, uh, hmm, etc.)
+ * - Speaker role tagging (interviewer vs candidate)
+ * - Final transcripts only (no partial/interim results)
+ * - Enhanced accuracy with operating_point: 'enhanced'
+ */
+
 import type { TranscriptMessage } from '@webmoti-employ/shared'
 import { createSpeechmaticsJWT } from '@speechmatics/auth'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -15,26 +38,23 @@ interface StartRecognitionMessage {
   }
   transcription_config: {
     language: string
-    enable_partials: boolean
+    operating_point: string
     max_delay: number
+    transcript_filtering_config: {
+      remove_disfluencies: boolean
+    }
   }
-}
-
-interface AddPartialTranscriptMessage {
-  message: 'AddPartialTranscript'
-  results: Array<{
-    alternatives: Array<{
-      content: string
-    }>
-  }>
 }
 
 interface AddTranscriptMessage {
   message: 'AddTranscript'
   results: Array<{
-    alternatives: Array<{
+    type?: string
+    alternatives?: Array<{
       content: string
+      tags?: string[]
     }>
+    is_eos?: boolean
   }>
 }
 
@@ -48,17 +68,22 @@ interface ErrorMessage {
   reason: string
 }
 
-type SpeechmaticsMessage = 
-  | AddPartialTranscriptMessage 
-  | AddTranscriptMessage 
-  | EndOfTranscriptMessage 
-  | ErrorMessage
-  | { message: 'RecognitionStarted' }
-  | { message: 'AudioAdded' }
-  | { message: 'Info'; type: string }
+type SpeechmaticsMessage
+  = | AddTranscriptMessage
+    | EndOfTranscriptMessage
+    | ErrorMessage
+    | { message: 'RecognitionStarted' }
+    | { message: 'AudioAdded' }
+    | { message: 'Info', type: string }
 
 const SPEECHMATICS_URL = 'wss://eu2.rt.speechmatics.com/v2'
-const SAMPLE_RATE = 16000 // Speechmatics prefers 16kHz
+// Speechmatics expects raw PCM audio and works best/reliably with 16kHz mono.
+// IMPORTANT: Most devices (and Electron) capture mic audio at 48kHz.
+// If we send 48kHz while telling Speechmatics it's 48kHz, you *may* still get no transcripts
+// depending on plan/region/model/settings. The safest approach is:
+// - Tell Speechmatics we're sending 16kHz
+// - Downsample our captured audio to 16kHz before sending
+const SAMPLE_RATE = 16000
 const RECONNECT_DELAY = 5000 // Increased to 5 seconds
 const MAX_RECONNECT_ATTEMPTS = 1 // Reduced to 1 to avoid quota issues
 
@@ -71,7 +96,6 @@ export function useSpeechmaticsTranscription(
   const participants = useZoomParticipants()
 
   const [hasNotifiedUser, setHasNotifiedUser] = useState(false)
-  const [currentTranscript, setCurrentTranscript] = useState('')
 
   // Refs to persist across renders
   const wsRef = useRef<WebSocket | null>(null)
@@ -96,10 +120,10 @@ export function useSpeechmaticsTranscription(
     const apiKey = import.meta.env.VITE_SPEECHMATICS_API_KEY
     if (!apiKey || apiKey === 'your_api_key_here') {
       throw new Error(
-        'Speechmatics API key not configured.\n\n' +
-        'Please set your API key in client/.env.local:\n' +
-        'VITE_SPEECHMATICS_API_KEY=your_api_key_here\n\n' +
-        'Get your API key from: https://portal.speechmatics.com/manage-access/'
+        'Speechmatics API key not configured.\n\n'
+        + 'Please set your API key in client/.env.local:\n'
+        + 'VITE_SPEECHMATICS_API_KEY=your_api_key_here\n\n'
+        + 'Get your API key from: https://portal.speechmatics.com/manage-access/',
       )
     }
 
@@ -119,7 +143,9 @@ export function useSpeechmaticsTranscription(
   }, [])
 
   // Connect to Speechmatics WebSocket
-  const connectWebSocket = useCallback(async (sampleRate: number) => {
+  // Create the WebSocket connection and send the StartRecognition "handshake".
+  // We keep this separate from audio capture so reconnect logic is straightforward.
+  const connectWebSocket = useCallback(async () => {
     if (isConnectingRef.current || wsRef.current?.readyState === WebSocket.OPEN) {
       return
     }
@@ -135,77 +161,80 @@ export function useSpeechmaticsTranscription(
         reconnectAttemptsRef.current = 0
         isConnectingRef.current = false
 
-        // Send StartRecognition message with actual sample rate
+        // Always use 16kHz for Speechmatics.
+        // NOTE: this must match the audio we *actually* send over the socket.
+        // We downsample the microphone audio to 16kHz in `onaudioprocess`.
         const startMessage: StartRecognitionMessage = {
           message: 'StartRecognition',
           audio_format: {
             type: 'raw',
             encoding: 'pcm_s16le',
-            sample_rate: sampleRate,
+            sample_rate: SAMPLE_RATE,
           },
           transcription_config: {
             language: 'en',
-            enable_partials: true,
-            max_delay: 2, // seconds
+            operating_point: 'enhanced',
+            max_delay: 1.0,
+            transcript_filtering_config: {
+              remove_disfluencies: false,
+            },
           },
         }
         ws.send(JSON.stringify(startMessage))
-        logger.log(`Sent StartRecognition to Speechmatics with ${sampleRate}Hz sample rate`)
+        logger.log(`Sent StartRecognition to Speechmatics with ${SAMPLE_RATE}Hz sample rate`)
       }
 
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data) as SpeechmaticsMessage
 
-          if (data.message === 'AddPartialTranscript') {
-            // Handle partial transcripts
-            const text = data.results
-              .map(r => r.alternatives[0]?.content)
-              .filter(Boolean)
-              .join(' ')
-            
-            if (text) {
-              setCurrentTranscript(prev => {
-                const updated = prev + ' ' + text
-                currentTranscriptRef.current = updated
-                return updated
-              })
-              
-              // Send partial transcripts in chunks based on word buffer
-              const words = getWords(text)
-              if (words.length >= maxWordsBuffer) {
-                const speaker = getSpeakerRole()
-                logger.log('Partial transcript:', text)
-                sendTranscript({ text, status: 'partial', speaker })
+          if (data.message === 'AddTranscript') {
+            // We only process FINAL transcripts (AddTranscript).
+            // Speechmatics can also send partials if enabled, but we intentionally do not use them.
+            //
+            // The payload comes as a list of "results" (words/punctuation), similar to their docs.
+            let transcriptText = ''
+            let fillerCount = 0
+
+            for (const result of data.results) {
+              if (result.type === 'word') {
+                transcriptText += ' '
+
+                // Filler words are tagged by Speechmatics with "disfluency"
+                // (e.g. "um", "uh", "hmm" in English).
+                const tags = result.alternatives?.[0]?.tags
+                if (tags && tags.includes('disfluency')) {
+                  fillerCount++
+                  logger.log('Detected filler word:', result.alternatives?.[0]?.content)
+                }
+              }
+              const content = result.alternatives?.[0]?.content
+              if (content) {
+                transcriptText += content
+              }
+              if (result.is_eos) {
+                transcriptText += '\n'
               }
             }
-          }
-          else if (data.message === 'AddTranscript') {
-            // Handle final transcripts - Speechmatics sends phrases, so just accumulate and send when we have enough words
-            const text = data.results
-              .map(r => r.alternatives[0]?.content)
-              .filter(Boolean)
-              .join(' ')
-            
+
+            // Remove leading/trailing whitespace but preserve internal spacing
+            const text = transcriptText.trim().replace(/\n/g, ' ')
+
             if (text) {
-              // Accumulate words
-              setCurrentTranscript(prev => {
-                const updated = prev ? prev + ' ' + text : text
-                currentTranscriptRef.current = updated
-                
-                // Check if we have enough words to send
-                const wordCount = getWords(updated).length
-                if (wordCount >= maxWordsBuffer) {
-                  const speaker = getSpeakerRole()
-                  logger.log('Sending final transcript:', updated)
-                  sendTranscript({ text: updated, status: 'final', speaker })
-                  // Reset
-                  currentTranscriptRef.current = ''
-                  return ''
-                }
-                
-                return updated
-              })
+              // Accumulate words for final transcripts
+              const prev = currentTranscriptRef.current
+              const updated = prev ? `${prev} ${text}` : text
+              currentTranscriptRef.current = updated
+
+              // Check if we have enough words to send
+              const wordCount = getWords(updated).length
+              if (wordCount >= maxWordsBuffer) {
+                const speaker = getSpeakerRole()
+                logger.log('Sending final transcript:', updated, 'Filler words detected:', fillerCount)
+                sendTranscript({ text: updated, status: 'final', speaker })
+                // Reset
+                currentTranscriptRef.current = ''
+              }
             }
           }
           else if (data.message === 'EndOfTranscript') {
@@ -214,7 +243,6 @@ export function useSpeechmaticsTranscription(
               const speaker = getSpeakerRole()
               logger.log('Sending remaining transcript on EndOfTranscript:', currentTranscriptRef.current)
               sendTranscript({ text: currentTranscriptRef.current, status: 'final', speaker })
-              setCurrentTranscript('')
               currentTranscriptRef.current = ''
             }
           }
@@ -246,7 +274,7 @@ export function useSpeechmaticsTranscription(
           logger.error('Speechmatics quota exceeded. Please wait before reconnecting or upgrade your plan.')
           errorNotification(
             'Transcription quota exceeded',
-            'Your Speechmatics account has reached its concurrent session limit. Please wait a moment and try again, or upgrade your plan.'
+            'Your Speechmatics account has reached its concurrent session limit. Please wait a moment and try again, or upgrade your plan.',
           )
           return // Don't attempt reconnection
         }
@@ -257,9 +285,7 @@ export function useSpeechmaticsTranscription(
           reconnectAttemptsRef.current += 1
           logger.log(`Attempting to reconnect... (${reconnectAttemptsRef.current}/${MAX_RECONNECT_ATTEMPTS})`)
           setTimeout(() => {
-            // Use the current audio context's sample rate for reconnection
-            const sampleRate = audioContextRef.current?.sampleRate || SAMPLE_RATE
-            void connectWebSocket(sampleRate)
+            void connectWebSocket()
           }, RECONNECT_DELAY)
         }
         else if (reconnectAttemptsRef.current >= MAX_RECONNECT_ATTEMPTS) {
@@ -307,30 +333,42 @@ export function useSpeechmaticsTranscription(
       })
       streamRef.current = stream
 
-      // Create audio context with default sample rate to avoid conflicts
+      // Create an AudioContext for microphone capture + processing.
+      // We do NOT force a sample rate here because Electron/Chromium may ignore it anyway.
+      // Instead, we downsample whatever rate we get to 16kHz.
       const audioContext = new AudioContext()
       audioContextRef.current = audioContext
-      
-      const actualSampleRate = audioContext.sampleRate
-      logger.log(`Audio context created with sample rate: ${actualSampleRate}Hz`)
 
-      // Connect WebSocket with the actual sample rate
-      await connectWebSocket(actualSampleRate)
+      // In some environments (including Electron), AudioContext may start "suspended"
+      // until resumed by a user gesture. If it stays suspended, `onaudioprocess` may never fire,
+      // which means we would send zero audio to Speechmatics (and get zero transcripts).
+      await audioContext.resume()
+
+      const inputSampleRate = audioContext.sampleRate
+      logger.log(`Audio context created with sample rate: ${inputSampleRate}Hz (sending ${SAMPLE_RATE}Hz to Speechmatics)`)
+
+      // Connect WebSocket first (we always tell Speechmatics we're sending 16kHz).
+      await connectWebSocket()
 
       // Set up audio processing
       const source = audioContext.createMediaStreamSource(stream)
-      
+
       const processor = audioContext.createScriptProcessor(4096, 1, 1)
       processorRef.current = processor
 
       processor.onaudioprocess = (e) => {
         if (wsRef.current?.readyState === WebSocket.OPEN) {
+          // Grab the latest mono PCM frame from the microphone.
           const inputData = e.inputBuffer.getChannelData(0)
-          
+          // Downsample to 16kHz so our binary audio matches StartRecognition.sample_rate.
+          const resampled = inputSampleRate === SAMPLE_RATE
+            ? inputData
+            : downsampleFloat32ToSampleRate(inputData, inputSampleRate, SAMPLE_RATE)
+
           // Convert Float32Array to Int16Array (PCM 16-bit)
-          const pcmData = new Int16Array(inputData.length)
-          for (let i = 0; i < inputData.length; i++) {
-            const s = Math.max(-1, Math.min(1, inputData[i]))
+          const pcmData = new Int16Array(resampled.length)
+          for (let i = 0; i < resampled.length; i++) {
+            const s = Math.max(-1, Math.min(1, resampled[i]))
             pcmData[i] = s < 0 ? s * 0x8000 : s * 0x7FFF
           }
 
@@ -397,3 +435,31 @@ function getWords(text: string): string[] {
   return text.trim().split(/\s+/).filter(Boolean)
 }
 
+function downsampleFloat32ToSampleRate(
+  input: Float32Array,
+  inputSampleRate: number,
+  outputSampleRate: number,
+): Float32Array {
+  // Very small, dependency-free resampler.
+  // We only downsample (e.g. 48000 -> 16000). If output >= input, we return the input unchanged.
+  // Linear interpolation is good enough for speech transcription and keeps CPU low.
+  if (outputSampleRate >= inputSampleRate) {
+    // No upsampling here; just return input.
+    return input
+  }
+
+  const ratio = inputSampleRate / outputSampleRate
+  const outputLength = Math.round(input.length / ratio)
+  const output = new Float32Array(outputLength)
+
+  let pos = 0
+  for (let i = 0; i < outputLength; i++) {
+    const idx = Math.floor(pos)
+    const nextIdx = Math.min(idx + 1, input.length - 1)
+    const frac = pos - idx
+    output[i] = input[idx] * (1 - frac) + input[nextIdx] * frac
+    pos += ratio
+  }
+
+  return output
+}

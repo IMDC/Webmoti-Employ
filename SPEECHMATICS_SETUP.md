@@ -24,7 +24,17 @@ The Speechmatics Real-Time transcription system has been successfully integrated
 
 ## Setup Instructions
 
-### 1. Get Your Speechmatics API Key
+### 1. Install Required Packages
+
+**IMPORTANT:** Before running the application, ensure dependencies are installed:
+
+```bash
+pnpm install
+```
+
+This will install all dependencies including `@speechmatics/auth` (used for JWT token generation). The implementation connects directly to the Speechmatics WebSocket API without using a client library.
+
+### 2. Get Your Speechmatics API Key
 
 1. Go to [Speechmatics Portal - API Keys](https://portal.speechmatics.com/manage-access/)
 2. Sign up or log in
@@ -35,7 +45,7 @@ The Speechmatics Real-Time transcription system has been successfully integrated
 
 **How it works:** The app automatically generates temporary JWT tokens from your API key using the official `@speechmatics/auth` package. Tokens are valid for 1 hour and regenerated as needed.
 
-### 2. Configure Environment Variables
+### 3. Configure Environment Variables
 
 #### For Client (Speechmatics API Key)
 Create a file `client/.env.local` with:
@@ -44,7 +54,7 @@ Create a file `client/.env.local` with:
 VITE_SPEECHMATICS_API_KEY=your_api_key_here
 ```
 
-**Important:** 
+**Important:**
 - Replace `your_api_key_here` with your actual Speechmatics API key
 - The app will automatically generate temporary JWT tokens from this API key
 - This file is gitignored, so it won't be committed
@@ -96,6 +106,15 @@ Partial transcript: hello this is a test
 Final transcript: hello this is a test
 ```
 
+## Quick Start Checklist
+
+For team members setting up for the first time:
+
+- [ ] Run `pnpm install` (installs Speechmatics packages)
+- [ ] Create `client/.env.local` with your Speechmatics API key
+- [ ] Create `electron/.env.electron` with your Speechmatics API key (for Electron app)
+- [ ] Run the application with `pnpm run dev`
+
 ## How It Works
 
 ### Architecture
@@ -122,8 +141,8 @@ Transcripts are tagged accordingly and sent to the AI as:
 ### Transcript Flow
 
 ```
-User speaks → Microphone → Web Audio API → PCM Conversion → 
-WebSocket → Speechmatics → Transcript → Tagged with role → 
+User speaks → Microphone → Web Audio API → PCM Conversion →
+WebSocket → Speechmatics → Transcript → Tagged with role →
 AI Backend → Interview feedback
 ```
 
@@ -135,7 +154,7 @@ AI Backend → Interview feedback
 
 ### Issue: "Microphone access failed"
 
-**Solution:** 
+**Solution:**
 - Grant microphone permissions in your browser/Electron
 - Check if another app is using the microphone
 - Try restarting the application
@@ -232,4 +251,3 @@ Currently transcribes only the local user. To transcribe all participants:
 ---
 
 ✅ **Integration Complete!** The system is ready to use once you add your API key.
-

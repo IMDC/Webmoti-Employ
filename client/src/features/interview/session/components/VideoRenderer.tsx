@@ -26,7 +26,8 @@ export function VideoRenderer({ attach, detach, setHostVideo, userId }: VideoRen
         // attach video from zoom
         const result = await attach(el)
 
-        if (!isMounted) return
+        if (!isMounted)
+          return
 
         // if this VideoRenderer is the host, setHostVideo is defined
         if (!setHostVideo) {
@@ -42,7 +43,7 @@ export function VideoRenderer({ attach, detach, setHostVideo, userId }: VideoRen
       catch (error: any) {
         // Error 6001 means video stream not ready yet - retry after delay
         if (error?.errorCode === 6001 && attempt < 5 && isMounted) {
-          const delay = Math.min(1000 * Math.pow(2, attempt), 3000) // Exponential backoff, max 3s
+          const delay = Math.min(1000 * 2 ** attempt, 3000) // Exponential backoff, max 3s
           retryTimeout = setTimeout(() => {
             if (isMounted) {
               setup(attempt + 1)

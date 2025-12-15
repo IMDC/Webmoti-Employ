@@ -14,6 +14,7 @@ WebMoti-Employ is an app that uses eyetracking to deliver real-time feedback dur
 
 - [Stack](#stack)
 - [Setup](#setup)
+  - [Speechmatics Transcription Setup](#speechmatics-transcription-setup)
 - [CI/CD](#cicd)
 - [Dependabot](#dependabot)
 - [Desktop App](#desktop-app)
@@ -96,6 +97,31 @@ Hosting:
     # this will run both the client and server in parallel
     pnpm run dev
     ```
+
+### Speechmatics Transcription Setup
+
+**IMPORTANT:** This project uses Speechmatics for real-time audio transcription during interviews.
+
+The required packages are already included in `package.json` and will be installed when you run `pnpm install`. However, you **must** configure your Speechmatics API key:
+
+1. **Get a Speechmatics API key** from [Speechmatics Portal](https://portal.speechmatics.com/manage-access/)
+
+2. **Create environment files:**
+   - `client/.env.local` with:
+     ```bash
+     VITE_SPEECHMATICS_API_KEY=your_api_key_here
+     ```
+   - `electron/.env.electron` with the same key (for desktop app)
+
+3. **See the complete setup guide:** [SPEECHMATICS_SETUP.md](SPEECHMATICS_SETUP.md)
+
+**Features:**
+- ✅ Real-time transcription with enhanced accuracy
+- ✅ Automatic filler word detection (um, uh, hmm)
+- ✅ Speaker role identification (interviewer vs candidate)
+- ✅ Works in both web and Electron apps
+
+**Note:** The required package is `@speechmatics/auth` (for JWT token generation). The implementation connects directly to the Speechmatics WebSocket API. This is already in `package.json`, so `pnpm install` will install it automatically.
 
 ## CI/CD
 
