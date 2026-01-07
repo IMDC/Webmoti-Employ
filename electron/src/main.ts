@@ -1,5 +1,6 @@
+import path from 'node:path'
 import process from 'node:process'
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, dialog } from 'electron'
 import { addLog, setRendererReady } from './logQueue'
 import { setupSocket, socketSendBoundingBox } from './socket'
 import { startLocalPythonServer, startPackagedPythonServer, stopPythonServer } from './startPythonServer'
@@ -12,15 +13,59 @@ import {
   ipcHandle,
   ipcOnMain,
   isDev,
+  isMac,
 } from './utils'
 
+const PROTOCOL_NAME = 'webmoti-employ'
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient(PROTOCOL_NAME, process.execPath, [path.resolve(process.argv[1])])
+  }
+}
+else {
+  app.setAsDefaultProtocolClient(PROTOCOL_NAME)
+}
+
+let mainWindow: BrowserWindow | null = null
+
+// the lock prevents a second app window from opening when handling custom protocol
+const gotTheLock = app.requestSingleInstanceLock()
+if (!gotTheLock) {
+  app.quit()
+}
+else {
+  app.whenReady().then(async () => {
+    await createWindow()
+    if (!mainWindow)
+      throw new Error('Main window not initialized')
+
+    setupSocket(mainWindow)
+
+    addLog(mainWindow, 'Starting python server...')
+    try {
+      if (isDev) {
+        await startLocalPythonServer()
+        addLog(mainWindow, 'Local Python server started successfully.')
+      }
+      else {
+        await startPackagedPythonServer()
+        addLog(mainWindow, 'Packaged Python server started successfully.')
+      }
+    }
+    catch (error) {
+      addLog(mainWindow, `Failed to start Python server: ${error}`)
+    }
+  })
+}
+
 async function createWindow() {
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     webPreferences: {
       preload: getPreloadPath(),
       contextIsolation: true,
       nodeIntegration: false,
     },
+    // only show after maximized
     show: false,
   })
   mainWindow.maximize()
@@ -42,35 +87,42 @@ async function createWindow() {
   })
 
   ipcOnMain('setRendererReady', (_event) => {
-    setRendererReady(mainWindow)
+    setRendererReady(mainWindow!)
   })
 
   return mainWindow
 }
 
-app.on('ready', async () => {
-  const mainWindow = await createWindow()
-  setupSocket(mainWindow)
+function showDeepLinkPopup(url: string) {
+  dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`)
+}
 
-  addLog(mainWindow, 'Starting python server...')
-  try {
-    if (isDev) {
-      await startLocalPythonServer()
-      addLog(mainWindow, 'Local Python server started successfully.')
-    }
-    else {
-      await startPackagedPythonServer()
-      addLog(mainWindow, 'Packaged Python server started successfully.')
-    }
+app.on('second-instance', (_event, commandLine) => {
+  if (mainWindow) {
+    if (mainWindow.isMinimized())
+      mainWindow.restore()
+    mainWindow.focus()
   }
-  catch (error) {
-    addLog(mainWindow, `Failed to start Python server: ${error}`)
+
+  const url = commandLine.find(arg =>
+    arg.startsWith(`${PROTOCOL_NAME}://`),
+  )
+
+  if (url) {
+    showDeepLinkPopup(url)
   }
+})
+
+// this is for mac
+// https://www.electronjs.org/docs/latest/tutorial/launch-app-from-url-in-another-app#macos-code
+app.on('open-url', (event, url) => {
+  event.preventDefault()
+  showDeepLinkPopup(url)
 })
 
 app.on('window-all-closed', () => {
   stopPythonServer()
-  if (process.platform !== 'darwin') {
+  if (!isMac()) {
     app.quit()
   }
 })
