@@ -34,6 +34,9 @@ if (!gotTheLock) {
   app.quit()
 }
 else {
+  // This method will be called when Electron has finished
+  // initialization and is ready to create browser windows.
+  // Some APIs can only be used after this event occurs.
   app.whenReady().then(async () => {
     await createWindow()
     if (!mainWindow)
@@ -98,12 +101,14 @@ function showDeepLinkPopup(url: string) {
 }
 
 app.on('second-instance', (_event, commandLine) => {
+  // Someone tried to run a second instance, we should focus our window.
   if (mainWindow) {
     if (mainWindow.isMinimized())
       mainWindow.restore()
     mainWindow.focus()
   }
 
+  // the commandLine is array of strings in which last element is deep link url
   const url = commandLine.find(arg =>
     arg.startsWith(`${PROTOCOL_NAME}://`),
   )
@@ -115,6 +120,9 @@ app.on('second-instance', (_event, commandLine) => {
 
 // this is for mac
 // https://www.electronjs.org/docs/latest/tutorial/launch-app-from-url-in-another-app#macos-code
+// Quit when all windows are closed, except on macOS. There, it's common
+// for applications and their menu bar to stay active until the user quits
+// explicitly with Cmd + Q.
 app.on('open-url', (event, url) => {
   event.preventDefault()
   showDeepLinkPopup(url)
