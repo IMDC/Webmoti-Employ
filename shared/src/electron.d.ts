@@ -31,6 +31,12 @@ declare global {
     openExternalUrl: string
     gazeStats: GazeStats
     log: string
+
+    // toolbar controls
+    reloadWindow: undefined
+    goBackWindow: undefined
+    goForwardWindow: undefined
+    toggleConsoleWindow: undefined
   }
 
   type UnsubscribeFunction = () => void
@@ -44,6 +50,11 @@ declare global {
       subscribeToLogs: (callback: (message: string) => void) => UnsubscribeFunction
       setRendererReady: () => void
       openExternalUrl: (url: string) => void
+
+      reloadWindow: () => void
+      goBackWindow: () => void
+      goForwardWindow: () => void
+      toggleConsoleWindow: () => void
     }
   }
 }

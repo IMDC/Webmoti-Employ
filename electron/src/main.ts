@@ -88,20 +88,34 @@ else {
 
 async function createWindow() {
   mainWindow = new BrowserWindow({
+    minWidth: 576, // prevent shrinking too small and messing up the ui
+    minHeight: 576,
+    titleBarStyle: 'hidden', // remove the default titlebar
+    // expose window controls in Windows/Linux
+    ...(!isMac()
+      ? {
+          // add system buttons (minimize, restore, close)
+          titleBarOverlay: {
+            color: '#00000000', // transparent background
+            symbolColor: '#ffffff',
+            height: 40, // this should be the same height as the client toolbar
+          },
+        }
+      : {}),
+    show: false, // only show after maximized
     webPreferences: {
       preload: getPreloadPath(),
       contextIsolation: true,
       nodeIntegration: false,
     },
-    // only show after maximized
-    show: false,
   })
+
+  // start maximized. this also makes the window show
   mainWindow.maximize()
 
   if (isDev) {
     mainWindow.setIcon(getAppIconPath())
     mainWindow.loadURL(`http://${getLocalDomain()}`)
-    mainWindow.webContents.openDevTools()
   }
   else {
     mainWindow.loadURL(HOSTED_URL)
@@ -130,6 +144,28 @@ async function createWindow() {
     }
     catch (err) {
       console.error('Failed to parse URL in openExternalUrl handler:', err)
+    }
+  })
+
+  // toolbar controls
+  ipcOnMain('reloadWindow', () => mainWindow!.reload())
+  ipcOnMain('goBackWindow', () => {
+    const wc = mainWindow!.webContents
+    if (wc.navigationHistory.canGoBack())
+      wc.navigationHistory.goBack()
+  })
+  ipcOnMain('goForwardWindow', () => {
+    const wc = mainWindow!.webContents
+    if (wc.navigationHistory.canGoForward())
+      wc.navigationHistory.goForward()
+  })
+  ipcOnMain('toggleConsoleWindow', () => {
+    const wc = mainWindow!.webContents
+    if (wc.isDevToolsOpened()) {
+      wc.closeDevTools()
+    }
+    else {
+      wc.openDevTools({ mode: 'bottom' })
     }
   })
 

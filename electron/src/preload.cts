@@ -20,6 +20,12 @@ electron.contextBridge.exposeInMainWorld('electron', {
   setRendererReady: () => ipcSend('setRendererReady', undefined),
 
   openExternalUrl: url => ipcSend('openExternalUrl', url),
+
+  // toolbar controls
+  reloadWindow: () => ipcSend('reloadWindow', undefined),
+  goBackWindow: () => ipcSend('goBackWindow', undefined),
+  goForwardWindow: () => ipcSend('goForwardWindow', undefined),
+  toggleConsoleWindow: () => ipcSend('toggleConsoleWindow', undefined),
 } satisfies Window['electron'])
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(

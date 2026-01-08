@@ -1,4 +1,4 @@
-import { AppShell, Center, Divider, Group, Stack, Text, Title, useMantineColorScheme, useMantineTheme } from '@mantine/core'
+import { AppShell, Center, Divider, Group, Stack, Text, Title, useMantineTheme } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { ElectronToolbar } from '@/components/ElectronToolbar'
@@ -32,7 +32,6 @@ function NotFound() {
 function RootRoute() {
   useElectronLogs()
   const theme = useMantineTheme()
-  const scheme = useMantineColorScheme()
 
   return (
     <>
@@ -41,9 +40,7 @@ function RootRoute() {
         styles={{
           header: {
             border: 'none',
-            backgroundColor: scheme.colorScheme === 'dark'
-              ? theme.colors.gray[9]
-              : theme.colors.gray[0],
+            backgroundColor: theme.colors.gray[9],
           },
           // remove default padding from main
           main: { padding: 0 },
