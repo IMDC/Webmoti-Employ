@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as authenticatedRouteRouteImport } from './routes/(authenticated)/route'
 import { Route as authenticatedIndexRouteImport } from './routes/(authenticated)/index'
+import { Route as AuthElectronRouteImport } from './routes/auth.electron'
 import { Route as authenticatedInterviewRouteRouteImport } from './routes/(authenticated)/interview/route'
 import { Route as authenticatedInterviewIndexRouteImport } from './routes/(authenticated)/interview/index'
 import { Route as authenticatedInterviewIdRouteImport } from './routes/(authenticated)/interview/$id'
@@ -33,6 +34,11 @@ const authenticatedIndexRoute = authenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => authenticatedRouteRoute,
+} as any)
+const AuthElectronRoute = AuthElectronRouteImport.update({
+  id: '/auth/electron',
+  path: '/auth/electron',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const authenticatedInterviewRouteRoute =
   authenticatedInterviewRouteRouteImport.update({
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/': typeof authenticatedIndexRoute
   '/sign-in': typeof SignInRoute
   '/interview': typeof authenticatedInterviewRouteRouteWithChildren
+  '/auth/electron': typeof AuthElectronRoute
   '/interview/prejoin': typeof authenticatedInterviewPrejoinRouteRouteWithChildren
   '/end/$id': typeof authenticatedEndIdRoute
   '/interview/$id': typeof authenticatedInterviewIdRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
+  '/auth/electron': typeof AuthElectronRoute
   '/': typeof authenticatedIndexRoute
   '/end/$id': typeof authenticatedEndIdRoute
   '/interview/$id': typeof authenticatedInterviewIdRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/(authenticated)': typeof authenticatedRouteRouteWithChildren
   '/sign-in': typeof SignInRoute
   '/(authenticated)/interview': typeof authenticatedInterviewRouteRouteWithChildren
+  '/auth/electron': typeof AuthElectronRoute
   '/(authenticated)/': typeof authenticatedIndexRoute
   '/(authenticated)/interview/prejoin': typeof authenticatedInterviewPrejoinRouteRouteWithChildren
   '/(authenticated)/end/$id': typeof authenticatedEndIdRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/'
     | '/sign-in'
     | '/interview'
+    | '/auth/electron'
     | '/interview/prejoin'
     | '/end/$id'
     | '/interview/$id'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/sign-in'
+    | '/auth/electron'
     | '/'
     | '/end/$id'
     | '/interview/$id'
@@ -135,6 +146,7 @@ export interface FileRouteTypes {
     | '/(authenticated)'
     | '/sign-in'
     | '/(authenticated)/interview'
+    | '/auth/electron'
     | '/(authenticated)/'
     | '/(authenticated)/interview/prejoin'
     | '/(authenticated)/end/$id'
@@ -147,6 +159,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   authenticatedRouteRoute: typeof authenticatedRouteRouteWithChildren
   SignInRoute: typeof SignInRoute
+  AuthElectronRoute: typeof AuthElectronRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -171,6 +184,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof authenticatedIndexRouteImport
       parentRoute: typeof authenticatedRouteRoute
+    }
+    '/auth/electron': {
+      id: '/auth/electron'
+      path: '/auth/electron'
+      fullPath: '/auth/electron'
+      preLoaderRoute: typeof AuthElectronRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/(authenticated)/interview': {
       id: '/(authenticated)/interview'
@@ -279,6 +299,7 @@ const authenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   authenticatedRouteRoute: authenticatedRouteRouteWithChildren,
   SignInRoute: SignInRoute,
+  AuthElectronRoute: AuthElectronRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

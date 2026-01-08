@@ -1,6 +1,6 @@
 import path from 'node:path'
 import process from 'node:process'
-import { app, BrowserWindow, dialog } from 'electron'
+import { app, BrowserWindow, shell } from 'electron'
 import { addLog, setRendererReady } from './logQueue'
 import { setupSocket, socketSendBoundingBox } from './socket'
 import { startLocalPythonServer, startPackagedPythonServer, stopPythonServer } from './startPythonServer'
@@ -16,14 +16,14 @@ import {
   isMac,
 } from './utils'
 
-const PROTOCOL_NAME = 'webmoti-employ'
+const PROTOCOL_SCHEME = 'webmoti-employ'
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
-    app.setAsDefaultProtocolClient(PROTOCOL_NAME, process.execPath, [path.resolve(process.argv[1])])
+    app.setAsDefaultProtocolClient(PROTOCOL_SCHEME, process.execPath, [path.resolve(process.argv[1])])
   }
 }
 else {
-  app.setAsDefaultProtocolClient(PROTOCOL_NAME)
+  app.setAsDefaultProtocolClient(PROTOCOL_SCHEME)
 }
 
 let mainWindow: BrowserWindow | null = null
@@ -93,11 +93,39 @@ async function createWindow() {
     setRendererReady(mainWindow!)
   })
 
+  ipcOnMain('openExternalUrl', (_event, url: string) => {
+    shell.openExternal(url)
+  })
+
   return mainWindow
 }
 
-function showDeepLinkPopup(url: string) {
-  dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`)
+function handleDeepLink(url: string) {
+  if (!mainWindow)
+    return
+
+  try {
+    const parsedUrl = new URL(url)
+    if (parsedUrl.protocol !== `${PROTOCOL_SCHEME}:`)
+      return
+
+    const token = parsedUrl.searchParams.get('authToken')
+    if (!token) {
+      console.error('Token not found')
+      return
+    }
+
+    const redirectParam = `/?authToken=${encodeURIComponent(token)}`
+    if (isDev) {
+      mainWindow.loadURL(`http://${getLocalDomain()}${redirectParam}`)
+    }
+    else {
+      mainWindow.loadURL(HOSTED_URL + redirectParam)
+    }
+  }
+  catch (err) {
+    console.error('Failed to parse deep link URL:', err)
+  }
 }
 
 app.on('second-instance', (_event, commandLine) => {
@@ -110,26 +138,27 @@ app.on('second-instance', (_event, commandLine) => {
 
   // the commandLine is array of strings in which last element is deep link url
   const url = commandLine.find(arg =>
-    arg.startsWith(`${PROTOCOL_NAME}://`),
+    arg.startsWith(`${PROTOCOL_SCHEME}://`),
   )
 
   if (url) {
-    showDeepLinkPopup(url)
+    handleDeepLink(url)
   }
 })
 
 // this is for mac
 // https://www.electronjs.org/docs/latest/tutorial/launch-app-from-url-in-another-app#macos-code
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on('open-url', (event, url) => {
   event.preventDefault()
-  showDeepLinkPopup(url)
+  handleDeepLink(url)
 })
 
 app.on('window-all-closed', () => {
   stopPythonServer()
+
+  // Quit when all windows are closed, except on macOS. There, it's common
+  // for applications and their menu bar to stay active until the user quits
+  // explicitly with Cmd + Q.
   if (!isMac()) {
     app.quit()
   }
