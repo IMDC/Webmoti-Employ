@@ -1,6 +1,8 @@
-import { Center, Image, Stack, Text } from '@mantine/core'
-import { createFileRoute } from '@tanstack/react-router'
+import { Button, Center, Image, Stack, Text } from '@mantine/core'
+import { IconExclamationCircle } from '@tabler/icons-react'
+import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
+import z from 'zod'
 import { Loading } from '@/components/Loading'
 import { electronGoogleSignIn } from '@/lib/auth-client'
 import { useAppActions } from '@/useAppStore'
@@ -9,10 +11,16 @@ import { clearUrlParam, getUrlAuthToken } from '@/utils/utils'
 
 export const Route = createFileRoute('/auth/electron')({
   component: ElectronAuthPage,
+  validateSearch: z.object({
+    error: z.string().optional(),
+  }),
 })
 
 function ElectronAuthPage() {
+  const { error } = useSearch({ from: '/auth/electron' })
   const { setError } = useAppActions()
+  const [loading, setLoading] = useState(false)
+
   const [hasToken, setHasToken] = useState(false)
   const effectRan = useRef(false)
 
@@ -36,9 +44,34 @@ function ElectronAuthPage() {
       return
     }
 
+    if (error) {
+      return
+    }
+
     // if token not found, it means the page just loaded for the first time, so need to sign in.
     electronGoogleSignIn(setError)
-  }, [setError])
+  }, [setError, error])
+
+  if (error) {
+    return (
+      <Center h="100vh">
+        <Stack align="center">
+          <IconExclamationCircle size={100} />
+          <Text fz="h2" fw="bold">{`Error signing in: ${error.replace(/_/g, ' ')}`}</Text>
+          <Button
+            variant="gradient"
+            onClick={() => {
+              setLoading(true)
+              electronGoogleSignIn(setError)
+            }}
+            loading={loading}
+          >
+            Try Again
+          </Button>
+        </Stack>
+      </Center>
+    )
+  }
 
   if (!hasToken) {
     return <Loading />
