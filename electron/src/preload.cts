@@ -19,7 +19,7 @@ electron.contextBridge.exposeInMainWorld('electron', {
   getModelBuffer: () => ipcInvoke('getModelBuffer'),
   setRendererReady: () => ipcSend('setRendererReady', undefined),
 
-  openExternalUrl: (url) => { ipcSend('openExternalUrl', url) },
+  openExternalUrl: url => ipcSend('openExternalUrl', url),
 } satisfies Window['electron'])
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(

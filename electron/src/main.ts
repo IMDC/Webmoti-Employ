@@ -59,6 +59,31 @@ else {
       addLog(mainWindow, `Failed to start Python server: ${error}`)
     }
   })
+
+  app.on('second-instance', (_event, commandLine) => {
+  // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      if (mainWindow.isMinimized())
+        mainWindow.restore()
+      mainWindow.focus()
+    }
+
+    // the commandLine is array of strings in which last element is deep link url
+    const url = commandLine.find(arg =>
+      arg.startsWith(`${PROTOCOL_SCHEME}://`),
+    )
+
+    if (url) {
+      handleDeepLink(url)
+    }
+  })
+
+  // this is for mac
+  // https://www.electronjs.org/docs/latest/tutorial/launch-app-from-url-in-another-app#macos-code
+  app.on('open-url', (event, url) => {
+    event.preventDefault()
+    handleDeepLink(url)
+  })
 }
 
 async function createWindow() {
@@ -94,7 +119,18 @@ async function createWindow() {
   })
 
   ipcOnMain('openExternalUrl', (_event, url: string) => {
-    shell.openExternal(url)
+    try {
+      const parsedUrl = new URL(url)
+      if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+        shell.openExternal(parsedUrl.toString())
+      }
+      else {
+        console.error('Blocked attempt to open URL with disallowed protocol:', url)
+      }
+    }
+    catch (err) {
+      console.error('Failed to parse URL in openExternalUrl handler:', err)
+    }
   })
 
   return mainWindow
@@ -127,31 +163,6 @@ function handleDeepLink(url: string) {
     console.error('Failed to parse deep link URL:', err)
   }
 }
-
-app.on('second-instance', (_event, commandLine) => {
-  // Someone tried to run a second instance, we should focus our window.
-  if (mainWindow) {
-    if (mainWindow.isMinimized())
-      mainWindow.restore()
-    mainWindow.focus()
-  }
-
-  // the commandLine is array of strings in which last element is deep link url
-  const url = commandLine.find(arg =>
-    arg.startsWith(`${PROTOCOL_SCHEME}://`),
-  )
-
-  if (url) {
-    handleDeepLink(url)
-  }
-})
-
-// this is for mac
-// https://www.electronjs.org/docs/latest/tutorial/launch-app-from-url-in-another-app#macos-code
-app.on('open-url', (event, url) => {
-  event.preventDefault()
-  handleDeepLink(url)
-})
 
 app.on('window-all-closed', () => {
   stopPythonServer()

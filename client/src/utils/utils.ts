@@ -147,6 +147,8 @@ export function setLocalBearerToken(bearerToken: string) {
 }
 
 export function getUrlAuthToken() {
+  // get the better-auth token from the url parameters.
+  // it will be set there after signing in.
   const url = new URL(window.location.href)
   const authToken = url.searchParams.get('authToken')
   return authToken
