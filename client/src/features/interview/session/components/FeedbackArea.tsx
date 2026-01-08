@@ -72,7 +72,6 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
       notLookingTimerRef.current = null
     }
     if (looking || !fixation) {
-      // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
       setShowLookPrompt(false)
       return
     }
