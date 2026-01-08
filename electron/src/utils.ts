@@ -95,5 +95,13 @@ export function ipcOnMain<Key extends keyof EventPayloadMapping>(
   key: Key,
   handler: (event: Electron.IpcMainEvent, payload: EventPayloadMapping[Key]) => void,
 ) {
-  ipcMain.on(key, (event, payload) => handler(event, payload))
+  ipcMain.on(key, (event, payload) => {
+    if (!event.senderFrame) {
+      console.warn('Sender frame is null')
+      return
+    }
+
+    validateEventFrame(event.senderFrame)
+    handler(event, payload)
+  })
 }

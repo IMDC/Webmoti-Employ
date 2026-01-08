@@ -11,4 +11,7 @@ export default antfu({
   ignores: [
     '**/routeTree.gen.ts',
   ],
+  rules: {
+    'react-hooks-extra/no-direct-set-state-in-use-effect': 'off',
+  },
 })

@@ -189,8 +189,8 @@ async def handle_gaze_data(sample: GazeSample) -> None:
         looking_at_interviewer = (
             xmin <= gaze_x_avg <= xmin + width and ymin <= gaze_y_avg <= ymin + height
         )
-    else:
-        logger.warning("No bounding box found")
+    # else:
+    #     logger.warning("No bounding box found")
 
     movement_type = classify_eye_movement((gaze_x_avg, gaze_y_avg), sample["timestamp"])
     # Smooth fixation signal to reduce rapid flipping
@@ -236,7 +236,7 @@ async def handle_gaze_data(sample: GazeSample) -> None:
                 "gaze_stats",
                 {"gazeOnInterviewerRatio": ratio, "windowSeconds": GAZE_RATIO_WINDOW_S},
             )
-            logger.debug(f"Gaze ratio: {ratio:.2%} over {GAZE_RATIO_WINDOW_S}s")
+            # logger.debug(f"Gaze ratio: {ratio:.2%} over {GAZE_RATIO_WINDOW_S}s")
 
 
 def _store_latest_gaze_args(sample: GazeSample) -> None:

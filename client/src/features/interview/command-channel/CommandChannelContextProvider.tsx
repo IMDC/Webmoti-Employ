@@ -26,7 +26,6 @@ export function CommandChannelContextProvider({ children }: CommandChannelContex
     let commandChannelStore: StoreApi<CommandChannelStore> | null = null
     try {
       commandChannelStore = createCommandChannelStore(zoomClient)
-      // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
       setStore(commandChannelStore)
     }
     catch (error) {

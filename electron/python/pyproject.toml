@@ -24,6 +24,7 @@ select = [ "ALL" ]
 ignore = [
   "D103", # https://docs.astral.sh/ruff/rules/undocumented-public-function
   "D100", # https://docs.astral.sh/ruff/rules/undocumented-public-module
+  "ERA001", # https://docs.astral.sh/ruff/rules/commented-out-code
 ]
 
 [tool.ruff.format]

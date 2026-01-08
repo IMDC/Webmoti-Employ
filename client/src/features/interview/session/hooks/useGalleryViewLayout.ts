@@ -57,7 +57,6 @@ export default function useGalleryViewLayout(
     }
 
     const finalWidth = Math.ceil(minVideoWidth) - GALLERY_VIEW_MARGIN * 2
-    // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
     setParticipantVideoWidth(finalWidth)
   }, [rawWidth, rawHeight, participantCount])
 

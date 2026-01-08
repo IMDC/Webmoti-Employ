@@ -100,7 +100,6 @@ export function useTranscription(
       sendTranscript({ text: textToSend, status: 'final' })
     }
 
-    // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
     setSentWordCount(0)
     resetTranscript()
   }, [finalTranscript, sentWordCount, resetTranscript, sendTranscript])
@@ -121,7 +120,6 @@ export function useTranscription(
       if (wordsToSend) {
         logger.log('partial transcript:', wordsToSend)
         sendTranscript({ text: wordsToSend, status: 'partial' })
-        // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
         setSentWordCount(nextIndex)
         // don't call reset transcript here since it will interrupt and lose the current word
       }

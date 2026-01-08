@@ -28,6 +28,7 @@ declare global {
     coordinates: InterviewerCoordinates
     getModelBuffer: ArrayBuffer
     setRendererReady: undefined
+    openExternalUrl: string
     gazeStats: GazeStats
     log: string
   }
@@ -42,6 +43,7 @@ declare global {
       getModelBuffer: () => Promise<ArrayBuffer>
       subscribeToLogs: (callback: (message: string) => void) => UnsubscribeFunction
       setRendererReady: () => void
+      openExternalUrl: (url: string) => void
     }
   }
 }

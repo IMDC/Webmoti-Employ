@@ -21,7 +21,6 @@ export function useSingleLayout(containerRef: React.RefObject<HTMLDivElement | n
       width = height * GALLERY_VIEW_ASPECT_RATIO
     }
 
-    // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
     setParticipantVideoSize({ width, height })
   }, [rawWidth, rawHeight])
 
