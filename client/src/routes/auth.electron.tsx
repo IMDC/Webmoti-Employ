@@ -40,7 +40,7 @@ function ElectronAuthPage() {
 
       const electronLink = `${ELECTRON_PROTOCOL_SCHEME}://auth?authToken=${encodeURIComponent(authToken)}`
       // redirect to electron app
-      window.location.href = electronLink
+      window.location.replace(electronLink)
       return
     }
 
