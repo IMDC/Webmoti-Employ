@@ -23,6 +23,11 @@ declare global {
     windowSeconds: number
   }
 
+  interface NavigationState {
+    canGoBack: boolean
+    canGoForward: boolean
+  }
+
   interface EventPayloadMapping {
     feedback: Feedback[]
     coordinates: InterviewerCoordinates
@@ -31,6 +36,13 @@ declare global {
     openExternalUrl: string
     gazeStats: GazeStats
     log: string
+
+    // toolbar
+    reloadWindow: undefined
+    goBackWindow: undefined
+    goForwardWindow: undefined
+    toggleConsoleWindow: undefined
+    navigationState: NavigationState
   }
 
   type UnsubscribeFunction = () => void
@@ -44,6 +56,12 @@ declare global {
       subscribeToLogs: (callback: (message: string) => void) => UnsubscribeFunction
       setRendererReady: () => void
       openExternalUrl: (url: string) => void
+
+      reloadWindow: () => void
+      goBackWindow: () => void
+      goForwardWindow: () => void
+      toggleConsoleWindow: () => void
+      subscribeToNavigation: (callback: (nav: NavigationState) => void) => UnsubscribeFunction
     }
   }
 }
