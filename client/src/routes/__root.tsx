@@ -5,6 +5,7 @@ import { ElectronToolbar } from '@/components/ElectronToolbar'
 import { ErrorDialog } from '@/components/ErrorDialog'
 import { useElectronLogs } from '@/features/interview/session/hooks/useElectronLogs'
 import { OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
+import { isElectron } from '@/utils/utils'
 
 export const Route = createRootRoute({
   component: RootRoute,
@@ -36,7 +37,7 @@ function RootRoute() {
   return (
     <>
       <AppShell
-        header={{ height: OUTER_TOOLBAR_HEIGHT }}
+        header={{ height: isElectron() ? OUTER_TOOLBAR_HEIGHT : 0 }}
         styles={{
           header: {
             border: 'none',
@@ -46,9 +47,11 @@ function RootRoute() {
           main: { padding: 0 },
         }}
       >
-        <AppShell.Header>
-          <ElectronToolbar />
-        </AppShell.Header>
+        {isElectron() && (
+          <AppShell.Header>
+            <ElectronToolbar />
+          </AppShell.Header>
+        )}
 
         <AppShell.Main>
           <Outlet />

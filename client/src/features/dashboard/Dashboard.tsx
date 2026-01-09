@@ -26,7 +26,7 @@ import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { RightHeader } from '@/components/RightHeader'
 import { HEADER_HEIGHT, HEADER_SIDE_PADDING, OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
-import { getFirstName } from '@/utils/utils'
+import { getFirstName, isElectron } from '@/utils/utils'
 import { useUser } from '../auth/hooks/useUserStore'
 import { InterviewList } from './components/InterviewList'
 import { ScheduleForm } from './components/ScheduleForm'
@@ -53,7 +53,7 @@ export function Dashboard() {
       styles={{
         header: {
           border: 'none',
-          marginTop: OUTER_TOOLBAR_HEIGHT,
+          marginTop: isElectron() ? OUTER_TOOLBAR_HEIGHT : 0,
           paddingLeft: HEADER_SIDE_PADDING,
           paddingRight: HEADER_SIDE_PADDING,
         },
