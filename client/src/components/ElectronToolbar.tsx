@@ -23,10 +23,7 @@ function ToolbarIcon({
     <ActionIcon
       variant="subtle"
       onClick={disabled ? undefined : action}
-      style={{
-        WebkitAppRegion: 'no-drag',
-
-      }}
+      style={{ WebkitAppRegion: 'no-drag' }}
       // custom styles to not show background when disabled
       styles={{
         root: {

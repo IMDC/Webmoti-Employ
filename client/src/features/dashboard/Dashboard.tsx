@@ -65,9 +65,7 @@ export function Dashboard() {
     >
       <AppShell.Header>
         {/* 100vw makes it so the scrollbar doesn't shift the layout */}
-        <Flex justify="space-between" align="center" w="100vw" h="100%" p="lg">
-          <div></div>
-
+        <Flex justify="right" align="center" w="100vw" h="100%" p="lg">
           <RightHeader />
         </Flex>
       </AppShell.Header>
@@ -93,7 +91,7 @@ export function Dashboard() {
           />
         </Modal>
 
-        <Flex justify="center" align="center"direction="column" w="100vw">
+        <Flex justify="center" align="center" direction="column" w="100vw">
           <Stack align="center" gap="xs">
             <Title ta="center" mt={50} fz={{ base: 25, sm: 35, md: 45 }} px="lg">
               {`Welcome ${getFirstName(user.name)}!`}
