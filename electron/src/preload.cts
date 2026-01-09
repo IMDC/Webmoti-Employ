@@ -26,6 +26,10 @@ electron.contextBridge.exposeInMainWorld('electron', {
   goBackWindow: () => ipcSend('goBackWindow', undefined),
   goForwardWindow: () => ipcSend('goForwardWindow', undefined),
   toggleConsoleWindow: () => ipcSend('toggleConsoleWindow', undefined),
+  subscribeToNavigation: callback =>
+    ipcOn('navigationState', (state) => {
+      callback(state)
+    }),
 } satisfies Window['electron'])
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(

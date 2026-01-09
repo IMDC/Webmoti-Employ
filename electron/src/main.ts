@@ -12,6 +12,7 @@ import {
   HOSTED_URL,
   ipcHandle,
   ipcOnMain,
+  ipcWebContentsSend,
   isDev,
   isMac,
 } from './utils'
@@ -147,26 +148,38 @@ async function createWindow() {
     }
   })
 
+  const wc = mainWindow.webContents
+
+  function sendNavState() {
+    ipcWebContentsSend(
+      'navigationState',
+      wc,
+      {
+        canGoBack: wc.navigationHistory.canGoBack(),
+        canGoForward: wc.navigationHistory.canGoForward(),
+      },
+    )
+  }
+
+  // update whenever navigation happens
+  wc.once('did-finish-load', sendNavState)
+  wc.on('did-navigate', sendNavState)
+  wc.on('did-navigate-in-page', sendNavState)
+
   // toolbar controls
   ipcOnMain('reloadWindow', () => mainWindow!.reload())
   ipcOnMain('goBackWindow', () => {
-    const wc = mainWindow!.webContents
     if (wc.navigationHistory.canGoBack())
       wc.navigationHistory.goBack()
   })
   ipcOnMain('goForwardWindow', () => {
-    const wc = mainWindow!.webContents
     if (wc.navigationHistory.canGoForward())
       wc.navigationHistory.goForward()
   })
   ipcOnMain('toggleConsoleWindow', () => {
-    const wc = mainWindow!.webContents
-    if (wc.isDevToolsOpened()) {
+    if (wc.isDevToolsOpened())
       wc.closeDevTools()
-    }
-    else {
-      wc.openDevTools({ mode: 'bottom' })
-    }
+    else wc.openDevTools({ mode: 'bottom' })
   })
 
   return mainWindow
