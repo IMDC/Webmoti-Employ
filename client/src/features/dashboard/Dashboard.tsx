@@ -95,7 +95,7 @@ export function Dashboard() {
 
         <Flex justify="center" align="center"direction="column" w="100vw">
           <Stack align="center" gap="xs">
-            <Title ta="center" mt={{ base: 25, sm: 50 }} fz={{ base: 25, sm: 35, md: 45 }} px="lg">
+            <Title ta="center" mt={50} fz={{ base: 25, sm: 35, md: 45 }} px="lg">
               {`Welcome ${getFirstName(user.name)}!`}
             </Title>
             <Text c="dimmed">

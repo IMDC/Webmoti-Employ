@@ -1,4 +1,5 @@
-import { ActionIcon, Group, Image, Space, Text } from '@mantine/core'
+import { ActionIcon, em, Group, Image, Space, Text, useMantineTheme } from '@mantine/core'
+import { useMediaQuery } from '@mantine/hooks'
 import {
   IconArrowLeft,
   IconArrowRight,
@@ -7,6 +8,7 @@ import {
 } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
 import { HEADER_SIDE_PADDING, OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
+import { isElectron } from '@/utils/utils'
 
 function ToolbarIcon({
   icon: IconComponent,
@@ -43,7 +45,13 @@ export function ElectronToolbar() {
   const [canGoBack, setCanGoBack] = useState(false)
   const [canGoForward, setCanGoForward] = useState(false)
 
+  const theme = useMantineTheme()
+  const isMobile = useMediaQuery(`(max-width: ${em(theme.breakpoints.sm)})`)
+
   useEffect(() => {
+    if (!isElectron()) {
+      return
+    }
     return window.electron.subscribeToNavigation((state: NavigationState) => {
       setCanGoBack(state.canGoBack)
       setCanGoForward(state.canGoForward)
@@ -70,15 +78,16 @@ export function ElectronToolbar() {
           w="auto"
           fit="contain"
         />
-        <Text
-          fz={15}
-          fw={900}
-          variant="gradient"
-          gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
-          draggable={false}
-        >
-          WebMoti-Employ
-        </Text>
+        {!isMobile && (
+          <Text
+            fz={15}
+            fw={900}
+            variant="gradient"
+            gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
+          >
+            WebMoti-Employ
+          </Text>
+        )}
 
         <Space w="xs" />
 
