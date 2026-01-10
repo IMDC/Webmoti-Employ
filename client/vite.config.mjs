@@ -1,7 +1,19 @@
+import { execSync } from 'node:child_process'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
+
+let commitHash = 'local'
+let commitDate = 'unknown'
+try {
+  commitHash = execSync('git rev-parse --short HEAD').toString().trim()
+  const rawCommitDate = execSync(`git show -s --format=%ci ${commitHash}`)
+    .toString()
+    .trim()
+  commitDate = new Date(rawCommitDate).toISOString()
+}
+catch {}
 
 export default defineConfig({
   base: '/',
@@ -29,5 +41,12 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/api/, ''),
       },
     },
+  },
+  define: {
+    // eslint-disable-next-line node/prefer-global/process
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version ?? '0.0.0'),
+    __APP_SHA__: JSON.stringify(commitHash),
+    __APP_COMMIT_DATE__: JSON.stringify(commitDate),
+    __APP_BUILD_DATE__: JSON.stringify(new Date().toISOString()),
   },
 })
