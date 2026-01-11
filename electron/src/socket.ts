@@ -86,5 +86,7 @@ export function socketSendBoundingBox(boundingBox: FaceDetectionBoundingBox) {
 }
 
 export function closeSocket() {
-  socket.disconnect()
+  if (socket) {
+    socket.disconnect()
+  }
 }

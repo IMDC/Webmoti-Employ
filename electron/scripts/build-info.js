@@ -33,14 +33,20 @@ for (const line of lines) {
 const pkg = JSON.parse(readFileSync(PKG_PATH, 'utf-8'))
 const version = pkg.version
 
-// compute git values at build time
-const sha = execSync('git rev-parse --short HEAD').toString().trim()
-const rawDate = execSync(`git show -s --format=%ci ${sha}`).toString().trim()
+let sha = 'unknown'
+let gitCommitDate = 'unknown'
+try {
+  const resolvedSha = execSync('git rev-parse --short HEAD').toString().trim()
+  const rawDate = execSync(`git show -s --format=%ci ${resolvedSha}`).toString().trim()
+  sha = resolvedSha || 'unknown'
+  gitCommitDate = new Date(rawDate).toISOString()
+}
+catch {}
 
 // overwrite only our keys
 env.set('ELECTRON_APP_VERSION', version)
 env.set('ELECTRON_GIT_SHA', sha)
-env.set('ELECTRON_GIT_COMMIT_DATE', new Date(rawDate).toISOString())
+env.set('ELECTRON_GIT_COMMIT_DATE', gitCommitDate)
 env.set('ELECTRON_BUILD_DATE', new Date().toISOString())
 
 // serialize back to file
