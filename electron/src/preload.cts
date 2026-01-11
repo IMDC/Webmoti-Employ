@@ -18,10 +18,9 @@ electron.contextBridge.exposeInMainWorld('electron', {
   sendInterviewerCoordinates: coordinates => ipcSend('coordinates', coordinates),
   getModelBuffer: () => ipcInvoke('getModelBuffer'),
   setRendererReady: () => ipcSend('setRendererReady', undefined),
-
   openExternalUrl: url => ipcSend('openExternalUrl', url),
+  getBuildInfo: () => ipcInvoke('electronBuildInfo'),
 
-  // toolbar controls
   reloadWindow: () => ipcSend('reloadWindow', undefined),
   goBackWindow: () => ipcSend('goBackWindow', undefined),
   goForwardWindow: () => ipcSend('goForwardWindow', undefined),

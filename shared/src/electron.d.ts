@@ -28,6 +28,13 @@ declare global {
     canGoForward: boolean
   }
 
+  interface ElectronBuildInfo {
+    version: string
+    sha: string
+    commitDate: string
+    buildDate: string
+  }
+
   interface EventPayloadMapping {
     feedback: Feedback[]
     coordinates: InterviewerCoordinates
@@ -36,8 +43,8 @@ declare global {
     openExternalUrl: string
     gazeStats: GazeStats
     log: string
+    electronBuildInfo: ElectronBuildInfo
 
-    // toolbar
     reloadWindow: undefined
     goBackWindow: undefined
     goForwardWindow: undefined
@@ -56,6 +63,7 @@ declare global {
       subscribeToLogs: (callback: (message: string) => void) => UnsubscribeFunction
       setRendererReady: () => void
       openExternalUrl: (url: string) => void
+      getBuildInfo: () => Promise<ElectronBuildInfo>
 
       reloadWindow: () => void
       goBackWindow: () => void

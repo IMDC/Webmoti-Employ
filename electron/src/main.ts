@@ -2,9 +2,10 @@ import path from 'node:path'
 import process from 'node:process'
 import { app, BrowserWindow, shell } from 'electron'
 import { addLog, setRendererReady } from './logQueue'
-import { setupSocket, socketSendBoundingBox } from './socket'
+import { closeSocket, setupSocket, socketSendBoundingBox } from './socket'
 import { startLocalPythonServer, startPackagedPythonServer, stopPythonServer } from './startPythonServer'
 import {
+  BUILD_INFO,
   getAppIconPath,
   getLocalDomain,
   getModelBuffer,
@@ -122,7 +123,13 @@ async function createWindow() {
     mainWindow.loadURL(HOSTED_URL)
   }
 
+  mainWindow.on('closed', () => {
+    closeSocket()
+  })
+
   ipcHandle('getModelBuffer', getModelBuffer)
+
+  ipcHandle('electronBuildInfo', () => BUILD_INFO)
 
   // Listen for updates from frontend renderer (React app)
   ipcOnMain('coordinates', (_event, coordinates) => {

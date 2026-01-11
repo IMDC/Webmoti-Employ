@@ -13,7 +13,3 @@ a {
   -webkit-user-drag: none;
   user-select: none;
 }
-
-p {
-  user-select: none;
-}
