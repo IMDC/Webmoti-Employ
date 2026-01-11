@@ -5,6 +5,7 @@ import { addLog, setRendererReady } from './logQueue'
 import { setupSocket, socketSendBoundingBox } from './socket'
 import { startLocalPythonServer, startPackagedPythonServer, stopPythonServer } from './startPythonServer'
 import {
+  BUILD_INFO,
   getAppIconPath,
   getLocalDomain,
   getModelBuffer,
@@ -123,6 +124,8 @@ async function createWindow() {
   }
 
   ipcHandle('getModelBuffer', getModelBuffer)
+
+  ipcHandle('electronBuildInfo', () => BUILD_INFO)
 
   // Listen for updates from frontend renderer (React app)
   ipcOnMain('coordinates', (_event, coordinates) => {

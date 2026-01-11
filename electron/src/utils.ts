@@ -12,6 +12,13 @@ if (!envHostedUrl)
 
 export const HOSTED_URL: string = envHostedUrl
 
+export const BUILD_INFO = {
+  version: process.env.ELECTRON_APP_VERSION ?? 'unknown',
+  sha: process.env.ELECTRON_GIT_SHA ?? 'unknown',
+  commitDate: process.env.ELECTRON_GIT_COMMIT_DATE ?? 'unknown',
+  buildDate: process.env.ELECTRON_BUILD_DATE ?? 'unknown',
+}
+
 export const isDev = !app.isPackaged
 
 export function getPreloadPath() {

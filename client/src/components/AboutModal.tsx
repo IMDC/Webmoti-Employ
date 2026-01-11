@@ -1,5 +1,7 @@
-import { Modal, Stack, Text } from '@mantine/core'
+import { Divider, Modal, Stack, Text } from '@mantine/core'
 import { DateTime } from 'luxon'
+import { useEffect, useState } from 'react'
+import { isElectron } from '@/utils/utils'
 
 interface AboutModalProps {
   isOpen: boolean
@@ -17,6 +19,16 @@ function formatDate(iso: string) {
 }
 
 export function AboutModal({ isOpen, onClose }: AboutModalProps) {
+  const [electronInfo, setElectronInfo] = useState<ElectronBuildInfo | null>(null)
+
+  useEffect(() => {
+    if (isElectron()) {
+      window.electron.getBuildInfo().then(setElectronInfo).catch(() => {
+        setElectronInfo(null)
+      })
+    }
+  }, [])
+
   return (
     <Modal
       opened={isOpen}
@@ -29,6 +41,16 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
         <Text ff="monospace">{`Commit SHA: ${__APP_SHA__}`}</Text>
         <Text ff="monospace">{`Commit Date: ${formatDate(__APP_COMMIT_DATE__)}`}</Text>
         <Text ff="monospace">{`Built At: ${formatDate(__APP_BUILD_DATE__)}`}</Text>
+
+        {isElectron() && electronInfo && (
+          <>
+            <Divider />
+            <Text ff="monospace">{`Electron Version: ${electronInfo.version}`}</Text>
+            <Text ff="monospace">{`Electron SHA: ${electronInfo.sha}`}</Text>
+            <Text ff="monospace">{`Electron Commit Date: ${formatDate(electronInfo.commitDate)}`}</Text>
+            <Text ff="monospace">{`Electron Built At: ${formatDate(electronInfo.buildDate)}`}</Text>
+          </>
+        )}
       </Stack>
     </Modal>
   )
