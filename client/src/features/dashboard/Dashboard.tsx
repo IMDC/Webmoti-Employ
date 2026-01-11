@@ -32,6 +32,8 @@ import { InterviewList } from './components/InterviewList'
 import { ScheduleForm } from './components/ScheduleForm'
 import { JoinCodeInput } from './schema'
 
+declare const __APP_VERSION__: string
+
 export function Dashboard() {
   const [isNewInterviewPopupOpen, setIsNewInterviewPopupOpen] = useState(false)
   const [isScheduleModalOpened, { open: openScheduleModal, close: closeScheduleModal }]
@@ -65,7 +67,8 @@ export function Dashboard() {
     >
       <AppShell.Header>
         {/* 100vw makes it so the scrollbar doesn't shift the layout */}
-        <Flex justify="right" align="center" w="100vw" h="100%" p="lg">
+        <Flex justify="space-between" align="center" w="100vw" h="100%" p="lg">
+          <Text ff="monospace" fz="xs">{`v${__APP_VERSION__}`}</Text>
           <RightHeader />
         </Flex>
       </AppShell.Header>
