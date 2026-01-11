@@ -84,3 +84,7 @@ export function setupSocket(mainWindow: BrowserWindow) {
 export function socketSendBoundingBox(boundingBox: FaceDetectionBoundingBox) {
   socket.emit('update_aoi', boundingBox)
 }
+
+export function closeSocket() {
+  socket.disconnect()
+}

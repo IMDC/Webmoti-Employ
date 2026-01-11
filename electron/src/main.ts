@@ -2,7 +2,7 @@ import path from 'node:path'
 import process from 'node:process'
 import { app, BrowserWindow, shell } from 'electron'
 import { addLog, setRendererReady } from './logQueue'
-import { setupSocket, socketSendBoundingBox } from './socket'
+import { closeSocket, setupSocket, socketSendBoundingBox } from './socket'
 import { startLocalPythonServer, startPackagedPythonServer, stopPythonServer } from './startPythonServer'
 import {
   BUILD_INFO,
@@ -122,6 +122,10 @@ async function createWindow() {
   else {
     mainWindow.loadURL(HOSTED_URL)
   }
+
+  mainWindow.on('closed', () => {
+    closeSocket()
+  })
 
   ipcHandle('getModelBuffer', getModelBuffer)
 
