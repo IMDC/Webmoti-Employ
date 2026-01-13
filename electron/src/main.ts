@@ -139,7 +139,7 @@ async function createWindow() {
 
   // Show the window when the page is ready to avoid white screen
   mainWindow.once('ready-to-show', () => {
-    mainWindow.show()
+    mainWindow!.show()
   })
 
   if (isDev) {
