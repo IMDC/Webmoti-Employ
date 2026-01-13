@@ -1,7 +1,7 @@
 import type { TranscriptMessage } from '@webmoti-employ/shared'
 import { NotificationMessage, WebSocketMessage } from '@webmoti-employ/shared'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { logger } from '@/utils/logger'
 import { getLocalBearerToken } from '@/utils/utils'
@@ -21,9 +21,13 @@ export function useAiWebsocket() {
     : import.meta.env.VITE_API_BASE_URL.replace(/^https?:\/\//, '')
   const socketUrl = `${protocol}://${host}/ws`
 
+  // Buffer transcripts while the socket is not yet open (e.g., early messages on slow startup).
+  const pendingQueueRef = useRef<WebSocketMessage[]>([])
+
   const {
     sendJsonMessage,
     readyState,
+    getWebSocket,
   } = useWebSocket<WebSocketMessage>(socketUrl, {
     queryParams: {
       token: encodeURIComponent(getLocalBearerToken() ?? ''),
@@ -31,6 +35,18 @@ export function useAiWebsocket() {
     },
     shouldReconnect: () => true,
     onMessage: event => handleMessage(event),
+    onOpen: () => {
+      // Flush any queued messages once the socket is ready.
+      if (pendingQueueRef.current.length > 0) {
+        const ws = getWebSocket()
+        if (ws && ws.readyState === ReadyState.OPEN) {
+          for (const msg of pendingQueueRef.current) {
+            sendJsonMessage(msg)
+          }
+          pendingQueueRef.current = []
+        }
+      }
+    },
   })
 
   const sendWebsocketMessage = useCallback((msg: WebSocketMessage) => {
@@ -38,7 +54,9 @@ export function useAiWebsocket() {
       sendJsonMessage(msg)
     }
     else {
-      logger.error('Websocket is not ready to send transcript')
+      // Queue messages until the socket opens; this avoids losing early transcripts.
+      pendingQueueRef.current.push(msg)
+      logger.warn('Websocket not ready yet; buffering message')
     }
   }, [readyState, sendJsonMessage])
 

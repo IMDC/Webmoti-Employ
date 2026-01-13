@@ -105,6 +105,9 @@ export function useSpeechmaticsTranscription(
   const reconnectAttemptsRef = useRef(0)
   const isConnectingRef = useRef(false)
   const currentTranscriptRef = useRef('')
+  const isStreamingRef = useRef(false)
+  // Used to cancel an in-flight start when React StrictMode (dev) mounts/unmounts effects twice.
+  const startTokenRef = useRef(0)
 
   // Determine if local user is the host (interviewer) or candidate
   const getSpeakerRole = useCallback((): 'interviewer' | 'candidate' => {
@@ -195,6 +198,7 @@ export function useSpeechmaticsTranscription(
             // The payload comes as a list of "results" (words/punctuation), similar to their docs.
             let transcriptText = ''
             let fillerCount = 0
+            let sawEndOfSentence = false
 
             for (const result of data.results) {
               if (result.type === 'word') {
@@ -214,6 +218,7 @@ export function useSpeechmaticsTranscription(
               }
               if (result.is_eos) {
                 transcriptText += '\n'
+                sawEndOfSentence = true
               }
             }
 
@@ -228,7 +233,10 @@ export function useSpeechmaticsTranscription(
 
               // Check if we have enough words to send
               const wordCount = getWords(updated).length
-              if (wordCount >= maxWordsBuffer) {
+              // We flush either:
+              // - when we have enough words for the AI buffer, OR
+              // - when Speechmatics marks end-of-sentence (so short answers still get sent)
+              if (wordCount >= maxWordsBuffer || sawEndOfSentence) {
                 const speaker = getSpeakerRole()
                 logger.log('Sending final transcript:', updated, 'Filler words detected:', fillerCount)
                 sendTranscript({ text: updated, status: 'final', speaker })
@@ -327,10 +335,21 @@ export function useSpeechmaticsTranscription(
   // Start capturing audio and streaming to Speechmatics
   const startTranscribing = useCallback(async () => {
     try {
+      // Guard against duplicate starts (common in React StrictMode and during rapid toggles).
+      if (isStreamingRef.current)
+        return
+      isStreamingRef.current = true
+      const myToken = ++startTokenRef.current
+
       // Get microphone access - using minimal constraints to avoid conflicts with Zoom's video stream
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true, // Simplified to avoid forcing a new stream
       })
+      // If we were stopped while awaiting permissions, abort.
+      if (startTokenRef.current !== myToken) {
+        stream.getTracks().forEach(track => track.stop())
+        return
+      }
       streamRef.current = stream
 
       // Create an AudioContext for microphone capture + processing.
@@ -343,12 +362,17 @@ export function useSpeechmaticsTranscription(
       // until resumed by a user gesture. If it stays suspended, `onaudioprocess` may never fire,
       // which means we would send zero audio to Speechmatics (and get zero transcripts).
       await audioContext.resume()
+      // If we were stopped while resuming, abort cleanly.
+      if (startTokenRef.current !== myToken)
+        return
 
       const inputSampleRate = audioContext.sampleRate
       logger.log(`Audio context created with sample rate: ${inputSampleRate}Hz (sending ${SAMPLE_RATE}Hz to Speechmatics)`)
 
       // Connect WebSocket first (we always tell Speechmatics we're sending 16kHz).
       await connectWebSocket()
+      if (startTokenRef.current !== myToken)
+        return
 
       // Set up audio processing
       const source = audioContext.createMediaStreamSource(stream)
@@ -384,6 +408,7 @@ export function useSpeechmaticsTranscription(
     }
     catch (error) {
       logger.error('Failed to start audio capture:', error)
+      isStreamingRef.current = false
       if (!hasNotifiedUser) {
         errorNotification('Microphone access failed', 'Please allow microphone access for transcription')
         setHasNotifiedUser(true)
@@ -393,6 +418,10 @@ export function useSpeechmaticsTranscription(
 
   // Stop capturing audio
   const stopTranscribing = useCallback(() => {
+    // Cancel any in-flight `startTranscribing` work.
+    startTokenRef.current += 1
+    isStreamingRef.current = false
+
     // Stop audio processing
     if (processorRef.current) {
       processorRef.current.disconnect()
