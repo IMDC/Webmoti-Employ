@@ -1,13 +1,11 @@
 import {
   ActionIcon,
   Affix,
-  Anchor,
   AppShell,
   Button,
   Divider,
   Flex,
   Group,
-  Image,
   Modal,
   Popover,
   Stack,
@@ -27,11 +25,14 @@ import {
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { RightHeader } from '@/components/RightHeader'
-import { getFirstName } from '@/utils/utils'
+import { HEADER_HEIGHT, HEADER_SIDE_PADDING, OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
+import { getFirstName, isElectron } from '@/utils/utils'
 import { useUser } from '../auth/hooks/useUserStore'
 import { InterviewList } from './components/InterviewList'
 import { ScheduleForm } from './components/ScheduleForm'
 import { JoinCodeInput } from './schema'
+
+declare const __APP_VERSION__: string
 
 export function Dashboard() {
   const [isNewInterviewPopupOpen, setIsNewInterviewPopupOpen] = useState(false)
@@ -50,36 +51,24 @@ export function Dashboard() {
 
   return (
     <AppShell
-      header={{ height: 60 }}
+      header={{ height: HEADER_HEIGHT }}
       styles={{
-        header: { border: 'none' },
+        header: {
+          border: 'none',
+          marginTop: isElectron() ? OUTER_TOOLBAR_HEIGHT : 0,
+          paddingLeft: HEADER_SIDE_PADDING,
+          paddingRight: HEADER_SIDE_PADDING,
+        },
         // hide horizontal scrollbar
-        main: { height: 'calc(100vh - 60px)' },
+        main: {
+          height: `calc(100vh - ${HEADER_HEIGHT}px)`,
+        },
       }}
     >
       <AppShell.Header>
         {/* 100vw makes it so the scrollbar doesn't shift the layout */}
         <Flex justify="space-between" align="center" w="100vw" h="100%" p="lg">
-          <Anchor component={Link} to="/" underline="never">
-            <Group gap="xs">
-              <Image
-                src="/favicon.svg"
-                h={{ base: 15, sm: 25 }}
-                w="auto"
-                fit="contain"
-              />
-              <Text
-                fz={{ base: 15, sm: 25 }}
-                fw={900}
-                variant="gradient"
-                gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
-                draggable={false}
-              >
-                WebMoti-Employ
-              </Text>
-            </Group>
-          </Anchor>
-
+          <Text ff="monospace" fz="xs">{`v${__APP_VERSION__}`}</Text>
           <RightHeader />
         </Flex>
       </AppShell.Header>
@@ -105,9 +94,9 @@ export function Dashboard() {
           />
         </Modal>
 
-        <Flex justify="center" align="center"direction="column" w="100vw">
+        <Flex justify="center" align="center" direction="column" w="100vw">
           <Stack align="center" gap="xs">
-            <Title ta="center" mt={{ base: 25, sm: 50 }} fz={{ base: 25, sm: 35, md: 45 }} px="lg">
+            <Title ta="center" mt={50} fz={{ base: 25, sm: 35, md: 45 }} px="lg">
               {`Welcome ${getFirstName(user.name)}!`}
             </Title>
             <Text c="dimmed">

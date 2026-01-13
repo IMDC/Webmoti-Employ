@@ -30,7 +30,6 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
     let chatStore: StoreApi<ChatStore> | null = null
     try {
       chatStore = createChatStore(zoomClient)
-      // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
       setStore(chatStore)
     }
     catch (error) {

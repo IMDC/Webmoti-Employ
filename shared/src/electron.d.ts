@@ -23,13 +23,33 @@ declare global {
     windowSeconds: number
   }
 
+  interface NavigationState {
+    canGoBack: boolean
+    canGoForward: boolean
+  }
+
+  interface ElectronBuildInfo {
+    version: string
+    sha: string
+    commitDate: string
+    buildDate: string
+  }
+
   interface EventPayloadMapping {
     feedback: Feedback[]
     coordinates: InterviewerCoordinates
     getModelBuffer: ArrayBuffer
     setRendererReady: undefined
+    openExternalUrl: string
     gazeStats: GazeStats
     log: string
+    electronBuildInfo: ElectronBuildInfo
+
+    reloadWindow: undefined
+    goBackWindow: undefined
+    goForwardWindow: undefined
+    toggleConsoleWindow: undefined
+    navigationState: NavigationState
   }
 
   type UnsubscribeFunction = () => void
@@ -42,6 +62,14 @@ declare global {
       getModelBuffer: () => Promise<ArrayBuffer>
       subscribeToLogs: (callback: (message: string) => void) => UnsubscribeFunction
       setRendererReady: () => void
+      openExternalUrl: (url: string) => void
+      getBuildInfo: () => Promise<ElectronBuildInfo>
+
+      reloadWindow: () => void
+      goBackWindow: () => void
+      goForwardWindow: () => void
+      toggleConsoleWindow: () => void
+      subscribeToNavigation: (callback: (nav: NavigationState) => void) => UnsubscribeFunction
     }
   }
 }

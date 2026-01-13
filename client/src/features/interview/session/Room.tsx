@@ -12,7 +12,7 @@ import {
   useZoomSessionActions,
 } from '@/features/interview/zoom/useZoomSessionStore'
 import { useAppPermissionState } from '@/useAppStore'
-import { GALLERY_VIEW_MARGIN } from '@/utils/constants'
+import { GALLERY_VIEW_MARGIN, HEADER_HEIGHT } from '@/utils/constants'
 import { useAiWebsocket } from '../ai/useAiWebsocket'
 import { useSpeechmaticsTranscription } from '../ai/useSpeechmaticsTranscription'
 import { Chat } from '../chat/Chat'
@@ -107,9 +107,9 @@ export function Room() {
 
   return (
     <AppShell
-      footer={{ height: '60px' }}
+      footer={{ height: HEADER_HEIGHT }}
       styles={{
-        main: { height: 'calc(100vh - 60px)' },
+        main: { height: `calc(100vh - ${HEADER_HEIGHT}px)` },
         footer: { border: 'none' },
       }}
     >

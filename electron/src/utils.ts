@@ -12,6 +12,13 @@ if (!envHostedUrl)
 
 export const HOSTED_URL: string = envHostedUrl
 
+export const BUILD_INFO = {
+  version: process.env.ELECTRON_APP_VERSION ?? 'unknown',
+  sha: process.env.ELECTRON_GIT_SHA ?? 'unknown',
+  commitDate: process.env.ELECTRON_GIT_COMMIT_DATE ?? 'unknown',
+  buildDate: process.env.ELECTRON_BUILD_DATE ?? 'unknown',
+}
+
 export const isDev = !app.isPackaged
 
 export function getPreloadPath() {
@@ -95,5 +102,13 @@ export function ipcOnMain<Key extends keyof EventPayloadMapping>(
   key: Key,
   handler: (event: Electron.IpcMainEvent, payload: EventPayloadMapping[Key]) => void,
 ) {
-  ipcMain.on(key, (event, payload) => handler(event, payload))
+  ipcMain.on(key, (event, payload) => {
+    if (!event.senderFrame) {
+      console.warn('Sender frame is null')
+      return
+    }
+
+    validateEventFrame(event.senderFrame)
+    handler(event, payload)
+  })
 }

@@ -145,3 +145,11 @@ export function setLocalBearerToken(bearerToken: string) {
   // if changing this on server, make sure to change this as well
   localStorage.setItem(LOCAL_BEARER_TOKEN_EXPIRY_KEY, DateTime.now().plus({ days: 7 }).toISO())
 }
+
+export function getUrlAuthToken() {
+  // get the better-auth token from the url parameters.
+  // it will be set there after signing in.
+  const url = new URL(window.location.href)
+  const authToken = url.searchParams.get('authToken')
+  return authToken
+}
