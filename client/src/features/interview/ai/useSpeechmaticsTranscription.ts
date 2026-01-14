@@ -1,16 +1,9 @@
 /**
  * Speechmatics Real-Time Transcription Hook
  *
- * SETUP REQUIRED:
- * 1. Install dependencies: pnpm install
- * 2. Set up your Speechmatics API key in client/.env.local:
- *    VITE_SPEECHMATICS_API_KEY=your_api_key_here
- *
- * See SPEECHMATICS_SETUP.md for complete setup instructions.
- *
  * IMPLEMENTATION:
  * - Uses @speechmatics/auth for JWT token generation
- * - Connects directly to Speechmatics WebSocket API (wss://eu2.rt.speechmatics.com/v2)
+ * - Connects directly to Speechmatics WebSocket API
  * - Sends raw PCM audio data and receives JSON transcript messages
  *
  * FEATURES:
