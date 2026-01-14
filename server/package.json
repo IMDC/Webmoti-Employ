@@ -24,6 +24,7 @@
     "@ai-sdk/groq": "^2.0.22",
     "@hono-rate-limiter/cloudflare": "^0.2.2",
     "@hono/zod-validator": "^0.7.2",
+    "@speechmatics/auth": "^0.1.0",
     "@webmoti-employ/shared": "workspace:^",
     "ai": "^5.0.60",
     "better-auth": "catalog:",

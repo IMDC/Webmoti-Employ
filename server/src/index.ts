@@ -11,6 +11,7 @@ import authRoute from './routes/auth'
 import interviewsRoute from './routes/interviews'
 import profilesRoute from './routes/profiles'
 import sessionsRoute from './routes/sessions'
+import speechmaticsRoute from './routes/speechmatics'
 import wsRoute from './routes/ws'
 
 export interface AppContext {
@@ -60,6 +61,7 @@ protectedRoutes.route('/sessions', sessionsRoute)
 protectedRoutes.route('/interviews', interviewsRoute)
 protectedRoutes.route('/profiles', profilesRoute)
 protectedRoutes.route('/ws', wsRoute)
+protectedRoutes.route('/speechmatics', speechmaticsRoute)
 
 app.route('/', protectedRoutes)
 
