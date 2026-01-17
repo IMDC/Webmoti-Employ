@@ -29,6 +29,7 @@ export interface ZoomSessionActions {
 
   startVideo: () => Promise<void>
   stopVideo: () => Promise<void>
+  blurVideo: (isBlurred: boolean) => Promise<void>
   switchCamera: (deviceId: string) => Promise<void>
 
   attachVideoPlayer: (userId: number, element: VideoPlayer) => Promise<VideoPlayer>
@@ -60,6 +61,7 @@ export interface ZoomSessionStore {
   roomName: string | null
   isAudioOn: boolean
   isVideoOn: boolean
+  isVideoBlurred: boolean
   actions: ZoomSessionActions
 }
 
@@ -123,6 +125,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       activeSpeakerUserId: null,
       isAudioOn: true,
       isVideoOn: true,
+      isVideoBlurred: false,
       roomName: null,
 
       actions: {
@@ -196,6 +199,17 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           logger.log('Stopping video...')
           await stream().stopVideo()
           updateParticipants()
+        },
+        blurVideo: async (isBlurred) => {
+          await stream().stopVideo()
+          await stream().startVideo(
+            {
+              virtualBackground: {
+                imageUrl: isBlurred ? 'blur' : undefined,
+              },
+            },
+          )
+          set({ isVideoBlurred: isBlurred })
         },
         switchCamera: async (deviceId) => {
           const oldDeviceId = deviceStore.getState().selectedVideoDevice
