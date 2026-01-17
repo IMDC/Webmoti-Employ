@@ -30,6 +30,7 @@ export interface ZoomSessionActions {
   startVideo: () => Promise<void>
   stopVideo: () => Promise<void>
   blurVideo: (isBlurred: boolean) => Promise<void>
+  toggleBlurPrejoin: () => void
   switchCamera: (deviceId: string) => Promise<void>
 
   attachVideoPlayer: (userId: number, element: VideoPlayer) => Promise<VideoPlayer>
@@ -165,10 +166,16 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
               selectedAudioOutputDevice,
             } = deviceStore.getState()
 
-            const { isAudioOn, isVideoOn } = get()
+            const { isAudioOn, isVideoOn, isVideoBlurred } = get()
             const granted = appStore.getState().permissionState === 'granted'
-            if (granted && isVideoOn)
-              await stream.startVideo({ cameraId: selectedVideoDevice ?? undefined })
+            if (granted && isVideoOn) {
+              await stream.startVideo({
+                cameraId: selectedVideoDevice ?? undefined,
+                virtualBackground: {
+                  imageUrl: isVideoBlurred ? 'blur' : undefined,
+                },
+              })
+            }
             if (granted && isAudioOn) {
               await stream.startAudio({
                 microphoneId: selectedAudioInputDevice ?? undefined,
@@ -201,15 +208,21 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           updateParticipants()
         },
         blurVideo: async (isBlurred) => {
+          const { selectedVideoDevice } = deviceStore.getState()
+
           await stream().stopVideo()
           await stream().startVideo(
             {
+              cameraId: selectedVideoDevice ?? undefined,
               virtualBackground: {
                 imageUrl: isBlurred ? 'blur' : undefined,
               },
             },
           )
           set({ isVideoBlurred: isBlurred })
+        },
+        toggleBlurPrejoin: () => {
+          set(s => ({ isVideoBlurred: !s.isVideoBlurred }))
         },
         switchCamera: async (deviceId) => {
           const oldDeviceId = deviceStore.getState().selectedVideoDevice
