@@ -25,6 +25,14 @@ import { SpotlightView } from './components/SpotlightView'
 import { VideoGrid } from './components/VideoGrid'
 import { useFaceDetection } from './hooks/useFaceDetection'
 
+interface LayoutProps {
+  containerRef: React.RefObject<HTMLDivElement | null>
+  setHostVideo: React.Dispatch<React.SetStateAction<HTMLVideoElement | null>>
+  participants: ReturnType<typeof useZoomParticipants>
+  profiles: ReturnType<typeof useParticipantProfiles>['profiles']
+  isLoadingProfiles: boolean
+}
+
 export function Room() {
   const participantStageRef = useRef<HTMLDivElement>(null)
 
@@ -66,6 +74,11 @@ export function Room() {
   const [isLayoutModalOpen, { open: openLayoutModal, close: closeLayoutModal }]
     = useDisclosure(false)
   const [layout, setLayout] = useState<LayoutValue>('spotlight')
+  const layoutComponents: Record<LayoutValue, React.FC<LayoutProps>> = {
+    spotlight: SpotlightView,
+    grid: VideoGrid,
+  }
+  const LayoutComponent = layoutComponents[layout]
 
   async function onToggleMic() {
     if (permissionState !== 'granted') {
@@ -139,25 +152,13 @@ export function Room() {
                 // relative is for spotlight view
                 pos="relative"
               >
-                {layout === 'spotlight'
-                  ? (
-                      <SpotlightView
-                        containerRef={participantStageRef}
-                        setHostVideo={setHostVideo}
-                        participants={participants}
-                        profiles={profiles}
-                        isLoadingProfiles={isLoadingProfiles}
-                      />
-                    )
-                  : (
-                      <VideoGrid
-                        containerRef={participantStageRef}
-                        setHostVideo={setHostVideo}
-                        participants={participants}
-                        profiles={profiles}
-                        isLoadingProfiles={isLoadingProfiles}
-                      />
-                    )}
+                <LayoutComponent
+                  containerRef={participantStageRef}
+                  setHostVideo={setHostVideo}
+                  participants={participants}
+                  profiles={profiles}
+                  isLoadingProfiles={isLoadingProfiles}
+                />
               </Flex>
             </Stack>
           )}
