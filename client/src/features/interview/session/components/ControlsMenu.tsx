@@ -1,5 +1,7 @@
 import { Button, Menu, Tooltip } from '@mantine/core'
 import {
+  IconBlur,
+  IconBlurOff,
   IconDotsVertical,
   IconLayoutGrid,
   IconMaximize,
@@ -10,6 +12,7 @@ import {
 } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
 import { useAppActions } from '@/useAppStore'
+import { useIsVideoBlurred, useZoomSessionActions } from '../../zoom/useZoomSessionStore'
 
 interface ControlsMenuProps {
   onLayoutOpen?: () => void
@@ -19,6 +22,8 @@ interface ControlsMenuProps {
 
 export function ControlsMenu({ onLayoutOpen, isMobile, sendDevIsJohnDoNotUseThis }: ControlsMenuProps) {
   const { setIsSettingsOpen } = useAppActions()
+  const isVideoBlurred = useIsVideoBlurred()
+  const { blurVideo } = useZoomSessionActions()
 
   const [isFullscreen, setIsFullscreen] = useState(false)
 
@@ -64,6 +69,13 @@ export function ControlsMenu({ onLayoutOpen, isMobile, sendDevIsJohnDoNotUseThis
           onClick={toggleFullscreen}
         >
           {isFullscreen ? 'Exit full screen' : 'Full screen'}
+        </Menu.Item>
+
+        <Menu.Item
+          onClick={() => blurVideo(!isVideoBlurred)}
+          leftSection={isVideoBlurred ? <IconBlur size={14} /> : <IconBlurOff size={14} />}
+        >
+          {isVideoBlurred ? 'Unblur Video' : 'Blur Video'}
         </Menu.Item>
 
         <Menu.Item onClick={() => setIsSettingsOpen(true)} leftSection={<IconSettings size={14} />}>

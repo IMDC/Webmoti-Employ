@@ -32,6 +32,33 @@ export function handleAppError(
   }
 }
 
+export function handleAppErrorWithNotification(
+  error: unknown,
+  defaultMessage: string,
+) {
+  logger.error(defaultMessage, { error })
+
+  if (isExecutedFailure(error)) {
+    showErrorNotification(`${error.errorCode} ${defaultMessage}`, error.reason)
+  }
+  else if (error instanceof HttpError) {
+    const details
+      = typeof error.details === 'string'
+        ? error.details
+        : error.details != null
+          ? JSON.stringify(error.details)
+          : ''
+
+    showErrorNotification(`${error.status} ${error.message}`, details)
+  }
+  else if (error instanceof Error) {
+    showErrorNotification(defaultMessage, error.message)
+  }
+  else {
+    showErrorNotification('Error', defaultMessage)
+  }
+}
+
 export function showErrorNotification(title: string, message: string) {
   notifications.show({
     title,
