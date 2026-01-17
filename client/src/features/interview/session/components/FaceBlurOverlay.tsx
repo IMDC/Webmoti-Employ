@@ -2,16 +2,14 @@ import { useEffect, useRef } from 'react'
 
 interface FaceBlurOverlayProps {
   blurPx?: number
-  faceBox?: { x: number, y: number, w: number, h: number }
   active?: boolean
   faceDetectionResult?: InterviewerCoordinates | null
 }
 
 export function FaceBlurOverlay({
   blurPx = 8,
-  faceBox,
   active = true,
-  // faceDetectionResult,
+  faceDetectionResult,
 }: FaceBlurOverlayProps) {
   const overlayRef = useRef<HTMLDivElement>(null)
 
@@ -20,10 +18,13 @@ export function FaceBlurOverlay({
     if (!overlay || !active)
       return
 
-    // fallback mask if no faceBox provided
-    const cx = faceBox ? faceBox.x + faceBox.w / 2 : overlay.clientWidth / 2
-    const cy = faceBox ? faceBox.y + faceBox.h / 2 : overlay.clientHeight / 2
-    const r = faceBox ? Math.max(faceBox.w, faceBox.h) / 2 : 50
+    const { boundingBox } = faceDetectionResult || {}
+    const { width: overlayW, height: overlayH } = overlay.getBoundingClientRect()
+
+    // fallback center if no detection
+    const cx = boundingBox ? boundingBox.x * overlayW + (boundingBox.width * overlayW) / 2 : overlayW / 2
+    const cy = boundingBox ? boundingBox.y * overlayH + (boundingBox.height * overlayH) / 2 : overlayH / 2
+    const r = boundingBox ? Math.max(boundingBox.width * overlayW, boundingBox.height * overlayH) / 2 : 50
 
     const mask = `
       radial-gradient(
@@ -35,7 +36,7 @@ export function FaceBlurOverlay({
 
     overlay.style.maskImage = mask
     overlay.style.backdropFilter = `blur(${blurPx}px)`
-  }, [faceBox, blurPx, active])
+  }, [faceDetectionResult, blurPx, active])
 
   return (
     <div
