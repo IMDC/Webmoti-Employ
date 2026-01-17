@@ -44,7 +44,7 @@ export function PrejoinMenuBar() {
     if (!isVideoBlurred) {
       notifications.show({
         title: 'Video Blur Activated',
-        message: 'Your video will be blurred when joining the session',
+        message: 'Your background will be blurred when joining the session',
       })
     }
 
