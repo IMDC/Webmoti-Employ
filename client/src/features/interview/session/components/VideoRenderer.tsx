@@ -1,6 +1,7 @@
 import type { VideoPlayer } from '@zoom/videosdk'
 import type { Dispatch, SetStateAction } from 'react'
 import { useEffect, useRef } from 'react'
+import { FaceBlurOverlay } from './FaceBlurOverlay'
 
 interface VideoRendererProps {
   attach: (el: VideoPlayer) => Promise<VideoPlayer | void>
@@ -45,6 +46,8 @@ export function VideoRenderer({ attach, detach, setHostVideo, userId }: VideoRen
   return (
     <video-player-container>
       <video-player ref={ref} data-user-id={userId} />
+
+      <FaceBlurOverlay />
     </video-player-container>
   )
 }
