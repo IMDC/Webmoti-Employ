@@ -4,9 +4,15 @@ interface FaceBlurOverlayProps {
   blurPx?: number
   faceBox?: { x: number, y: number, w: number, h: number }
   active?: boolean
+  faceDetectionResult?: InterviewerCoordinates | null
 }
 
-export function FaceBlurOverlay({ blurPx = 8, faceBox, active = true }: FaceBlurOverlayProps) {
+export function FaceBlurOverlay({
+  blurPx = 8,
+  faceBox,
+  active = true,
+  // faceDetectionResult,
+}: FaceBlurOverlayProps) {
   const overlayRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {

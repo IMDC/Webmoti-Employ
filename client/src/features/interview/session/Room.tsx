@@ -1,6 +1,6 @@
 import type { ProfilesResponse } from '@webmoti-employ/shared'
 import type { Participant } from '@zoom/videosdk'
-import type { Dispatch, RefObject, SetStateAction } from 'react'
+import type { Dispatch, FC, RefObject, SetStateAction } from 'react'
 import type { LayoutValue } from './components/ChangeLayoutModal/ChangeLayoutModal'
 import { AppShell, Box, em, Flex, Stack, useMantineTheme } from '@mantine/core'
 import { useDisclosure, useMediaQuery } from '@mantine/hooks'
@@ -34,6 +34,7 @@ export interface LayoutProps {
   participants: Map<number, Participant>
   isLoadingProfiles: boolean
   profiles?: ProfilesResponse
+  faceDetectionResult?: InterviewerCoordinates | null
 }
 
 export function Room() {
@@ -72,12 +73,12 @@ export function Room() {
   const { profiles, isLoadingProfiles } = useParticipantProfiles(participants)
 
   const [hostVideo, setHostVideo] = useState<HTMLVideoElement | null>(null)
-  useFaceDetection(hostVideo, 5)
+  const faceDetectionResult = useFaceDetection(hostVideo, 5)
 
   const [isLayoutModalOpen, { open: openLayoutModal, close: closeLayoutModal }]
     = useDisclosure(false)
   const [layout, setLayout] = useState<LayoutValue>('spotlight')
-  const layoutComponents: Record<LayoutValue, React.FC<LayoutProps>> = {
+  const layoutComponents: Record<LayoutValue, FC<LayoutProps>> = {
     spotlight: SpotlightView,
     grid: VideoGrid,
   }
@@ -161,6 +162,7 @@ export function Room() {
                   participants={participants}
                   profiles={profiles}
                   isLoadingProfiles={isLoadingProfiles}
+                  faceDetectionResult={faceDetectionResult}
                 />
               </Flex>
             </Stack>
