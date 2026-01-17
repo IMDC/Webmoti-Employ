@@ -1,3 +1,6 @@
+import type { ProfilesResponse } from '@webmoti-employ/shared'
+import type { Participant } from '@zoom/videosdk'
+import type { Dispatch, RefObject, SetStateAction } from 'react'
 import type { LayoutValue } from './components/ChangeLayoutModal/ChangeLayoutModal'
 import { AppShell, Box, em, Flex, Stack, useMantineTheme } from '@mantine/core'
 import { useDisclosure, useMediaQuery } from '@mantine/hooks'
@@ -25,12 +28,12 @@ import { SpotlightView } from './components/SpotlightView'
 import { VideoGrid } from './components/VideoGrid'
 import { useFaceDetection } from './hooks/useFaceDetection'
 
-interface LayoutProps {
-  containerRef: React.RefObject<HTMLDivElement | null>
-  setHostVideo: React.Dispatch<React.SetStateAction<HTMLVideoElement | null>>
-  participants: ReturnType<typeof useZoomParticipants>
-  profiles: ReturnType<typeof useParticipantProfiles>['profiles']
+export interface LayoutProps {
+  containerRef: RefObject<HTMLDivElement | null>
+  setHostVideo: Dispatch<SetStateAction<HTMLVideoElement | null>>
+  participants: Map<number, Participant>
   isLoadingProfiles: boolean
+  profiles?: ProfilesResponse
 }
 
 export function Room() {
