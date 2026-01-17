@@ -14,7 +14,7 @@ import ZoomVideo, { VideoActiveState, VideoQuality } from '@zoom/videosdk'
 import { createStore } from 'zustand'
 import { appStore } from '@/useAppStore'
 import { logger } from '@/utils/logger'
-import { handleAppError, isExecutedFailure } from '@/utils/utils'
+import { handleAppError, handleAppErrorWithNotification, isExecutedFailure } from '@/utils/utils'
 
 export interface ZoomSessionActions {
   setIsAudioOn: (value: boolean) => void
@@ -210,16 +210,22 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         blurVideo: async (isBlurred) => {
           const { selectedVideoDevice } = deviceStore.getState()
 
-          await stream().stopVideo()
-          await stream().startVideo(
-            {
-              cameraId: selectedVideoDevice ?? undefined,
-              virtualBackground: {
-                imageUrl: isBlurred ? 'blur' : undefined,
+          try {
+            await stream().stopVideo()
+            await stream().startVideo(
+              {
+                cameraId: selectedVideoDevice ?? undefined,
+                virtualBackground: {
+                  imageUrl: isBlurred ? 'blur' : undefined,
+                },
               },
-            },
-          )
-          set({ isVideoBlurred: isBlurred })
+            )
+            set({ isVideoBlurred: isBlurred })
+          }
+          catch (error) {
+            handleAppErrorWithNotification(error, 'Failed to set blur')
+          }
+          updateParticipants()
         },
         toggleBlurPrejoin: () => {
           set(s => ({ isVideoBlurred: !s.isVideoBlurred }))

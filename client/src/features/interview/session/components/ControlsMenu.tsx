@@ -73,7 +73,7 @@ export function ControlsMenu({ onLayoutOpen, isMobile, sendDevIsJohnDoNotUseThis
 
         <Menu.Item
           onClick={() => blurVideo(!isVideoBlurred)}
-          leftSection={isVideoBlurred ? <IconBlurOff size={14} /> : <IconBlur size={14} />}
+          leftSection={isVideoBlurred ? <IconBlur size={14} /> : <IconBlurOff size={14} />}
         >
           {isVideoBlurred ? 'Unblur Video' : 'Blur Video'}
         </Menu.Item>
