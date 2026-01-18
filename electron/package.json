@@ -6,6 +6,7 @@
   "author": "IMDC",
   "main": "dist/main.js",
   "scripts": {
+    "start": "pnpm --prefix .. start",
     "typecheck": "tsc --noEmit",
     "gen-build-info": "node scripts/build-info.js",
     "dev:electron": "pnpm gen-build-info && rimraf dist && tsc && electron .",
