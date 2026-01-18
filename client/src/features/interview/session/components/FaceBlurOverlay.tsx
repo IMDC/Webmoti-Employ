@@ -5,7 +5,8 @@ const BLUR_INCREASE_RATE = 20 // px/sec blur increase when not looking
 const BLUR_DECREASE_RATE = MAX_BLUR // px/sec blur decrease when looking
 const TARGET_RADIUS = 150 // circle radius when fully blurred
 const START_RADIUS = TARGET_RADIUS * 2 // initial circle radius
-const CIRCLE_GROW_RATE = 20 // px/sec grow when looking
+const CIRCLE_GROW_RATE
+  = ((START_RADIUS - TARGET_RADIUS) * BLUR_DECREASE_RATE) / MAX_BLUR // px/sec grow when looking
 
 interface FaceBlurOverlayProps {
   faceDetectionResult?: InterviewerCoordinates | null
@@ -20,14 +21,22 @@ export function FaceBlurOverlay({
   const blurRef = useRef(0)
   const radiusRef = useRef(START_RADIUS)
   const lastTimeRef = useRef(performance.now())
-  const lookingRef = useRef(isLookingAtInterviewer ?? true)
+  const lookingRef = useRef(isLookingAtInterviewer ?? false)
+
+  const rafIdRef = useRef<number | null>(null)
+  const cancelledRef = useRef(false)
 
   useEffect(() => {
-    lookingRef.current = isLookingAtInterviewer ?? true
+    lookingRef.current = isLookingAtInterviewer ?? false
   }, [isLookingAtInterviewer])
 
   useEffect(() => {
+    cancelledRef.current = false
+
     const animate = (time: number) => {
+      if (cancelledRef.current)
+        return
+
       const dt = (time - lastTimeRef.current) / 1000
       lastTimeRef.current = time
 
@@ -74,12 +83,18 @@ export function FaceBlurOverlay({
         overlay.style.backdropFilter = `blur(${blurRef.current}px)`
       }
 
-      requestAnimationFrame(animate)
+      rafIdRef.current = requestAnimationFrame(animate)
     }
 
     lastTimeRef.current = performance.now()
-    const id = requestAnimationFrame(animate)
-    return () => cancelAnimationFrame(id)
+    rafIdRef.current = requestAnimationFrame(animate)
+
+    return () => {
+      cancelledRef.current = true
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current)
+      }
+    }
   }, [faceDetectionResult])
 
   return (
