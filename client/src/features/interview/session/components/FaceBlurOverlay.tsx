@@ -7,6 +7,7 @@ const TARGET_RADIUS = 150 // circle radius when fully blurred
 const START_RADIUS = TARGET_RADIUS * 2 // initial circle radius
 const CIRCLE_GROW_RATE
   = ((START_RADIUS - TARGET_RADIUS) * BLUR_DECREASE_RATE) / MAX_BLUR // px/sec grow when looking
+const FEATHER = 75 // px, controls softness of the circle edge
 
 interface FaceBlurOverlayProps {
   faceDetectionResult?: InterviewerCoordinates | null
@@ -75,8 +76,8 @@ export function FaceBlurOverlay({
         const mask = `
           radial-gradient(
             circle at ${cx}px ${cy}px,
-            rgba(0,0,0,0) ${radiusRef.current}px,
-            rgba(0,0,0,1) ${radiusRef.current + 1}px
+            transparent ${radiusRef.current}px,
+            black ${radiusRef.current + FEATHER}px
           )
         `
         overlay.style.maskImage = mask
