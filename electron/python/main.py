@@ -50,7 +50,7 @@ MIN_GAZE_POINTS = 2
 
 # for patterned test mode
 ON_PHASE_S = 5
-OFF_PHASE_S = 10
+OFF_PHASE_S = 7.5
 
 # ===== TYPES ==========================================================================
 

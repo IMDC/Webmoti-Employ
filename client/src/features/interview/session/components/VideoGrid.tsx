@@ -9,6 +9,7 @@ export function VideoGrid({
   profiles,
   isLoadingProfiles,
   setHostVideo,
+  isLookingAtInterviewer,
 }: LayoutProps) {
   const participantCount = participants.size
   const { participantVideoWidth } = useGalleryViewLayout(participantCount, containerRef)
@@ -36,6 +37,7 @@ export function VideoGrid({
             // Use profile picture URL if available, otherwise empty string (Avatar component will show fallback letter)
             profileUrl={profile?.profilePic || ''}
             isLoadingProfiles={isLoadingProfiles}
+            isLookingAtInterviewer={isLookingAtInterviewer}
           />
         )
       })}

@@ -13,6 +13,7 @@ export function SpotlightView({
   isLoadingProfiles,
   setHostVideo,
   faceDetectionResult,
+  isLookingAtInterviewer,
 }: LayoutProps) {
   const { width, height } = useSingleLayout(containerRef)
   const localUserId = useLocalUserId()
@@ -56,6 +57,7 @@ export function SpotlightView({
         profileUrl={mainProfile?.profilePic || ''}
         isLoadingProfiles={isLoadingProfiles}
         faceDetectionResult={faceDetectionResult}
+        isLookingAtInterviewer={isLookingAtInterviewer}
       />
 
       {secondaryParticipant && (

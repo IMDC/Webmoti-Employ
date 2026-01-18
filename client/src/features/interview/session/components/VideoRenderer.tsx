@@ -1,6 +1,7 @@
 import type { VideoPlayer } from '@zoom/videosdk'
 import type { Dispatch, SetStateAction } from 'react'
 import { useEffect, useRef } from 'react'
+import { isElectron } from '@/utils/utils'
 import { FaceBlurOverlay } from './FaceBlurOverlay'
 
 interface VideoRendererProps {
@@ -9,6 +10,7 @@ interface VideoRendererProps {
   setHostVideo?: Dispatch<SetStateAction<HTMLVideoElement | null>>
   userId?: number
   faceDetectionResult?: InterviewerCoordinates | null
+  isLookingAtInterviewer?: boolean
 }
 
 export function VideoRenderer({
@@ -17,6 +19,7 @@ export function VideoRenderer({
   setHostVideo,
   userId,
   faceDetectionResult,
+  isLookingAtInterviewer,
 }: VideoRendererProps) {
   const ref = useRef<VideoPlayer>(null)
 
@@ -54,7 +57,12 @@ export function VideoRenderer({
     <video-player-container>
       <video-player ref={ref} data-user-id={userId} />
 
-      <FaceBlurOverlay faceDetectionResult={faceDetectionResult} />
+      {isElectron() && (
+        <FaceBlurOverlay
+          faceDetectionResult={faceDetectionResult}
+          isLookingAtInterviewer={isLookingAtInterviewer}
+        />
+      )}
     </video-player-container>
   )
 }

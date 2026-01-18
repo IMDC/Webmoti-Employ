@@ -22,6 +22,7 @@ interface SessionTileProps {
   isLoadingProfiles: boolean
   setHostVideo?: Dispatch<SetStateAction<HTMLVideoElement | null>>
   faceDetectionResult?: InterviewerCoordinates | null
+  isLookingAtInterviewer?: boolean
 }
 
 export function SessionTile({
@@ -33,6 +34,7 @@ export function SessionTile({
   name,
   setHostVideo,
   faceDetectionResult,
+  isLookingAtInterviewer,
 }: SessionTileProps) {
   const { attachVideoPlayer, detachVideoPlayer } = useZoomSessionActions()
 
@@ -69,6 +71,7 @@ export function SessionTile({
           detach={detachStable}
           setHostVideo={setHostVideo}
           faceDetectionResult={faceDetectionResult}
+          isLookingAtInterviewer={isLookingAtInterviewer}
         />
       )}
 

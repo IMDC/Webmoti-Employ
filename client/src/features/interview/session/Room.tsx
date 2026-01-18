@@ -35,6 +35,7 @@ export interface LayoutProps {
   isLoadingProfiles: boolean
   profiles?: ProfilesResponse
   faceDetectionResult?: InterviewerCoordinates | null
+  isLookingAtInterviewer?: boolean
 }
 
 export function Room() {
@@ -73,7 +74,7 @@ export function Room() {
   const { profiles, isLoadingProfiles } = useParticipantProfiles(participants)
 
   const [hostVideo, setHostVideo] = useState<HTMLVideoElement | null>(null)
-  const faceDetectionResult = useFaceDetection(hostVideo, 5)
+  const faceDetectionResult = useFaceDetection(hostVideo, 10)
 
   const [isLayoutModalOpen, { open: openLayoutModal, close: closeLayoutModal }]
     = useDisclosure(false)
@@ -83,6 +84,8 @@ export function Room() {
     grid: VideoGrid,
   }
   const LayoutComponent = layoutComponents[layout]
+
+  const [isLookingAtInterviewer, setIsLookingAtInterviewer] = useState(false)
 
   async function onToggleMic() {
     if (permissionState !== 'granted') {
@@ -139,7 +142,10 @@ export function Room() {
                 w="100%"
                 h={{ base: '12%', xl: '15%' }}
               >
-                <FeedbackArea notification={notification} />
+                <FeedbackArea
+                  notification={notification}
+                  onLookingChange={setIsLookingAtInterviewer}
+                />
               </Box>
 
               <Flex
@@ -163,6 +169,7 @@ export function Room() {
                   profiles={profiles}
                   isLoadingProfiles={isLoadingProfiles}
                   faceDetectionResult={faceDetectionResult}
+                  isLookingAtInterviewer={isLookingAtInterviewer}
                 />
               </Flex>
             </Stack>
