@@ -1,9 +1,16 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { isElectron } from '@/utils/utils'
 import { FaceDetectorRunner } from './FaceDetectorRunner'
 
 export function useFaceDetection(hostVideo: HTMLVideoElement | null, fps: number) {
   const runnerRef = useRef<FaceDetectorRunner | null>(null)
+  const [detectionResult, setDetectionResult] = useState<InterviewerCoordinates | null>(null)
+
+  function handleFaceDetection(data: InterviewerCoordinates) {
+    setDetectionResult(data)
+    // send coordinate data to electron
+    window.electron.sendInterviewerCoordinates(data)
+  }
 
   useEffect(() => {
     if (!isElectron() || !hostVideo)
@@ -13,7 +20,7 @@ export function useFaceDetection(hostVideo: HTMLVideoElement | null, fps: number
       if (hostVideo.videoWidth === 0 || hostVideo.videoHeight === 0)
         return
 
-      const runner = new FaceDetectorRunner(hostVideo, fps)
+      const runner = new FaceDetectorRunner(hostVideo, handleFaceDetection, fps)
       runnerRef.current = runner
       runner.init()
     }
@@ -31,4 +38,6 @@ export function useFaceDetection(hostVideo: HTMLVideoElement | null, fps: number
       hostVideo.removeEventListener('loadeddata', startDetection)
     }
   }, [hostVideo, fps])
+
+  return detectionResult
 }

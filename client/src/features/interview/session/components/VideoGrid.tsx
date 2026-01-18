@@ -1,17 +1,7 @@
-import type { ProfilesResponse } from '@webmoti-employ/shared'
-import type { Participant } from '@zoom/videosdk'
-import type { Dispatch, RefObject, SetStateAction } from 'react'
+import type { LayoutProps } from '../Room'
 import { GALLERY_VIEW_ASPECT_RATIO } from '../../../../utils/constants'
 import useGalleryViewLayout from '../hooks/useGalleryViewLayout'
 import { SessionTile } from './SessionTile'
-
-interface VideoGridProps {
-  containerRef: RefObject<HTMLDivElement | null>
-  setHostVideo: Dispatch<SetStateAction<HTMLVideoElement | null>>
-  participants: Map<number, Participant>
-  isLoadingProfiles: boolean
-  profiles?: ProfilesResponse
-}
 
 export function VideoGrid({
   containerRef,
@@ -19,7 +9,8 @@ export function VideoGrid({
   profiles,
   isLoadingProfiles,
   setHostVideo,
-}: VideoGridProps) {
+  isLookingAtInterviewer,
+}: LayoutProps) {
   const participantCount = participants.size
   const { participantVideoWidth } = useGalleryViewLayout(participantCount, containerRef)
 
@@ -46,6 +37,7 @@ export function VideoGrid({
             // Use profile picture URL if available, otherwise empty string (Avatar component will show fallback letter)
             profileUrl={profile?.profilePic || ''}
             isLoadingProfiles={isLoadingProfiles}
+            isLookingAtInterviewer={isLookingAtInterviewer}
           />
         )
       })}

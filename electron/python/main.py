@@ -48,6 +48,10 @@ FIXATION_THRESHOLD_RATIO = 0.6
 FIXATION_VELOCITY_THRESHOLD = 100  # pixels per second
 MIN_GAZE_POINTS = 2
 
+# for patterned test mode
+ON_PHASE_S = 5
+OFF_PHASE_S = 7.5
+
 # ===== TYPES ==========================================================================
 
 
@@ -92,7 +96,7 @@ class GazeData(TypedDict):
 # Global state
 current_aoi_bbox = None
 start_timestamp = None
-TEST_MODE = False  # Auto-set if no tracker
+TEST_MODE: Literal[None, "random", "patterned"] = None  # Auto-set if no tracker
 ASYNC_LOOP: asyncio.AbstractEventLoop | None = None
 
 # latest gaze sample storage (set from Tobii callback, consumed by publisher loop)
@@ -267,21 +271,37 @@ def gaze_callback(gaze_data: GazeData) -> None:
 
 
 async def simulate_gaze_data() -> None:
+    """Simulate gaze for the selected TEST_MODE with configurable on/off durations."""
+    toggle_on = True
+    next_toggle_time = time.time() + ON_PHASE_S  # start with on-phase
+
     while TEST_MODE:
-        timestamp = int(time.time() * 1e6)
+        now = time.time()
+
+        if TEST_MODE == "random":
+            # random gaze anywhere on screen
+            gaze_value = random.uniform(0.3, 0.7)  # noqa: S311
+        elif TEST_MODE == "patterned":
+            # switch on/off according to durations
+            if now >= next_toggle_time:
+                toggle_on = not toggle_on
+                next_toggle_time = now + (ON_PHASE_S if toggle_on else OFF_PHASE_S)
+            gaze_value = 0.5 if toggle_on else 0.0
+
         _store_latest_gaze_args(
             {
-                "timestamp": timestamp,
-                "gaze_x_left": random.uniform(0.3, 0.7),  # noqa: S311
-                "gaze_y_left": random.uniform(0.3, 0.7),  # noqa: S311
-                "gaze_x_right": random.uniform(0.3, 0.7),  # noqa: S311
-                "gaze_y_right": random.uniform(0.3, 0.7),  # noqa: S311
-                "pupil_left": random.uniform(2.5, 3.5),  # noqa: S311
-                "pupil_right": random.uniform(2.5, 3.5),  # noqa: S311
+                "timestamp": int(now * 1e6),
+                "gaze_x_left": gaze_value,
+                "gaze_y_left": gaze_value,
+                "gaze_x_right": gaze_value,
+                "gaze_y_right": gaze_value,
+                "pupil_left": 3.0,
+                "pupil_right": 3.0,
                 "validity_left": 1,
                 "validity_right": 1,
             },
         )
+
         await asyncio.sleep(0.05)
 
 
@@ -307,7 +327,7 @@ async def main() -> None:
         tracker.subscribe_to(tr.EYETRACKER_GAZE_DATA, gaze_callback, as_dictionary=True)
     else:
         logger.warning("No Tobii tracker found. Using TEST_MODE.")
-        TEST_MODE = True
+        TEST_MODE = "patterned"  # "random" or "patterned"
         asyncio.create_task(simulate_gaze_data())  # noqa: RUF006
 
     web_runner = web.AppRunner(app)
