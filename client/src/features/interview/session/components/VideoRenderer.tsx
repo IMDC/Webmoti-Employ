@@ -1,16 +1,32 @@
 import type { VideoPlayer } from '@zoom/videosdk'
 import type { Dispatch, SetStateAction } from 'react'
 import { useEffect, useRef } from 'react'
+import { isElectron } from '@/utils/utils'
+import { FaceBlurOverlay } from './FaceBlurOverlay'
 
 interface VideoRendererProps {
   attach: (el: VideoPlayer) => Promise<VideoPlayer | void>
   detach: () => void
   setHostVideo?: Dispatch<SetStateAction<HTMLVideoElement | null>>
   userId?: number
+  faceDetectionResult?: InterviewerCoordinates | null
+  isLookingAtInterviewer?: boolean
 }
 
-export function VideoRenderer({ attach, detach, setHostVideo, userId }: VideoRendererProps) {
+export function VideoRenderer({
+  attach,
+  detach,
+  setHostVideo,
+  userId,
+  faceDetectionResult,
+  isLookingAtInterviewer,
+}: VideoRendererProps) {
   const ref = useRef<VideoPlayer>(null)
+
+  const isElectronApp = isElectron()
+
+  // if this VideoRenderer is the host, setHostVideo is defined
+  const isHost = !!setHostVideo
 
   useEffect(() => {
     const el = ref.current
@@ -18,60 +34,42 @@ export function VideoRenderer({ attach, detach, setHostVideo, userId }: VideoRen
       return
     }
 
-    let isMounted = true
-    let retryTimeout: NodeJS.Timeout | null = null
+    const setup = async () => {
+      // attach video from zoom
+      const result = await attach(el)
 
-    const setup = async (attempt = 0) => {
-      try {
-        // attach video from zoom
-        const result = await attach(el)
-
-        if (!isMounted)
-          return
-
-        // if this VideoRenderer is the host, setHostVideo is defined
-        if (!setHostVideo) {
-          return
-        }
-        const player = result ?? el
-        const videoElement = player.querySelector('video')
-        if (videoElement) {
-          // the host video will be used higher in the tree for face detection
-          setHostVideo(videoElement)
-        }
+      if (!isHost) {
+        return
       }
-      catch (error: any) {
-        // Error 6001 means video stream not ready yet - retry after delay
-        if (error?.errorCode === 6001 && attempt < 5 && isMounted) {
-          const delay = Math.min(1000 * 2 ** attempt, 3000) // Exponential backoff, max 3s
-          retryTimeout = setTimeout(() => {
-            if (isMounted) {
-              setup(attempt + 1)
-            }
-          }, delay)
-        }
-        else if (error?.errorCode !== 6001) {
-          // Log other errors but don't crash
-          console.error('Failed to attach video player:', error)
-        }
+      const player = result ?? el
+      const videoElement = player.querySelector('video')
+      if (videoElement) {
+        // the host video will be used higher in the tree for face detection
+        setHostVideo(videoElement)
       }
     }
 
     setup()
 
     return () => {
-      isMounted = false
-      if (retryTimeout) {
-        clearTimeout(retryTimeout)
-      }
       detach()
-      setHostVideo?.(null)
+      if (isHost) {
+        setHostVideo?.(null)
+      }
     }
-  }, [attach, detach, setHostVideo])
+  }, [attach, detach, setHostVideo, isHost])
 
   return (
     <video-player-container>
       <video-player ref={ref} data-user-id={userId} />
+
+      {/* only blur background of interviewer */}
+      {isElectronApp && isHost && (
+        <FaceBlurOverlay
+          faceDetectionResult={faceDetectionResult}
+          isLookingAtInterviewer={isLookingAtInterviewer}
+        />
+      )}
     </video-player-container>
   )
 }

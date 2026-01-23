@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "start": "pnpm --prefix .. start",
     "build": "tsc -b --force",
     "typecheck": "pnpm run build",
     "lint": "eslint .",

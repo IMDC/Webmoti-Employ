@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "start": "pnpm --prefix .. start",
     "dev": "wrangler dev",
     "dev:electron": "pnpm run dev",
     "test": "vitest run",

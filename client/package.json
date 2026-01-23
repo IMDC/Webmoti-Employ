@@ -1,9 +1,10 @@
 {
   "name": "@webmoti-employ/client",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
+    "start": "pnpm --prefix .. start",
     "dev": "vite",
     "dev:electron": "pnpm run dev",
     "typecheck": "tsc --noEmit",

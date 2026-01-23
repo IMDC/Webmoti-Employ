@@ -1,5 +1,7 @@
 import { FaceDetector, FilesetResolver } from '@mediapipe/tasks-vision'
 
+export type FaceDetectionCallback = (data: InterviewerCoordinates) => void
+
 export class FaceDetectorRunner {
   private detector: FaceDetector | null = null
   private rafId: number | null = null
@@ -8,9 +10,11 @@ export class FaceDetectorRunner {
   private videoEl: HTMLVideoElement
   private readonly minFrameInterval: number
   private isRunning = false
+  private callback: FaceDetectionCallback
 
-  constructor(videoEl: HTMLVideoElement, fps = 30) {
+  constructor(videoEl: HTMLVideoElement, callback: FaceDetectionCallback, fps = 30) {
     this.videoEl = videoEl
+    this.callback = callback
     this.minFrameInterval = 1000 / fps
   }
 
@@ -102,7 +106,7 @@ export class FaceDetectorRunner {
       height: screenBox.height / screenH,
     }
 
-    window.electron.sendInterviewerCoordinates({ found: !!faceBox, boundingBox: norm })
+    this.callback({ found: !!faceBox, boundingBox: norm })
   }
 
   stop() {

@@ -17,9 +17,10 @@ import { useGazeStats } from '../hooks/useGazeStats'
 
 interface FeedbackAreaProps {
   notification: NotificationMessage
+  onLookingChange?: (looking: boolean) => void
 }
 
-export function FeedbackArea({ notification }: FeedbackAreaProps) {
+export function FeedbackArea({ notification, onLookingChange }: FeedbackAreaProps) {
   const theme = useMantineTheme()
   const isXL = useMediaQuery(`(min-width: ${theme.breakpoints.xl})`)
   const iconSize = isXL ? 48 : 24
@@ -73,10 +74,13 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
     }
     if (looking || !fixation) {
       setShowLookPrompt(false)
+      onLookingChange?.(true) // inform parent
       return
     }
     notLookingTimerRef.current = window.setTimeout(() => {
       setShowLookPrompt(true)
+
+      onLookingChange?.(false) // inform parent
     }, NOT_LOOKING_DELAY_MS)
 
     return () => {
@@ -85,7 +89,7 @@ export function FeedbackArea({ notification }: FeedbackAreaProps) {
         notLookingTimerRef.current = null
       }
     }
-  }, [looking, fixation])
+  }, [looking, fixation, onLookingChange])
 
   return (
     <Center h="100%">

@@ -29,3 +29,4 @@ export function useParticipantNetworkLevel(userId: number | null) {
   )
 }
 export const useIsZoomInitializing = () => useZoomSessionStore(s => s.isInitializing)
+export const useIsVideoBlurred = () => useZoomSessionStore(s => s.isVideoBlurred)

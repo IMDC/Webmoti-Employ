@@ -23,10 +23,12 @@
     "deploy": "pnpm build && pnpm run -r deploy",
     "migrate": "pnpm --filter @webmoti-employ/server migrate",
     "cf-typegen": "pnpm --filter @webmoti-employ/server cf-typegen",
-    "db-typegen": "pnpm --filter @webmoti-employ/server db:typegen"
+    "db-typegen": "pnpm --filter @webmoti-employ/server db:typegen",
+    "clean-modules": "rimraf --glob \"**/node_modules\" || exit 0 && rimraf node_modules || exit 0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.2.1",
-    "eslint": "^9.35.0"
+    "eslint": "^9.35.0",
+    "rimraf": "^6.1.2"
   }
 }

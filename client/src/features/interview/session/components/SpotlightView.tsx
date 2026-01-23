@@ -1,6 +1,4 @@
-import type { ProfilesResponse } from '@webmoti-employ/shared'
-import type { Participant } from '@zoom/videosdk'
-import type { Dispatch, RefObject, SetStateAction } from 'react'
+import type { LayoutProps } from '../Room'
 import { AspectRatio } from '@mantine/core'
 import { GALLERY_VIEW_ASPECT_RATIO } from '@/utils/constants'
 import { logger } from '@/utils/logger'
@@ -8,21 +6,15 @@ import { useLocalUserId } from '../../zoom/useZoomSessionStore'
 import { useSingleLayout } from '../hooks/useSingleLayout'
 import { SessionTile } from './SessionTile'
 
-interface SpotlightViewProps {
-  containerRef: RefObject<HTMLDivElement | null>
-  setHostVideo: Dispatch<SetStateAction<HTMLVideoElement | null>>
-  participants: Map<number, Participant>
-  isLoadingProfiles: boolean
-  profiles?: ProfilesResponse
-}
-
 export function SpotlightView({
   containerRef,
   participants,
   profiles,
   isLoadingProfiles,
   setHostVideo,
-}: SpotlightViewProps) {
+  faceDetectionResult,
+  isLookingAtInterviewer,
+}: LayoutProps) {
   const { width, height } = useSingleLayout(containerRef)
   const localUserId = useLocalUserId()
 
@@ -64,6 +56,8 @@ export function SpotlightView({
         name={mainProfile?.displayName || mainParticipant.displayName}
         profileUrl={mainProfile?.profilePic || ''}
         isLoadingProfiles={isLoadingProfiles}
+        faceDetectionResult={faceDetectionResult}
+        isLookingAtInterviewer={isLookingAtInterviewer}
       />
 
       {secondaryParticipant && (

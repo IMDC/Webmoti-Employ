@@ -1,3 +1,6 @@
+import type { ProfilesResponse } from '@webmoti-employ/shared'
+import type { Participant } from '@zoom/videosdk'
+import type { Dispatch, FC, RefObject, SetStateAction } from 'react'
 import type { LayoutValue } from './components/ChangeLayoutModal/ChangeLayoutModal'
 import { AppShell, Box, em, Flex, Stack, useMantineTheme } from '@mantine/core'
 import { useDisclosure, useMediaQuery } from '@mantine/hooks'
@@ -24,6 +27,16 @@ import { FeedbackArea } from './components/FeedbackArea'
 import { SpotlightView } from './components/SpotlightView'
 import { VideoGrid } from './components/VideoGrid'
 import { useFaceDetection } from './hooks/useFaceDetection'
+
+export interface LayoutProps {
+  containerRef: RefObject<HTMLDivElement | null>
+  setHostVideo: Dispatch<SetStateAction<HTMLVideoElement | null>>
+  participants: Map<number, Participant>
+  isLoadingProfiles: boolean
+  profiles?: ProfilesResponse
+  faceDetectionResult?: InterviewerCoordinates | null
+  isLookingAtInterviewer?: boolean
+}
 
 export function Room() {
   const participantStageRef = useRef<HTMLDivElement>(null)
@@ -61,11 +74,18 @@ export function Room() {
   const { profiles, isLoadingProfiles } = useParticipantProfiles(participants)
 
   const [hostVideo, setHostVideo] = useState<HTMLVideoElement | null>(null)
-  useFaceDetection(hostVideo, 5)
+  const faceDetectionResult = useFaceDetection(hostVideo, 10)
 
   const [isLayoutModalOpen, { open: openLayoutModal, close: closeLayoutModal }]
     = useDisclosure(false)
   const [layout, setLayout] = useState<LayoutValue>('spotlight')
+  const layoutComponents: Record<LayoutValue, FC<LayoutProps>> = {
+    spotlight: SpotlightView,
+    grid: VideoGrid,
+  }
+  const LayoutComponent = layoutComponents[layout]
+
+  const [isLookingAtInterviewer, setIsLookingAtInterviewer] = useState(false)
 
   async function onToggleMic() {
     if (permissionState !== 'granted') {
@@ -122,7 +142,10 @@ export function Room() {
                 w="100%"
                 h={{ base: '12%', xl: '15%' }}
               >
-                <FeedbackArea notification={notification} />
+                <FeedbackArea
+                  notification={notification}
+                  onLookingChange={setIsLookingAtInterviewer}
+                />
               </Box>
 
               <Flex
@@ -139,25 +162,15 @@ export function Room() {
                 // relative is for spotlight view
                 pos="relative"
               >
-                {layout === 'spotlight'
-                  ? (
-                      <SpotlightView
-                        containerRef={participantStageRef}
-                        setHostVideo={setHostVideo}
-                        participants={participants}
-                        profiles={profiles}
-                        isLoadingProfiles={isLoadingProfiles}
-                      />
-                    )
-                  : (
-                      <VideoGrid
-                        containerRef={participantStageRef}
-                        setHostVideo={setHostVideo}
-                        participants={participants}
-                        profiles={profiles}
-                        isLoadingProfiles={isLoadingProfiles}
-                      />
-                    )}
+                <LayoutComponent
+                  containerRef={participantStageRef}
+                  setHostVideo={setHostVideo}
+                  participants={participants}
+                  profiles={profiles}
+                  isLoadingProfiles={isLoadingProfiles}
+                  faceDetectionResult={faceDetectionResult}
+                  isLookingAtInterviewer={isLookingAtInterviewer}
+                />
               </Flex>
             </Stack>
           )}
