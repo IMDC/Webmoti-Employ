@@ -15,10 +15,12 @@
  */
 
 import type { TranscriptMessage } from '@webmoti-employ/shared'
-import { createSpeechmaticsJWT } from '@speechmatics/auth'
+import { SpeechmaticsResponse } from '@webmoti-employ/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import z from 'zod'
+import { HttpError } from '@/utils/HttpError'
 import { logger } from '@/utils/logger'
-import { errorNotification } from '@/utils/utils'
+import { errorNotification, getLocalBearerToken, handleAppErrorWithNotification } from '@/utils/utils'
 import { useIsAudioOn, useLocalUserId, useZoomParticipants } from '../zoom/useZoomSessionStore'
 
 // Speechmatics message types
@@ -111,31 +113,36 @@ export function useSpeechmaticsTranscription(
     return localParticipant?.isHost ? 'interviewer' : 'candidate'
   }, [localUserId, participants])
 
-  // Get Speechmatics API key and generate JWT token
-  const generateJWT = useCallback(async () => {
-    const apiKey = import.meta.env.VITE_SPEECHMATICS_API_KEY
-    if (!apiKey || apiKey === 'your_api_key_here') {
-      throw new Error(
-        'Speechmatics API key not configured.\n\n'
-        + 'Please set your API key in client/.env.local:\n'
-        + 'VITE_SPEECHMATICS_API_KEY=your_api_key_here\n\n'
-        + 'Get your API key from: https://portal.speechmatics.com/manage-access/',
+  const getSpeechmaticsJWT = useCallback(async () => {
+    const endpoint = `${import.meta.env.VITE_API_BASE_URL}/speechmatics/token`
+    const authToken = getLocalBearerToken()
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
+      },
+    })
+    const json = await response.json()
+
+    if (!response.ok) {
+      handleAppErrorWithNotification(
+        new HttpError(
+          'Failed to get Speechmatics JWT',
+          response.status,
+          json,
+        ),
       )
     }
 
-    try {
-      // Generate a temporary JWT token (valid for 1 hour)
-      const jwt = await createSpeechmaticsJWT({
-        type: 'rt',
-        apiKey,
-        ttl: 3600, // 1 hour
-      })
-      return jwt
+    const result = SpeechmaticsResponse.safeParse(json)
+    if (!result.success) {
+      handleAppErrorWithNotification(
+        new HttpError('Invalid response schema', 500, z.flattenError(result.error)),
+      )
     }
-    catch (error) {
-      logger.error('Failed to generate Speechmatics JWT:', error)
-      throw new Error('Failed to generate Speechmatics JWT token. Please check your API key.')
-    }
+
+    return result.data?.key
   }, [])
 
   // Connect to Speechmatics WebSocket
@@ -149,7 +156,7 @@ export function useSpeechmaticsTranscription(
     isConnectingRef.current = true
 
     try {
-      const jwt = await generateJWT()
+      const jwt = await getSpeechmaticsJWT()
       const ws = new WebSocket(`${SPEECHMATICS_URL}?jwt=${jwt}`)
 
       ws.onopen = () => {
@@ -304,7 +311,7 @@ export function useSpeechmaticsTranscription(
         setHasNotifiedUser(true)
       }
     }
-  }, [generateJWT, isAudioEnabled, hasNotifiedUser, getSpeakerRole, sendTranscript, maxWordsBuffer])
+  }, [getSpeechmaticsJWT, isAudioEnabled, hasNotifiedUser, getSpeakerRole, sendTranscript, maxWordsBuffer])
 
   // Disconnect WebSocket
   const disconnectWebSocket = useCallback(() => {
