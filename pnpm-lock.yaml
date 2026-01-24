@@ -47,6 +47,15 @@ importers:
       '@mediapipe/tasks-vision':
         specifier: 0.10.22-rc.20250304
         version: 0.10.22-rc.20250304
+      '@speechmatics/browser-audio-input':
+        specifier: ^2.0.3
+        version: 2.0.3
+      '@speechmatics/browser-audio-input-react':
+        specifier: ^2.0.3
+        version: 2.0.3(react@19.1.1)
+      '@speechmatics/real-time-client-react':
+        specifier: ^3.2.1
+        version: 3.2.1(react@19.1.1)
       '@tabler/icons-react':
         specifier: ^3.35.0
         version: 3.35.0(react@19.1.1)
@@ -1647,6 +1656,22 @@ packages:
 
   '@speechmatics/auth@0.1.0':
     resolution: {integrity: sha512-vF1XOFlAtbNSWYsuJm9WDAZfZIOpwibgqu0sH/Qqkbyz2w/EQyoIhlKta8KRVZ74JeKyY08mnGQ17WDj6i6U4Q==}
+
+  '@speechmatics/browser-audio-input-react@2.0.3':
+    resolution: {integrity: sha512-+OwyBNrxP4JfT8S6KvnmKZQ+wy4Za6qtK3NdUmq+7lm3CpdGDRYOCF+yzPaNng8GEGWCgP4jj3dVy36PhPgqgA==}
+    peerDependencies:
+      react: ^18 || ^19
+
+  '@speechmatics/browser-audio-input@2.0.3':
+    resolution: {integrity: sha512-NSfp2D0lg+fimm4FL7hFAEq/W4NEKu+gEoF9L50EwJfldH1xvUR3DVLuA4xi/7U/0j67nRG4tpBv473Rp0gAPQ==}
+
+  '@speechmatics/real-time-client-react@3.2.1':
+    resolution: {integrity: sha512-RvlbKJ1nnUYOEDVB9jbFrKPfDtGO/mjbRdbsZ+T+TgBs7EKY755f5l10u4CUNdnsb8q3GEBjB4W493ZrZMqyWQ==}
+    peerDependencies:
+      react: ^18 || ^19
+
+  '@speechmatics/real-time-client@8.2.0':
+    resolution: {integrity: sha512-VC988dRXXh4PAfRlq/kg7S9MSIWlCKQVhCGGZhuxMrdYYC6pDImHGR7/I3Gko3cm5KquNJCwV4AIoU192tfVgQ==}
 
   '@speed-highlight/core@1.2.7':
     resolution: {integrity: sha512-0dxmVj4gxg3Jg879kvFS/msl4s9F3T9UXC1InxgOf7t5NvcPD97u/WTA5vL/IxWHMn7qSxBozqrnnE2wvl1m8g==}
@@ -5297,6 +5322,7 @@ packages:
   tar@6.2.1:
     resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
 
   temp-file@3.4.0:
     resolution: {integrity: sha512-C5tjlC/HCtVUOi3KWVokd4vHVViOmGjtLwIh4MuzPo/nMYTV/p1urt3RnMz2IWXDdKEGJH3k5+KPxtqRsUYGtg==}
@@ -5434,6 +5460,9 @@ packages:
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
       typescript: '>=4.8.4 <6.0.0'
+
+  typescript-event-target@1.1.2:
+    resolution: {integrity: sha512-TvkrTUpv7gCPlcnSoEwUVUBwsdheKm+HF5u2tPAKubkIGMfovdSizCTaZRY/NhR8+Ijy8iZZUapbVQAsNrkFrw==}
 
   typescript@5.9.2:
     resolution: {integrity: sha512-CWBzXQrc/qOkhidw1OzBTQuYRbfyxDXJMVJ1XNwUHGROVmuaeiEm3OslpZ1RV96d7SKKjZKrSJu3+t/xlw3R9A==}
@@ -5924,7 +5953,7 @@ snapshots:
       '@eslint-community/eslint-plugin-eslint-comments': 4.5.0(eslint@9.35.0(jiti@2.6.1))
       '@eslint/markdown': 7.2.0
       '@stylistic/eslint-plugin': 5.3.1(eslint@9.35.0(jiti@2.6.1))
-      '@typescript-eslint/eslint-plugin': 8.42.0(@typescript-eslint/parser@8.44.0(eslint@9.35.0(jiti@2.6.1))(typescript@5.9.2))(eslint@9.35.0(jiti@2.6.1))(typescript@5.9.2)
+      '@typescript-eslint/eslint-plugin': 8.42.0(@typescript-eslint/parser@8.42.0(eslint@9.35.0(jiti@2.6.1))(typescript@5.9.2))(eslint@9.35.0(jiti@2.6.1))(typescript@5.9.2)
       '@typescript-eslint/parser': 8.42.0(eslint@9.35.0(jiti@2.6.1))(typescript@5.9.2)
       '@vitest/eslint-plugin': 1.3.8(eslint@9.35.0(jiti@2.6.1))(typescript@5.9.2)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.5)(yaml@2.8.1))
       ansis: 4.1.0
@@ -7232,6 +7261,31 @@ snapshots:
 
   '@speechmatics/auth@0.1.0': {}
 
+  '@speechmatics/browser-audio-input-react@2.0.3(react@19.1.1)':
+    dependencies:
+      '@speechmatics/browser-audio-input': 2.0.3
+      react: 19.1.1
+
+  '@speechmatics/browser-audio-input@2.0.3':
+    dependencies:
+      typescript-event-target: 1.1.2
+
+  '@speechmatics/real-time-client-react@3.2.1(react@19.1.1)':
+    dependencies:
+      '@speechmatics/real-time-client': 8.2.0
+      react: 19.1.1
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
+  '@speechmatics/real-time-client@8.2.0':
+    dependencies:
+      typescript-event-target: 1.1.2
+      ws: 8.18.3
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
   '@speed-highlight/core@1.2.7': {}
 
   '@standard-schema/spec@1.0.0': {}
@@ -7500,6 +7554,23 @@ snapshots:
     dependencies:
       '@types/node': 24.10.1
     optional: true
+
+  '@typescript-eslint/eslint-plugin@8.42.0(@typescript-eslint/parser@8.42.0(eslint@9.35.0(jiti@2.6.1))(typescript@5.9.2))(eslint@9.35.0(jiti@2.6.1))(typescript@5.9.2)':
+    dependencies:
+      '@eslint-community/regexpp': 4.12.1
+      '@typescript-eslint/parser': 8.42.0(eslint@9.35.0(jiti@2.6.1))(typescript@5.9.2)
+      '@typescript-eslint/scope-manager': 8.42.0
+      '@typescript-eslint/type-utils': 8.42.0(eslint@9.35.0(jiti@2.6.1))(typescript@5.9.2)
+      '@typescript-eslint/utils': 8.42.0(eslint@9.35.0(jiti@2.6.1))(typescript@5.9.2)
+      '@typescript-eslint/visitor-keys': 8.42.0
+      eslint: 9.35.0(jiti@2.6.1)
+      graphemer: 1.4.0
+      ignore: 7.0.5
+      natural-compare: 1.4.0
+      ts-api-utils: 2.1.0(typescript@5.9.2)
+      typescript: 5.9.2
+    transitivePeerDependencies:
+      - supports-color
 
   '@typescript-eslint/eslint-plugin@8.42.0(@typescript-eslint/parser@8.44.0(eslint@9.35.0(jiti@2.6.1))(typescript@5.9.2))(eslint@9.35.0(jiti@2.6.1))(typescript@5.9.2)':
     dependencies:
@@ -11640,6 +11711,8 @@ snapshots:
       typescript: 5.9.2
     transitivePeerDependencies:
       - supports-color
+
+  typescript-event-target@1.1.2: {}
 
   typescript@5.9.2: {}
 

@@ -1,4 +1,6 @@
+import { RealtimeTranscriptionProvider } from '@speechmatics/real-time-client-react'
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { AudioProvider } from '@/features/interview/ai/AudioProvider'
 import { ChatContextProvider } from '@/features/interview/chat/ChatContextProvider'
 import { Room } from '@/features/interview/session/Room'
 
@@ -26,7 +28,11 @@ function RouteComponent() {
   return (
     <ChatContextProvider>
       {/* <CommandChannelContextProvider> */}
-      <Room />
+      <AudioProvider>
+        <RealtimeTranscriptionProvider>
+          <Room />
+        </RealtimeTranscriptionProvider>
+      </AudioProvider>
       {/* </CommandChannelContextProvider> */}
     </ChatContextProvider>
   )
