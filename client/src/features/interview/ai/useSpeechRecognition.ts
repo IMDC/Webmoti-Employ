@@ -1,13 +1,11 @@
 import type { StartRecordingOptions } from '@speechmatics/browser-audio-input-react'
-import type { RealtimeServerMessage, RealtimeTranscriptionConfig } from '@speechmatics/real-time-client-react'
+import type { RealtimeServerMessage } from '@speechmatics/real-time-client-react'
 import { usePCMAudioListener, usePCMAudioRecorderContext } from '@speechmatics/browser-audio-input-react'
 import { useRealtimeEventListener, useRealtimeTranscription } from '@speechmatics/real-time-client-react'
-import { SpeechmaticsResponse } from '@webmoti-employ/shared'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
-import { z } from 'zod'
-import { HttpError } from '@/utils/HttpError'
 import { logger } from '@/utils/logger'
-import { errorNotification, getLocalBearerToken, handleAppErrorWithNotification } from '@/utils/utils'
+import { errorNotification } from '@/utils/utils'
+import { getSpeechmaticsJWT, SPEECHMATICS_CONFIG } from './speechmatics-utils'
 
 interface Word {
   text: string
@@ -82,28 +80,7 @@ function transcriptReducer(state: State, action: Action): State {
   logger.info('[SpeechRecognition] Transcript update:', { transcript, finalTranscript })
   return { words: newWords, transcript, finalTranscript }
 }
-async function getSpeechmaticsJWT(): Promise<string | null> {
-  const endpoint = `${import.meta.env.VITE_API_BASE_URL}/speechmatics/token`
-  const authToken = getLocalBearerToken()
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${authToken}`,
-    },
-  })
-  const json = await response.json()
-  if (!response.ok) {
-    handleAppErrorWithNotification(new HttpError('Failed to get Speechmatics JWT', response.status, json))
-    return null
-  }
-  const result = SpeechmaticsResponse.safeParse(json)
-  if (!result.success) {
-    handleAppErrorWithNotification(new HttpError('Invalid response schema', 500, z.flattenError(result.error)))
-    return null
-  }
-  return result.data.key
-}
+
 export function useSpeechRecognition() {
   const { startRecording, stopRecording, audioContext } = usePCMAudioRecorderContext()
   const { startTranscription, stopTranscription, sendAudio, socketState } = useRealtimeTranscription()
@@ -139,20 +116,7 @@ export function useSpeechRecognition() {
       if (!jwt) {
         return
       }
-      await startTranscription(jwt, {
-        audio_format: {
-          type: 'raw',
-          encoding: 'pcm_f32le',
-          sample_rate: audioContext.sampleRate,
-        },
-        transcription_config: {
-          language: 'en',
-          operating_point: 'enhanced',
-          max_delay: 1,
-          transcript_filtering_config: { remove_disfluencies: false },
-          enable_partials: true,
-        },
-      } as RealtimeTranscriptionConfig)
+      await startTranscription(jwt, SPEECHMATICS_CONFIG)
       isTranscribingRef.current = true
       setTranscriptionStarted(true)
     }
