@@ -185,39 +185,6 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
 
             set({ stream, callState: 'joined', localUserId: client().getCurrentUserInfo().userId })
             updateParticipants()
-
-            if (granted && isVideoOn) {
-              try {
-                await stream.startVideo({ cameraId: selectedVideoDevice ?? undefined })
-                // Force immediate update
-                updateParticipants()
-                // Wait longer for Zoom to stabilize, then update again
-                setTimeout(() => {
-                  updateParticipants()
-                  const localId = get().localUserId
-                  if (localId) {
-                    const localParticipant = get().participants.get(localId)
-                    logger.log('After startVideo - bVideoOn:', localParticipant?.bVideoOn)
-                  }
-                }, 500)
-              }
-              catch {
-                set({ isVideoOn: false })
-              }
-            }
-
-            if (granted && isAudioOn) {
-              try {
-                await stream.startAudio({
-                  microphoneId: selectedAudioInputDevice ?? undefined,
-                  speakerId: selectedAudioOutputDevice ?? undefined,
-                })
-              }
-              catch (error) {
-                logger.error('Failed to start audio:', error)
-                set({ isAudioOn: false })
-              }
-            }
           }
           catch (error) {
             set({ callState: 'prejoin', stream: null })
@@ -234,19 +201,6 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           logger.log('Starting video...')
           await stream().startVideo()
           updateParticipants()
-
-          // Debug: Check if bVideoOn is updated after starting video
-          setTimeout(() => {
-            const localId = get().localUserId
-            if (localId) {
-              const localParticipant = get().participants.get(localId)
-              logger.log('After startVideo - local participant:', {
-                userId: localId,
-                bVideoOn: localParticipant?.bVideoOn,
-                isVideoOn: get().isVideoOn,
-              })
-            }
-          }, 500)
         },
         stopVideo: async () => {
           logger.log('Stopping video...')
@@ -389,23 +343,8 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       return
     }
 
-    const currentParticipants = zoomSessionStore.getState().participants
-    const allUsers = client.getAllUser()
-
-    const newParticipants = new Map(
-      allUsers.map((user) => {
-        const existingUser = currentParticipants.get(user.userId)
-        // Preserve bVideoOn if the new value is undefined but we had a previous value
-        if (existingUser && user.bVideoOn === undefined && existingUser.bVideoOn !== undefined) {
-          logger.log(`Preserving bVideoOn for user ${user.userId}: ${existingUser.bVideoOn}`)
-          return [user.userId, { ...user, bVideoOn: existingUser.bVideoOn }]
-        }
-        return [user.userId, user]
-      }),
-    )
-
     zoomSessionStore.setState({
-      participants: newParticipants,
+      participants: new Map(client.getAllUser().map(user => [user.userId, user])),
     })
   }
 
@@ -506,7 +445,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
 
   function handleUserUpdated(payload: Participant[]) {
     payload.forEach((user) => {
-      logger.log(`User ${user.userId} updated: bVideoOn=${user.bVideoOn}`)
+      logger.log(`User ${user.userId} was updated`)
     })
     updateParticipants()
   }
@@ -514,7 +453,6 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
   function handlePeerVideoStateChange(payload: Parameters<typeof event_peer_video_state_change>[0]) {
     const { userId, action } = payload
     logger.log(`Video state change for user ${userId}: ${action}`)
-    updateParticipants()
 
     const { stream, actions } = zoomSessionStore.getState()
     if (!stream)

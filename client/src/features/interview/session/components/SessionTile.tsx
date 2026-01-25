@@ -54,9 +54,6 @@ export function SessionTile({
 
   const networkLevel = useParticipantNetworkLevel(participant.userId)
 
-  // Debug logging
-  // Removed logging to reduce console spam
-
   return (
     <ParticipantTile
       height={height}

@@ -18,22 +18,6 @@ import {
   isMac,
 } from './utils'
 
-async function waitForUrl(url: string, timeoutMs = 15000) {
-  const start = Date.now()
-  // Node 22 has global fetch
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(url, { method: 'GET' })
-      if (res.ok)
-        return
-    }
-    catch {
-      // ignore and retry
-    }
-    await new Promise(resolve => setTimeout(resolve, 250))
-  }
-}
-
 const PROTOCOL_SCHEME = 'webmoti-employ'
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
@@ -131,25 +115,10 @@ async function createWindow() {
   // start maximized. this also makes the window show
   mainWindow.maximize()
 
-  // Google OAuth may block embedded browsers based on the Electron user-agent.
-  // Remove the Electron token so Google treats this like a normal Chromium browser.
-  const defaultUA = mainWindow.webContents.getUserAgent()
-  const chromeLikeUA = defaultUA.replace(/\sElectron\/\S+/g, '')
-  mainWindow.webContents.setUserAgent(chromeLikeUA)
-
-  // Show the window when the page is ready to avoid white screen
-  mainWindow.once('ready-to-show', () => {
-    mainWindow!.show()
-  })
-
   if (isDev) {
     mainWindow.setIcon(getAppIconPath())
     const url = `http://${getLocalDomain()}/`
-    // When running `pnpm run dev:electron`, Vite and Electron start in parallel.
-    // If Electron loads before Vite is listening, it can get stuck on a white screen.
-    await waitForUrl(url)
     await mainWindow.loadURL(url)
-    mainWindow.webContents.openDevTools()
   }
   else {
     await mainWindow.loadURL(HOSTED_URL)
