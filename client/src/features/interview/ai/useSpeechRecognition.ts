@@ -60,12 +60,9 @@ function transcriptReducer(state: State, action: Action): State {
     case 'Error':
       logger.error(`[SpeechRecognition] Error: ${action.type} - ${action.reason}`)
       errorNotification('Speechmatics error', action.reason || 'Unknown error')
-      // Optionally stop transcription here if needed
       return state
     case 'EndOfTranscript':
-      logger.info('[SpeechRecognition] End of transcript')
       return state
-    // Add other cases if needed, e.g., 'RecognitionStarted', 'Info', etc.
     default:
       return state
   }
@@ -74,13 +71,10 @@ function transcriptReducer(state: State, action: Action): State {
   const finalTranscript = buildTextFromWords(finalWords)
   // Skip if finalTranscript is just punctuation (e.g., '.')
   if (finalTranscript && /^[\p{P}\p{S}\s]*$/u.test(finalTranscript)) {
-    logger.info('[SpeechRecognition] Skipping punctuation-only final transcript:', finalTranscript)
     return { ...state, words: newWords, transcript } // Update transcript but not final
   }
-  logger.info('[SpeechRecognition] Transcript update:', { transcript, finalTranscript })
   return { words: newWords, transcript, finalTranscript }
 }
-
 export function useSpeechRecognition() {
   const { startRecording, stopRecording, audioContext } = usePCMAudioRecorderContext()
   const { startTranscription, stopTranscription, sendAudio, socketState } = useRealtimeTranscription()
@@ -89,12 +83,29 @@ export function useSpeechRecognition() {
   const [isMicrophoneAvailable, setIsMicrophoneAvailable] = useState(true)
   const [hasNotifiedUser, setHasNotifiedUser] = useState(false)
   const [transcriptionStarted, setTranscriptionStarted] = useState(false)
+  const [recognitionReady, setRecognitionReady] = useState(false)
   const isTranscribingRef = useRef(false)
   const isRecordingRef = useRef(false)
-
-  useRealtimeEventListener('receiveMessage', e => dispatch(e.data))
-  usePCMAudioListener(sendAudio)
-
+  useRealtimeEventListener('receiveMessage', (e) => {
+    dispatch(e.data)
+    if (e.data.message === 'RecognitionStarted') {
+      setRecognitionReady(true)
+    }
+  })
+  const onAudio = useCallback((audio: Float32Array) => {
+    try {
+      sendAudio(audio)
+    }
+    catch (err: any) {
+      if (err.message?.includes('Socket not ready to receive audio')) {
+        // Silently drop the chunk since we're just starting up
+      }
+      else {
+        throw err
+      }
+    }
+  }, [sendAudio])
+  usePCMAudioListener(onAudio)
   const startListening = useCallback(async () => {
     try {
       if (!audioContext) {
@@ -122,7 +133,6 @@ export function useSpeechRecognition() {
     }
     catch (err: any) {
       if (err.message?.includes('Still in CONNECTING state')) {
-        logger.warn('[SpeechRecognition] Ignored transient WebSocket connecting error:', err.message)
         // Proceed assuming connection will establish; do not notify or disable
         isTranscribingRef.current = true
         setTranscriptionStarted(true)
@@ -137,9 +147,8 @@ export function useSpeechRecognition() {
       }
     }
   }, [audioContext, startTranscription, hasNotifiedUser])
-
   useEffect(() => {
-    if (transcriptionStarted && socketState === 'open' && !listening) {
+    if (transcriptionStarted && recognitionReady && socketState === 'open' && !listening) {
       const startRec = async () => {
         try {
           if (!audioContext || audioContext.state === 'closed') {
@@ -162,8 +171,7 @@ export function useSpeechRecognition() {
       }
       startRec()
     }
-  }, [transcriptionStarted, socketState, listening, startRecording, audioContext, hasNotifiedUser])
-
+  }, [transcriptionStarted, recognitionReady, socketState, listening, startRecording, audioContext, hasNotifiedUser])
   const abortListening = useCallback(() => {
     if (isRecordingRef.current) {
       stopRecording()
@@ -175,18 +183,16 @@ export function useSpeechRecognition() {
     }
     setListening(false)
     setTranscriptionStarted(false)
+    setRecognitionReady(false)
   }, [stopRecording, stopTranscription])
-
   const resetTranscript = useCallback(() => {
     dispatch({ type: 'reset' })
   }, [])
-
   useEffect(() => {
     return () => {
       abortListening()
     }
   }, [abortListening])
-
   return {
     transcript: state.transcript,
     finalTranscript: state.finalTranscript,
