@@ -31,26 +31,33 @@ WebMoti-Employ is an app that uses eyetracking to deliver real-time feedback dur
 
 ## Stack
 
-- PNPM - package manager
+- PNPM - Package manager
 - TypeScript
-- Zod - validation
-- Eslint – formatting and linting (@antfu/eslint-config)
+- Zod - Validation
+- ESLint - Formatting and linting (@antfu/eslint-config)
+- Vitest - Unit testing
 
 Client:
 
 - React
 - Vite
 - Mantine - UI components
-- Tanstack router - routing
-- Tanstack query - server state
-- Zustand - client state
-- Better-Auth
+- Tanstack Router - Routing
+- Tanstack Query - Server state
+- Zustand - Client state
+- Better-Auth - Authentication
 - Zoom Video
+- Speechmatics - Transcription
+- Mediapipe - Face detection
+- Playwright - E2E testing
 
 Server:
 
 - Hono
 - Kysely - SQL query builder
+- Groq - AI analysis
+- Cloudflare Durable Objects - Stateful websockets
+- Cloudflare Hyperdrive
 
 Desktop App:
 
@@ -58,13 +65,13 @@ Desktop App:
 - Electron-Builder
 - Python
 - Socket.IO
-- Tobii Pro SDK (Eyetracking)
+- Tobii Pro SDK - Eye tracking
 
 Hosting:
 
-- Neon - database
-- Cloudflare workers - server hosting
-- Vercel - client hosting
+- Neon - Postgres database
+- Cloudflare Workers - Serverless backend
+- Vercel - Client hosting
 
 ## Setup
 
