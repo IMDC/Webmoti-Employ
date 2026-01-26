@@ -33,7 +33,7 @@ export interface ZoomSessionActions {
   toggleBlurPrejoin: () => void
   switchCamera: (deviceId: string) => Promise<void>
 
-  attachVideoPlayer: (userId: number, element: VideoPlayer) => Promise<VideoPlayer>
+  attachVideoPlayer: (userId: number, element: VideoPlayer) => Promise<void>
   detachVideoPlayer: (userId: number) => Promise<void>
 
   startAudio: () => Promise<void>
@@ -245,17 +245,12 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           }
         },
         attachVideoPlayer: async (userId: number, element: VideoPlayer) => {
-        // need to detach first to ensure it works properly (this matters in strict mode)
-          await stream().detachVideo(userId)
-
           logger.log('Attaching video player...')
-          const player = await stream().attachVideo(userId, VideoQuality.Video_720P, element)
+          const result = await stream().attachVideo(userId, VideoQuality.Video_720P, element)
 
-          if (isExecutedFailure(player)) {
+          if (isExecutedFailure(result)) {
             throw new Error('Failed to attach video player')
           }
-
-          return player
         },
         detachVideoPlayer: async (userId: number) => {
           logger.log('Detaching video player...')

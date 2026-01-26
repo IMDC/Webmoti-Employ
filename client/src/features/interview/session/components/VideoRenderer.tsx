@@ -5,8 +5,8 @@ import { isElectron } from '@/utils/utils'
 import { FaceBlurOverlay } from './FaceBlurOverlay'
 
 interface VideoRendererProps {
-  attach: (el: VideoPlayer) => Promise<VideoPlayer | void>
-  detach: () => void
+  attach: (el: VideoPlayer) => Promise<void>
+  detach: () => Promise<void>
   setHostVideo?: Dispatch<SetStateAction<HTMLVideoElement | null>>
   userId?: number
   faceDetectionResult?: InterviewerCoordinates | null
@@ -34,17 +34,19 @@ export function VideoRenderer({
       return
     }
 
+    let cancelled = false
+
     const setup = async () => {
       // attach video from zoom
-      const result = await attach(el)
+      await attach(el)
 
-      if (!isHost) {
+      if (cancelled || !isHost) {
         return
       }
-      const player = result ?? el
-      const videoElement = player.querySelector('video')
+
+      // the host video will be used higher in the tree for face detection
+      const videoElement = el.querySelector('video')
       if (videoElement) {
-        // the host video will be used higher in the tree for face detection
         setHostVideo(videoElement)
       }
     }
@@ -52,6 +54,7 @@ export function VideoRenderer({
     setup()
 
     return () => {
+      cancelled = true
       detach()
       if (isHost) {
         setHostVideo?.(null)
