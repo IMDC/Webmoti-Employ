@@ -101,7 +101,7 @@ ASYNC_LOOP: asyncio.AbstractEventLoop | None = None
 
 # latest gaze sample storage (set from Tobii callback, consumed by publisher loop)
 _LATEST_GAZE_ARGS: GazeSample | None = None
-_LAST_SENT_STATE: tuple[bool, bool] | None = None  # (looking_at_interviewer, fixation)
+_LAST_SENT_STATE: bool | None = None
 _LOOK_HISTORY: deque[bool] = deque(maxlen=int(GAZE_RATIO_WINDOW_S * PUBLISH_HZ))
 _LAST_RATIO_EMIT = 0.0
 _LAST_RATIO: float | None = None
@@ -197,7 +197,6 @@ async def handle_gaze_data(sample: GazeSample) -> None:
     #     logger.warning("No bounding box found")
 
     movement_type = classify_eye_movement((gaze_x_avg, gaze_y_avg), sample["timestamp"])
-    # Smooth fixation signal to reduce rapid flipping
     fixation_history.append(movement_type == "Fixation")
     fixation_active = sum(1 for v in fixation_history if v) >= max(
         1,
@@ -209,15 +208,13 @@ async def handle_gaze_data(sample: GazeSample) -> None:
         {
             "feedbackType": "lookingAtInterviewer",
             "isActive": looking_at_interviewer,
-        },
-        {"feedbackType": "fixation", "isActive": fixation_active},
+        }
     ]
 
     # Deduplicate: only emit on change to reduce traffic
     global _LAST_SENT_STATE  # noqa: PLW0603
-    current_state = (looking_at_interviewer, fixation_active)
-    if current_state != _LAST_SENT_STATE:
-        _LAST_SENT_STATE = current_state
+    if looking_at_interviewer != _LAST_SENT_STATE:
+        _LAST_SENT_STATE = looking_at_interviewer
         await sio.emit("feedback", feedback)
         logger.info(f"Sent feedback: {feedback}")
 

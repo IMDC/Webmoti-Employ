@@ -88,12 +88,29 @@ export class FaceDetectorRunner {
     })
 
     const screenBox = faceBox
-      ? {
-          x: rectLeftScreen + faceBox.originX * scaleX,
-          y: rectTopScreen + faceBox.originY * scaleY,
-          width: faceBox.width * scaleX,
-          height: faceBox.height * scaleY,
-        }
+      ? (() => {
+          const rawX = rectLeftScreen + faceBox.originX * scaleX
+          const rawY = rectTopScreen + faceBox.originY * scaleY
+          const rawW = faceBox.width * scaleX
+          const rawH = faceBox.height * scaleY
+
+          const heightScale = 1.4
+          const extraH = rawH * (heightScale - 1)
+          const expandedY = rawY - extraH / 2
+          const expandedH = rawH + extraH
+
+          const widthScale = 1.2
+          const extraW = rawW * (widthScale - 1)
+          const expandedX = rawX - extraW / 2
+          const expandedW = rawW + extraW
+
+          return {
+            x: expandedX,
+            y: expandedY,
+            width: expandedW,
+            height: expandedH,
+          }
+        })()
       : toScreenBox()
 
     // Normalize to screen [0,1] coordinates to match Tobii on_display_area
