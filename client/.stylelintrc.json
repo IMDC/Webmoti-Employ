@@ -6,6 +6,12 @@
     "declaration-empty-line-before": null,
     "property-no-vendor-prefix": null,
     "no-descending-specificity": null,
-    "comment-empty-line-before": null
+    "comment-empty-line-before": null,
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": ["mixin"]
+      }
+    ]
   }
 }
