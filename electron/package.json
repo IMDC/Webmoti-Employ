@@ -25,11 +25,7 @@
     "zod": "^4.1.8"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^5.2.1",
     "electron": "39.0.0",
-    "electron-builder": "^26.0.12",
-    "eslint": "^9.35.0",
-    "rimraf": "^6.0.1",
-    "typescript": "~5.9.2"
+    "electron-builder": "^26.0.12"
   }
 }

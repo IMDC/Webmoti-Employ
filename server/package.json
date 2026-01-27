@@ -36,11 +36,9 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^5.2.1",
     "@cloudflare/vitest-pool-workers": "^0.9.2",
     "@types/pg": "^8.15.5",
     "dotenv": "^17.2.2",
-    "eslint": "^9.35.0",
     "globals": "^16.4.0",
     "kysely-codegen": "^0.19.0",
     "kysely-ctl": "^0.19.0",
