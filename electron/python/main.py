@@ -198,10 +198,6 @@ async def handle_gaze_data(sample: GazeSample) -> None:
 
     movement_type = classify_eye_movement((gaze_x_avg, gaze_y_avg), sample["timestamp"])
     fixation_history.append(movement_type == "Fixation")
-    fixation_active = sum(1 for v in fixation_history if v) >= max(
-        1,
-        int(FIXATION_THRESHOLD_RATIO * len(fixation_history)),
-    )
 
     # see shared/src/electron.d.ts and electron/src/main.ts for feedback structure
     feedback = [
