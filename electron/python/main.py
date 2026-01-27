@@ -204,7 +204,7 @@ async def handle_gaze_data(sample: GazeSample) -> None:
         {
             "feedbackType": "lookingAtInterviewer",
             "isActive": looking_at_interviewer,
-        }
+        },
     ]
 
     # Deduplicate: only emit on change to reduce traffic
