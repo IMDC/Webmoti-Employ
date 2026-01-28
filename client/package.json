@@ -13,7 +13,7 @@
     "build:deploy": "pnpm -r --filter @webmoti-employ/shared --filter @webmoti-employ/client build",
     "lint": "eslint . && pnpm run stylelint",
     "lint:fix": "eslint . --fix",
-    "stylelint": "stylelint **/*.css",
+    "stylelint": "stylelint \"**/*.css\"",
     "vitest:watch": "vitest",
     "test": "vitest run --passWithNoTests",
     "test:e2e": "playwright test"

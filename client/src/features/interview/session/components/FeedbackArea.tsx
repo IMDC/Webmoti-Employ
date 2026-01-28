@@ -88,7 +88,7 @@ export function FeedbackArea({ notification, onLookingChange }: FeedbackAreaProp
         graceTimerRef.current = null
       }
     }
-  }, [looking])
+  }, [looking, onLookingChange])
 
   return (
     <Center h="100%">
