@@ -1,7 +1,9 @@
 # this 3 day minimum is to avoid supply chain attacks
 minimumReleaseAge: 4320
 
-shellEmulator: true
+# shellEmulator makes Ctrl C not work on Windows
+# eslint-disable-next-line pnpm/yaml-enforce-settings
+shellEmulator: false
 
 trustPolicy: no-downgrade
 
