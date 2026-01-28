@@ -87,17 +87,24 @@ Hosting:
     npm install -g pnpm
     ```
 
-5. Install dependencies
+5. (optional) Update pnpm
+
+    ```bash
+    # run this when you want to update pnpm to the latest version
+    pnpm self-update
+    ```
+
+6. Install dependencies
 
     ```bash
     pnpm install
     ```
 
-6. Setup ESLint
+7. Setup ESLint
 
     This project uses ESLint to have better code quality and prevent bugs. This should be configured depending on your IDE so you can see issues as you write code. If you use VSCode, follow [these steps](#vscode-auto-formatting-code) to set it up.
 
-7. Run the project locally
+8. Run the project locally
 
     ```bash
     # this will run both the client and server in parallel
