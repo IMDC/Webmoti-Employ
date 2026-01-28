@@ -18,6 +18,7 @@ overrides:
   # pg-connection-string v2.10.0 introduces a bug with vitest-pool-workers
   pg-connection-string: 2.9.1
   vitest: 3.2.4
+
 catalog:
   better-auth: 1.4.17
   zod: 4.3.6
