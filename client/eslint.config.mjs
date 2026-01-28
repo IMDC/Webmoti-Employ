@@ -4,6 +4,7 @@ export default antfu({
   react: true,
   typescript: true,
   markdown: true,
+  pnpm: true,
   formatters: {
     css: true,
     html: true,
@@ -13,5 +14,6 @@ export default antfu({
   ],
   rules: {
     'react-hooks-extra/no-direct-set-state-in-use-effect': 'off',
+    'pnpm/json-enforce-catalog': 'off',
   },
 })
