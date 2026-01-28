@@ -1,7 +1,7 @@
 {
   "name": "@webmoti-employ/electron",
   "productName": "WebMoti-Employ",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "WebMoti-Employ desktop app",
   "author": "IMDC",
   "main": "dist/main.js",
