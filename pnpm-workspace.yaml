@@ -5,8 +5,10 @@ packages:
   - electron
 
 catalog:
-  better-auth: 1.4.5
-  zod: 4.1.8
+  better-auth: 1.4.17
+  zod: 4.3.6
+
+minimumReleaseAge: 4320
 
 onlyBuiltDependencies:
   - electron
@@ -14,6 +16,3 @@ onlyBuiltDependencies:
   - esbuild
   - sharp
   - workerd
-
-# 3 day delay (avoid supply chain attack)
-minimumReleaseAge: 4320
