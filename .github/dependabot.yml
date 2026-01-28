@@ -17,7 +17,7 @@ updates:
           - '@eslint-react/eslint-plugin'
           - 'eslint-plugin*'
         update-types:
-          - version-update:semver-minor
+          - minor
 
       patch:
         applies-to: version-updates
@@ -28,7 +28,7 @@ updates:
           - '@eslint-react/eslint-plugin'
           - 'eslint-plugin*'
         update-types:
-          - version-update:semver-patch
+          - patch
 
       eslint:
         applies-to: version-updates
@@ -37,8 +37,8 @@ updates:
           - '@eslint-react/eslint-plugin'
           - 'eslint-plugin*'
         update-types:
-          - version-update:semver-minor
-          - version-update:semver-patch
+          - minor
+          - patch
 
   - package-ecosystem: uv
     directory: /electron/python/
@@ -48,7 +48,7 @@ updates:
       default-days: 30
     ignore:
       - dependency-name: '*'
-        update-types: ['version-update:semver-minor', 'version-update:semver-patch']
+        update-types: [minor, patch]
 
   - package-ecosystem: github-actions
     directory: /
