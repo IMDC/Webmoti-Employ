@@ -48,7 +48,7 @@ updates:
       default-days: 30
     ignore:
       - dependency-name: '*'
-        update-types: [minor, patch]
+        update-types: ['version-update:semver-minor', 'version-update:semver-patch']
 
   - package-ecosystem: github-actions
     directory: /
