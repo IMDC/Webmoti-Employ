@@ -4,16 +4,16 @@ import { useMediaQuery } from '@mantine/hooks'
 import {
   IconBubbleTextFilled,
   IconClockHour4Filled,
-  IconEyeCheck,
   IconHelpHexagonFilled,
   IconHourglassFilled,
+  IconMoodSad,
+  IconMoodSmileBeam,
 } from '@tabler/icons-react'
 import { useEffect, useRef, useState } from 'react'
 import { logger } from '@/utils/logger'
 import { useCountdown } from '../hooks/useCountdown'
 import { useCountup } from '../hooks/useCountup'
 import { useFeedback } from '../hooks/useFeedback'
-import { useGazeStats } from '../hooks/useGazeStats'
 
 interface FeedbackAreaProps {
   notification: NotificationMessage
@@ -30,11 +30,8 @@ export function FeedbackArea({ notification, onLookingChange }: FeedbackAreaProp
   const { hint, timer, fillerCount, newTopic, countUp } = notification
 
   const looking = feedback.find(f => f.feedbackType === 'lookingAtInterviewer')?.isActive
-  const [showLookPrompt, setShowLookPrompt] = useState(false)
-  const fixation = feedback.find(f => f.feedbackType === 'fixation')?.isActive
-  const notLookingTimerRef = useRef<number | null>(null)
-  const NOT_LOOKING_DELAY_MS = 1200
-  const gazeStats = useGazeStats()
+  const [emoticonPositive, setEmoticonPositive] = useState<boolean | null>(null)
+  const graceTimerRef = useRef<number | null>(null)
 
   const { countdownSeconds, startCountdown, stopCountdown } = useCountdown()
   const { countupSeconds, startCountup, stopCountup } = useCountup()
@@ -68,49 +65,43 @@ export function FeedbackArea({ notification, onLookingChange }: FeedbackAreaProp
   }, [newTopic, countUp, stopCountup])
 
   useEffect(() => {
-    if (notLookingTimerRef.current) {
-      clearTimeout(notLookingTimerRef.current)
-      notLookingTimerRef.current = null
+    if (graceTimerRef.current) {
+      clearTimeout(graceTimerRef.current)
+      graceTimerRef.current = null
     }
-    if (looking || !fixation) {
-      setShowLookPrompt(false)
-      onLookingChange?.(true) // inform parent
+    if (looking == null) {
       return
     }
-    notLookingTimerRef.current = window.setTimeout(() => {
-      setShowLookPrompt(true)
-
-      onLookingChange?.(false) // inform parent
-    }, NOT_LOOKING_DELAY_MS)
+    if (looking) {
+      setEmoticonPositive(true)
+      onLookingChange?.(true)
+      return
+    }
+    graceTimerRef.current = window.setTimeout(() => {
+      setEmoticonPositive(false)
+      onLookingChange?.(false)
+    }, 2000)
 
     return () => {
-      if (notLookingTimerRef.current) {
-        clearTimeout(notLookingTimerRef.current)
-        notLookingTimerRef.current = null
+      if (graceTimerRef.current) {
+        clearTimeout(graceTimerRef.current)
+        graceTimerRef.current = null
       }
     }
-  }, [looking, fixation, onLookingChange])
+  }, [looking, onLookingChange])
 
   return (
     <Center h="100%">
       <Group gap={70}>
-        {gazeStats && (
-          <Stack align="center" gap={0}>
-            <Text size="xs" fw={500}>
-              {Math.round(gazeStats.gazeOnInterviewerRatio * 100)}
-              % on interviewer
-            </Text>
-            <Text size="xs" c="dimmed">
-              last
-              {gazeStats.windowSeconds}
-              s
-            </Text>
-          </Stack>
-        )}
         <FeedbackIcon
-          icon={<IconEyeCheck size={iconSize} />}
+          icon={<IconMoodSmileBeam size={iconSize} />}
+          label="Eye Contact"
+          isActive={emoticonPositive === true}
+        />
+        <FeedbackIcon
+          icon={<IconMoodSad size={iconSize} />}
           label="Look at Interviewer"
-          isActive={showLookPrompt}
+          isActive={emoticonPositive === false}
         />
         <FeedbackIcon
           icon={<IconHourglassFilled size={iconSize} />}

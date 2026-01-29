@@ -192,7 +192,7 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
             </Text>
           )}
           <Button
-            onClick={() => form.insertListItem('invites', { email: '' })}
+            onClick={() => form.insertListItem('invites', { email: '', isInterviewer: false })}
             leftSection={<IconMailFast />}
           >
             Add invitation

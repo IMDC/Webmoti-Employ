@@ -3,19 +3,42 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: monthly
+      interval: weekly
     cooldown:
-      default-days: 30
-      semver-major-days: 30
-    ignore:
-      - dependency-name: '*'
-        update-types: ['version-update:semver-minor', 'version-update:semver-patch']
+      default-days: 14
+
     groups:
-      eslint-config:
+      minor:
+        applies-to: version-updates
+        patterns:
+          - '*'
+        exclude-patterns:
+          - '@antfu/eslint-config'
+          - '@eslint-react/eslint-plugin'
+          - 'eslint-plugin*'
+        update-types:
+          - minor
+
+      patch:
+        applies-to: version-updates
+        patterns:
+          - '*'
+        exclude-patterns:
+          - '@antfu/eslint-config'
+          - '@eslint-react/eslint-plugin'
+          - 'eslint-plugin*'
+        update-types:
+          - patch
+
+      eslint:
+        applies-to: version-updates
         patterns:
           - '@antfu/eslint-config'
           - '@eslint-react/eslint-plugin'
           - 'eslint-plugin*'
+        update-types:
+          - minor
+          - patch
 
   - package-ecosystem: uv
     directory: /electron/python/
@@ -23,7 +46,6 @@ updates:
       interval: monthly
     cooldown:
       default-days: 30
-      semver-major-days: 30
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-minor', 'version-update:semver-patch']

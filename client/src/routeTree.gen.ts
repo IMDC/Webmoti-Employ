@@ -83,10 +83,10 @@ const authenticatedInterviewPrejoinIdRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof authenticatedIndexRoute
   '/sign-in': typeof SignInRoute
   '/interview': typeof authenticatedInterviewRouteRouteWithChildren
   '/auth/electron': typeof AuthElectronRoute
+  '/': typeof authenticatedIndexRoute
   '/interview/prejoin': typeof authenticatedInterviewPrejoinRouteRouteWithChildren
   '/end/$id': typeof authenticatedEndIdRoute
   '/interview/$id': typeof authenticatedInterviewIdRoute
@@ -121,10 +121,10 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
     | '/sign-in'
     | '/interview'
     | '/auth/electron'
+    | '/'
     | '/interview/prejoin'
     | '/end/$id'
     | '/interview/$id'
@@ -173,8 +173,8 @@ declare module '@tanstack/react-router' {
     }
     '/(authenticated)': {
       id: '/(authenticated)'
-      path: '/'
-      fullPath: '/'
+      path: ''
+      fullPath: ''
       preLoaderRoute: typeof authenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }

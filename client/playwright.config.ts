@@ -75,7 +75,7 @@ export default defineConfig({
   webServer: process.env.CI
     ? {
         // run built app in ci
-        command: 'pnpm --filter @webmoti-employ/client run serve',
+        command: 'pnpm --filter @webmoti-employ/client run playwright-serve',
         url: 'http://localhost:4173',
         reuseExistingServer: true,
       }

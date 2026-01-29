@@ -12,10 +12,5 @@
   },
   "dependencies": {
     "zod": "catalog:"
-  },
-  "devDependencies": {
-    "@antfu/eslint-config": "^5.2.1",
-    "eslint": "^9.35.0",
-    "typescript": "^5.9.2"
   }
 }
