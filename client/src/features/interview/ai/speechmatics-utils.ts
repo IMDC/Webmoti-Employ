@@ -16,10 +16,19 @@ export const SPEECHMATICS_CONFIG: RealtimeTranscriptionConfig = {
   },
   transcription_config: {
     language: 'en',
-    operating_point: 'enhanced',
-    max_delay: 1,
-    transcript_filtering_config: { remove_disfluencies: false },
-    enable_partials: true,
+    operating_point: 'enhanced', // prioritize accuracy over speed
+    max_delay: 0.7,
+    max_delay_mode: 'flexible',
+    transcript_filtering_config: {
+      // keep filler words in the transcript
+      remove_disfluencies: false,
+    },
+    // we don't need partials since we're buffering anyways (avoid spamming the ai with words)
+    enable_partials: false,
+    conversation_config: {
+      // the amount of silence before we send all words in the buffer
+      end_of_utterance_silence_trigger: 0.5,
+    },
   },
 }
 

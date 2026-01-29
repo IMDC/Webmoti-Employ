@@ -14,45 +14,56 @@ interface Word {
   punctuation: boolean
   partial?: boolean
 }
+
 interface State {
   words: readonly Word[]
+  finalWords: readonly Word[] // Cumulative finalized utterances
+  pendingUtteranceWords: readonly Word[] // Finals for current utterance
   transcript: string
   finalTranscript: string
 }
+
 type Action = RealtimeServerMessage | { type: 'reset' }
+
 const initialState: State = {
   words: [],
+  finalWords: [],
+  pendingUtteranceWords: [],
   transcript: '',
   finalTranscript: '',
 }
+
 function transcriptReducer(state: State, action: Action): State {
   if ('type' in action && action.type === 'reset') {
     return initialState
   }
   let newWords: readonly Word[] = state.words
+  let newFinalWords: readonly Word[] = state.finalWords
+  let newPendingUtteranceWords: readonly Word[] = state.pendingUtteranceWords
+  let newFinalTranscript = state.finalTranscript
   switch (action.message) {
     case 'AddTranscript':
-      newWords = [
-        ...state.words.filter(w => !w.partial),
+      newPendingUtteranceWords = [
+        ...state.pendingUtteranceWords,
         ...action.results.map(result => ({
           text: result.alternatives?.[0].content ?? '',
           startTime: result.start_time ?? 0,
           endTime: result.end_time ?? 0,
           punctuation: result.type === 'punctuation',
+          partial: false,
         })),
+      ]
+      newWords = [
+        ...state.finalWords,
+        ...newPendingUtteranceWords,
       ]
       break
-    case 'AddPartialTranscript':
-      newWords = [
-        ...state.words.filter(w => !w.partial),
-        ...action.results.map(result => ({
-          text: result.alternatives?.[0].content ?? '',
-          startTime: result.start_time ?? 0,
-          endTime: result.end_time ?? 0,
-          punctuation: result.type === 'punctuation',
-          partial: true,
-        })),
-      ]
+    case 'EndOfUtterance':
+      // Append pending to finals and update finalTranscript
+      newFinalWords = [...state.finalWords, ...state.pendingUtteranceWords]
+      newFinalTranscript = buildTextFromWords(newFinalWords)
+      newPendingUtteranceWords = []
+      newWords = [...newFinalWords]
       break
     case 'Warning':
       logger.warn(`[SpeechRecognition] Warning: ${action.type} - ${action.reason}`)
@@ -62,19 +73,23 @@ function transcriptReducer(state: State, action: Action): State {
       errorNotification('Speechmatics error', action.reason || 'Unknown error')
       return state
     case 'EndOfTranscript':
-      return state
+      // Finalize any remaining pending at session end
+      newFinalWords = [...state.finalWords, ...state.pendingUtteranceWords]
+      newFinalTranscript = buildTextFromWords(newFinalWords)
+      newPendingUtteranceWords = []
+      newWords = [...newFinalWords]
+      break
     default:
       return state
   }
   const transcript = buildTextFromWords(newWords)
-  const finalWords = newWords.filter(w => !w.partial)
-  const finalTranscript = buildTextFromWords(finalWords)
   // Skip if finalTranscript is just punctuation (e.g., '.')
-  if (finalTranscript && /^[\p{P}\p{S}\s]*$/u.test(finalTranscript)) {
-    return { ...state, words: newWords, transcript } // Update transcript but not final
+  if (newFinalTranscript && /^[\p{P}\p{S}\s]*$/u.test(newFinalTranscript)) {
+    return { ...state, words: newWords, finalWords: newFinalWords, pendingUtteranceWords: newPendingUtteranceWords, transcript } // Update transcript but not final
   }
-  return { words: newWords, transcript, finalTranscript }
+  return { words: newWords, finalWords: newFinalWords, pendingUtteranceWords: newPendingUtteranceWords, transcript, finalTranscript: newFinalTranscript }
 }
+
 export function useSpeechRecognition() {
   const { startRecording, stopRecording, audioContext } = usePCMAudioRecorderContext()
   const { startTranscription, stopTranscription, sendAudio, socketState } = useRealtimeTranscription()
@@ -86,12 +101,14 @@ export function useSpeechRecognition() {
   const [recognitionReady, setRecognitionReady] = useState(false)
   const isTranscribingRef = useRef(false)
   const isRecordingRef = useRef(false)
+
   useRealtimeEventListener('receiveMessage', (e) => {
     dispatch(e.data)
     if (e.data.message === 'RecognitionStarted') {
       setRecognitionReady(true)
     }
   })
+
   const onAudio = useCallback((audio: Float32Array) => {
     try {
       sendAudio(audio)
@@ -105,7 +122,9 @@ export function useSpeechRecognition() {
       }
     }
   }, [sendAudio])
+
   usePCMAudioListener(onAudio)
+
   const startListening = useCallback(async () => {
     try {
       if (!audioContext) {
@@ -147,6 +166,7 @@ export function useSpeechRecognition() {
       }
     }
   }, [audioContext, startTranscription, hasNotifiedUser])
+
   useEffect(() => {
     if (transcriptionStarted && recognitionReady && socketState === 'open' && !listening) {
       const startRec = async () => {
@@ -172,6 +192,7 @@ export function useSpeechRecognition() {
       startRec()
     }
   }, [transcriptionStarted, recognitionReady, socketState, listening, startRecording, audioContext, hasNotifiedUser])
+
   const abortListening = useCallback(() => {
     if (isRecordingRef.current) {
       stopRecording()
@@ -185,14 +206,17 @@ export function useSpeechRecognition() {
     setTranscriptionStarted(false)
     setRecognitionReady(false)
   }, [stopRecording, stopTranscription])
+
   const resetTranscript = useCallback(() => {
     dispatch({ type: 'reset' })
   }, [])
+
   useEffect(() => {
     return () => {
       abortListening()
     }
   }, [abortListening])
+
   return {
     transcript: state.transcript,
     finalTranscript: state.finalTranscript,
@@ -203,6 +227,7 @@ export function useSpeechRecognition() {
     resetTranscript,
   }
 }
+
 function buildTextFromWords(words: readonly Word[]): string {
   return words
     .map(({ text, punctuation }) => (!punctuation ? ` ${text}` : text))
