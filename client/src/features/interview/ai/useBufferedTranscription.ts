@@ -5,7 +5,7 @@ import { errorNotification } from '@/utils/utils'
 import { useIsAudioOn } from '../zoom/useZoomSessionStore'
 import { useSpeechRecognition } from './useSpeechRecognition'
 
-export function useTranscription(
+export function useBufferedTranscription(
   maxWordsBuffer: number,
   sendTranscript: (transcript: TranscriptMessage) => void,
 ) {
