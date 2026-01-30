@@ -16,8 +16,8 @@ export const SPEECHMATICS_CONFIG: RealtimeTranscriptionConfig = {
   },
   transcription_config: {
     language: 'en',
-    operating_point: 'enhanced', // prioritize accuracy over speed
-    max_delay: 0.7,
+    operating_point: 'enhanced', // more accurate but slower than standard mode
+    max_delay: 0.7, // this is the lowest allowed value for delay
     max_delay_mode: 'flexible',
     transcript_filtering_config: {
       // keep filler words in the transcript

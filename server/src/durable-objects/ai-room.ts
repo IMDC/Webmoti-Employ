@@ -209,18 +209,9 @@ export class AiRoom {
       if (websocketMsg.type === 'transcript') {
         const payload = websocketMsg.payload
 
-        // Use speaker from payload if available (from Speechmatics), otherwise fall back to session info
-        let role: 'interviewer' | 'interviewee' | 'candidate'
-        if (payload.speaker) {
-          // Speechmatics integration provides speaker role directly
-          role = payload.speaker === 'interviewer' ? 'interviewer' : 'interviewee'
-        }
-        else {
-          // Fallback to session-based role detection
-          role = this.sessions.get(ws)?.isInterviewer ? 'interviewer' : 'interviewee'
-        }
-
         let name = this.sessions.get(ws)?.name ?? ''
+        let role: 'interviewer' | 'interviewee'
+          = this.sessions.get(ws)?.isInterviewer ? 'interviewer' : 'interviewee'
 
         if (this.devIsJohnDoNotUseThis) {
           // dev override

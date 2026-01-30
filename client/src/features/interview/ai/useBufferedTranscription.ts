@@ -15,7 +15,6 @@ export function useBufferedTranscription(
     transcript,
     finalTranscript,
     listening,
-    isMicrophoneAvailable,
     startListening,
     abortListening,
   } = useSpeechRecognition()
@@ -23,17 +22,13 @@ export function useBufferedTranscription(
   const [sentWordCount, setSentWordCount] = useState(0)
 
   const startTranscribing = useCallback(async () => {
-    if (!isMicrophoneAvailable) {
-      logger.warn('Microphone is not available for transcription')
-      return
-    }
     try {
       await startListening()
     }
     catch (error) {
       errorNotification('Transcription error', error)
     }
-  }, [isMicrophoneAvailable, startListening])
+  }, [startListening])
 
   const stopTranscribing = useCallback(async () => {
     if (listening) {

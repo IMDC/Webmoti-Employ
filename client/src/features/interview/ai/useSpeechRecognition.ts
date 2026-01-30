@@ -12,7 +12,6 @@ interface Word {
   startTime: number
   endTime: number
   punctuation: boolean
-  partial?: boolean
 }
 
 interface State {
@@ -50,7 +49,6 @@ function transcriptReducer(state: State, action: Action): State {
           startTime: result.start_time ?? 0,
           endTime: result.end_time ?? 0,
           punctuation: result.type === 'punctuation',
-          partial: false,
         })),
       ]
       newWords = [
@@ -95,7 +93,6 @@ export function useSpeechRecognition() {
   const { startTranscription, stopTranscription, sendAudio, socketState } = useRealtimeTranscription()
   const [state, dispatch] = useReducer(transcriptReducer, initialState)
   const [listening, setListening] = useState(false)
-  const [isMicrophoneAvailable, setIsMicrophoneAvailable] = useState(true)
   const [hasNotifiedUser, setHasNotifiedUser] = useState(false)
   const [transcriptionStarted, setTranscriptionStarted] = useState(false)
   const [recognitionReady, setRecognitionReady] = useState(false)
@@ -131,8 +128,6 @@ export function useSpeechRecognition() {
         throw new Error('AudioContext not available yet')
       }
       if (audioContext.state === 'closed') {
-        logger.error('[SpeechRecognition] AudioContext is closed, cannot resume')
-        setIsMicrophoneAvailable(false)
         if (!hasNotifiedUser) {
           errorNotification('Transcription error', 'Audio context is closed')
           setHasNotifiedUser(true)
@@ -157,8 +152,6 @@ export function useSpeechRecognition() {
         setTranscriptionStarted(true)
       }
       else {
-        logger.error('[SpeechRecognition] Error starting:', err.message)
-        setIsMicrophoneAvailable(false)
         if (!hasNotifiedUser) {
           errorNotification('Transcription error', err?.message || 'Unknown error')
           setHasNotifiedUser(true)
@@ -181,8 +174,6 @@ export function useSpeechRecognition() {
           setListening(true)
         }
         catch (err: any) {
-          logger.error('[SpeechRecognition] Error recording:', err.message)
-          setIsMicrophoneAvailable(false)
           if (!hasNotifiedUser) {
             errorNotification('Transcription error', err?.message || 'Unknown error')
             setHasNotifiedUser(true)
@@ -221,7 +212,6 @@ export function useSpeechRecognition() {
     transcript: state.transcript,
     finalTranscript: state.finalTranscript,
     listening,
-    isMicrophoneAvailable,
     startListening,
     abortListening,
     resetTranscript,
