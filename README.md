@@ -13,6 +13,9 @@ WebMoti-Employ is an app that uses eyetracking to deliver real-time feedback dur
 [![Build](https://github.com/DanielBoxer/web-employ/actions/workflows/build.yml/badge.svg)](https://github.com/DanielBoxer/web-employ/actions/workflows/build.yml)
 
 - [Stack](#stack)
+- [Real-time feedback pipeline](#real-time-feedback-pipeline)
+  - [Eyetracking](#eyetracking)
+  - [AI speech analysis](#ai-speech-analysis)
 - [Setup](#setup)
 - [CI/CD](#cicd)
 - [Dependabot](#dependabot)
@@ -72,6 +75,35 @@ Hosting:
 - Neon - Postgres database
 - Cloudflare Workers - Serverless backend
 - Vercel - Client hosting
+
+## Real-time feedback pipeline
+
+Real-time feedback is done using eye tracking and AI analysis.
+
+### Eyetracking
+
+1. Electron spawns a Python server that runs eyetracking continuously using the Tobii SDK
+2. Mediapipe face detection runs in the browser to determine the dynamic area of interest (AOI)
+3. The AOI bounding box is sent through IPC to Electron
+4. Electron sends the AOI to the Python server through Socket.IO
+5. The Python server checks if the user is looking at the AOI using the Tobii eyetracking data
+6. The Python server sends this eyetracking feedback to Electron
+7. Electron sends this to the browser
+8. Repeat from step 2
+
+### AI speech analysis
+
+1. User starts talking
+2. Browser sends speech to Speechmatics over websocket
+3. Speechmatics sends back transcribed words
+4. Words are buffered in two cases to avoid spamming the AI with single words:
+   - 5 or more words are accumulated in the buffer before sending
+   - The user stops talking (all words in buffer are sent)
+5. Transcript words are sent through a websocket to a Cloudflare Durable Object that allows multiple persistent connections
+6. The durable object sends transcripts to Groq for AI analysis
+7. Groq sends back a JSON with feedback
+8. The durable object broadcasts this feedback to all connected clients
+9. Repeat from step 1
 
 ## Setup
 
