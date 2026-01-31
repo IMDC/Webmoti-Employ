@@ -8,7 +8,7 @@ const envPath = path.join(app.getAppPath(), '.env.electron')
 dotenv.config({ path: envPath })
 const envHostedUrl = process.env.CLIENT_HOSTED_URL
 if (!envHostedUrl)
-  throw new Error('CLIENT_HOSTED_URL not set in .env.electron')
+  throw new Error(`CLIENT_HOSTED_URL not set in .env.electron. Tried to load from: ${envPath}`)
 
 export const HOSTED_URL: string = envHostedUrl
 

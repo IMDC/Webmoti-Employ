@@ -207,17 +207,20 @@ export class AiRoom {
       // debugLog(`Received message: ${parsedMessage.text}`)
 
       if (websocketMsg.type === 'transcript') {
+        const payload = websocketMsg.payload
+
+        let name = this.sessions.get(ws)?.name ?? ''
         let role: 'interviewer' | 'interviewee'
           = this.sessions.get(ws)?.isInterviewer ? 'interviewer' : 'interviewee'
-        let name = this.sessions.get(ws)?.name ?? ''
+
         if (this.devIsJohnDoNotUseThis) {
           // dev override
           role = this.devIsJohnInterviewer ? 'interviewer' : 'interviewee'
           name = 'John Smith'
         }
 
-        const payload = websocketMsg.payload
-        // right now we're not using the payload.status since it doesn't help ai analysis
+        // Format: [role] name: transcript text
+        // e.g., "[interviewer] John Smith: Tell me about yourself"
         this.transcriptQueue.push(`[${role}] ${name}: ${payload.text}`)
         // don't await this
         void this.processQueue()

@@ -34,12 +34,19 @@ export function handleAppError(
 
 export function handleAppErrorWithNotification(
   error: unknown,
-  defaultMessage: string,
+  defaultMessage?: string,
 ) {
-  logger.error(defaultMessage, { error })
+  const fallbackMessage = defaultMessage ?? 'Error'
+
+  logger.error(fallbackMessage, { error })
 
   if (isExecutedFailure(error)) {
-    showErrorNotification(`${error.errorCode} ${defaultMessage}`, error.reason)
+    showErrorNotification(
+      defaultMessage != null
+        ? `${error.errorCode} ${defaultMessage}`
+        : `${error.errorCode}`,
+      error.reason,
+    )
   }
   else if (error instanceof HttpError) {
     const details
@@ -52,10 +59,10 @@ export function handleAppErrorWithNotification(
     showErrorNotification(`${error.status} ${error.message}`, details)
   }
   else if (error instanceof Error) {
-    showErrorNotification(defaultMessage, error.message)
+    showErrorNotification(fallbackMessage, error.message)
   }
   else {
-    showErrorNotification('Error', defaultMessage)
+    showErrorNotification('Error', defaultMessage ?? '')
   }
 }
 

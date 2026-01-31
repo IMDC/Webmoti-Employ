@@ -117,10 +117,11 @@ async function createWindow() {
 
   if (isDev) {
     mainWindow.setIcon(getAppIconPath())
-    mainWindow.loadURL(`http://${getLocalDomain()}`)
+    const url = `http://${getLocalDomain()}/`
+    await mainWindow.loadURL(url)
   }
   else {
-    mainWindow.loadURL(HOSTED_URL)
+    await mainWindow.loadURL(HOSTED_URL)
   }
 
   mainWindow.on('closed', () => {

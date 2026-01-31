@@ -19,6 +19,8 @@ describe('/profiles route', () => protectedRouteTest('/profiles', 'POST'))
 
 describe('/interviews GET route', () => protectedRouteTest('/interviews'))
 describe('/interviews POST route', () => protectedRouteTest('/interviews', 'POST'))
+describe('/ws GET route', () => protectedRouteTest('/ws', 'GET'))
+describe('/speechmatics/token POST route', () => protectedRouteTest('/speechmatics/token', 'POST'))
 
 describe('/auth route', () => {
   it('allows unauthenticated access to /auth', async () => {
