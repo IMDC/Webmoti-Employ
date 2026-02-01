@@ -9,12 +9,15 @@ interface AboutModalProps {
 }
 
 // injected at build time
-declare const __APP_VERSION__: string
-declare const __APP_SHA__: string
-declare const __APP_COMMIT_DATE__: string
+declare const __APP_VERSION__: string | null
+declare const __APP_SHA__: string | null
+declare const __APP_COMMIT_DATE__: string | null
 declare const __APP_BUILD_DATE__: string
 
-function formatDate(iso: string) {
+function formatDate(iso: string | null) {
+  if (!iso)
+    return 'null'
+
   return DateTime.fromISO(iso, { zone: 'utc' })
     .setZone('America/Toronto')
     .toFormat('yyyy-MM-dd HH:mm ZZZZ')
@@ -39,7 +42,7 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
       overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
     >
       <Stack>
-        <Text ff="monospace">{`Client Version: ${__APP_VERSION__}`}</Text>
+        <Text ff="monospace">{`Client Version: ${__APP_VERSION__ ?? 'null'}`}</Text>
         <Text ff="monospace">{`Commit SHA: ${__APP_SHA__}`}</Text>
         <Text ff="monospace">{`Commit Date: ${formatDate(__APP_COMMIT_DATE__)}`}</Text>
         <Text ff="monospace">{`Built At: ${formatDate(__APP_BUILD_DATE__)}`}</Text>
