@@ -15,7 +15,9 @@ declare const __APP_COMMIT_DATE__: string
 declare const __APP_BUILD_DATE__: string
 
 function formatDate(iso: string) {
-  return DateTime.fromISO(iso, { zone: 'utc' }).toFormat('yyyy-MM-dd HH:mm \'UTC\'')
+  return DateTime.fromISO(iso, { zone: 'utc' })
+    .setZone('America/Toronto')
+    .toFormat('yyyy-MM-dd HH:mm ZZZZ')
 }
 
 export function AboutModal({ isOpen, onClose }: AboutModalProps) {
