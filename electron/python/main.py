@@ -95,6 +95,7 @@ class GazeData(TypedDict):
 
 # Global state
 current_aoi_bbox = None
+current_feedback_aoi_bbox = None
 start_timestamp = None
 TEST_MODE: Literal[None, "random", "patterned"] = None  # Auto-set if no tracker
 ASYNC_LOOP: asyncio.AbstractEventLoop | None = None
@@ -137,7 +138,26 @@ async def update_aoi(_: str, data: AOIBoundingBox) -> None:
     logger.debug(f"Updated AOI: {data}")
 
 
+@sio.event
+async def update_feedback_aoi(_: str, data: AOIBoundingBox | None) -> None:
+    global current_feedback_aoi_bbox  # noqa: PLW0603
+    current_feedback_aoi_bbox = data
+    logger.debug(f"Updated feedback AOI: {data}")
+
+
 # ===== EYETRACKING ====================================================================
+
+
+def is_point_inside_bbox(x: float, y: float, bbox: AOIBoundingBox | None) -> bool:
+    if bbox is None:
+        return False
+    xmin, ymin, width, height = (
+        bbox["x"],
+        bbox["y"],
+        bbox["width"],
+        bbox["height"],
+    )
+    return xmin <= x <= xmin + width and ymin <= y <= ymin + height
 
 
 def classify_eye_movement(
@@ -182,19 +202,15 @@ async def handle_gaze_data(sample: GazeSample) -> None:
     gaze_x_avg = sum(gaze_coords_x) / len(gaze_coords_x)
     gaze_y_avg = sum(gaze_coords_y) / len(gaze_coords_y)
 
-    looking_at_interviewer = False
-    if current_aoi_bbox:
-        xmin, ymin, width, height = (
-            current_aoi_bbox["x"],
-            current_aoi_bbox["y"],
-            current_aoi_bbox["width"],
-            current_aoi_bbox["height"],
-        )
-        looking_at_interviewer = (
-            xmin <= gaze_x_avg <= xmin + width and ymin <= gaze_y_avg <= ymin + height
-        )
-    # else:
-    #     logger.warning("No bounding box found")
+    looking_at_interviewer = is_point_inside_bbox(
+        gaze_x_avg,
+        gaze_y_avg,
+        current_aoi_bbox,
+    ) or is_point_inside_bbox(
+        gaze_x_avg,
+        gaze_y_avg,
+        current_feedback_aoi_bbox,
+    )
 
     movement_type = classify_eye_movement((gaze_x_avg, gaze_y_avg), sample["timestamp"])
     fixation_history.append(movement_type == "Fixation")

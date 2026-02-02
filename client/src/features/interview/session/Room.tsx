@@ -141,6 +141,13 @@ export function Room() {
               <Box
                 w="100%"
                 h={{ base: '12%', xl: '15%' }}
+                id="feedback-safe-aoi"
+                style={{
+                  outline: '2px dashed rgba(0, 255, 170, 0.9)',
+                  outlineOffset: '-2px',
+                  borderRadius: 4,
+                  boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.3)',
+                }}
               >
                 <FeedbackArea
                   notification={notification}
@@ -227,3 +234,5 @@ export function Room() {
     </AppShell>
   )
 }
+
+

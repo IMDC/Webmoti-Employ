@@ -85,8 +85,12 @@ export function socketSendBoundingBox(boundingBox: FaceDetectionBoundingBox) {
   socket.emit('update_aoi', boundingBox)
 }
 
+export function socketSendFeedbackSafeBoundingBox(boundingBox: FaceDetectionBoundingBox | null) {
+  socket.emit('update_feedback_aoi', boundingBox)
+}
 export function closeSocket() {
   if (socket) {
     socket.disconnect()
   }
 }
+

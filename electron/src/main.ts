@@ -2,7 +2,7 @@ import path from 'node:path'
 import process from 'node:process'
 import { app, BrowserWindow, shell } from 'electron'
 import { addLog, setRendererReady } from './logQueue'
-import { closeSocket, setupSocket, socketSendBoundingBox } from './socket'
+import { closeSocket, setupSocket, socketSendBoundingBox, socketSendFeedbackSafeBoundingBox } from './socket'
 import { startLocalPythonServer, startPackagedPythonServer, stopPythonServer } from './startPythonServer'
 import {
   BUILD_INFO,
@@ -137,6 +137,10 @@ async function createWindow() {
     socketSendBoundingBox(coordinates.boundingBox)
   })
 
+  ipcOnMain('feedbackSafeAoi', (_event, boundingBox) => {
+    socketSendFeedbackSafeBoundingBox(boundingBox)
+  })
+
   ipcOnMain('setRendererReady', (_event) => {
     setRendererReady(mainWindow!)
   })
@@ -237,3 +241,4 @@ app.on('activate', () => {
     createWindow()
   }
 })
+

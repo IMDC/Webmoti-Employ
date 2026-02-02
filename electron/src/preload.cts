@@ -16,6 +16,7 @@ electron.contextBridge.exposeInMainWorld('electron', {
       callback(log)
     }),
   sendInterviewerCoordinates: coordinates => ipcSend('coordinates', coordinates),
+  sendFeedbackSafeAoi: boundingBox => ipcSend('feedbackSafeAoi', boundingBox),
   getModelBuffer: () => ipcInvoke('getModelBuffer'),
   setRendererReady: () => ipcSend('setRendererReady', undefined),
   openExternalUrl: url => ipcSend('openExternalUrl', url),
@@ -52,3 +53,4 @@ function ipcSend<Key extends keyof EventPayloadMapping>(
 ): void {
   electron.ipcRenderer.send(key, payload)
 }
+
