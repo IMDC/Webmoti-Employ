@@ -51,6 +51,11 @@ jobs:
           node-version-file: package.json
           cache: pnpm
 
+      - name: Capture Git metadata
+        run: |
+          echo "APP_GIT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "APP_GIT_COMMIT_DATE=$(git show -s --format=%cI HEAD)" >> $GITHUB_ENV
+
       - name: Strip Git metadata for Vercel
         run: rm -rf .git
       - name: Install Vercel CLI

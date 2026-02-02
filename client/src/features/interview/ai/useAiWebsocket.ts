@@ -38,7 +38,7 @@ export function useAiWebsocket() {
       sendJsonMessage(msg)
     }
     else {
-      logger.error('Websocket is not ready to send transcript')
+      logger.warn('Websocket is not ready to send transcript')
     }
   }, [readyState, sendJsonMessage])
 

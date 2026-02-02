@@ -440,14 +440,14 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
 
   function handleUserUpdated(payload: Participant[]) {
     payload.forEach((user) => {
-      logger.log(`${user.userId} was updated.`)
+      logger.log(`User ${user.userId} was updated`)
     })
     updateParticipants()
   }
 
   function handlePeerVideoStateChange(payload: Parameters<typeof event_peer_video_state_change>[0]) {
-    logger.log('peer video state change')
     const { userId, action } = payload
+    logger.log(`Video state change for user ${userId}: ${action}`)
 
     const { stream, actions } = zoomSessionStore.getState()
     if (!stream)

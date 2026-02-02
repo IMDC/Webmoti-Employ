@@ -59,6 +59,15 @@ importers:
       '@mediapipe/tasks-vision':
         specifier: 0.10.32
         version: 0.10.32
+      '@speechmatics/browser-audio-input':
+        specifier: ^2.0.3
+        version: 2.0.3
+      '@speechmatics/browser-audio-input-react':
+        specifier: ^2.0.3
+        version: 2.0.3(react@19.2.3)
+      '@speechmatics/real-time-client-react':
+        specifier: ^3.2.1
+        version: 3.2.1(react@19.2.3)
       '@tabler/icons-react':
         specifier: ^3.36.1
         version: 3.36.1(react@19.2.3)
@@ -98,9 +107,6 @@ importers:
       react-dom:
         specifier: 19.2.3
         version: 19.2.3(react@19.2.3)
-      react-speech-recognition:
-        specifier: ^4.0.1
-        version: 4.0.1(react@19.2.3)
       react-use-websocket:
         specifier: 4.13.0
         version: 4.13.0
@@ -144,9 +150,6 @@ importers:
       '@types/react-dom':
         specifier: 19.2.3
         version: 19.2.3(@types/react@19.2.9)
-      '@types/react-speech-recognition':
-        specifier: ^3.9.6
-        version: 3.9.6
       '@vitejs/plugin-react':
         specifier: ^5.1.2
         version: 5.1.2(vite@7.3.1(@types/node@25.0.10)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.21.0)(yaml@2.8.2))
@@ -217,6 +220,9 @@ importers:
       '@hono/zod-validator':
         specifier: ^0.7.6
         version: 0.7.6(hono@4.11.5)(zod@4.3.6)
+      '@speechmatics/auth':
+        specifier: ^0.1.0
+        version: 0.1.0
       '@webmoti-employ/shared':
         specifier: workspace:^
         version: link:../shared
@@ -1936,6 +1942,25 @@ packages:
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
 
+  '@speechmatics/auth@0.1.0':
+    resolution: {integrity: sha512-vF1XOFlAtbNSWYsuJm9WDAZfZIOpwibgqu0sH/Qqkbyz2w/EQyoIhlKta8KRVZ74JeKyY08mnGQ17WDj6i6U4Q==}
+
+  '@speechmatics/browser-audio-input-react@2.0.3':
+    resolution: {integrity: sha512-+OwyBNrxP4JfT8S6KvnmKZQ+wy4Za6qtK3NdUmq+7lm3CpdGDRYOCF+yzPaNng8GEGWCgP4jj3dVy36PhPgqgA==}
+    peerDependencies:
+      react: ^18 || ^19
+
+  '@speechmatics/browser-audio-input@2.0.3':
+    resolution: {integrity: sha512-NSfp2D0lg+fimm4FL7hFAEq/W4NEKu+gEoF9L50EwJfldH1xvUR3DVLuA4xi/7U/0j67nRG4tpBv473Rp0gAPQ==}
+
+  '@speechmatics/real-time-client-react@3.2.1':
+    resolution: {integrity: sha512-RvlbKJ1nnUYOEDVB9jbFrKPfDtGO/mjbRdbsZ+T+TgBs7EKY755f5l10u4CUNdnsb8q3GEBjB4W493ZrZMqyWQ==}
+    peerDependencies:
+      react: ^18 || ^19
+
+  '@speechmatics/real-time-client@8.2.0':
+    resolution: {integrity: sha512-VC988dRXXh4PAfRlq/kg7S9MSIWlCKQVhCGGZhuxMrdYYC6pDImHGR7/I3Gko3cm5KquNJCwV4AIoU192tfVgQ==}
+
   '@speed-highlight/core@1.2.14':
     resolution: {integrity: sha512-G4ewlBNhUtlLvrJTb88d2mdy2KRijzs4UhnlrOSRT4bmjh/IqNElZa3zkrZ+TC47TwtlDWzVLFADljF1Ijp5hA==}
 
@@ -2090,9 +2115,6 @@ packages:
   '@types/deep-eql@4.0.2':
     resolution: {integrity: sha512-c9h9dVVMigMPc4bwTvC5dxqtqJZwQPePsWjPlpSOnojbor6pGqdk541lfA7AqFQr5pB1BRdq0juY9db81BwyFw==}
 
-  '@types/dom-speech-recognition@0.0.7':
-    resolution: {integrity: sha512-NjiUoJbBlKhyufNsMZLSp+pbPNtPAFnR738RCJvtZy/HVQ2TZjmqpMyaeOSMXgxdfZM60nt8QGbtfmQrJAH2sw==}
-
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
@@ -2133,9 +2155,6 @@ packages:
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
     peerDependencies:
       '@types/react': ^19.2.0
-
-  '@types/react-speech-recognition@3.9.6':
-    resolution: {integrity: sha512-cdzwXIZXWyp8zfM2XI7APDW1rZf4Nz73T4SIS2y+cC7zHnZluCdumYKH6HacxgxJH+zemAq2oXbHWXcyW0eT3A==}
 
   '@types/react@19.2.9':
     resolution: {integrity: sha512-Lpo8kgb/igvMIPeNV2rsYKTgaORYdO1XGVZ4Qz3akwOj0ySGYMPlQWa8BaLn0G63D1aSaAQ5ldR06wCpChQCjA==}
@@ -4129,9 +4148,6 @@ packages:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
 
-  lodash.debounce@4.0.8:
-    resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
-
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
@@ -4924,11 +4940,6 @@ packages:
       '@types/react':
         optional: true
 
-  react-speech-recognition@4.0.1:
-    resolution: {integrity: sha512-0fIqzLtfY8vuYA6AmJVK7qiabZx0oFKOO+rbiBgFI3COWVGREy0A+gdU16hWXmFebeyrI8JsOLYsWk6WaHUXRw==}
-    peerDependencies:
-      react: '>=16.8.0'
-
   react-style-singleton@2.2.3:
     resolution: {integrity: sha512-b6jSvxvVnyptAiLjbkWLE/lOnR4lfTtDAl+eUC7RZy+QQWc6wRzIV2CE6xBuMmDxc2qIihtDCZD5NPOFl7fRBQ==}
     engines: {node: '>=10'}
@@ -5527,6 +5538,9 @@ packages:
   type-fest@4.41.0:
     resolution: {integrity: sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA==}
     engines: {node: '>=16'}
+
+  typescript-event-target@1.1.2:
+    resolution: {integrity: sha512-TvkrTUpv7gCPlcnSoEwUVUBwsdheKm+HF5u2tPAKubkIGMfovdSizCTaZRY/NhR8+Ijy8iZZUapbVQAsNrkFrw==}
 
   typescript@5.9.3:
     resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
@@ -7352,6 +7366,33 @@ snapshots:
 
   '@socket.io/component-emitter@3.1.2': {}
 
+  '@speechmatics/auth@0.1.0': {}
+
+  '@speechmatics/browser-audio-input-react@2.0.3(react@19.2.3)':
+    dependencies:
+      '@speechmatics/browser-audio-input': 2.0.3
+      react: 19.2.3
+
+  '@speechmatics/browser-audio-input@2.0.3':
+    dependencies:
+      typescript-event-target: 1.1.2
+
+  '@speechmatics/real-time-client-react@3.2.1(react@19.2.3)':
+    dependencies:
+      '@speechmatics/real-time-client': 8.2.0
+      react: 19.2.3
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
+  '@speechmatics/real-time-client@8.2.0':
+    dependencies:
+      typescript-event-target: 1.1.2
+      ws: 8.19.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
   '@speed-highlight/core@1.2.14': {}
 
   '@standard-schema/spec@1.1.0': {}
@@ -7548,8 +7589,6 @@ snapshots:
 
   '@types/deep-eql@4.0.2': {}
 
-  '@types/dom-speech-recognition@0.0.7': {}
-
   '@types/estree@1.0.8': {}
 
   '@types/fs-extra@9.0.13':
@@ -7595,10 +7634,6 @@ snapshots:
   '@types/react-dom@19.2.3(@types/react@19.2.9)':
     dependencies:
       '@types/react': 19.2.9
-
-  '@types/react-speech-recognition@3.9.6':
-    dependencies:
-      '@types/dom-speech-recognition': 0.0.7
 
   '@types/react@19.2.9':
     dependencies:
@@ -9864,8 +9899,6 @@ snapshots:
     dependencies:
       p-locate: 5.0.0
 
-  lodash.debounce@4.0.8: {}
-
   lodash.merge@4.6.2: {}
 
   lodash.truncate@4.4.2: {}
@@ -10807,11 +10840,6 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.9
 
-  react-speech-recognition@4.0.1(react@19.2.3):
-    dependencies:
-      lodash.debounce: 4.0.8
-      react: 19.2.3
-
   react-style-singleton@2.2.3(@types/react@19.2.9)(react@19.2.3):
     dependencies:
       get-nonce: 1.0.1
@@ -11506,6 +11534,8 @@ snapshots:
   type-fest@2.19.0: {}
 
   type-fest@4.41.0: {}
+
+  typescript-event-target@1.1.2: {}
 
   typescript@5.9.3: {}
 
