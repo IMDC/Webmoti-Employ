@@ -97,7 +97,7 @@ class GazeData(TypedDict):
 current_aoi_bbox = None
 current_feedback_aoi_bbox = None
 start_timestamp = None
-TEST_MODE: Literal[None, "random", "patterned"] = None  # Auto-set if no tracker
+TEST_MODE: Literal["random", "patterned"] = None  # Auto-set if no tracker
 ASYNC_LOOP: asyncio.AbstractEventLoop | None = None
 
 # latest gaze sample storage (set from Tobii callback, consumed by publisher loop)
