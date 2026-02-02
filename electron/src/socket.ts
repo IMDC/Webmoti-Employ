@@ -93,4 +93,3 @@ export function closeSocket() {
     socket.disconnect()
   }
 }
-

@@ -53,4 +53,3 @@ function ipcSend<Key extends keyof EventPayloadMapping>(
 ): void {
   electron.ipcRenderer.send(key, payload)
 }
-
