@@ -141,6 +141,7 @@ export function Room() {
               <Box
                 w="100%"
                 h={{ base: '12%', xl: '15%' }}
+                id="feedback-safe-aoi"
               >
                 <FeedbackArea
                   notification={notification}

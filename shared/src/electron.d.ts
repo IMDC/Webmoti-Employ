@@ -38,6 +38,7 @@ declare global {
   interface EventPayloadMapping {
     feedback: Feedback[]
     coordinates: InterviewerCoordinates
+    feedbackSafeAoi: FaceDetectionBoundingBox | null
     getModelBuffer: ArrayBuffer
     setRendererReady: undefined
     openExternalUrl: string
@@ -59,6 +60,7 @@ declare global {
       subscribeToFeedback: (callback: (feedback: Feedback[]) => void) => UnsubscribeFunction
       subscribeToGazeStats: (callback: (stats: GazeStats) => void) => UnsubscribeFunction
       sendInterviewerCoordinates: (coordinates: InterviewerCoordinates) => void
+      sendFeedbackSafeAoi: (boundingBox: FaceDetectionBoundingBox | null) => void
       getModelBuffer: () => Promise<ArrayBuffer>
       subscribeToLogs: (callback: (message: string) => void) => UnsubscribeFunction
       setRendererReady: () => void
