@@ -98,21 +98,6 @@ export function FaceBlurOverlay({
     }
   }, [faceDetectionResult])
 
-  const boundingBox = faceDetectionResult?.boundingBox
-  const aoiStyle = boundingBox
-    ? {
-        position: 'absolute' as const,
-        left: `${boundingBox.x * 100}%`,
-        top: `${boundingBox.y * 100}%`,
-        width: `${boundingBox.width * 100}%`,
-        height: `${boundingBox.height * 100}%`,
-        border: '2px dashed rgba(0, 255, 170, 0.9)',
-        boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.3)',
-        borderRadius: 4,
-        pointerEvents: 'none' as const,
-      }
-    : undefined
-
   return (
     <div
       style={{
@@ -135,14 +120,6 @@ export function FaceBlurOverlay({
           pointerEvents: 'none',
         }}
       />
-      {aoiStyle && (
-        <div
-          style={{
-            ...aoiStyle,
-            zIndex: 2,
-          }}
-        />
-      )}
     </div>
   )
 }
