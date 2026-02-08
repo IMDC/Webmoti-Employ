@@ -90,7 +90,12 @@ function transcriptReducer(state: State, action: Action): State {
 
 export function useSpeechRecognition() {
   const { startRecording, stopRecording, audioContext } = usePCMAudioRecorderContext()
-  const { startTranscription, stopTranscription, sendAudio, socketState } = useRealtimeTranscription()
+  const {
+    startTranscription,
+    stopTranscription,
+    sendAudio,
+    socketState,
+  } = useRealtimeTranscription()
   const [state, dispatch] = useReducer(transcriptReducer, initialState)
   const [listening, setListening] = useState(false)
   const [hasNotifiedUser, setHasNotifiedUser] = useState(false)
@@ -185,28 +190,29 @@ export function useSpeechRecognition() {
   }, [transcriptionStarted, recognitionReady, socketState, listening, startRecording, audioContext, hasNotifiedUser])
 
   const abortListening = useCallback(() => {
+    // here we only stop recording audio, but keep transcription active.
+    // this is because it would add seconds of delay to have to reconnect to the socket each time.
     if (isRecordingRef.current) {
       stopRecording()
       isRecordingRef.current = false
     }
-    if (isTranscribingRef.current) {
-      stopTranscription()
-      isTranscribingRef.current = false
-    }
     setListening(false)
-    setTranscriptionStarted(false)
-    setRecognitionReady(false)
-  }, [stopRecording, stopTranscription])
+  }, [stopRecording])
 
   const resetTranscript = useCallback(() => {
     dispatch({ type: 'reset' })
   }, [])
 
   useEffect(() => {
+    // on unmount, stop recording and close the speechmatics socket
     return () => {
       abortListening()
+      if (isTranscribingRef.current) {
+        stopTranscription()
+        isTranscribingRef.current = false
+      }
     }
-  }, [abortListening])
+  }, [abortListening, stopTranscription])
 
   return {
     transcript: state.transcript,
