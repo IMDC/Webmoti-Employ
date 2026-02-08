@@ -91,7 +91,7 @@ export function FeedbackArea({ notification, onLookingChange }: FeedbackAreaProp
         />
         <FeedbackIcon
           icon={<IconClockHour4Filled size={iconSize} />}
-          label={String(countupSeconds)}
+          label={`${countupSeconds}s`}
           isActive={countupSeconds > 0}
         />
         <FeedbackIcon
