@@ -96,6 +96,7 @@ export function useSpeechRecognition() {
     sendAudio,
     socketState,
   } = useRealtimeTranscription()
+  const socketStateRef = useRef(socketState)
   const [state, dispatch] = useReducer(transcriptReducer, initialState)
   const [listening, setListening] = useState(false)
   const [hasNotifiedUser, setHasNotifiedUser] = useState(false)
@@ -204,18 +205,21 @@ export function useSpeechRecognition() {
   }, [])
 
   useEffect(() => {
-    // on unmount, stop recording and close the speechmatics socket
+    socketStateRef.current = socketState
+  }, [socketState])
+
+  // on unmount, stop recording and close the speechmatics socket
+  useEffect(() => {
     return () => {
       abortListening()
       if (isTranscribingRef.current) {
-        // can only send stop message if socket is open
-        if (socketState === 'open') {
+        if (socketStateRef.current === 'open') {
           stopTranscription()
         }
         isTranscribingRef.current = false
       }
     }
-  }, [abortListening, stopTranscription, socketState])
+  }, [abortListening, stopTranscription])
 
   return {
     transcript: state.transcript,

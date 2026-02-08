@@ -166,9 +166,11 @@ export function createPreviewStore(
         }
         catch (error: unknown) {
           // AudioNotStartedError happens every time so it's safe to ignore
-          if (!(error instanceof Error && error.message === 'AudioNotStartedError')) {
-            throw error
+          if (error instanceof Error && error.message === 'AudioNotStartedError') {
+            set({ localAudioTrack: null })
+            return
           }
+          throw error
         }
       },
     },
