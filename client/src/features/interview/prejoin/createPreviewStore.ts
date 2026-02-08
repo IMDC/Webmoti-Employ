@@ -159,7 +159,17 @@ export function createPreviewStore(
 
       cleanup: async () => {
         await get().actions.stopCamera()
-        await get().actions.stopMicrophone()
+
+        // stop microphone but ignore AudioNotStartedError due to react strict mode
+        try {
+          await get().actions.stopMicrophone()
+        }
+        catch (error: unknown) {
+          // AudioNotStartedError happens every time so it's safe to ignore
+          if (!(error instanceof Error && error.message === 'AudioNotStartedError')) {
+            throw error
+          }
+        }
       },
     },
   }))
