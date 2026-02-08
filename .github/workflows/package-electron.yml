@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - id: check
-        uses: EndBug/version-check@v2
+        uses: EndBug/version-check@5102328418c0130d66ca712d755c303e93368ce2
         with:
           diff-search: true
           file-name: electron/package.json
@@ -103,7 +103,7 @@ jobs:
           merge-multiple: true
 
       - name: Create release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b
         with:
           tag_name: v${{ needs.check-version.outputs.version }}
           name: v${{ needs.check-version.outputs.version }}
@@ -112,7 +112,7 @@ jobs:
       # since we don't need artifacts after the workflow, we delete them all.
       # this is because of the github artifact storage limit (recalculated every 6-12 hours)
       - name: Delete artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@f275313e70c08f6120db482d7a6b98377786765b
         with:
           name: '*-dist'
           failOnError: false

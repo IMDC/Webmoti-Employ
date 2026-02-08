@@ -45,7 +45,7 @@ updates:
     schedule:
       interval: monthly
     cooldown:
-      default-days: 30
+      default-days: 14
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-minor', 'version-update:semver-patch']
@@ -53,6 +53,6 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: monthly
+      interval: weekly
     cooldown:
-      default-days: 30
+      default-days: 7
