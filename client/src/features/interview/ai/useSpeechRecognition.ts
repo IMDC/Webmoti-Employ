@@ -68,7 +68,7 @@ function transcriptReducer(state: State, action: Action): State {
       return state
     case 'Error':
       logger.error(`[SpeechRecognition] Error: ${action.type} - ${action.reason}`)
-      errorNotification('Speechmatics error', action.reason || 'Unknown error')
+      errorNotification('Speechmatics error', action.reason || 'Unknown error while transcribing')
       return state
     case 'EndOfTranscript':
       // Finalize any remaining pending at session end
@@ -158,7 +158,7 @@ export function useSpeechRecognition() {
       }
       else {
         if (!hasNotifiedUser) {
-          errorNotification('Transcription error', err?.message || 'Unknown error')
+          errorNotification('Transcription error', err?.message || 'Unknown error when starting transcription')
           setHasNotifiedUser(true)
         }
       }
@@ -180,7 +180,7 @@ export function useSpeechRecognition() {
         }
         catch (err: any) {
           if (!hasNotifiedUser) {
-            errorNotification('Transcription error', err?.message || 'Unknown error')
+            errorNotification('Transcription error', err?.message || 'Unknown error when starting recording')
             setHasNotifiedUser(true)
           }
         }
@@ -208,11 +208,14 @@ export function useSpeechRecognition() {
     return () => {
       abortListening()
       if (isTranscribingRef.current) {
-        stopTranscription()
+        // can only send stop message if socket is open
+        if (socketState === 'open') {
+          stopTranscription()
+        }
         isTranscribingRef.current = false
       }
     }
-  }, [abortListening, stopTranscription])
+  }, [abortListening, stopTranscription, socketState])
 
   return {
     transcript: state.transcript,
