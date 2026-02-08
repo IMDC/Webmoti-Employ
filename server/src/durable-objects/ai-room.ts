@@ -36,7 +36,7 @@ export class AiRoom {
 
     2. Then provide a JSON object with these keys always:
       - "fillerCount": number of filler words for this topic (0 if none, never null).
-      - "timer": variable estimated answer duration in seconds if transcript is a question, null otherwise. This timer should vary based on the complexity of the question.
+      - "isQuestion": boolean, true if transcript is a question, false otherwise.
       - "hint": list of hints as described above (always a list, never null). The hints should vary based on the question and stay until the question starts to be answered properly.
       - "newTopic": boolean, true if the interviewer has started a new topic/question, false otherwise.
 
@@ -59,37 +59,37 @@ export class AiRoom {
 
     Transcript is a greeting:  
     "Hello there."  
-    {"timer": null, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false}
 
     Transcript is a question:  
     "Tell me about yourself."  
-    {"timer": 60, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": true, "hint": [], "fillerCount": 0, "newTopic": false}
 
     Transcript is a question asking for a definition:
     "What is polymorphism?"
-    {"timer": 45, "hint": ["object", "behavior"], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": true, "hint": ["object", "behavior"], "fillerCount": 0, "newTopic": false}
 
     Transcript is a response:
     "I led a project on X and achieved Z outcome."
-    {"timer": null, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false}
 
     Transcript is a general question:
     "Tell me about your project."
-    {"timer": 120, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": true, "hint": [], "fillerCount": 0, "newTopic": false}
 
     Transcript is a question asking for an example:
     "Tell me about a time when you resolved a conflict."
-    {"timer": 120, "hint": ["provide one example"], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": true, "hint": ["provide one example"], "fillerCount": 0, "newTopic": false}
 
     Transcript is made up of two separate transcripts:
     "Define"
-    {"timer": null, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false}
     "top down parsing"
-    {"timer": 45, "hint": ["recursive", "grammar"], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": true, "hint": ["recursive", "grammar"], "fillerCount": 0, "newTopic": false}
 
     Transcript is incomplete:
     "Define"
-    {"timer": null, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false}
   `
 
   constructor(state: DurableObjectState, env: CloudflareBindings) {
@@ -247,18 +247,8 @@ export class AiRoom {
   }
 
   async notifyClients(payload: NotificationMessage) {
-    this.sessions.forEach(({ isInterviewer }, session) => {
-      // if override is active, use the opposite role as john
-      const devIsInterviewer
-        = this.devIsJohnDoNotUseThis ? !this.devIsJohnInterviewer : isInterviewer
-
-      const sessionPayload: NotificationMessage = {
-        ...payload,
-        // if timer is to be set, make interviewee count up
-        // (interviewer has countdown timer)
-        countUp: !devIsInterviewer && !!payload.timer,
-        timer: !devIsInterviewer ? null : payload.timer,
-      }
+    this.sessions.forEach((_, session) => {
+      const sessionPayload: NotificationMessage = payload
 
       const notificationMessage: WebSocketMessage = {
         type: 'notification',

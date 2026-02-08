@@ -4,14 +4,12 @@ import { useMediaQuery } from '@mantine/hooks'
 import {
   IconBubbleTextFilled,
   IconClockHour4Filled,
-  IconHourglassFilled,
   IconMoodSad,
   IconMoodSmileBeam,
   IconStepInto,
 } from '@tabler/icons-react'
 import { useEffect, useRef, useState } from 'react'
 import { logger } from '@/utils/logger'
-import { useCountdown } from '../hooks/useCountdown'
 import { useCountup } from '../hooks/useCountup'
 import { useFeedback } from '../hooks/useFeedback'
 
@@ -27,42 +25,30 @@ export function FeedbackArea({ notification, onLookingChange }: FeedbackAreaProp
 
   const feedback = useFeedback()
 
-  const { hint, timer, fillerCount, newTopic, countUp } = notification
+  const { hint, isQuestion, fillerCount, newTopic } = notification
 
   const looking = feedback.find(f => f.feedbackType === 'lookingAtInterviewer')?.isActive
   const [emoticonPositive, setEmoticonPositive] = useState<boolean | null>(null)
   const graceTimerRef = useRef<number | null>(null)
 
-  const { countdownSeconds, startCountdown, stopCountdown } = useCountdown()
   const { countupSeconds, startCountup, stopCountup } = useCountup()
 
+  // start countup if notification is a question
   useEffect(() => {
-    if (timer) {
-      logger.log(`Starting ${timer}s countdown`)
-      startCountdown(timer)
-      stopCountup()
-    }
-  }, [timer, startCountdown, stopCountup])
-
-  useEffect(() => {
-    if (newTopic && timer === null) {
-      logger.log('Stopping timer because null and new topic')
-      stopCountdown()
-    }
-  }, [timer, stopCountdown, newTopic])
-
-  useEffect(() => {
-    if (countUp) {
+    if (isQuestion) {
+      logger.log('Starting countup for question')
       startCountup()
-      stopCountdown()
     }
-  }, [startCountup, countUp, stopCountdown])
-
-  useEffect(() => {
-    if (newTopic && !countUp) {
+    else {
       stopCountup()
     }
-  }, [newTopic, countUp, stopCountup])
+  }, [isQuestion, startCountup, stopCountup])
+
+  useEffect(() => {
+    if (newTopic && !isQuestion) {
+      stopCountup()
+    }
+  }, [newTopic, isQuestion, stopCountup])
 
   useEffect(() => {
     if (graceTimerRef.current) {
@@ -102,11 +88,6 @@ export function FeedbackArea({ notification, onLookingChange }: FeedbackAreaProp
           icon={<IconMoodSad size={iconSize} />}
           label="Look at Interviewer"
           isActive={emoticonPositive === false}
-        />
-        <FeedbackIcon
-          icon={<IconHourglassFilled size={iconSize} />}
-          label={String(countdownSeconds)}
-          isActive={countdownSeconds > 0}
         />
         <FeedbackIcon
           icon={<IconClockHour4Filled size={iconSize} />}

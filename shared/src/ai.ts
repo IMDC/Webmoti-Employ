@@ -7,10 +7,9 @@ export const TranscriptMessage = z.object({
 
 export const NotificationMessage = z.object({
   hint: z.array(z.string()).default([]),
-  timer: z.number().nullable().default(null),
+  isQuestion: z.boolean().default(false),
   fillerCount: z.number().default(0),
   newTopic: z.boolean().default(false),
-  countUp: z.boolean().optional(),
 })
 
 export const DevIsJohnDoNotUseThisMessage = z.object({
