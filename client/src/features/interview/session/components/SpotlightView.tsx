@@ -1,7 +1,6 @@
 import type { LayoutProps } from '../Room'
 import { AspectRatio } from '@mantine/core'
 import { GALLERY_VIEW_ASPECT_RATIO } from '@/utils/constants'
-import { logger } from '@/utils/logger'
 import { useLocalUserId } from '../../zoom/useZoomSessionStore'
 import { useSingleLayout } from '../hooks/useSingleLayout'
 import { SessionTile } from './SessionTile'
@@ -20,7 +19,6 @@ export function SpotlightView({
 
   const localParticipant = localUserId ? participants.get(localUserId) : undefined
   if (!localParticipant) {
-    logger.error('No local participant found')
     return null
   }
 
