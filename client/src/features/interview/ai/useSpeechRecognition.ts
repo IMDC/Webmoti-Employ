@@ -68,7 +68,7 @@ function transcriptReducer(state: State, action: Action): State {
       return state
     case 'Error':
       logger.error(`[SpeechRecognition] Error: ${action.type} - ${action.reason}`)
-      errorNotification('Speechmatics error', action.reason || 'Unknown error')
+      errorNotification('Speechmatics error', action.reason || 'Unknown error while transcribing')
       return state
     case 'EndOfTranscript':
       // Finalize any remaining pending at session end
@@ -96,6 +96,7 @@ export function useSpeechRecognition() {
     sendAudio,
     socketState,
   } = useRealtimeTranscription()
+  const socketStateRef = useRef(socketState)
   const [state, dispatch] = useReducer(transcriptReducer, initialState)
   const [listening, setListening] = useState(false)
   const [hasNotifiedUser, setHasNotifiedUser] = useState(false)
@@ -158,7 +159,7 @@ export function useSpeechRecognition() {
       }
       else {
         if (!hasNotifiedUser) {
-          errorNotification('Transcription error', err?.message || 'Unknown error')
+          errorNotification('Transcription error', err?.message || 'Unknown error when starting transcription')
           setHasNotifiedUser(true)
         }
       }
@@ -180,7 +181,7 @@ export function useSpeechRecognition() {
         }
         catch (err: any) {
           if (!hasNotifiedUser) {
-            errorNotification('Transcription error', err?.message || 'Unknown error')
+            errorNotification('Transcription error', err?.message || 'Unknown error when starting recording')
             setHasNotifiedUser(true)
           }
         }
@@ -204,11 +205,17 @@ export function useSpeechRecognition() {
   }, [])
 
   useEffect(() => {
-    // on unmount, stop recording and close the speechmatics socket
+    socketStateRef.current = socketState
+  }, [socketState])
+
+  // on unmount, stop recording and close the speechmatics socket
+  useEffect(() => {
     return () => {
       abortListening()
       if (isTranscribingRef.current) {
-        stopTranscription()
+        if (socketStateRef.current === 'open') {
+          stopTranscription()
+        }
         isTranscribingRef.current = false
       }
     }
