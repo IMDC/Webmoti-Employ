@@ -4,10 +4,10 @@ import { useMediaQuery } from '@mantine/hooks'
 import {
   IconBubbleTextFilled,
   IconClockHour4Filled,
-  IconHelpHexagonFilled,
   IconHourglassFilled,
   IconMoodSad,
   IconMoodSmileBeam,
+  IconStepInto,
 } from '@tabler/icons-react'
 import { useEffect, useRef, useState } from 'react'
 import { logger } from '@/utils/logger'
@@ -114,7 +114,7 @@ export function FeedbackArea({ notification, onLookingChange }: FeedbackAreaProp
           isActive={countupSeconds > 0}
         />
         <FeedbackIcon
-          icon={<IconHelpHexagonFilled size={iconSize} />}
+          icon={<IconStepInto size={iconSize} />}
           label={hint.join(', ')}
           isActive={hint.length > 0}
         />
