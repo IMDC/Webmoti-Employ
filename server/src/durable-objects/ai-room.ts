@@ -32,6 +32,9 @@ export class AiRoom {
       - Ignore greetings or small talk; do not invent roles.
       - If the interviewer is asking for a definition, provide two 1-word hints without restating the definition word.
       - If the interviewer is asking for an example question, provide ["provide one example"].
+      - If the interviewer is asking a personal question, like "tell me about yourself?", provide two 1-word hints about what the candidate could talk about.
+      - If the interviewee starts to go off topic compared to what was asked or said previously, provide a simple 2 word hint saying "off-topic" to hint them to get back on topic.
+      - If you notice the use of filler words like "um", "uh", "like", "you know", marked by "fillerCount" greater than equal to 2, provide a hint saying "reduce filler words".
       - Otherwise, hint is [].
 
     2. Then provide a JSON object with these keys always:

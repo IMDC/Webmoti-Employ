@@ -135,14 +135,14 @@ async def disconnect(sid: str) -> None:
 async def update_aoi(_: str, data: AOIBoundingBox) -> None:
     global current_aoi_bbox  # noqa: PLW0603
     current_aoi_bbox = data
-    logger.debug(f"Updated AOI: {data}")
+    # logger.debug(f"Updated AOI: {data}")
 
 
 @sio.event
 async def update_feedback_aoi(_: str, data: AOIBoundingBox | None) -> None:
     global current_feedback_aoi_bbox  # noqa: PLW0603
     current_feedback_aoi_bbox = data
-    logger.debug(f"Updated feedback AOI: {data}")
+    # logger.debug(f"Updated feedback AOI: {data}")
 
 
 # ===== EYETRACKING ====================================================================
@@ -245,10 +245,10 @@ async def handle_gaze_data(sample: GazeSample) -> None:
         ):
             _LAST_RATIO = ratio
             _LAST_RATIO_EMIT = now_sec
-            await sio.emit(
-                "gaze_stats",
-                {"gazeOnInterviewerRatio": ratio, "windowSeconds": GAZE_RATIO_WINDOW_S},
-            )
+            # await sio.emit(
+            # "gaze_stats",
+            # {"gazeOnInterviewerRatio": ratio, "windowSeconds": GAZE_RATIO_WINDOW_S},
+            # )
             # logger.debug(f"Gaze ratio: {ratio:.2%} over {GAZE_RATIO_WINDOW_S}s")
 
 
