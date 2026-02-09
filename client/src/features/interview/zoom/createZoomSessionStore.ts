@@ -94,6 +94,13 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         leaveOnPageUnload: true,
       })
 
+      // there's some bug with zoom where the client hasn't finished initializing here.
+      // it only happens in dev.
+      // if you try to join too early here, it will error: "Client not initialized"
+      if (import.meta.env.DEV) {
+        await new Promise(resolve => setTimeout(resolve, 1350))
+      }
+
       set({ isInitializing: false })
 
       newClient.on('user-added', handleUserAdded)
