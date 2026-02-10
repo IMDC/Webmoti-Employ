@@ -2,6 +2,7 @@ import type { MediaDevice } from '@zoom/videosdk'
 import ZoomVideo from '@zoom/videosdk'
 import { createStore } from 'zustand'
 import { logger } from '@/utils/logger'
+import { notifyError } from '@/utils/utils'
 import { appStore } from '../../../useAppStore'
 
 export interface DeviceStoreActions {
@@ -70,7 +71,7 @@ export function createDeviceStore() {
         const hasPermission = [...videoDevices, ...audioInputDevices].length > 0
 
         if (!hasPermission) {
-          appActions.setError({ message: 'Could not access media devices' })
+          notifyError('Could not access media devices')
           appActions.setPermissionState('denied')
           return 'denied'
         }

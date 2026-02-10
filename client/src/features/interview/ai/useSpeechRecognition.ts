@@ -4,7 +4,7 @@ import { usePCMAudioListener, usePCMAudioRecorderContext } from '@speechmatics/b
 import { useRealtimeEventListener, useRealtimeTranscription } from '@speechmatics/real-time-client-react'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { logger } from '@/utils/logger'
-import { errorNotification } from '@/utils/utils'
+import { notifyError } from '@/utils/utils'
 import { getSpeechmaticsJWT, SPEECHMATICS_CONFIG } from './speechmatics-utils'
 
 interface Word {
@@ -68,7 +68,7 @@ function transcriptReducer(state: State, action: Action): State {
       return state
     case 'Error':
       logger.error(`[SpeechRecognition] Error: ${action.type} - ${action.reason}`)
-      errorNotification('Speechmatics error', action.reason || 'Unknown error while transcribing')
+      notifyError('Speechmatics error', action.reason || 'Unknown error while transcribing')
       return state
     case 'EndOfTranscript':
       // Finalize any remaining pending at session end
@@ -135,7 +135,7 @@ export function useSpeechRecognition() {
       }
       if (audioContext.state === 'closed') {
         if (!hasNotifiedUser) {
-          errorNotification('Transcription error', 'Audio context is closed')
+          notifyError('Transcription error', 'Audio context is closed')
           setHasNotifiedUser(true)
         }
         return
@@ -159,7 +159,7 @@ export function useSpeechRecognition() {
       }
       else {
         if (!hasNotifiedUser) {
-          errorNotification('Transcription error', err?.message || 'Unknown error when starting transcription')
+          notifyError('Transcription error', err?.message || 'Unknown error when starting transcription')
           setHasNotifiedUser(true)
         }
       }
@@ -181,7 +181,7 @@ export function useSpeechRecognition() {
         }
         catch (err: any) {
           if (!hasNotifiedUser) {
-            errorNotification('Transcription error', err?.message || 'Unknown error when starting recording')
+            notifyError('Transcription error', err?.message || 'Unknown error when starting recording')
             setHasNotifiedUser(true)
           }
         }

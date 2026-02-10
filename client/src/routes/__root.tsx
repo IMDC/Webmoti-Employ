@@ -2,7 +2,6 @@ import { AppShell, Center, Divider, Group, Stack, Text, Title, useMantineTheme }
 import { Notifications } from '@mantine/notifications'
 import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { ElectronToolbar } from '@/components/ElectronToolbar'
-import { ErrorDialog } from '@/components/ErrorDialog'
 import { useElectronLogs } from '@/features/interview/session/hooks/useElectronLogs'
 import { OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
 import { isElectron } from '@/utils/utils'
@@ -58,7 +57,6 @@ function RootRoute() {
         </AppShell.Main>
       </AppShell>
 
-      <ErrorDialog />
       <Notifications />
     </>
   )

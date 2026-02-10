@@ -4,9 +4,8 @@ import type { ZoomSessionStore } from '../zoom/createZoomSessionStore'
 import type { DeviceStore } from '@/features/interview/zoom/createDeviceStore'
 import ZoomVideo from '@zoom/videosdk'
 import { createStore } from 'zustand'
-import { appStore } from '@/useAppStore'
 import { logger } from '@/utils/logger'
-import { handleAppError } from '@/utils/utils'
+import { notifyError } from '@/utils/utils'
 
 export interface PreviewStoreActions {
   startCamera: (element: VideoPlayer) => Promise<void>
@@ -52,8 +51,7 @@ export function createPreviewStore(
           set({ localVideoTrack: track })
         }
         catch (error) {
-          const { setError } = appStore.getState().actions
-          handleAppError(error, setError, 'Failed to start camera')
+          notifyError('Failed to start camera', error)
         }
       },
 
@@ -74,8 +72,7 @@ export function createPreviewStore(
         }
         catch (error) {
           deviceStore.setState({ selectedVideoDevice: oldDeviceId })
-          const { setError } = appStore.getState().actions
-          handleAppError(error, setError, 'Failed to switch camera')
+          notifyError('Failed to switch camera', error)
         }
       },
 
@@ -145,9 +142,7 @@ export function createPreviewStore(
           deviceStore.setState({ selectedAudioInputDevice: oldDeviceId })
           await oldTrack.start()
           await oldTrack.unmute()
-
-          const { setError } = appStore.getState().actions
-          handleAppError(error, setError, 'Failed to switch microphone')
+          notifyError('Failed to switch microphone', error)
         }
       },
 

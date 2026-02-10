@@ -2,7 +2,6 @@ import { DateTime } from 'luxon'
 import { describe, expect, it, vi } from 'vitest'
 import {
   clearUrlParam,
-  formatAppError,
   getFirstName,
   getHighlightColor,
   getInterviewLink,
@@ -19,40 +18,6 @@ describe('utils', () => {
       const obj = { name: 'test', value: 123 }
       const result = jsonStringifyIndented(obj)
       expect(result).toBe('{\n  "name": "test",\n  "value": 123\n}')
-    })
-  })
-
-  describe('formatAppError', () => {
-    it('should format error with status, message and details', () => {
-      const error = {
-        status: 404,
-        message: 'Not Found',
-        details: 'Resource not available',
-      }
-      const result = formatAppError(error)
-      expect(result).toContain('Status: 404')
-      expect(result).toContain('Message: Not Found')
-      expect(result).toContain('Details: Resource not available')
-    })
-
-    it('should format error without status', () => {
-      const error = {
-        message: 'Error occurred',
-      }
-      const result = formatAppError(error)
-      expect(result).not.toContain('Status:')
-      expect(result).toContain('Message: Error occurred')
-    })
-
-    it('should format error with object details', () => {
-      const error = {
-        status: 500,
-        message: 'Server Error',
-        details: { code: 'ERR_500', description: 'Internal error' },
-      }
-      const result = formatAppError(error)
-      expect(result).toContain('Status: 500')
-      expect(result).toContain('"code": "ERR_500"')
     })
   })
 

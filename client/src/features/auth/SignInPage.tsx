@@ -3,18 +3,16 @@ import { useSearch } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { Loading } from '@/components/Loading'
 import { googleSignIn } from '@/lib/auth-client'
-import { useAppActions } from '@/useAppStore'
-import { clearUrlParam } from '@/utils/utils'
+import { clearUrlParam, notifyError } from '@/utils/utils'
 import GoogleSignInImg from './web_dark_rd_ctn.svg'
 
 export function SignInPage() {
   const { redirectTo, error } = useSearch({ from: '/sign-in' })
-  const { setError } = useAppActions()
   const [loading, setLoading] = useState(false)
 
   const handleGoogleLogin = async () => {
     setLoading(true)
-    await googleSignIn(redirectTo, setError)
+    await googleSignIn(redirectTo)
   }
 
   // this checks for an error in the search params and if it finds it,
@@ -23,10 +21,10 @@ export function SignInPage() {
   useEffect(() => {
     if (error) {
       const formatError = (msg: string) => msg.replace(/_/g, ' ')
-      setError({ message: formatError(error) })
+      notifyError('Error signing in', formatError(error))
       clearUrlParam('error')
     }
-  }, [error, setError])
+  }, [error])
 
   if (loading) {
     return <Loading />

@@ -3,8 +3,7 @@ import type { StoreApi } from 'zustand'
 import type { ChatStore } from './createChatStore'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { useAppActions } from '@/useAppStore'
-import { handleAppError } from '@/utils/utils'
+import { notifyError } from '@/utils/utils'
 import { useZoomSessionClient } from '../zoom/useZoomSessionStore'
 import { createChatStore } from './createChatStore'
 import { ChatStoreContext } from './useChatStore'
@@ -16,8 +15,6 @@ interface ChatContextProviderProps {
 export function ChatContextProvider({ children }: ChatContextProviderProps) {
   const zoomClient = useZoomSessionClient()
   const [store, setStore] = useState<StoreApi<ChatStore>>()
-
-  const { setError } = useAppActions()
 
   const { id } = useParams({ from: '/(authenticated)/interview/$id' })
   const navigate = useNavigate()
@@ -33,14 +30,14 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
       setStore(chatStore)
     }
     catch (error) {
-      handleAppError(error, setError, 'Failed to join chat session')
+      notifyError('Failed to join chat session', error)
       navigate({ to: '/end/$id', params: { id } })
     }
 
     return () => {
       chatStore?.getState().actions.cleanup()
     }
-  }, [zoomClient, setError, id, navigate])
+  }, [zoomClient, id, navigate])
 
   if (!store) {
     return null

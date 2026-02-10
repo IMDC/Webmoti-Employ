@@ -1,5 +1,4 @@
 import type { ExecutedFailure } from '@zoom/videosdk'
-import type { AppError } from '@/useAppStore'
 import { notifications } from '@mantine/notifications'
 import { DateTime } from 'luxon'
 import { HttpError } from './HttpError'
@@ -12,61 +11,7 @@ export function isExecutedFailure(error: unknown): error is ExecutedFailure {
   return typeof error === 'object' && error !== null && 'reason' in error && 'errorCode' in error
 }
 
-export function handleAppError(
-  error: unknown,
-  setError: (e: AppError) => void,
-  defaultMessage: string,
-) {
-  logger.log(defaultMessage)
-  if (isExecutedFailure(error)) {
-    setError({ message: defaultMessage, status: error.errorCode, details: error.reason })
-  }
-  else if (error instanceof HttpError) {
-    setError({ message: error.message, status: error.status, details: error.details })
-  }
-  else if (error instanceof Error) {
-    setError({ message: defaultMessage, details: error.message })
-  }
-  else {
-    setError({ message: defaultMessage })
-  }
-}
-
-export function handleAppErrorWithNotification(
-  error: unknown,
-  defaultMessage?: string,
-) {
-  const fallbackMessage = defaultMessage ?? 'Error'
-
-  logger.error(fallbackMessage, { error })
-
-  if (isExecutedFailure(error)) {
-    showErrorNotification(
-      defaultMessage != null
-        ? `${error.errorCode} ${defaultMessage}`
-        : `${error.errorCode}`,
-      error.reason,
-    )
-  }
-  else if (error instanceof HttpError) {
-    const details
-      = typeof error.details === 'string'
-        ? error.details
-        : error.details != null
-          ? JSON.stringify(error.details)
-          : ''
-
-    showErrorNotification(`${error.status} ${error.message}`, details)
-  }
-  else if (error instanceof Error) {
-    showErrorNotification(fallbackMessage, error.message)
-  }
-  else {
-    showErrorNotification('Error', defaultMessage ?? '')
-  }
-}
-
-export function showErrorNotification(title: string, message: string) {
+export function showErrorNotification(title: string, message?: string) {
   notifications.show({
     title,
     message,
@@ -75,8 +20,10 @@ export function showErrorNotification(title: string, message: string) {
   })
 }
 
-export function errorNotification(title: string, error: unknown) {
-  logger.error(title, error)
+export function notifyError(title: string, error?: unknown) {
+  if (error !== undefined) {
+    logger.error(title, error)
+  }
 
   let message: string | undefined
   let code: string | number | undefined
@@ -98,35 +45,11 @@ export function errorNotification(title: string, error: unknown) {
 
   const fullTitle = code ? `${title} (${code})` : title
 
-  showErrorNotification(fullTitle, message || '')
+  showErrorNotification(fullTitle, message)
 }
 
 export function jsonStringifyIndented(json: unknown) {
   return JSON.stringify(json, null, 2)
-}
-
-export function formatAppError(error: AppError): string {
-  const { status, message, details } = error
-
-  const lines = []
-
-  if (status !== undefined) {
-    lines.push(`Status: ${status}`)
-  }
-
-  if (message && message.length > 0) {
-    lines.push(`Message: ${message}`)
-  }
-
-  if (details !== undefined) {
-    const detailsText = typeof details === 'string' ? details : jsonStringifyIndented(details)
-
-    if (detailsText.length > 0) {
-      lines.push(`Details: ${detailsText}`)
-    }
-  }
-
-  return lines.join('\n')
 }
 
 export function getInterviewLink(sessionId: string) {

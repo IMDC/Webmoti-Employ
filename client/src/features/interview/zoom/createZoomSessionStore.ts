@@ -14,7 +14,7 @@ import ZoomVideo, { VideoActiveState, VideoQuality } from '@zoom/videosdk'
 import { createStore } from 'zustand'
 import { appStore } from '@/useAppStore'
 import { logger } from '@/utils/logger'
-import { handleAppError, handleAppErrorWithNotification, isExecutedFailure } from '@/utils/utils'
+import { isExecutedFailure, notifyError } from '@/utils/utils'
 
 export interface ZoomSessionActions {
   setIsAudioOn: (value: boolean) => void
@@ -146,8 +146,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
 
           const checkReqs = ZoomVideo.checkSystemRequirements()
           if (!checkReqs.video || !checkReqs.audio) {
-            const { setError } = appStore.getState().actions
-            setError({ message: 'Your device is not supported' })
+            notifyError('Your device is not supported')
             return
           }
 
@@ -195,8 +194,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           }
           catch (error) {
             set({ callState: 'prejoin', stream: null })
-            const { setError } = appStore.getState().actions
-            handleAppError(error, setError, 'Failed to join Zoom session')
+            notifyError('Failed to join Zoom session', error)
           }
         },
         leave: async () => {
@@ -230,7 +228,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
             set({ isVideoBlurred: isBlurred })
           }
           catch (error) {
-            handleAppErrorWithNotification(error, 'Failed to set blur')
+            notifyError('Failed to set blur', error)
           }
           updateParticipants()
         },
@@ -247,8 +245,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           }
           catch (error) {
             deviceStore.setState({ selectedVideoDevice: oldDeviceId })
-            const { setError } = appStore.getState().actions
-            handleAppError(error, setError, 'Failed to switch camera')
+            notifyError('Failed to switch camera', error)
           }
         },
         attachVideoPlayer: async (userId: number, element: VideoPlayer) => {
@@ -292,8 +289,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           }
           catch (error) {
             deviceStore.setState({ selectedAudioInputDevice: oldDeviceId })
-            const { setError } = appStore.getState().actions
-            handleAppError(error, setError, 'Failed to switch microphone')
+            notifyError('Failed to switch microphone', error)
           }
         },
         switchSpeaker: async (deviceId) => {
@@ -304,8 +300,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           }
           catch (error) {
             deviceStore.setState({ selectedAudioOutputDevice: oldDeviceId })
-            const { setError } = appStore.getState().actions
-            handleAppError(error, setError, 'Failed to switch speaker')
+            notifyError('Failed to switch speaker', error)
           }
         },
         cleanup: async () => {

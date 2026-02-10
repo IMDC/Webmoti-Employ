@@ -2,8 +2,7 @@ import type { ReactNode } from 'react'
 import type { StoreApi } from 'zustand'
 import type { CommandChannelStore } from './createCommandChannelStore'
 import { useEffect, useState } from 'react'
-import { useAppActions } from '@/useAppStore'
-import { handleAppError } from '@/utils/utils'
+import { notifyError } from '@/utils/utils'
 import { useZoomSessionClient } from '../zoom/useZoomSessionStore'
 import { createCommandChannelStore } from './createCommandChannelStore'
 import { CommandChannelStoreContext } from './useCommandChannelStore'
@@ -16,8 +15,6 @@ export function CommandChannelContextProvider({ children }: CommandChannelContex
   const zoomClient = useZoomSessionClient()
   const [store, setStore] = useState<StoreApi<CommandChannelStore>>()
 
-  const { setError } = useAppActions()
-
   useEffect(() => {
     if (!zoomClient) {
       return
@@ -29,13 +26,13 @@ export function CommandChannelContextProvider({ children }: CommandChannelContex
       setStore(commandChannelStore)
     }
     catch (error) {
-      handleAppError(error, setError, 'Failed to join command channel')
+      notifyError('Failed to join command channel', error)
     }
 
     return () => {
       commandChannelStore?.getState().actions.cleanup()
     }
-  }, [zoomClient, setError])
+  }, [zoomClient])
 
   if (!store) {
     return null

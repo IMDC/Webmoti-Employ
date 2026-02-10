@@ -1,6 +1,10 @@
-import type { AppError } from '@/useAppStore'
 import { createAuthClient } from 'better-auth/react'
-import { getLocalBearerToken, isElectron, removeLocalBearerToken } from '@/utils/utils'
+import {
+  getLocalBearerToken,
+  isElectron,
+  notifyError,
+  removeLocalBearerToken,
+} from '@/utils/utils'
 
 export const authClient: ReturnType<typeof createAuthClient> = createAuthClient({
   baseURL: `${import.meta.env.VITE_API_BASE_URL}/auth`,
@@ -31,22 +35,17 @@ export const authClient: ReturnType<typeof createAuthClient> = createAuthClient(
 // 2. Don't send token from browser to electron, instead use the backend server and a single use nonce
 // 3. Don't have the token in the URL at all (But this is an issue with the better-auth library)
 
-export async function electronGoogleSignIn(
-  setError: (error: AppError | null) => void,
-) {
+export async function electronGoogleSignIn() {
   const clientBase = window.location.origin
   const callbackURL = `${clientBase}/auth/electron`
 
   await authClient.signIn.social(
     { provider: 'google', callbackURL, errorCallbackURL: callbackURL },
-    { onError: error => setError({ message: 'Failed to sign in', details: error }) },
+    { onError: error => notifyError('Failed to sign in', error) },
   )
 }
 
-export async function googleSignIn(
-  redirectTo: string | undefined,
-  setError: (error: AppError | null) => void,
-) {
+export async function googleSignIn(redirectTo: string | undefined) {
   const clientBase = window.location.origin
 
   // if on electron and pressing sign in, it should redirect to the users external browser.
@@ -63,7 +62,7 @@ export async function googleSignIn(
 
   await authClient.signIn.social(
     { provider: 'google', callbackURL, errorCallbackURL },
-    { onError: error => setError({ message: 'Failed to sign in', details: error }) },
+    { onError: error => notifyError('Failed to sign in', error) },
   )
 }
 

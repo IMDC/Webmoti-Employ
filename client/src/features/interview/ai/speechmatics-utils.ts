@@ -2,7 +2,7 @@ import type { RealtimeTranscriptionConfig } from '@speechmatics/real-time-client
 import { SpeechmaticsResponse } from '@webmoti-employ/shared'
 import z from 'zod'
 import { HttpError } from '@/utils/HttpError'
-import { getLocalBearerToken, handleAppErrorWithNotification } from '@/utils/utils'
+import { getLocalBearerToken, notifyError } from '@/utils/utils'
 
 // Speechmatics recommends using a sample rate of 16_000 Hz for real-time transcription.
 // Anything higher will be downsampled by the server. Lower sample rates are also supported.
@@ -44,12 +44,18 @@ export async function getSpeechmaticsJWT(): Promise<string | null> {
   })
   const json = await response.json()
   if (!response.ok) {
-    handleAppErrorWithNotification(new HttpError('Failed to get Speechmatics JWT', response.status, json))
+    notifyError(
+      'Transcription Error',
+      new HttpError('Failed to get Speechmatics JWT', response.status, json),
+    )
     return null
   }
   const result = SpeechmaticsResponse.safeParse(json)
   if (!result.success) {
-    handleAppErrorWithNotification(new HttpError('Invalid response schema', 500, z.flattenError(result.error)))
+    notifyError(
+      'Transcription Error',
+      new HttpError('Invalid response schema', 500, z.flattenError(result.error)),
+    )
     return null
   }
   return result.data.key

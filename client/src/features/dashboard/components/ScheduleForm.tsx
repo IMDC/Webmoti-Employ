@@ -23,8 +23,12 @@ import { DateTime } from 'luxon'
 import { zod4Resolver } from 'mantine-form-zod-resolver'
 import z from 'zod'
 import { useUser } from '@/features/auth/hooks/useUserStore'
-import { useAppActions, useAppIsColorblindModeOn } from '@/useAppStore'
-import { getHighlightColor, getInterviewLink, handleAppError } from '@/utils/utils'
+import { useAppIsColorblindModeOn } from '@/useAppStore'
+import {
+  getHighlightColor,
+  getInterviewLink,
+  notifyError,
+} from '@/utils/utils'
 import { useScheduleInterview } from '../queries'
 import { ScheduleInterviewForm } from '../schema'
 
@@ -64,7 +68,6 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
   const { scheduleInterviewMutation, isScheduleInterviewPending } = useScheduleInterview()
   const user = useUser()
 
-  const { setError } = useAppActions()
   const isColorblindModeOn = useAppIsColorblindModeOn()
 
   const interviewTimeRange = getTimeRange({ startTime: '09:00', endTime: '16:00', interval: '00:30' })
@@ -86,7 +89,7 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
     // zod4Resolver doesn't actually return the parsed values, so we need to parse again
     const parsed = ScheduleInterviewForm.safeParse(values)
     if (!parsed.success) {
-      setError({ message: 'Invalid form data', details: z.flattenError(parsed.error) })
+      notifyError('Invalid form data', z.flattenError(parsed.error))
       return
     }
     const { date, startTime, invites, openGoogleCalendar } = parsed.data
@@ -113,7 +116,7 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
       onSuccess()
     }
     catch (error: unknown) {
-      handleAppError(error, setError, 'Failed to schedule interview')
+      notifyError('Failed to schedule interview', error)
     }
   }
 

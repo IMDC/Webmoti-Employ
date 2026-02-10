@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from 'react'
 import z from 'zod'
 import { Loading } from '@/components/Loading'
 import { electronGoogleSignIn } from '@/lib/auth-client'
-import { useAppActions } from '@/useAppStore'
 import { ELECTRON_PROTOCOL_SCHEME } from '@/utils/constants'
 import { clearUrlParam, getUrlAuthToken } from '@/utils/utils'
 
@@ -18,7 +17,6 @@ export const Route = createFileRoute('/auth/electron')({
 
 function ElectronAuthPage() {
   const { error } = useSearch({ from: '/auth/electron' })
-  const { setError } = useAppActions()
   const [loading, setLoading] = useState(false)
 
   const [hasToken, setHasToken] = useState(false)
@@ -49,8 +47,8 @@ function ElectronAuthPage() {
     }
 
     // if token not found, it means the page just loaded for the first time, so need to sign in.
-    electronGoogleSignIn(setError)
-  }, [setError, error])
+    electronGoogleSignIn()
+  }, [error])
 
   if (error) {
     return (
@@ -62,7 +60,7 @@ function ElectronAuthPage() {
             variant="gradient"
             onClick={() => {
               setLoading(true)
-              electronGoogleSignIn(setError)
+              electronGoogleSignIn()
             }}
             loading={loading}
           >

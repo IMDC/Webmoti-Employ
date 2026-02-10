@@ -1,7 +1,7 @@
 import type { TranscriptMessage } from '@webmoti-employ/shared'
 import { useCallback, useEffect, useState } from 'react'
 import { logger } from '@/utils/logger'
-import { errorNotification } from '@/utils/utils'
+import { notifyError } from '@/utils/utils'
 import { useIsAudioOn } from '../zoom/useZoomSessionStore'
 import { useSpeechRecognition } from './useSpeechRecognition'
 
@@ -26,7 +26,7 @@ export function useBufferedTranscription(
       await startListening()
     }
     catch (error) {
-      errorNotification('Transcription error', error)
+      notifyError('Transcription error', error)
     }
   }, [startListening])
 
