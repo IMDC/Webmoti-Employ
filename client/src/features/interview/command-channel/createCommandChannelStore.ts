@@ -1,5 +1,6 @@
 import type { CommandChannel, VideoClient } from '@zoom/videosdk'
 import { createStore } from 'zustand'
+import { logger } from '@/utils/logger'
 
 export interface CommandChannelMessage {
   senderId: string
@@ -34,7 +35,7 @@ export function createCommandChannelStore(zoomClient: typeof VideoClient) {
           await commandChannelClient.send(text, userId)
         }
         catch (error) {
-          console.error('Failed to send command channel message:', error)
+          logger.error('Failed to send command channel message:', error)
         }
       },
       cleanup: () => {

@@ -468,7 +468,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       }
     }
     catch (err) {
-      console.error(`Error handling peer-video-state-change for user ${userId}`, err)
+      logger.error(`Error handling peer-video-state-change for user ${userId}`, err)
     }
   }
 

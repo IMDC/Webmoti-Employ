@@ -104,12 +104,13 @@ export function useSpeechRecognition() {
       sendAudio(audio)
     }
     catch (err: any) {
-      if (err.message?.includes('Socket not ready to receive audio')) {
+      const msg = err.message ?? ''
+      if (msg.includes('Socket not ready to receive audio')) {
         // Silently drop the chunk since we're just starting up
+        return
       }
-      else {
-        throw err
-      }
+
+      logger.error('Audio send failed:', err)
     }
   }, [sendAudio])
 
