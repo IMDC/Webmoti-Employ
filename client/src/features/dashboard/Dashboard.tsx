@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Affix,
   AppShell,
+  Box,
   Button,
   Divider,
   Flex,
@@ -59,17 +60,20 @@ export function Dashboard() {
           paddingLeft: HEADER_SIDE_PADDING,
           paddingRight: HEADER_SIDE_PADDING,
         },
-        // hide horizontal scrollbar
         main: {
-          height: `calc(100vh - ${HEADER_HEIGHT}px)`,
+          // shift the content left so the scrollbar doesn't shift the layout
+          paddingLeft: 'calc(100vw - 100%)',
         },
       }}
     >
       <AppShell.Header>
-        {/* 100vw makes it so the scrollbar doesn't shift the layout */}
+        {/* 100vw is needed for the header as well so the scrollbar doesn't shift the layout */}
         <Flex justify="space-between" align="center" w="100vw" h="100%" p="lg">
           <Text ff="monospace" fz="xs">{`v${__APP_VERSION__}`}</Text>
-          <RightHeader />
+          {/* shift the header left to counteract the above shift */}
+          <Box mr="sm">
+            <RightHeader />
+          </Box>
         </Flex>
       </AppShell.Header>
 
@@ -94,7 +98,7 @@ export function Dashboard() {
           />
         </Modal>
 
-        <Flex justify="center" align="center" direction="column" w="100vw">
+        <Flex justify="center" align="center" direction="column" w="100%">
           <Stack align="center" gap="xs">
             <Title ta="center" mt={50} fz={{ base: 25, sm: 35, md: 45 }} px="lg">
               {`Welcome ${getFirstName(user.name)}!`}

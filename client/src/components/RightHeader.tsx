@@ -7,7 +7,7 @@ export function RightHeader() {
   const time = useCurrentTime()
 
   return (
-    <Group mr="sm">
+    <Group>
       <Text ff="monospace">{time}</Text>
       <SettingsButton />
       <UserButton />
