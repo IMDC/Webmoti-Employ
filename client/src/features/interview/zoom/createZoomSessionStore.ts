@@ -79,7 +79,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
     const client = () => {
       const c = get().client
       if (!c) {
-        throw new Error('Client not initialized')
+        throw new Error('Client not initialized in store')
       }
       return c
     }
@@ -314,7 +314,9 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           client().off('video-active-change', handleActiveSpeakerChange)
           client().off('network-quality-change', handleNetworkQualityChange)
 
+          logger.log('Destroying zoom client')
           await ZoomVideo.destroyClient()
+
           set({
             client: null,
             stream: null,
@@ -468,7 +470,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       }
     }
     catch (err) {
-      console.error(`Error handling peer-video-state-change for user ${userId}`, err)
+      logger.error(`Error handling peer-video-state-change for user ${userId}`, err)
     }
   }
 
