@@ -20,15 +20,17 @@ export function TranscriptionManager({ children }: { children: ReactNode }) {
 
     const connect = async () => {
       const jwt = await getSpeechmaticsJWT()
-      if (!jwt)
+      if (!jwt) {
+        startedTranscriptionRef.current = false
         return
+      }
       try {
         logger.log('Connecting to speechmatics')
         await startTranscription(jwt, SPEECHMATICS_CONFIG)
       }
       catch (err) {
         // ignore errors if socket is still connecting
-        if (err instanceof Error && !err.message?.includes('Still in CONNECTING state')) {
+        if (!(socketStateRef.current === 'connecting')) {
           logger.error(err)
         }
       }
@@ -39,7 +41,7 @@ export function TranscriptionManager({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     return () => {
-      if (socketStateRef.current === 'open') {
+      if (socketStateRef.current === 'open' || socketStateRef.current === 'connecting') {
         logger.log('Disconnecting from speechmatics')
         stopTranscription()
       }
