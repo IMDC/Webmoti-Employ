@@ -1,6 +1,6 @@
 import type { InterviewResponse } from '@webmoti-employ/shared'
-import { ActionIcon, Avatar, Badge, Button, Card, Divider, Flex, Group, Stack, Text } from '@mantine/core'
-import { IconPlus, IconReport, IconTie, IconVideoFilled } from '@tabler/icons-react'
+import { Avatar, Badge, Button, Card, Divider, Flex, Group, Stack, Text } from '@mantine/core'
+import { IconReport, IconTie, IconVideoFilled } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
 import { GoogleAvatar } from '@/components/GoogleAvatar'
@@ -100,14 +100,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
             )}
 
           {interview.invites.length < 2
-            ? (
-                <Group gap="xs">
-                  <ActionIcon variant="default">
-                    <IconPlus size={16} />
-                  </ActionIcon>
-                  <Text fw="bold">Invite a guest</Text>
-                </Group>
-              )
+            ? <Text fw="bold">No participants invited</Text>
             : <Text fw="bold">{displayLine}</Text>}
         </Flex>
 
