@@ -45,7 +45,7 @@ export async function getSpeechmaticsJWT(): Promise<string | null> {
   const json = await response.json()
   if (!response.ok) {
     notifyError(
-      'Transcription Error',
+      'Error Fetching JWT',
       new HttpError('Failed to get Speechmatics JWT', response.status, json),
     )
     return null
@@ -53,7 +53,7 @@ export async function getSpeechmaticsJWT(): Promise<string | null> {
   const result = SpeechmaticsResponse.safeParse(json)
   if (!result.success) {
     notifyError(
-      'Transcription Error',
+      'Error Parsing Speechmatics Response',
       new HttpError('Invalid response schema', 500, z.flattenError(result.error)),
     )
     return null

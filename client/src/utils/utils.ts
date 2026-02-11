@@ -11,12 +11,24 @@ export function isExecutedFailure(error: unknown): error is ExecutedFailure {
   return typeof error === 'object' && error !== null && 'reason' in error && 'errorCode' in error
 }
 
+function hashString(str: string) {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i)
+    hash |= 0
+  }
+  return hash.toString()
+}
+
 export function showErrorNotification(title: string, message?: string) {
+  const id = hashString(title + (message ?? ''))
+
   notifications.show({
+    id, // unique id so repeated notifications won't show
     title,
     message,
     color: 'red',
-    autoClose: false,
+    autoClose: message && message.length > 100 ? 8000 : 5000,
   })
 }
 
@@ -41,6 +53,14 @@ export function notifyError(title: string, error?: unknown) {
   }
   else if (error instanceof Error) {
     message = error.message || undefined
+  }
+  else if (typeof error === 'object' && error !== null) {
+    try {
+      message = JSON.stringify(error, null, 2)
+    }
+    catch {
+      message = String(error)
+    }
   }
 
   const fullTitle = code ? `${title} (${code})` : title

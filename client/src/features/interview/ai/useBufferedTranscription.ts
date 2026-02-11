@@ -26,7 +26,7 @@ export function useBufferedTranscription(
       await startListening()
     }
     catch (error) {
-      notifyError('Transcription error', error)
+      notifyError('Error starting transcription', error)
     }
   }, [startListening])
 

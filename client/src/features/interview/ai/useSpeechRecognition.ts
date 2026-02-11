@@ -135,7 +135,7 @@ export function useSpeechRecognition() {
       }
       if (audioContext.state === 'closed') {
         if (!hasNotifiedUser) {
-          notifyError('Transcription error', 'Audio context is closed')
+          notifyError('Error starting transcription', 'Audio context is closed')
           setHasNotifiedUser(true)
         }
         return
@@ -159,7 +159,10 @@ export function useSpeechRecognition() {
       }
       else {
         if (!hasNotifiedUser) {
-          notifyError('Transcription error', err?.message || 'Unknown error when starting transcription')
+          notifyError(
+            'Unknown transcription error',
+            err?.message || 'Unknown error when starting transcription',
+          )
           setHasNotifiedUser(true)
         }
       }
@@ -181,7 +184,7 @@ export function useSpeechRecognition() {
         }
         catch (err: any) {
           if (!hasNotifiedUser) {
-            notifyError('Transcription error', err?.message || 'Unknown error when starting recording')
+            notifyError('Unknown recording error', err?.message || 'Unknown error when starting recording')
             setHasNotifiedUser(true)
           }
         }

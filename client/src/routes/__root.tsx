@@ -57,7 +57,7 @@ function RootRoute() {
         </AppShell.Main>
       </AppShell>
 
-      <Notifications />
+      <Notifications limit={2} />
     </>
   )
 }
