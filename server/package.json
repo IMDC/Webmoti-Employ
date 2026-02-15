@@ -20,7 +20,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "migrate:local": "cross-env MIGRATION_TARGET=LOCAL kysely migrate latest",
-    "migrate:remote": "cross-env MIGRATION_TARGET=REMOTE kysely migrate latest"
+    "migrate:remote": "cross-env MIGRATION_TARGET=REMOTE kysely migrate latest",
+    "create-migration": "node scripts/create-migration-file.js"
   },
   "dependencies": {
     "@ai-sdk/groq": "3.0.15",
