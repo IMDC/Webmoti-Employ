@@ -21,6 +21,6 @@ const db = getDb(migrationUrl)
 export default defineConfig({
   kysely: db,
   migrations: {
-    migrationFolder: 'src/migrations/db',
+    migrationFolder: 'src/db/migrations',
   },
 })
