@@ -139,7 +139,7 @@ The database is postgres deployed with the Neon service. We also use Cloudflare 
 
 #### Migrations
 
-Database migrations sync a databse with the project migration files (similar to git commits).
+Database migrations sync a database with the project migration files (similar to git commits).
 This means that if the database needs to be changed, one person can commit a migration file with those changes, and all team members can run the migrate command to update their local databases.
 
 ##### Local migrations
@@ -147,6 +147,9 @@ This means that if the database needs to be changed, one person can commit a mig
 These migrations will update your local postgres database.
 
 ```bash
+# This command runs both our migration and better-auth. It's meant for setup only.
+pnpm migrate:local:all
+
 # Our custom tables:
 pnpm migrate:local
 
@@ -160,6 +163,9 @@ pnpm migrate:better-auth:local
 These migrations will update the remote postgres (Neon) database.
 
 ```bash
+# This command runs both our migration and better-auth. It's meant for setup only.
+pnpm migrate:remote:all
+
 # Our custom tables:
 pnpm migrate:remote
 

@@ -22,6 +22,8 @@
     "migrate:better-auth:remote": "cross-env MIGRATION_TARGET=REMOTE pnpm dlx @better-auth/cli@latest migrate --config ./better-auth.config.ts && pnpm db:typegen",
     "migrate:local": "cross-env MIGRATION_TARGET=LOCAL kysely migrate latest && pnpm db:typegen",
     "migrate:remote": "cross-env MIGRATION_TARGET=REMOTE kysely migrate latest && pnpm db:typegen",
+    "migrate:local:all": "pnpm migrate:local && pnpm migrate:better-auth:local",
+    "migrate:remote:all": "pnpm migrate:remote && pnpm migrate:better-auth:remote",
     "create-migration": "node scripts/create-migration-file.js"
   },
   "dependencies": {
