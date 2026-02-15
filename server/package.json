@@ -14,12 +14,17 @@
     "cf-typegen": "wrangler types worker-configuration.d.ts --env-interface CloudflareBindings",
     "db:typegen": "kysely-codegen",
     "db:better-auth-gen": "pnpm dlx @better-auth/cli@latest generate --config ./better-auth.config.ts --output ./src/db/better-auth-schema.sql",
-    "db:better-auth-migrate": "pnpm dlx @better-auth/cli@latest migrate --config ./better-auth.config.ts",
     "postinstall": "node scripts/postinstall.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "migrate": "kysely migrate latest"
+    "migrate:better-auth:local": "cross-env MIGRATION_TARGET=LOCAL pnpm dlx @better-auth/cli@latest migrate --config ./better-auth.config.ts && pnpm db:typegen",
+    "migrate:better-auth:remote": "cross-env MIGRATION_TARGET=REMOTE pnpm dlx @better-auth/cli@latest migrate --config ./better-auth.config.ts && pnpm db:typegen",
+    "migrate:local": "cross-env MIGRATION_TARGET=LOCAL kysely migrate latest && pnpm db:typegen",
+    "migrate:remote": "cross-env MIGRATION_TARGET=REMOTE kysely migrate latest && pnpm db:typegen",
+    "migrate:local:all": "pnpm migrate:local && pnpm migrate:better-auth:local",
+    "migrate:remote:all": "pnpm migrate:remote && pnpm migrate:better-auth:remote",
+    "create-migration": "node scripts/create-migration-file.js"
   },
   "dependencies": {
     "@ai-sdk/groq": "3.0.15",
@@ -39,6 +44,7 @@
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.12.6",
     "@types/pg": "^8.16.0",
+    "cross-env": "^10.1.0",
     "dotenv": "^17.2.3",
     "globals": "^17.1.0",
     "kysely-codegen": "^0.19.0",

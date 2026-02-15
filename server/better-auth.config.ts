@@ -1,22 +1,24 @@
+/* eslint-disable node/prefer-global/process */
+
 /**
  * Better Auth CLI configuration file
  *
  * Docs: https://www.better-auth.com/docs/concepts/cli
  *
- * This is separate from the getAuth.ts file since we need to use process.env here
+ * This is separate from the getAuth.ts file since we need to use process.env here. This file is only used for migrations.
  *
  */
+
 import { betterAuth } from 'better-auth'
-import { getDb } from './src/db/getDb'
+import { getMigrationDb } from './src/db/getMigrationDb'
 import { betterAuthOptions } from './src/lib/better-auth-options'
 
-// eslint-disable-next-line node/prefer-global/process
-const { DATABASE_URL, BETTER_AUTH_URL, BETTER_AUTH_SECRET } = process.env
+const { BETTER_AUTH_URL, BETTER_AUTH_SECRET } = process.env
 
 export const auth: ReturnType<typeof betterAuth> = betterAuth({
   ...betterAuthOptions,
   database: {
-    db: getDb(DATABASE_URL),
+    db: getMigrationDb(),
     type: 'postgres',
   },
   baseURL: BETTER_AUTH_URL,
