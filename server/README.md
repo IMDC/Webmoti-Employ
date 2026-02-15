@@ -12,8 +12,10 @@ The server uses the Hono framework so it can run on serverless environments. Thi
   - [Video Calling](#video-calling)
   - [Database](#database)
     - [Neon](#neon)
-    - [Cloudflare Hyperdrive](#cloudflare-hyperdrive)
     - [Migrations](#migrations)
+      - [Local migrations](#local-migrations)
+      - [Remote migrations](#remote-migrations)
+    - [Cloudflare Hyperdrive](#cloudflare-hyperdrive)
   - [Authentication](#authentication)
     - [Better Auth Setup](#better-auth-setup)
     - [Google OAuth Setup](#google-oauth-setup)
@@ -57,18 +59,15 @@ Setup video: <https://www.youtube.com/watch?v=tu7zuv6aMug> (up to 3:45)
     3. Open pgAdmin and unlock with your superuser password
 2. Create database
     1. Right click `Databases` > `Create` > `Database...`
-    2. Under `General`, Enter anything for the `Database` name (ex. webmoti-employ)
+    2. Under `General`, Enter anything for the `Database` name (ex. `webmoti-employ`)
     3. Press `Save`
-3. Create tables
-    1. Right click the new database > `Query Tool`
-    2. Paste the [create tables sql](#neon)
-    3. Press `Execute script` (also `F5` shortcut works)
-4. Get the connection string (postgresql://USERNAME:PASSWORD@localhost:5432/DATABASE_NAME)
+3. Get the connection string (postgresql://USERNAME:PASSWORD@localhost:5432/DATABASE_NAME)
     - USERNAME: your superuser username (probably `postgres` if unchanged)
     - PASSWORD: your superuser password
     - DATABASE_NAME: your database name
     - localhost:5432: this part is the same if you selected the default port
-5. Put this connection string in `server/.env` as `WRANGLER_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`
+4. Put this connection string in `server/.env` as `WRANGLER_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`
+5. [Run local database migration](#migrations) to create the tables
 
 ## Deploying
 
@@ -116,42 +115,7 @@ The database is postgres deployed with the Neon service. We also use Cloudflare 
 #### Neon
 
 1. Choose the closest region (AWS US East 1 (N. Virginia))
-2. Create the tables in the public schema:
-
-    ```sql
-    CREATE TABLE "public"."interview" (
-      "id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-      "creator_id" varchar(128) NOT NULL,
-      "start_time" timestamp with time zone NOT NULL,
-      "end_time" timestamp with time zone,
-      "is_instant" BOOLEAN NOT NULL DEFAULT false,
-      "session_id" uuid UNIQUE NOT NULL DEFAULT gen_random_uuid (),
-      "created_at" timestamp with time zone NOT NULL DEFAULT now(),
-      "updated_at" timestamp with time zone NOT NULL DEFAULT now()
-    );
-
-    CREATE TABLE "public"."interview_invite" (
-      "id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-      "interview_id" integer NOT NULL,
-      "email" text NOT NULL,
-      "is_interviewer" boolean NOT NULL DEFAULT false,
-      "created_at" timestamp with time zone NOT NULL DEFAULT now(),
-      CONSTRAINT "interview_id_fkey" FOREIGN KEY ("interview_id") REFERENCES "public"."interview" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
-      CONSTRAINT "interview_invite_interview_id_email_key" UNIQUE ("interview_id", "email")
-    );
-
-    -- the below tables are generated using better-auth. see `server/src/db/better-auth-schema.sql`
-
-    create table "user" ("id" text not null primary key, "name" text not null, "email" text not null unique, "email_verified" boolean not null, "image" text, "created_at" timestamp not null, "updated_at" timestamp not null);
-
-    create table "session" ("id" text not null primary key, "expires_at" timestamp not null, "token" text not null unique, "created_at" timestamp not null, "updated_at" timestamp not null, "ip_address" text, "user_agent" text, "user_id" text not null references "user" ("id"));
-
-    create table "account" ("id" text not null primary key, "account_id" text not null, "provider_id" text not null, "user_id" text not null references "user" ("id"), "access_token" text, "refresh_token" text, "id_token" text, "access_token_expires_at" timestamp, "refresh_token_expires_at" timestamp, "scope" text, "password" text, "created_at" timestamp not null, "updated_at" timestamp not null);
-
-    create table "verification" ("id" text not null primary key, "identifier" text not null, "value" text not null, "expires_at" timestamp not null, "created_at" timestamp, "updated_at" timestamp);
-    ```
-
-3. Create a non owner role to use (replace `<password>` with the actual password) ([More info](https://neon.com/docs/manage/database-access#create-a-read-write-role)) The password should have at least 12 characters with a mix of lowercase, uppercase, number, and symbol characters.
+2. Create a non owner role to use (replace `<password>` with the actual password) ([More info](https://neon.com/docs/manage/database-access#create-a-read-write-role)) The password should have at least 12 characters with a mix of lowercase, uppercase, number, and symbol characters.
 
    ```sql
    -- readwrite role
@@ -170,8 +134,39 @@ The database is postgres deployed with the Neon service. We also use Cloudflare 
    GRANT readwrite TO readwrite_imdc;
    ```
 
-4. Get the connection string. Make sure the role is readwrite_imdc. Put this connection string in `.dev.vars` as the `DATABASE_URL` field. Also put it in `.env`.
-5. Run `pnpm run db:typegen` to generate types for the database. Do this whenever you change the Neon database.
+3. Get the connection string. Make sure the role is readwrite_imdc. Put this connection string in `.dev.vars` as the `DATABASE_URL` field. Also put it in `.env`.
+4. [Run remote database migration](#migrations) to generate the tables
+
+#### Migrations
+
+Database migrations sync a databse with the project migration files (similar to git commits).
+This means that if the database needs to be changed, one person can commit a migration file with those changes, and all team members can run the migrate command to update their local databases.
+
+##### Local migrations
+
+These migrations will update your local postgres database.
+
+```bash
+# Our custom tables:
+pnpm migrate:local
+
+# Better-Auth tables:
+# (This only needs to be run when setting up, not when you change our table schema)
+pnpm migrate:better-auth:local
+```
+
+##### Remote migrations
+
+These migrations will update the remote postgres (Neon) database.
+
+```bash
+# Our custom tables:
+pnpm migrate:remote
+
+# Better-Auth tables:
+# (This only needs to be run when setting up, not when you change our table schema)
+pnpm migrate:better-auth:remote
+```
 
 #### Cloudflare Hyperdrive
 
@@ -187,10 +182,6 @@ The database is postgres deployed with the Neon service. We also use Cloudflare 
     pnpm dlx wrangler hyperdrive update my-hyperdrive-id --origin-password my-db-password --caching-disabled true
     ```
 
-#### Migrations
-
-Run `pnpm migrate` to run the latest migrations
-
 ### Authentication
 
 Authentication is done using Better Auth. This is self hosted.
@@ -203,9 +194,8 @@ A good resource for this is: <https://hono.dev/examples/better-auth-on-cloudflar
 
 1. Use the site to generate the `BETTER_AUTH_SECRET` (or `npx @better-auth/cli secret`). Also generate a second one to put in the GitHub repo secrets so it works in the CI.
 2. For the `BETTER_AUTH_URL`, you can set this to `http://localhost:8787` for dev (assuming the hono app runs on port `8787`). For production you can set this to the actual url of the Cloudflare deployed hono app.
-3. Create Better Auth Tables: `pnpm run db:better-auth-gen`. This will generate `src/db/better-auth-schema.sql` which we don't use, but it's useful to use for creating local tables in the local Postgresql database.
-4. Add Better Auth Tables to the database: `pnpm run:db:better-auth-migrate`. This will connect to the Neon database and add the tables.
-4.
+3. (optional) Create Better Auth Table SQL: `pnpm run db:better-auth-gen`. This will generate `src/db/better-auth-schema.sql` which we don't use, but it's useful to use for creating local tables in the local Postgresql database.
+4. [Run better-auth migrations](#migrations)
 
 #### Google OAuth Setup
 
