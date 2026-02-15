@@ -15,7 +15,7 @@ export interface Account {
   accessToken: string | null;
   accessTokenExpiresAt: Timestamp | null;
   accountId: string;
-  createdAt: Timestamp;
+  createdAt: Generated<Timestamp>;
   id: string;
   idToken: string | null;
   password: string | null;
@@ -47,7 +47,7 @@ export interface InterviewInvite {
 }
 
 export interface Session {
-  createdAt: Timestamp;
+  createdAt: Generated<Timestamp>;
   expiresAt: Timestamp;
   id: string;
   ipAddress: string | null;
@@ -58,21 +58,21 @@ export interface Session {
 }
 
 export interface User {
-  createdAt: Timestamp;
+  createdAt: Generated<Timestamp>;
   email: string;
   emailVerified: boolean;
   id: string;
   image: string | null;
   name: string;
-  updatedAt: Timestamp;
+  updatedAt: Generated<Timestamp>;
 }
 
 export interface Verification {
-  createdAt: Timestamp | null;
+  createdAt: Generated<Timestamp>;
   expiresAt: Timestamp;
   id: string;
   identifier: string;
-  updatedAt: Timestamp | null;
+  updatedAt: Generated<Timestamp>;
   value: string;
 }
 
