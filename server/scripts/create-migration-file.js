@@ -5,7 +5,7 @@ import path from 'node:path'
 // read migration description from command line
 const description = process.argv[2]
 if (!description) {
-  console.error('Usage: node create-migration.js <description>')
+  console.error('Usage: pnpm create-migration <description>')
   process.exit(1)
 }
 
