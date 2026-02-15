@@ -12,7 +12,7 @@ if (!description) {
 // format timestamp: YYYYMMDDHHMM
 const now = new Date()
 const pad = n => String(n).padStart(2, '0')
-const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}`
+const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`
 
 // generate filename
 const fileName = `${timestamp}_${description.replace(/\s+/g, '_').toLowerCase()}.ts`
