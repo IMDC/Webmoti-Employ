@@ -7,6 +7,10 @@ shellEmulator: false
 
 trustPolicy: no-downgrade
 
+trustPolicyExclude:
+  # semver@6.3.1 has no provenance/trust evidence (from better-auth)
+  - semver@6.3.1
+
 packages:
   - client
   - server

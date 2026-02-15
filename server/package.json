@@ -14,13 +14,14 @@
     "cf-typegen": "wrangler types worker-configuration.d.ts --env-interface CloudflareBindings",
     "db:typegen": "kysely-codegen",
     "db:better-auth-gen": "pnpm dlx @better-auth/cli@latest generate --config ./better-auth.config.ts --output ./src/db/better-auth-schema.sql",
-    "db:better-auth-migrate": "pnpm dlx @better-auth/cli@latest migrate --config ./better-auth.config.ts",
     "postinstall": "node scripts/postinstall.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "migrate:local": "cross-env MIGRATION_TARGET=LOCAL kysely migrate latest",
-    "migrate:remote": "cross-env MIGRATION_TARGET=REMOTE kysely migrate latest",
+    "migrate:better-auth:local": "cross-env MIGRATION_TARGET=LOCAL pnpm dlx @better-auth/cli@latest migrate --config ./better-auth.config.ts && pnpm db:typegen",
+    "migrate:better-auth:remote": "cross-env MIGRATION_TARGET=REMOTE pnpm dlx @better-auth/cli@latest migrate --config ./better-auth.config.ts && pnpm db:typegen",
+    "migrate:local": "cross-env MIGRATION_TARGET=LOCAL kysely migrate latest && pnpm db:typegen",
+    "migrate:remote": "cross-env MIGRATION_TARGET=REMOTE kysely migrate latest && pnpm db:typegen",
     "create-migration": "node scripts/create-migration-file.js"
   },
   "dependencies": {
