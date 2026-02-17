@@ -5,11 +5,12 @@ minimumReleaseAge: 4320
 # eslint-disable-next-line pnpm/yaml-enforce-settings
 shellEmulator: false
 
-trustPolicy: no-downgrade
+# eslint-disable-next-line pnpm/yaml-enforce-settings
+trustPolicy: off
 
-trustPolicyExclude:
-  # semver@6.3.1 has no provenance/trust evidence (from better-auth)
-  - semver@6.3.1
+# # semver < 7.5.1 has no provenance/trust evidence
+# trustPolicyExclude:
+#   - semver@5.7.2 || 6.3.1
 
 packages:
   - client
