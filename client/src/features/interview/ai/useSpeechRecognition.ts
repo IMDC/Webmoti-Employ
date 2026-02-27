@@ -5,6 +5,7 @@ import { useRealtimeEventListener, useRealtimeTranscription } from '@speechmatic
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { logger } from '@/utils/logger'
 import { notifyError } from '@/utils/utils'
+import { getSpeechmaticsJWT, SPEECHMATICS_CONFIG } from './speechmatics-utils'
 
 interface Word {
   text: string
@@ -89,14 +90,26 @@ function transcriptReducer(state: State, action: Action): State {
 
 export function useSpeechRecognition() {
   const { startRecording, stopRecording, audioContext } = usePCMAudioRecorderContext()
-  const { sendAudio } = useRealtimeTranscription()
+  const {
+    startTranscription,
+    stopTranscription,
+    sendAudio,
+    socketState,
+  } = useRealtimeTranscription()
+  const socketStateRef = useRef(socketState)
   const [state, dispatch] = useReducer(transcriptReducer, initialState)
   const [listening, setListening] = useState(false)
   const [hasNotifiedUser, setHasNotifiedUser] = useState(false)
+  const [transcriptionStarted, setTranscriptionStarted] = useState(false)
+  const [recognitionReady, setRecognitionReady] = useState(false)
+  const isTranscribingRef = useRef(false)
   const isRecordingRef = useRef(false)
 
   useRealtimeEventListener('receiveMessage', (e) => {
     dispatch(e.data)
+    if (e.data.message === 'RecognitionStarted') {
+      setRecognitionReady(true)
+    }
   })
 
   const onAudio = useCallback((audio: Float32Array) => {
@@ -104,13 +117,12 @@ export function useSpeechRecognition() {
       sendAudio(audio)
     }
     catch (err: any) {
-      const msg = err.message ?? ''
-      if (msg.includes('Socket not ready to receive audio')) {
+      if (err.message?.includes('Socket not ready to receive audio')) {
         // Silently drop the chunk since we're just starting up
-        return
       }
-
-      logger.error('Audio send failed:', err)
+      else {
+        throw err
+      }
     }
   }, [sendAudio])
 
@@ -131,18 +143,55 @@ export function useSpeechRecognition() {
       if (audioContext.state !== 'running') {
         await audioContext.resume()
       }
-      const options: StartRecordingOptions = { audioContext }
-      await startRecording(options)
-      isRecordingRef.current = true
-      setListening(true)
+      const jwt = await getSpeechmaticsJWT()
+      if (!jwt) {
+        return
+      }
+      await startTranscription(jwt, SPEECHMATICS_CONFIG)
+      isTranscribingRef.current = true
+      setTranscriptionStarted(true)
     }
     catch (err: any) {
-      if (!hasNotifiedUser) {
-        notifyError('Unknown recording error', err?.message || 'Unknown error when starting recording')
-        setHasNotifiedUser(true)
+      if (err.message?.includes('Still in CONNECTING state')) {
+        // Proceed assuming connection will establish; do not notify or disable
+        isTranscribingRef.current = true
+        setTranscriptionStarted(true)
+      }
+      else {
+        if (!hasNotifiedUser) {
+          notifyError(
+            'Unknown transcription error',
+            err?.message || 'Unknown error when starting transcription',
+          )
+          setHasNotifiedUser(true)
+        }
       }
     }
-  }, [audioContext, startRecording, hasNotifiedUser])
+  }, [audioContext, startTranscription, hasNotifiedUser])
+
+  useEffect(() => {
+    if (transcriptionStarted && recognitionReady && socketState === 'open' && !listening) {
+      const startRec = async () => {
+        try {
+          if (!audioContext || audioContext.state === 'closed') {
+            logger.error('[SpeechRecognition] AudioContext is closed, cannot start recording')
+            return
+          }
+          const options: StartRecordingOptions = { audioContext }
+          await startRecording(options)
+          isRecordingRef.current = true
+          setListening(true)
+        }
+        catch (err: any) {
+          if (!hasNotifiedUser) {
+            notifyError('Unknown recording error', err?.message || 'Unknown error when starting recording')
+            setHasNotifiedUser(true)
+          }
+        }
+      }
+      startRec()
+    }
+  }, [transcriptionStarted, recognitionReady, socketState, listening, startRecording, audioContext, hasNotifiedUser])
 
   const abortListening = useCallback(() => {
     // here we only stop recording audio, but keep transcription active.
@@ -158,12 +207,22 @@ export function useSpeechRecognition() {
     dispatch({ type: 'reset' })
   }, [])
 
-  // on unmount, stop recording. transcription will be stopped when leaving the /interview route.
+  useEffect(() => {
+    socketStateRef.current = socketState
+  }, [socketState])
+
+  // on unmount, stop recording and close the speechmatics socket
   useEffect(() => {
     return () => {
       abortListening()
+      if (isTranscribingRef.current) {
+        if (socketStateRef.current === 'open') {
+          stopTranscription()
+        }
+        isTranscribingRef.current = false
+      }
     }
-  }, [abortListening])
+  }, [abortListening, stopTranscription])
 
   return {
     transcript: state.transcript,

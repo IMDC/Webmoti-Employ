@@ -1,7 +1,4 @@
-import { RealtimeTranscriptionProvider } from '@speechmatics/real-time-client-react'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
-import { AudioProvider } from '@/features/interview/ai/AudioProvider'
-import { TranscriptionManager } from '@/features/interview/ai/TranscriptionManager'
 import { DeviceContextProvider } from '@/features/interview/zoom/DeviceContextProvider'
 import { ZoomSessionContextProvider } from '@/features/interview/zoom/ZoomSessionContextProvider'
 
@@ -18,13 +15,7 @@ function ZoomSessionLayout() {
   return (
     <DeviceContextProvider>
       <ZoomSessionContextProvider>
-        <AudioProvider>
-          <RealtimeTranscriptionProvider>
-            <TranscriptionManager>
-              <Outlet />
-            </TranscriptionManager>
-          </RealtimeTranscriptionProvider>
-        </AudioProvider>
+        <Outlet />
       </ZoomSessionContextProvider>
     </DeviceContextProvider>
   )
