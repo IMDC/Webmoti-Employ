@@ -1,11 +1,11 @@
 import type { StartRecordingOptions } from '@speechmatics/browser-audio-input-react'
 import type { RealtimeServerMessage } from '@speechmatics/real-time-client-react'
 import { usePCMAudioListener, usePCMAudioRecorderContext } from '@speechmatics/browser-audio-input-react'
-import { useRealtimeEventListener, useRealtimeTranscription } from '@speechmatics/real-time-client-react'
+import { useRealtimeEventListener } from '@speechmatics/real-time-client-react'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { logger } from '@/utils/logger'
 import { notifyError } from '@/utils/utils'
-import { getSpeechmaticsJWT, SPEECHMATICS_CONFIG } from './speechmatics-utils'
+import { useTranscriptionManager } from './TranscriptionManagerContext'
 
 interface Word {
   text: string
@@ -91,18 +91,16 @@ function transcriptReducer(state: State, action: Action): State {
 export function useSpeechRecognition() {
   const { startRecording, stopRecording, audioContext } = usePCMAudioRecorderContext()
   const {
-    startTranscription,
-    stopTranscription,
-    sendAudio,
+    startTranscriptionSession,
+    stopTranscriptionSession,
     socketState,
-  } = useRealtimeTranscription()
-  const socketStateRef = useRef(socketState)
+    sendAudio,
+  } = useTranscriptionManager()
   const [state, dispatch] = useReducer(transcriptReducer, initialState)
   const [listening, setListening] = useState(false)
   const [hasNotifiedUser, setHasNotifiedUser] = useState(false)
   const [transcriptionStarted, setTranscriptionStarted] = useState(false)
   const [recognitionReady, setRecognitionReady] = useState(false)
-  const isTranscribingRef = useRef(false)
   const isRecordingRef = useRef(false)
 
   useRealtimeEventListener('receiveMessage', (e) => {
@@ -143,18 +141,15 @@ export function useSpeechRecognition() {
       if (audioContext.state !== 'running') {
         await audioContext.resume()
       }
-      const jwt = await getSpeechmaticsJWT()
-      if (!jwt) {
+      const started = await startTranscriptionSession()
+      if (!started) {
         return
       }
-      await startTranscription(jwt, SPEECHMATICS_CONFIG)
-      isTranscribingRef.current = true
       setTranscriptionStarted(true)
     }
     catch (err: any) {
       if (err.message?.includes('Still in CONNECTING state')) {
         // Proceed assuming connection will establish; do not notify or disable
-        isTranscribingRef.current = true
         setTranscriptionStarted(true)
       }
       else {
@@ -167,7 +162,7 @@ export function useSpeechRecognition() {
         }
       }
     }
-  }, [audioContext, startTranscription, hasNotifiedUser])
+  }, [audioContext, startTranscriptionSession, hasNotifiedUser])
 
   useEffect(() => {
     if (transcriptionStarted && recognitionReady && socketState === 'open' && !listening) {
@@ -207,22 +202,13 @@ export function useSpeechRecognition() {
     dispatch({ type: 'reset' })
   }, [])
 
-  useEffect(() => {
-    socketStateRef.current = socketState
-  }, [socketState])
-
   // on unmount, stop recording and close the speechmatics socket
   useEffect(() => {
     return () => {
       abortListening()
-      if (isTranscribingRef.current) {
-        if (socketStateRef.current === 'open') {
-          stopTranscription()
-        }
-        isTranscribingRef.current = false
-      }
+      stopTranscriptionSession()
     }
-  }, [abortListening, stopTranscription])
+  }, [abortListening, stopTranscriptionSession])
 
   return {
     transcript: state.transcript,
