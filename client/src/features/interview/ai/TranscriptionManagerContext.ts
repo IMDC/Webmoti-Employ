@@ -5,6 +5,7 @@ export interface TranscriptionManagerContextValue {
   sendAudio: (audioData: Float32Array) => void
   startTranscriptionSession: () => Promise<boolean>
   stopTranscriptionSession: () => void
+  isRecognitionReady: boolean
 }
 
 export const TranscriptionManagerContext = createContext<TranscriptionManagerContextValue | null>(null)

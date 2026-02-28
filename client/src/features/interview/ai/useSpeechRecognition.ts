@@ -95,19 +95,16 @@ export function useSpeechRecognition() {
     stopTranscriptionSession,
     socketState,
     sendAudio,
+    isRecognitionReady,
   } = useTranscriptionManager()
   const [state, dispatch] = useReducer(transcriptReducer, initialState)
   const [listening, setListening] = useState(false)
   const [hasNotifiedUser, setHasNotifiedUser] = useState(false)
   const [transcriptionStarted, setTranscriptionStarted] = useState(false)
-  const [recognitionReady, setRecognitionReady] = useState(false)
   const isRecordingRef = useRef(false)
 
   useRealtimeEventListener('receiveMessage', (e) => {
     dispatch(e.data)
-    if (e.data.message === 'RecognitionStarted') {
-      setRecognitionReady(true)
-    }
   })
 
   const onAudio = useCallback((audio: Float32Array) => {
@@ -165,7 +162,7 @@ export function useSpeechRecognition() {
   }, [audioContext, startTranscriptionSession, hasNotifiedUser])
 
   useEffect(() => {
-    if (transcriptionStarted && recognitionReady && socketState === 'open' && !listening) {
+    if (transcriptionStarted && isRecognitionReady && socketState === 'open' && !listening) {
       const startRec = async () => {
         try {
           if (!audioContext || audioContext.state === 'closed') {
@@ -186,7 +183,7 @@ export function useSpeechRecognition() {
       }
       startRec()
     }
-  }, [transcriptionStarted, recognitionReady, socketState, listening, startRecording, audioContext, hasNotifiedUser])
+  }, [transcriptionStarted, isRecognitionReady, socketState, listening, startRecording, audioContext, hasNotifiedUser])
 
   const abortListening = useCallback(() => {
     // here we only stop recording audio, but keep transcription active.

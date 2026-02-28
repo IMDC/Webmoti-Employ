@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import { useRealtimeTranscription } from '@speechmatics/real-time-client-react'
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useRealtimeEventListener, useRealtimeTranscription } from '@speechmatics/real-time-client-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getSpeechmaticsJWT, SPEECHMATICS_CONFIG } from './speechmatics-utils'
 import { TranscriptionManagerContext } from './TranscriptionManagerContext'
 
@@ -9,10 +9,17 @@ export function TranscriptionManager({ children }: { children: ReactNode }) {
   const socketStateRef = useRef(socketState)
   const isTranscribingRef = useRef(false)
   const startSessionPromiseRef = useRef<Promise<boolean> | null>(null)
+  const [isRecognitionReady, setIsRecognitionReady] = useState(false)
 
   useEffect(() => {
     socketStateRef.current = socketState
   }, [socketState])
+
+  useRealtimeEventListener('receiveMessage', (e) => {
+    if (e.data.message === 'RecognitionStarted') {
+      setIsRecognitionReady(true)
+    }
+  })
 
   const startTranscriptionSession = useCallback(async () => {
     if (isTranscribingRef.current) {
@@ -54,6 +61,7 @@ export function TranscriptionManager({ children }: { children: ReactNode }) {
         stopTranscription()
       }
       isTranscribingRef.current = false
+      setIsRecognitionReady(false)
     }
   }, [stopTranscription])
 
@@ -68,7 +76,8 @@ export function TranscriptionManager({ children }: { children: ReactNode }) {
     sendAudio,
     startTranscriptionSession,
     stopTranscriptionSession,
-  }), [socketState, sendAudio, startTranscriptionSession, stopTranscriptionSession])
+    isRecognitionReady,
+  }), [socketState, sendAudio, startTranscriptionSession, stopTranscriptionSession, isRecognitionReady])
 
   return <TranscriptionManagerContext value={contextValue}>{children}</TranscriptionManagerContext>
 }
