@@ -44,6 +44,7 @@ export function TranscriptionManager({ children }: { children: ReactNode }) {
       catch (err: any) {
         if (err.message?.includes('Still in CONNECTING state')) {
           isTranscribingRef.current = true
+          return true
         }
         throw err
       }

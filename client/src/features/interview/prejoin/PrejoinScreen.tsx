@@ -8,6 +8,7 @@ import { useUser } from '@/features/auth/hooks/useUserStore'
 import { useDeviceStoreActions } from '@/features/interview/zoom/useDeviceStore'
 import { useAppActions, useAppPermissionState } from '@/useAppStore'
 import { HEADER_HEIGHT, HEADER_SIDE_PADDING, OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
+import { logger } from '@/utils/logger'
 import { isElectron } from '@/utils/utils'
 import { useTranscriptionManager } from '../ai/TranscriptionManagerContext'
 import { useIsZoomInitializing, useZoomCallState, useZoomSessionActions } from '../zoom/useZoomSessionStore'
@@ -41,7 +42,9 @@ export function PrejoinScreen() {
   // Pre-connect to Speechmatics WebSocket so it's ready when joining the room
   useEffect(() => {
     if (interviewSession && !interviewSessionError) {
-      void startTranscriptionSession()
+      startTranscriptionSession().catch((error) => {
+        logger.error('Failed to pre-connect transcription session:', error)
+      })
     }
   }, [interviewSession, interviewSessionError, startTranscriptionSession])
 

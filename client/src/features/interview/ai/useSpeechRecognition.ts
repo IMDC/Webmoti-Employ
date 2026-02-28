@@ -112,11 +112,8 @@ export function useSpeechRecognition() {
       sendAudio(audio)
     }
     catch (err: any) {
-      if (err.message?.includes('Socket not ready to receive audio')) {
-        // Silently drop the chunk since we're just starting up
-      }
-      else {
-        throw err
+      if (!err.message?.includes('Socket not ready to receive audio')) {
+        logger.error('Audio send failed:', err)
       }
     }
   }, [sendAudio])
