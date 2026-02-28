@@ -8,7 +8,9 @@ import { useUser } from '@/features/auth/hooks/useUserStore'
 import { useDeviceStoreActions } from '@/features/interview/zoom/useDeviceStore'
 import { useAppActions, useAppPermissionState } from '@/useAppStore'
 import { HEADER_HEIGHT, HEADER_SIDE_PADDING, OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
+import { logger } from '@/utils/logger'
 import { isElectron } from '@/utils/utils'
+import { useTranscriptionManager } from '../ai/TranscriptionManagerContext'
 import { useIsZoomInitializing, useZoomCallState, useZoomSessionActions } from '../zoom/useZoomSessionStore'
 import { ErrorScreen } from './components/ErrorScreen'
 import { JoiningScreen } from './components/JoiningScreen'
@@ -31,9 +33,20 @@ export function PrejoinScreen() {
   const user = useUser()
   const { id: sessionId } = useParams({ strict: false })
 
+  const { startTranscriptionSession } = useTranscriptionManager()
+
   const userProfileUrl = user.image!
   const { interviewSession, isInterviewSessionPending, interviewSessionError }
     = useInterviewSession(sessionId)
+
+  // Pre-connect to Speechmatics WebSocket so it's ready when joining the room
+  useEffect(() => {
+    if (interviewSession && !interviewSessionError) {
+      startTranscriptionSession().catch((error) => {
+        logger.error('Failed to pre-connect transcription session:', error)
+      })
+    }
+  }, [interviewSession, interviewSessionError, startTranscriptionSession])
 
   useEffect(() => {
     // wait until the interview session query is successful before init devices
