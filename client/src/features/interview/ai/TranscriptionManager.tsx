@@ -1,19 +1,15 @@
 import type { ReactNode } from 'react'
 import { useRealtimeEventListener, useRealtimeTranscription } from '@speechmatics/real-time-client-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { logger } from '@/utils/logger'
 import { getSpeechmaticsJWT, SPEECHMATICS_CONFIG } from './speechmatics-utils'
 import { TranscriptionManagerContext } from './TranscriptionManagerContext'
 
 export function TranscriptionManager({ children }: { children: ReactNode }) {
   const { startTranscription, stopTranscription, socketState, sendAudio } = useRealtimeTranscription()
-  const socketStateRef = useRef(socketState)
   const isTranscribingRef = useRef(false)
   const startSessionPromiseRef = useRef<Promise<boolean> | null>(null)
   const [isRecognitionReady, setIsRecognitionReady] = useState(false)
-
-  useEffect(() => {
-    socketStateRef.current = socketState
-  }, [socketState])
 
   useRealtimeEventListener('receiveMessage', (e) => {
     if (e.data.message === 'RecognitionStarted') {
@@ -58,8 +54,13 @@ export function TranscriptionManager({ children }: { children: ReactNode }) {
 
   const stopTranscriptionSession = useCallback(() => {
     if (isTranscribingRef.current) {
-      if (socketStateRef.current === 'open') {
+      try {
         stopTranscription()
+      }
+      catch (err) {
+        // stopTranscription may throw if socket is still connecting (can't send EndOfStream)
+        // The socket will eventually time out or be GC'd
+        logger.warn('Failed to stop transcription cleanly:', err)
       }
       isTranscribingRef.current = false
       setIsRecognitionReady(false)
