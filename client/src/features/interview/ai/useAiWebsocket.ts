@@ -88,8 +88,9 @@ export function useAiWebsocket() {
           return {
             // Keep latest non-empty hints; preserve previous when AI sends []
             hint: incoming.hint.length > 0 ? incoming.hint : prev.hint,
-            // Follow the AI's per-chunk assessment (not sticky)
-            isQuestion: incoming.isQuestion,
+            // Sticky within a topic: once a question is detected, keep it true
+            // so the countup timer doesn't reset mid-answer
+            isQuestion: prev.isQuestion || incoming.isQuestion,
             // Sum filler counts across the topic
             fillerCount: prev.fillerCount + incoming.fillerCount,
             // Only true on the first notification of a new topic
