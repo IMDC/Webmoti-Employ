@@ -72,10 +72,29 @@ export function useAiWebsocket() {
       const msg = result.data
       if (msg.type === 'notification') {
         setNotification((prev) => {
-          const newPayload = Object.fromEntries(
-            Object.entries(msg.payload).filter(([_, v]) => v !== null),
-          )
-          return { ...prev, ...newPayload }
+          const incoming = msg.payload
+
+          // New topic: reset accumulators
+          if (incoming.newTopic) {
+            return {
+              hint: incoming.hint,
+              isQuestion: incoming.isQuestion,
+              fillerCount: incoming.fillerCount,
+              newTopic: true,
+            }
+          }
+
+          // Same topic: accumulate feedback to avoid flicker
+          return {
+            // Keep latest non-empty hints; preserve previous when AI sends []
+            hint: incoming.hint.length > 0 ? incoming.hint : prev.hint,
+            // Follow the AI's per-chunk assessment (not sticky)
+            isQuestion: incoming.isQuestion,
+            // Sum filler counts across the topic
+            fillerCount: prev.fillerCount + incoming.fillerCount,
+            // Only true on the first notification of a new topic
+            newTopic: false,
+          }
         })
         logger.log('Received notification:', msg.payload)
       }
