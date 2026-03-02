@@ -88,7 +88,7 @@ export function useBufferedTranscription(
         // don't reset transcript here to avoid interrupting ongoing accumulation
       }
     }
-  }, [transcript, sentWordCount, sendTranscript, maxWordsBuffer])
+  }, [transcript, sentWordCount, sendTranscript, maxWordsBuffer, finalTranscript])
 }
 
 function getWords(text: string): string[] {

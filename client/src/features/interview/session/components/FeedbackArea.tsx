@@ -28,7 +28,8 @@ export function FeedbackArea({ notification, onLookingChange }: FeedbackAreaProp
 
   const { hint, isQuestion, fillerCount, wordCount, newTopic, offTopic } = notification
 
-  // fillerCount and wordCount are already accumulated per topic in useAiWebsocket.
+  // fillerCount and wordCount are summed over a sliding window of the last
+  // FILLER_WINDOW_SIZE notifications in useAiWebsocket (reset on newTopic).
   // Only show the warning after enough words and if filler % exceeds threshold.
   const FILLER_MIN_WORDS = 10
   const FILLER_THRESHOLD = 0.08
