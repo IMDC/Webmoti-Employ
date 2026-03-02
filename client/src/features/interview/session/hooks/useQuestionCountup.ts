@@ -1,34 +1,39 @@
 import type { NotificationMessage } from '@webmoti-employ/shared'
-import { useEffect } from 'react'
-import { useCountup } from './useCountup'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 /**
- * Drives a countup timer based on whether the current notification is a question.
- * Resets on new topics that contain a question; stops when no question is active.
+ * Counts seconds since the current question was asked.
+ * Resets on new topics with a question; stops when no question is active.
  */
 export function useQuestionCountup(notification: NotificationMessage) {
   const { isQuestion, newTopic } = notification
-  const { countupSeconds, startCountup, stopCountup } = useCountup()
 
-  // start countup if notification is a question
+  const [seconds, setSeconds] = useState(0)
+  const intervalRef = useRef<number | null>(null)
+
+  const stop = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+  }, [])
+
+  const start = useCallback(() => {
+    stop()
+    setSeconds(0)
+    intervalRef.current = window.setInterval(() => setSeconds(s => s + 1), 1000)
+  }, [stop])
+
   useEffect(() => {
     if (isQuestion) {
-      startCountup()
+      start()
     }
     else {
-      stopCountup()
+      stop()
     }
-  }, [isQuestion, startCountup, stopCountup])
+    // newTopic in deps ensures the timer restarts when a new topic arrives
+    // with a question, even if isQuestion was already true.
+  }, [isQuestion, newTopic, start, stop])
 
-  // restart countup when a new topic arrives with a question
-  useEffect(() => {
-    if (newTopic && isQuestion) {
-      startCountup()
-    }
-    else if (newTopic && !isQuestion) {
-      stopCountup()
-    }
-  }, [newTopic, isQuestion, startCountup, stopCountup])
-
-  return countupSeconds
+  return seconds
 }
