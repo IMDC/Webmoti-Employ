@@ -2,6 +2,7 @@ import { Button, Menu, Tooltip } from '@mantine/core'
 import {
   IconBlur,
   IconBlurOff,
+  IconChartHistogram,
   IconDotsVertical,
   IconLayoutGrid,
   IconMaximize,
@@ -13,6 +14,7 @@ import {
 import { useEffect, useState } from 'react'
 import { useAppActions } from '@/useAppStore'
 import { useIsVideoBlurred, useZoomSessionActions } from '../../zoom/useZoomSessionStore'
+import { StatisticsModal } from './StatisticsModal'
 
 interface ControlsMenuProps {
   onLayoutOpen?: () => void
@@ -26,6 +28,7 @@ export function ControlsMenu({ onLayoutOpen, isMobile, sendDevIsJohnDoNotUseThis
   const { blurVideo } = useZoomSessionActions()
 
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isStatisticsOpen, setIsStatisticsOpen] = useState(false)
 
   const [isJohnInterviewerPressed, setIsJohnInterviewerPressed] = useState(false)
   const [isJohnCandidatePressed, setIsJohnCandidatePressed] = useState(false)
@@ -46,81 +49,89 @@ export function ControlsMenu({ onLayoutOpen, isMobile, sendDevIsJohnDoNotUseThis
   }
 
   return (
-    <Menu shadow="md" position="top-end">
-      <Menu.Target>
-        <Tooltip color="gray" label="Controls menu">
-          <Button variant="default" px={{ base: 5, sm: 'md' }}>
-            {isMobile ? <IconDotsVertical size={18} /> : <IconMenu2 size={18} />}
-          </Button>
-        </Tooltip>
-      </Menu.Target>
+    <>
+      <Menu shadow="md" position="top-end">
+        <Menu.Target>
+          <Tooltip color="gray" label="Controls menu">
+            <Button variant="default" px={{ base: 5, sm: 'md' }}>
+              {isMobile ? <IconDotsVertical size={18} /> : <IconMenu2 size={18} />}
+            </Button>
+          </Tooltip>
+        </Menu.Target>
 
-      <Menu.Dropdown>
-        <Menu.Label>Controls</Menu.Label>
+        <Menu.Dropdown>
+          <Menu.Label>Controls</Menu.Label>
 
-        <Menu.Item leftSection={<IconLayoutGrid size={14} />} onClick={onLayoutOpen}>
-          Layout
-        </Menu.Item>
+          <Menu.Item leftSection={<IconLayoutGrid size={14} />} onClick={onLayoutOpen}>
+            Layout
+          </Menu.Item>
 
-        <Menu.Item
-          leftSection={
-            isFullscreen ? <IconMinimize size={14} /> : <IconMaximize size={14} />
-          }
-          onClick={toggleFullscreen}
-        >
-          {isFullscreen ? 'Exit full screen' : 'Full screen'}
-        </Menu.Item>
+          <Menu.Item
+            leftSection={
+              isFullscreen ? <IconMinimize size={14} /> : <IconMaximize size={14} />
+            }
+            onClick={toggleFullscreen}
+          >
+            {isFullscreen ? 'Exit full screen' : 'Full screen'}
+          </Menu.Item>
 
-        <Menu.Item
-          onClick={() => blurVideo(!isVideoBlurred)}
-          leftSection={isVideoBlurred ? <IconBlur size={14} /> : <IconBlurOff size={14} />}
-        >
-          {isVideoBlurred ? 'Unblur Video' : 'Blur Video'}
-        </Menu.Item>
+          <Menu.Item
+            onClick={() => blurVideo(!isVideoBlurred)}
+            leftSection={isVideoBlurred ? <IconBlur size={14} /> : <IconBlurOff size={14} />}
+          >
+            {isVideoBlurred ? 'Unblur Video' : 'Blur Video'}
+          </Menu.Item>
 
-        <Menu.Item onClick={() => setIsSettingsOpen(true)} leftSection={<IconSettings size={14} />}>
-          Settings
-        </Menu.Item>
+          <Menu.Item onClick={() => setIsSettingsOpen(true)} leftSection={<IconSettings size={14} />}>
+            Settings
+          </Menu.Item>
 
-        <Menu.Item
-          closeMenuOnClick={false}
-          onMouseDown={() => {
-            setIsJohnInterviewerPressed(true)
-            sendDevIsJohnDoNotUseThis?.(true, true)
-          }}
-          onMouseUp={() => {
-            setIsJohnInterviewerPressed(false)
-            sendDevIsJohnDoNotUseThis?.(false, true)
-          }}
-          onMouseLeave={() => {
-            setIsJohnInterviewerPressed(false)
-            sendDevIsJohnDoNotUseThis?.(false, true)
-          }}
-          leftSection={<IconUserFilled size={14} />}
-          bg={isJohnInterviewerPressed ? 'blue' : undefined}
-        >
-          DEV: John (interviewer)
-        </Menu.Item>
-        <Menu.Item
-          closeMenuOnClick={false}
-          onMouseDown={() => {
-            setIsJohnCandidatePressed(true)
-            sendDevIsJohnDoNotUseThis?.(true, false)
-          }}
-          onMouseUp={() => {
-            setIsJohnCandidatePressed(false)
-            sendDevIsJohnDoNotUseThis?.(false, false)
-          }}
-          onMouseLeave={() => {
-            setIsJohnCandidatePressed(false)
-            sendDevIsJohnDoNotUseThis?.(false, false)
-          }}
-          leftSection={<IconUserFilled size={14} />}
-          bg={isJohnCandidatePressed ? 'blue' : undefined}
-        >
-          DEV: John (candidate)
-        </Menu.Item>
-      </Menu.Dropdown>
-    </Menu>
+          <Menu.Item onClick={() => setIsStatisticsOpen(true)} leftSection={<IconChartHistogram size={14} />}>
+            Statistics
+          </Menu.Item>
+
+          <Menu.Item
+            closeMenuOnClick={false}
+            onMouseDown={() => {
+              setIsJohnInterviewerPressed(true)
+              sendDevIsJohnDoNotUseThis?.(true, true)
+            }}
+            onMouseUp={() => {
+              setIsJohnInterviewerPressed(false)
+              sendDevIsJohnDoNotUseThis?.(false, true)
+            }}
+            onMouseLeave={() => {
+              setIsJohnInterviewerPressed(false)
+              sendDevIsJohnDoNotUseThis?.(false, true)
+            }}
+            leftSection={<IconUserFilled size={14} />}
+            bg={isJohnInterviewerPressed ? 'blue' : undefined}
+          >
+            DEV: John (interviewer)
+          </Menu.Item>
+          <Menu.Item
+            closeMenuOnClick={false}
+            onMouseDown={() => {
+              setIsJohnCandidatePressed(true)
+              sendDevIsJohnDoNotUseThis?.(true, false)
+            }}
+            onMouseUp={() => {
+              setIsJohnCandidatePressed(false)
+              sendDevIsJohnDoNotUseThis?.(false, false)
+            }}
+            onMouseLeave={() => {
+              setIsJohnCandidatePressed(false)
+              sendDevIsJohnDoNotUseThis?.(false, false)
+            }}
+            leftSection={<IconUserFilled size={14} />}
+            bg={isJohnCandidatePressed ? 'blue' : undefined}
+          >
+            DEV: John (candidate)
+          </Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
+
+      <StatisticsModal opened={isStatisticsOpen} onClose={() => setIsStatisticsOpen(false)} />
+    </>
   )
 }

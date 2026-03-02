@@ -19,6 +19,7 @@ export const useZoomParticipants = () => useZoomSessionStore(s => s.participants
 export const useIsVideoOn = () => useZoomSessionStore(s => s.isVideoOn)
 export const useIsAudioOn = () => useZoomSessionStore(s => s.isAudioOn)
 export const useZoomSessionClient = () => useZoomSessionStore(s => s.client)
+export const useZoomMediaStream = () => useZoomSessionStore(s => s.stream)
 export const useLocalUserId = () => useZoomSessionStore(s => s.localUserId)
 export const useActiveSpeakerUserId = () => useZoomSessionStore(s => s.activeSpeakerUserId)
 export const useRoomName = () => useZoomSessionStore(s => s.roomName)
@@ -30,3 +31,8 @@ export function useParticipantNetworkLevel(userId: number | null) {
 }
 export const useIsZoomInitializing = () => useZoomSessionStore(s => s.isInitializing)
 export const useIsVideoBlurred = () => useZoomSessionStore(s => s.isVideoBlurred)
+export const useAudioEncodingStatistic = () => useZoomSessionStore(s => s.audioEncodingStatistic)
+export const useAudioDecodingStatistic = () => useZoomSessionStore(s => s.audioDecodingStatistic)
+export const useVideoEncodingStatistic = () => useZoomSessionStore(s => s.videoEncodingStatistic)
+export const useVideoDecodingStatistic = () => useZoomSessionStore(s => s.videoDecodingStatistic)
+export const useSystemResourceUsage = () => useZoomSessionStore(s => s.systemResourceUsage)

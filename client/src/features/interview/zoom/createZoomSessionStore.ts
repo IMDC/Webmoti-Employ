@@ -1,12 +1,17 @@
 import type {
+  AudioQosData,
+  event_audio_statistic_data_change,
   event_device_permission_change,
   event_network_quality_change,
   event_peer_video_state_change,
+  event_system_resource_usage_change,
   event_video_active_change,
+  event_video_statistic_data_change,
   MediaDevice,
   Participant,
   VideoClient,
   VideoPlayer,
+  VideoQosData,
 } from '@zoom/videosdk'
 import type { StoreApi } from 'zustand'
 import type { DeviceStore } from './createDeviceStore'
@@ -46,6 +51,8 @@ export interface ZoomSessionActions {
   cleanup: () => Promise<void>
 }
 
+export type ZoomSystemResourceUsage = Parameters<typeof event_system_resource_usage_change>[0]
+
 export type CallState = 'prejoin' | 'joining' | 'joined' | 'left'
 
 export interface ZoomSessionStore {
@@ -63,6 +70,11 @@ export interface ZoomSessionStore {
   isAudioOn: boolean
   isVideoOn: boolean
   isVideoBlurred: boolean
+  audioEncodingStatistic: AudioQosData | null
+  audioDecodingStatistic: AudioQosData | null
+  videoEncodingStatistic: VideoQosData | null
+  videoDecodingStatistic: VideoQosData | null
+  systemResourceUsage: ZoomSystemResourceUsage | null
   actions: ZoomSessionActions
 }
 
@@ -134,6 +146,11 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       isAudioOn: true,
       isVideoOn: true,
       isVideoBlurred: false,
+      audioEncodingStatistic: null,
+      audioDecodingStatistic: null,
+      videoEncodingStatistic: null,
+      videoDecodingStatistic: null,
+      systemResourceUsage: null,
       roomName: null,
 
       actions: {
@@ -190,15 +207,20 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
             }
 
             set({ stream, callState: 'joined', localUserId: client().getCurrentUserInfo().userId })
+            subscribeStatisticsEvents()
             updateParticipants()
           }
           catch (error) {
             set({ callState: 'prejoin', stream: null })
+            unsubscribeStatisticsEvents()
+            resetStatisticsState()
             notifyError('Failed to join Zoom session', error)
           }
         },
         leave: async () => {
           logger.log('Leaving zoom session...')
+          unsubscribeStatisticsEvents()
+          resetStatisticsState()
           set({ callState: 'left', participants: new Map() })
           await client().leave()
         },
@@ -305,6 +327,8 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         },
         cleanup: async () => {
           logger.log('Cleaning up zoom client...')
+          unsubscribeStatisticsEvents()
+          resetStatisticsState()
           client().off('user-added', handleUserAdded)
           client().off('user-removed', handleUserRemoved)
           client().off('user-updated', handleUserUpdated)
@@ -334,6 +358,70 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
   // --------------------------------------------------
   // All zoom event listeners to keep state updated:
   // --------------------------------------------------
+
+  function resetStatisticsState() {
+    zoomSessionStore.setState({
+      audioEncodingStatistic: null,
+      audioDecodingStatistic: null,
+      videoEncodingStatistic: null,
+      videoDecodingStatistic: null,
+      systemResourceUsage: null,
+    })
+  }
+
+  function handleAudioStatisticDataChange(payload: Parameters<typeof event_audio_statistic_data_change>[0]) {
+    const { encoding, ...stats } = payload.data
+    if (encoding) {
+      zoomSessionStore.setState({ audioEncodingStatistic: stats })
+    }
+    else {
+      zoomSessionStore.setState({ audioDecodingStatistic: stats })
+    }
+  }
+
+  function handleVideoStatisticDataChange(payload: Parameters<typeof event_video_statistic_data_change>[0]) {
+    const { encoding, ...stats } = payload.data
+    if (encoding) {
+      zoomSessionStore.setState({ videoEncodingStatistic: stats })
+    }
+    else {
+      zoomSessionStore.setState({ videoDecodingStatistic: stats })
+    }
+  }
+
+  function handleSystemResourceUsageChange(payload: ZoomSystemResourceUsage) {
+    zoomSessionStore.setState({ systemResourceUsage: payload })
+  }
+
+  function subscribeStatisticsEvents() {
+    const { stream, client, callState } = zoomSessionStore.getState()
+    if (!stream || !client || callState !== 'joined')
+      return
+
+    stream.subscribeAudioStatisticData()
+    stream.subscribeVideoStatisticData()
+    void stream.subscribeSystemResourceUsage().catch(error => logger.warn('Failed to subscribe system resource usage', error))
+
+    client.on('audio-statistic-data-change', handleAudioStatisticDataChange)
+    client.on('video-statistic-data-change', handleVideoStatisticDataChange)
+    client.on('system-resource-usage-change', handleSystemResourceUsageChange)
+  }
+
+  function unsubscribeStatisticsEvents() {
+    const { stream, client } = zoomSessionStore.getState()
+
+    if (client) {
+      client.off('audio-statistic-data-change', handleAudioStatisticDataChange)
+      client.off('video-statistic-data-change', handleVideoStatisticDataChange)
+      client.off('system-resource-usage-change', handleSystemResourceUsageChange)
+    }
+
+    if (stream) {
+      stream.unsubscribeAudioStatisticData()
+      stream.unsubscribeVideoStatisticData()
+      void stream.unsubscribeSystemResourceUsage().catch(error => logger.warn('Failed to unsubscribe system resource usage', error))
+    }
+  }
 
   function updateParticipants() {
     const client = zoomSessionStore.getState().client
