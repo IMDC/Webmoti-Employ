@@ -9,6 +9,7 @@ export const NotificationMessage = z.object({
   hint: z.array(z.string()).default([]),
   isQuestion: z.boolean().default(false),
   fillerCount: z.number().default(0),
+  wordCount: z.number().default(0),
   newTopic: z.boolean().default(false),
 })
 

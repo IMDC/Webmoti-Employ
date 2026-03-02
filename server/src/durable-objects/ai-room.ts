@@ -34,11 +34,17 @@ export class AiRoom {
       - If the interviewer is asking for an example question, provide ["provide one example"].
       - If the interviewer is asking a personal question, like "tell me about yourself?", provide two 1-word hints about what the candidate could talk about.
       - If the interviewee starts to go off topic compared to what was asked or said previously, provide a simple 2 word hint saying "off-topic" to hint them to get back on topic.
-      - If you notice the use of filler words like "um", "uh", "like", "you know", marked by "fillerCount" greater than equal to 2, provide a hint saying "reduce filler words".
       - Otherwise, hint is [].
 
     2. Then provide a JSON object with these keys always:
-      - "fillerCount": number of filler words for this topic (0 if none, never null).
+      - "fillerCount": number of filler words in this transcript (0 if none, never null). Only count these as fillers:
+        * Hesitation sounds: "um", "uh", "er", "ah", "hmm"
+        * "like" ONLY when used as a verbal crutch (e.g. "it was like, difficult"), NOT when expressing preference ("I like coding") or comparison ("something like React")
+        * "you know" when used as a filler, not when genuinely asking
+        * "I mean" when used to stall, not when genuinely clarifying
+        * "basically", "sort of", "kind of" when used as hedging rather than literal meaning
+        * "right" ONLY when used as a filler tag (e.g. "so right, the thing is"), NOT for agreement or correctness
+        Do NOT count: "also", "so", "well", "actually", "just", "really", "okay", or any word used with clear meaning in context.
       - "isQuestion": boolean, true if transcript is a question, false otherwise.
       - "hint": list of hints as described above (always a list, never null). The hints should vary based on the question and stay until the question starts to be answered properly.
       - "newTopic": boolean, true if the interviewer has started a new topic/question, false otherwise.
@@ -83,6 +89,10 @@ export class AiRoom {
     Transcript is a question asking for an example:
     "Tell me about a time when you resolved a conflict."
     {"isQuestion": true, "hint": ["provide one example"], "fillerCount": 0, "newTopic": false}
+
+    Transcript with filler words:
+    "Um, I think, like, the main thing is, you know, scalability."
+    {"isQuestion": false, "hint": [], "fillerCount": 3, "newTopic": false}
 
     Transcript is made up of two separate transcripts:
     "Define"
@@ -168,7 +178,9 @@ export class AiRoom {
     try {
       this.messages.push({ role: 'user', content: transcript })
       const response = await this.aiGenerateText()
-      await this.handleAiResponse(response)
+      // Count words from the transcript text (strip the "[role] Name: " prefix)
+      const wordCount = countTranscriptWords(transcript)
+      await this.handleAiResponse(response, wordCount)
     }
     finally {
       this.generating = false
@@ -178,7 +190,7 @@ export class AiRoom {
     }
   }
 
-  private async handleAiResponse(response: string) {
+  private async handleAiResponse(response: string, wordCount: number) {
     function getResponseObject(response: string) {
     // match first {...} JSON block
       const match = response.match(/\{[\s\S]*\}/)
@@ -188,7 +200,10 @@ export class AiRoom {
       return JSON.parse(match[0])
     }
 
-    const notificationResult = NotificationMessage.safeParse(getResponseObject(response))
+    const notificationResult = NotificationMessage.safeParse({
+      ...getResponseObject(response),
+      wordCount,
+    })
 
     if (!notificationResult.success) {
       console.error('Failed to parse generated notification:', notificationResult.error)
@@ -277,4 +292,15 @@ export class AiRoom {
     console.error('WebSocket error:', error)
     this.sessions.delete(ws)
   }
+}
+
+/**
+ * Count spoken words from a transcript string.
+ * Strips the "[role] Name: " prefix and counts whitespace-separated words.
+ */
+function countTranscriptWords(transcript: string): number {
+  // Remove all "[role] Name: " prefixes (there can be multiple joined transcripts)
+  const text = transcript.replace(/\[(?:interviewer|interviewee)\] [^:]+: /gi, '')
+  const words = text.trim().split(/\s+/).filter(w => w.length > 0)
+  return words.length
 }

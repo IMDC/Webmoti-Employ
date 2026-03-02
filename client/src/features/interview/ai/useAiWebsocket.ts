@@ -1,11 +1,14 @@
 import type { TranscriptMessage } from '@webmoti-employ/shared'
 import { NotificationMessage, WebSocketMessage } from '@webmoti-employ/shared'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { logger } from '@/utils/logger'
 import { getLocalBearerToken } from '@/utils/utils'
 import { useRoomName } from '../zoom/useZoomSessionStore'
+
+/** Number of recent notifications to consider for filler percentage */
+const FILLER_WINDOW_SIZE = 5
 
 export function useAiWebsocket() {
   const roomName = useRoomName()
@@ -14,6 +17,9 @@ export function useAiWebsocket() {
     // make empty message using defaults
     NotificationMessage.parse({}),
   )
+
+  // Ring buffer of recent { fillerCount, wordCount } for sliding window
+  const recentRef = useRef<{ fillerCount: number, wordCount: number }[]>([])
 
   const protocol = import.meta.env.DEV ? 'ws' : 'wss'
   const host = import.meta.env.DEV
@@ -71,29 +77,43 @@ export function useAiWebsocket() {
 
       const msg = result.data
       if (msg.type === 'notification') {
-        setNotification((prev) => {
-          const incoming = msg.payload
+        const incoming = msg.payload
 
-          // New topic: reset accumulators
+        // Update sliding window outside of state updater to avoid double-mutation
+        if (incoming.newTopic) {
+          recentRef.current = [{ fillerCount: incoming.fillerCount, wordCount: incoming.wordCount }]
+        }
+        else {
+          recentRef.current.push({ fillerCount: incoming.fillerCount, wordCount: incoming.wordCount })
+          if (recentRef.current.length > FILLER_WINDOW_SIZE) {
+            recentRef.current.shift()
+          }
+        }
+
+        // Sum the window
+        let totalFillers = 0
+        let totalWords = 0
+        for (const entry of recentRef.current) {
+          totalFillers += entry.fillerCount
+          totalWords += entry.wordCount
+        }
+
+        setNotification((prev) => {
           if (incoming.newTopic) {
             return {
               hint: incoming.hint,
               isQuestion: incoming.isQuestion,
-              fillerCount: incoming.fillerCount,
+              fillerCount: totalFillers,
+              wordCount: totalWords,
               newTopic: true,
             }
           }
 
-          // Same topic: accumulate feedback to avoid flicker
           return {
-            // Keep latest non-empty hints; preserve previous when AI sends []
             hint: incoming.hint.length > 0 ? incoming.hint : prev.hint,
-            // Sticky within a topic: once a question is detected, keep it true
-            // so the countup timer doesn't reset mid-answer
             isQuestion: prev.isQuestion || incoming.isQuestion,
-            // Sum filler counts across the topic
-            fillerCount: prev.fillerCount + incoming.fillerCount,
-            // Only true on the first notification of a new topic
+            fillerCount: totalFillers,
+            wordCount: totalWords,
             newTopic: false,
           }
         })

@@ -25,7 +25,25 @@ export function FeedbackArea({ notification, onLookingChange }: FeedbackAreaProp
 
   const feedback = useFeedback()
 
-  const { hint, isQuestion, fillerCount, newTopic } = notification
+  const { hint, isQuestion, fillerCount, wordCount, newTopic } = notification
+
+  // fillerCount and wordCount are already accumulated per topic in useAiWebsocket.
+  // Only show the warning after enough words and if filler % exceeds threshold.
+  const FILLER_MIN_WORDS = 10
+  const FILLER_THRESHOLD = 0.08
+  const showFillerWarning = wordCount >= FILLER_MIN_WORDS
+    && fillerCount / wordCount >= FILLER_THRESHOLD
+
+  useEffect(() => {
+    logger.log('[FeedbackArea] filler tracking:', {
+      fillerCount,
+      wordCount,
+      pct: wordCount > 0
+        ? `${(fillerCount / wordCount * 100).toFixed(1)}%`
+        : '0%',
+      showFillerWarning,
+    })
+  }, [fillerCount, wordCount, showFillerWarning])
 
   const looking = feedback.find(f => f.feedbackType === 'lookingAtInterviewer')?.isActive
   const [emoticonPositive, setEmoticonPositive] = useState<boolean | null>(null)
@@ -101,8 +119,8 @@ export function FeedbackArea({ notification, onLookingChange }: FeedbackAreaProp
         />
         <FeedbackIcon
           icon={<IconBubbleTextFilled size={iconSize} />}
-          label={`${fillerCount} Filler Word${fillerCount === 1 ? '' : 's'}`}
-          isActive={fillerCount != null && fillerCount > 0}
+          label="Reduce Filler Words"
+          isActive={showFillerWarning}
         />
       </Group>
     </Center>
