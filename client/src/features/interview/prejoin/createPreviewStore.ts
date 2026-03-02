@@ -19,6 +19,7 @@ export interface PreviewStoreActions {
   toggleMuteMicrophone: () => Promise<void>
   switchMicrophone: (microphoneId: string) => Promise<void>
   switchSpeaker: (speakerId: string) => Promise<void>
+  toggleBlurBackground: () => Promise<void>
 
   cleanup: () => Promise<void>
 }
@@ -150,6 +151,26 @@ export function createPreviewStore(
         // this method doesn't actually change speakers because there's no point in doing that in prejoin.
         // it just saves the selection.
         deviceStore.setState({ selectedAudioOutputDevice: speakerId })
+      },
+
+      toggleBlurBackground: async () => {
+        const localVideoTrack = get().localVideoTrack
+        const isVideoBlurred = zoomSessionStore.getState().isVideoBlurred
+
+        if (localVideoTrack) {
+          try {
+            if (isVideoBlurred) {
+              await localVideoTrack.updateVirtualBackground(undefined)
+            }
+            else {
+              await localVideoTrack.updateVirtualBackground('blur')
+            }
+            zoomSessionStore.getState().actions.toggleBlurPrejoin()
+          }
+          catch (error) {
+            notifyError('Failed to toggle video blur', error)
+          }
+        }
       },
 
       cleanup: async () => {

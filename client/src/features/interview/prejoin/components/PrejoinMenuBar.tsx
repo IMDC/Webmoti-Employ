@@ -1,5 +1,4 @@
 import { Button, Group, Tooltip } from '@mantine/core'
-import { notifications } from '@mantine/notifications'
 import { IconBlur, IconBlurOff } from '@tabler/icons-react'
 import { useAppPermissionState } from '@/useAppStore'
 import { ToggleAudioButton } from '../../components/buttons/ToggleAudioButton'
@@ -11,7 +10,7 @@ import { useIsVideoBlurred, useZoomSessionActions } from '../../zoom/useZoomSess
 import { usePreviewActions } from '../hooks/usePreviewStore'
 
 export function PrejoinMenuBar() {
-  const { toggleIsVideoOn, toggleBlurPrejoin } = useZoomSessionActions()
+  const { toggleIsVideoOn } = useZoomSessionActions()
   const isVideoBlurred = useIsVideoBlurred()
   const permissionState = useAppPermissionState()
   const { initDevices } = useDeviceStoreActions()
@@ -20,6 +19,7 @@ export function PrejoinMenuBar() {
     switchCamera,
     switchMicrophone,
     switchSpeaker,
+    toggleBlurBackground,
   } = usePreviewActions()
 
   const disableMediaButtons = permissionState === 'idle' || permissionState === 'acquiring'
@@ -39,18 +39,6 @@ export function PrejoinMenuBar() {
     toggleIsVideoOn()
   }
 
-  function handleBlurToggle() {
-    // no need to show notification when turning blur off
-    if (!isVideoBlurred) {
-      notifications.show({
-        title: 'Video Blur Activated',
-        message: 'Your background will be blurred when joining the session',
-      })
-    }
-
-    toggleBlurPrejoin()
-  }
-
   return (
     <Group justify="center" align="center" h="100%" gap="sm">
       <Button.Group>
@@ -66,7 +54,7 @@ export function PrejoinMenuBar() {
       <Tooltip label="Toggle Blur" color="gray">
         <Button
           variant={isVideoBlurred ? 'gradient' : 'default'}
-          onClick={handleBlurToggle}
+          onClick={toggleBlurBackground}
           disabled={disableMediaButtons}
           // set width so it doesn't change when icon changes
           w={55}
