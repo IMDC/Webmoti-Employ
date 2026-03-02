@@ -1,7 +1,9 @@
 import type { LayoutProps } from '../Room'
 import { AspectRatio } from '@mantine/core'
-import { GALLERY_VIEW_ASPECT_RATIO } from '@/utils/constants'
+import { GALLERY_VIEW_ASPECT_RATIO, HEADER_HEIGHT, OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
+import { isElectron } from '@/utils/utils'
 import { useLocalUserId } from '../../zoom/useZoomSessionStore'
+import { useDraggable } from '../hooks/useDraggable'
 import { useSingleLayout } from '../hooks/useSingleLayout'
 import { SessionTile } from './SessionTile'
 
@@ -16,6 +18,11 @@ export function SpotlightView({
 }: LayoutProps) {
   const { width, height } = useSingleLayout(containerRef)
   const localUserId = useLocalUserId()
+  const draggable = useDraggable({
+    bottomInset: HEADER_HEIGHT,
+    topInset: isElectron() ? OUTER_TOOLBAR_HEIGHT : 0,
+    margin: 8,
+  })
 
   const localParticipant = localUserId ? participants.get(localUserId) : undefined
   if (!localParticipant) {
@@ -62,10 +69,14 @@ export function SpotlightView({
         <AspectRatio
           ratio={GALLERY_VIEW_ASPECT_RATIO}
           w={300}
+          onPointerDown={draggable.onPointerDown}
+          onPointerMove={draggable.onPointerMove}
+          onPointerUp={draggable.onPointerUp}
           style={{
             position: 'absolute',
             bottom: 15,
             right: 15,
+            ...draggable.style,
           }}
         >
           <SessionTile
