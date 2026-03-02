@@ -106,6 +106,7 @@ export function useAiWebsocket() {
               fillerCount: totalFillers,
               wordCount: totalWords,
               newTopic: true,
+              offTopic: false,
             }
           }
 
@@ -115,6 +116,7 @@ export function useAiWebsocket() {
             fillerCount: totalFillers,
             wordCount: totalWords,
             newTopic: false,
+            offTopic: incoming.offTopic,
           }
         })
         logger.log('Received notification:', msg.payload)

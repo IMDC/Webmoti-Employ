@@ -35,7 +35,6 @@ export class AiRoom {
       - If the interviewer is asking for a definition, provide two 1-word hints without restating the definition word.
       - If the interviewer is asking for an example question, provide ["provide one example"].
       - If the interviewer is asking a personal question, like "tell me about yourself?", provide two 1-word hints about what the candidate could talk about.
-      - If the interviewee starts to go off topic compared to what was asked or said previously, provide a simple 2 word hint saying "off-topic" to hint them to get back on topic.
       - Otherwise, hint is [].
 
     2. Then provide a JSON object with these keys always:
@@ -46,10 +45,11 @@ export class AiRoom {
         * "I mean" when used to stall, not when genuinely clarifying
         * "basically", "sort of", "kind of" when used as hedging rather than literal meaning
         * "right" ONLY when used as a filler tag (e.g. "so right, the thing is"), NOT for agreement or correctness
-        Do NOT count: "also", "so", "well", "actually", "just", "really", "okay", or any word used with clear meaning in context.
+        Do NOT count: "also", "so", "well", "actually", "just", "really", "okay", "anyway", "anyways", or any word used with clear meaning in context.
       - "isQuestion": boolean, true if transcript is a question, false otherwise.
       - "hint": list of hints as described above (always a list, never null). The hints should vary based on the question and stay until the question starts to be answered properly.
       - "newTopic": boolean, true if the interviewer has started a new topic/question, false otherwise.
+      - "offTopic": boolean, true ONLY if the interviewee has clearly gone off topic and is NOT coming back. Be very lenient — people often answer questions with stories or tangents that seem unrelated at first but circle back to the point. Only set true if the interviewee has been consistently off topic for multiple transcripts and shows no sign of returning, OR if it is blatantly irrelevant to the question. Default false.
 
     Always output reasoning first, then JSON on a new line.
     NEVER ACT AS A LANGUAGE MODEL AND ADDRESS THE USER. ONLY PROVIDE REASONING THEN JSON.
@@ -64,47 +64,48 @@ export class AiRoom {
 
     Make sure to keep the hints active while the candidate is answering the question until they have partly sufficiently answered it.
 
-    ONLY SET newTopic TO TRUE WHEN IT SEEMS LIKE THE INTERVIEWER HAS STARTED A NEW TOPIC. THEN ONLY NOTIFY WITH newTopic TRUE ONCE FOR THE FIRST NOTIFICATION OF THAT NEW TOPIC. THIS APPLIES TO THE FIRST TOPIC.
+    ONLY SET newTopic TO TRUE WHEN A SIGNIFICANT NEW QUESTION OR SUBJECT IS INTRODUCED BY EITHER THE INTERVIEWER OR INTERVIEWEE. THEN ONLY NOTIFY WITH newTopic TRUE ONCE FOR THE FIRST NOTIFICATION OF THAT NEW TOPIC. THIS APPLIES TO THE FIRST TOPIC.
+    IMPORTANT: An interviewee returning to the original topic after going off-topic is NOT a new topic. The topic only changes when a genuinely different question or subject is raised.
 
     Example outputs:
 
     Transcript is a greeting:  
     "Hello there."  
-    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false, "offTopic": false}
 
     Transcript is a question:  
     "Tell me about yourself."  
-    {"isQuestion": true, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": true, "hint": [], "fillerCount": 0, "newTopic": false, "offTopic": false}
 
     Transcript is a question asking for a definition:
     "What is polymorphism?"
-    {"isQuestion": true, "hint": ["object", "behavior"], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": true, "hint": ["object", "behavior"], "fillerCount": 0, "newTopic": false, "offTopic": false}
 
     Transcript is a response:
     "I led a project on X and achieved Z outcome."
-    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false, "offTopic": false}
 
     Transcript is a general question:
     "Tell me about your project."
-    {"isQuestion": true, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": true, "hint": [], "fillerCount": 0, "newTopic": false, "offTopic": false}
 
     Transcript is a question asking for an example:
     "Tell me about a time when you resolved a conflict."
-    {"isQuestion": true, "hint": ["provide one example"], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": true, "hint": ["provide one example"], "fillerCount": 0, "newTopic": false, "offTopic": false}
 
     Transcript with filler words:
     "Um, I think, like, the main thing is, you know, scalability."
-    {"isQuestion": false, "hint": [], "fillerCount": 3, "newTopic": false}
+    {"isQuestion": false, "hint": [], "fillerCount": 3, "newTopic": false, "offTopic": false}
 
     Transcript is made up of two separate transcripts:
     "Define"
-    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false, "offTopic": false}
     "top down parsing"
-    {"isQuestion": true, "hint": ["recursive", "grammar"], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": true, "hint": ["recursive", "grammar"], "fillerCount": 0, "newTopic": false, "offTopic": false}
 
     Transcript is incomplete:
     "Define"
-    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false, "offTopic": false}
   `
 
   constructor(state: DurableObjectState, env: CloudflareBindings) {
@@ -273,9 +274,9 @@ export class AiRoom {
         ? this.devIsJohnInterviewer
         : sessionIsInterviewer
 
-      // Interviewers only receive hints — strip filler data and question timing
+      // Interviewers only receive hints — strip filler data, question timing, and off-topic
       const sessionPayload: NotificationMessage = isInterviewer
-        ? { ...payload, fillerCount: 0, wordCount: 0, isQuestion: false }
+        ? { ...payload, fillerCount: 0, wordCount: 0, isQuestion: false, offTopic: false }
         : payload
 
       const notificationMessage: WebSocketMessage = {

@@ -2,6 +2,7 @@ import type { NotificationMessage } from '@webmoti-employ/shared'
 import { Center, Group, Stack, Text, useMantineTheme } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import {
+  IconAlertTriangleFilled,
   IconBubbleTextFilled,
   IconClockHour4Filled,
   IconMoodSad,
@@ -25,7 +26,7 @@ export function FeedbackArea({ notification, onLookingChange }: FeedbackAreaProp
 
   const feedback = useFeedback()
 
-  const { hint, isQuestion, fillerCount, wordCount, newTopic } = notification
+  const { hint, isQuestion, fillerCount, wordCount, newTopic, offTopic } = notification
 
   // fillerCount and wordCount are already accumulated per topic in useAiWebsocket.
   // Only show the warning after enough words and if filler % exceeds threshold.
@@ -54,7 +55,6 @@ export function FeedbackArea({ notification, onLookingChange }: FeedbackAreaProp
   // start countup if notification is a question
   useEffect(() => {
     if (isQuestion) {
-      logger.log('Starting countup for question')
       startCountup()
     }
     else {
@@ -62,11 +62,15 @@ export function FeedbackArea({ notification, onLookingChange }: FeedbackAreaProp
     }
   }, [isQuestion, startCountup, stopCountup])
 
+  // restart countup when a new topic arrives with a question
   useEffect(() => {
-    if (newTopic && !isQuestion) {
+    if (newTopic && isQuestion) {
+      startCountup()
+    }
+    else if (newTopic && !isQuestion) {
       stopCountup()
     }
-  }, [newTopic, isQuestion, stopCountup])
+  }, [newTopic, isQuestion, startCountup, stopCountup])
 
   useEffect(() => {
     if (graceTimerRef.current) {
@@ -116,6 +120,11 @@ export function FeedbackArea({ notification, onLookingChange }: FeedbackAreaProp
           icon={<IconStepInto size={iconSize} />}
           label={hint.join(', ')}
           isActive={hint.length > 0}
+        />
+        <FeedbackIcon
+          icon={<IconAlertTriangleFilled size={iconSize} />}
+          label="Off Topic"
+          isActive={offTopic}
         />
         <FeedbackIcon
           icon={<IconBubbleTextFilled size={iconSize} />}

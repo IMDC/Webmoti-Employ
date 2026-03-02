@@ -11,6 +11,7 @@ export const NotificationMessage = z.object({
   fillerCount: z.number().default(0),
   wordCount: z.number().default(0),
   newTopic: z.boolean().default(false),
+  offTopic: z.boolean().default(false),
 })
 
 export const DevIsJohnDoNotUseThisMessage = z.object({
