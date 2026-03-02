@@ -311,16 +311,10 @@ export class AiRoom {
   }
 }
 
-/**
- * Count spoken words from formatted transcript strings.
- * Strips the "[role] Name: " prefix and counts whitespace-separated words.
- */
 function countWords(transcripts: string[]): number {
   let total = 0
   for (const t of transcripts) {
-    // Remove the "[role] Name: " prefix
-    const text = t.replace(/^\[[^\]]+\] [^:]+: /, '')
-    const words = text.trim().split(/\s+/).filter(w => w.length > 0)
+    const words = t.trim().split(/\s+/).filter(w => w.length > 0)
     total += words.length
   }
   return total
