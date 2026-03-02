@@ -18,12 +18,14 @@ export class AiRoom {
   private devIsJohnInterviewer = false
 
   private generating = false
-  private transcriptQueue: string[] = []
+  private transcriptQueue: { text: string, isInterviewer: boolean }[] = []
 
   private model = groq('meta-llama/llama-4-scout-17b-16e-instruct')
 
   private systemPrompt = `
     Virtual Interview Assistant Notification System
+
+    Transcripts alternate between an interviewer and an interviewee, prefixed with their role (e.g. "[interviewer] Name:" or "[interviewee] Name:").
 
     For each transcript:
 
@@ -33,15 +35,21 @@ export class AiRoom {
       - If the interviewer is asking for a definition, provide two 1-word hints without restating the definition word.
       - If the interviewer is asking for an example question, provide ["provide one example"].
       - If the interviewer is asking a personal question, like "tell me about yourself?", provide two 1-word hints about what the candidate could talk about.
-      - If the interviewee starts to go off topic compared to what was asked or said previously, provide a simple 2 word hint saying "off-topic" to hint them to get back on topic.
-      - If you notice the use of filler words like "um", "uh", "like", "you know", marked by "fillerCount" greater than equal to 2, provide a hint saying "reduce filler words".
       - Otherwise, hint is [].
 
     2. Then provide a JSON object with these keys always:
-      - "fillerCount": number of filler words for this topic (0 if none, never null).
+      - "fillerCount": number of filler words in this transcript (0 if none, never null). Only count fillers from the INTERVIEWEE's speech — ignore the interviewer's filler words entirely. Only count these as fillers:
+        * Hesitation sounds: "um", "uh", "er", "ah", "hmm"
+        * "like" ONLY when used as a verbal crutch (e.g. "it was like, difficult"), NOT when expressing preference ("I like coding") or comparison ("something like React")
+        * "you know" when used as a filler, not when genuinely asking
+        * "I mean" when used to stall, not when genuinely clarifying
+        * "basically", "sort of", "kind of" when used as hedging rather than literal meaning
+        * "right" ONLY when used as a filler tag (e.g. "so right, the thing is"), NOT for agreement or correctness
+        Do NOT count: "also", "so", "well", "actually", "just", "really", "okay", "anyway", "anyways", or any word used with clear meaning in context.
       - "isQuestion": boolean, true if transcript is a question, false otherwise.
       - "hint": list of hints as described above (always a list, never null). The hints should vary based on the question and stay until the question starts to be answered properly.
       - "newTopic": boolean, true if the interviewer has started a new topic/question, false otherwise.
+      - "offTopic": boolean, true ONLY if the interviewee has clearly gone off topic and is NOT coming back. Be very lenient — people often answer questions with stories or tangents that seem unrelated at first but circle back to the point. Only set true if the interviewee has been consistently off topic for multiple transcripts and shows no sign of returning, OR if it is blatantly irrelevant to the question. Default false.
 
     Always output reasoning first, then JSON on a new line.
     NEVER ACT AS A LANGUAGE MODEL AND ADDRESS THE USER. ONLY PROVIDE REASONING THEN JSON.
@@ -56,43 +64,48 @@ export class AiRoom {
 
     Make sure to keep the hints active while the candidate is answering the question until they have partly sufficiently answered it.
 
-    ONLY SET newTopic TO TRUE WHEN IT SEEMS LIKE THE INTERVIEWER HAS STARTED A NEW TOPIC. THEN ONLY NOTIFY WITH newTopic TRUE ONCE FOR THE FIRST NOTIFICATION OF THAT NEW TOPIC. THIS APPLIES TO THE FIRST TOPIC.
+    ONLY SET newTopic TO TRUE WHEN A SIGNIFICANT NEW QUESTION OR SUBJECT IS INTRODUCED BY EITHER THE INTERVIEWER OR INTERVIEWEE. THEN ONLY NOTIFY WITH newTopic TRUE ONCE FOR THE FIRST NOTIFICATION OF THAT NEW TOPIC. THIS APPLIES TO THE FIRST TOPIC.
+    IMPORTANT: An interviewee returning to the original topic after going off-topic is NOT a new topic. The topic only changes when a genuinely different question or subject is raised.
 
     Example outputs:
 
     Transcript is a greeting:  
     "Hello there."  
-    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false, "offTopic": false}
 
     Transcript is a question:  
     "Tell me about yourself."  
-    {"isQuestion": true, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": true, "hint": [], "fillerCount": 0, "newTopic": false, "offTopic": false}
 
     Transcript is a question asking for a definition:
     "What is polymorphism?"
-    {"isQuestion": true, "hint": ["object", "behavior"], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": true, "hint": ["object", "behavior"], "fillerCount": 0, "newTopic": false, "offTopic": false}
 
     Transcript is a response:
     "I led a project on X and achieved Z outcome."
-    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false, "offTopic": false}
 
     Transcript is a general question:
     "Tell me about your project."
-    {"isQuestion": true, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": true, "hint": [], "fillerCount": 0, "newTopic": false, "offTopic": false}
 
     Transcript is a question asking for an example:
     "Tell me about a time when you resolved a conflict."
-    {"isQuestion": true, "hint": ["provide one example"], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": true, "hint": ["provide one example"], "fillerCount": 0, "newTopic": false, "offTopic": false}
+
+    Transcript with filler words:
+    "Um, I think, like, the main thing is, you know, scalability."
+    {"isQuestion": false, "hint": [], "fillerCount": 3, "newTopic": false, "offTopic": false}
 
     Transcript is made up of two separate transcripts:
     "Define"
-    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false, "offTopic": false}
     "top down parsing"
-    {"isQuestion": true, "hint": ["recursive", "grammar"], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": true, "hint": ["recursive", "grammar"], "fillerCount": 0, "newTopic": false, "offTopic": false}
 
     Transcript is incomplete:
     "Define"
-    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false}
+    {"isQuestion": false, "hint": [], "fillerCount": 0, "newTopic": false, "offTopic": false}
   `
 
   constructor(state: DurableObjectState, env: CloudflareBindings) {
@@ -160,15 +173,22 @@ export class AiRoom {
 
     this.generating = true
 
-    // combine all queued transcripts into one message
-    const transcript = this.transcriptQueue.join(' ')
+    const queued = this.transcriptQueue
     this.transcriptQueue = [] // clear the queue immediately
+
+    // combine all queued transcripts into one message for the AI
+    const transcript = queued.map(q => q.text).join(' ')
     debugLog(this.env.IS_DEV, 'Transcript:', transcript)
+
+    // Count only interviewee words so the denominator matches filler-counting rules
+    const wordCount = countWords(
+      queued.filter(q => !q.isInterviewer).map(q => q.text),
+    )
 
     try {
       this.messages.push({ role: 'user', content: transcript })
       const response = await this.aiGenerateText()
-      await this.handleAiResponse(response)
+      await this.handleAiResponse(response, wordCount)
     }
     finally {
       this.generating = false
@@ -178,7 +198,7 @@ export class AiRoom {
     }
   }
 
-  private async handleAiResponse(response: string) {
+  private async handleAiResponse(response: string, wordCount: number) {
     function getResponseObject(response: string) {
     // match first {...} JSON block
       const match = response.match(/\{[\s\S]*\}/)
@@ -188,7 +208,10 @@ export class AiRoom {
       return JSON.parse(match[0])
     }
 
-    const notificationResult = NotificationMessage.safeParse(getResponseObject(response))
+    const notificationResult = NotificationMessage.safeParse({
+      ...getResponseObject(response),
+      wordCount,
+    })
 
     if (!notificationResult.success) {
       console.error('Failed to parse generated notification:', notificationResult.error)
@@ -224,7 +247,8 @@ export class AiRoom {
 
         // Format: [role] name: transcript text
         // e.g., "[interviewer] John Smith: Tell me about yourself"
-        this.transcriptQueue.push(`[${role}] ${name}: ${payload.text}`)
+        const formatted = `[${role}] ${name}: ${payload.text}`
+        this.transcriptQueue.push({ text: formatted, isInterviewer: role === 'interviewer' })
         // don't await this
         void this.processQueue()
       }
@@ -250,15 +274,23 @@ export class AiRoom {
   }
 
   async notifyClients(payload: NotificationMessage) {
-    this.sessions.forEach((_, session) => {
-      const sessionPayload: NotificationMessage = payload
+    this.sessions.forEach(({ isInterviewer: sessionIsInterviewer }, ws) => {
+      // In dev mode, use the dev override role instead of the session's actual role
+      const isInterviewer = this.devIsJohnDoNotUseThis
+        ? this.devIsJohnInterviewer
+        : sessionIsInterviewer
+
+      // Interviewers only receive hints — strip filler data, question timing, and off-topic
+      const sessionPayload: NotificationMessage = isInterviewer
+        ? { ...payload, fillerCount: 0, wordCount: 0, isQuestion: false, offTopic: false }
+        : payload
 
       const notificationMessage: WebSocketMessage = {
         type: 'notification',
         payload: sessionPayload,
       }
 
-      session.send(JSON.stringify(notificationMessage))
+      ws.send(JSON.stringify(notificationMessage))
     })
   }
 
@@ -277,4 +309,13 @@ export class AiRoom {
     console.error('WebSocket error:', error)
     this.sessions.delete(ws)
   }
+}
+
+function countWords(transcripts: string[]): number {
+  let total = 0
+  for (const t of transcripts) {
+    const words = t.trim().split(/\s+/).filter(w => w.length > 0)
+    total += words.length
+  }
+  return total
 }

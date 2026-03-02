@@ -1,19 +1,23 @@
-import type { TranscriptMessage } from '@webmoti-employ/shared'
-import { NotificationMessage, WebSocketMessage } from '@webmoti-employ/shared'
+import type { NotificationMessage, TranscriptMessage } from '@webmoti-employ/shared'
+import { WebSocketMessage } from '@webmoti-employ/shared'
 
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { logger } from '@/utils/logger'
 import { getLocalBearerToken } from '@/utils/utils'
 import { useRoomName } from '../zoom/useZoomSessionStore'
 
-export function useAiWebsocket() {
-  const roomName = useRoomName()
+interface UseAiWebsocketOptions {
+  /** Called with each raw notification from the server */
+  onNotification: (notification: NotificationMessage) => void
+}
 
-  const [notification, setNotification] = useState<NotificationMessage>(
-    // make empty message using defaults
-    NotificationMessage.parse({}),
-  )
+/**
+ * WebSocket transport for the AI interview assistant.
+ * Handles connection, sending transcripts, and dispatching incoming notifications.
+ */
+export function useAiWebsocket({ onNotification }: UseAiWebsocketOptions) {
+  const roomName = useRoomName()
 
   const protocol = import.meta.env.DEV ? 'ws' : 'wss'
   const host = import.meta.env.DEV
@@ -59,8 +63,6 @@ export function useAiWebsocket() {
   }, [sendWebsocketMessage])
 
   function handleMessage(event: MessageEvent) {
-    // logger.log('received message!')
-
     try {
       const parsed = JSON.parse(event.data)
       const result = WebSocketMessage.safeParse(parsed)
@@ -71,17 +73,9 @@ export function useAiWebsocket() {
 
       const msg = result.data
       if (msg.type === 'notification') {
-        setNotification((prev) => {
-          const newPayload = Object.fromEntries(
-            Object.entries(msg.payload).filter(([_, v]) => v !== null),
-          )
-          return { ...prev, ...newPayload }
-        })
-        logger.log('Received notification:', msg.payload)
+        onNotification(msg.payload)
       }
       else if (msg.type === 'ping') {
-        // send back after receiving it.
-        // this should keep the connection warm to prevent delays
         sendWebsocketMessage({ type: 'pong' })
       }
     }
@@ -93,6 +87,5 @@ export function useAiWebsocket() {
   return {
     sendTranscript,
     sendDevIsJohnDoNotUseMessage,
-    notification,
   }
 }

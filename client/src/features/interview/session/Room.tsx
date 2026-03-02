@@ -18,6 +18,7 @@ import { useAppPermissionState } from '@/useAppStore'
 import { GALLERY_VIEW_MARGIN, HEADER_HEIGHT } from '@/utils/constants'
 import { useAiWebsocket } from '../ai/useAiWebsocket'
 import { useBufferedTranscription } from '../ai/useBufferedTranscription'
+import { useNotificationState } from '../ai/useNotificationState'
 import { Chat } from '../chat/Chat'
 import { MenuBar } from '../components/MenuBar'
 import { MobileMenuBar } from '../components/MobileMenuBar'
@@ -27,6 +28,7 @@ import { FeedbackArea } from './components/FeedbackArea'
 import { SpotlightView } from './components/SpotlightView'
 import { VideoGrid } from './components/VideoGrid'
 import { useFaceDetection } from './hooks/useFaceDetection'
+import { useInterviewFeedback } from './hooks/useInterviewFeedback'
 
 export interface LayoutProps {
   containerRef: RefObject<HTMLDivElement | null>
@@ -43,8 +45,14 @@ export function Room() {
 
   const [isChatOpen, setIsChatOpen] = useState(false)
 
-  const { sendTranscript, notification, sendDevIsJohnDoNotUseMessage } = useAiWebsocket()
+  const { notification, processNotification } = useNotificationState()
+  const { sendTranscript, sendDevIsJohnDoNotUseMessage } = useAiWebsocket({
+    onNotification: processNotification,
+  })
   useBufferedTranscription(5, sendTranscript)
+
+  const [isLookingAtInterviewer, setIsLookingAtInterviewer] = useState(false)
+  const interviewFeedback = useInterviewFeedback(notification, setIsLookingAtInterviewer)
 
   const permissionState = useAppPermissionState()
 
@@ -84,8 +92,6 @@ export function Room() {
     grid: VideoGrid,
   }
   const LayoutComponent = layoutComponents[layout]
-
-  const [isLookingAtInterviewer, setIsLookingAtInterviewer] = useState(false)
 
   async function onToggleMic() {
     if (permissionState !== 'granted') {
@@ -143,10 +149,7 @@ export function Room() {
                 h={{ base: '12%', xl: '15%' }}
                 id="feedback-safe-aoi"
               >
-                <FeedbackArea
-                  notification={notification}
-                  onLookingChange={setIsLookingAtInterviewer}
-                />
+                <FeedbackArea feedback={interviewFeedback} />
               </Box>
 
               <Flex

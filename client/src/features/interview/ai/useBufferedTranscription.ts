@@ -72,6 +72,9 @@ export function useBufferedTranscription(
 
   useEffect(() => {
     // handle incremental sending from transcript (finalized words)
+    // Skip if finalTranscript is present — the final effect handles that case
+    if (finalTranscript)
+      return
     const words = getWords(transcript)
     const unsentWordCount = words.length - sentWordCount
     if (unsentWordCount >= maxWordsBuffer) {
@@ -85,7 +88,7 @@ export function useBufferedTranscription(
         // don't reset transcript here to avoid interrupting ongoing accumulation
       }
     }
-  }, [transcript, sentWordCount, sendTranscript, maxWordsBuffer])
+  }, [transcript, sentWordCount, sendTranscript, maxWordsBuffer, finalTranscript])
 }
 
 function getWords(text: string): string[] {
