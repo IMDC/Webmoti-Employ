@@ -18,7 +18,7 @@ export class AiRoom {
   private devIsJohnInterviewer = false
 
   private generating = false
-  private transcriptQueue: string[] = []
+  private transcriptQueue: { text: string, isInterviewer: boolean }[] = []
 
   private model = groq('meta-llama/llama-4-scout-17b-16e-instruct')
 
@@ -173,16 +173,21 @@ export class AiRoom {
 
     this.generating = true
 
-    // combine all queued transcripts into one message
-    const transcript = this.transcriptQueue.join(' ')
+    const queued = this.transcriptQueue
     this.transcriptQueue = [] // clear the queue immediately
+
+    // combine all queued transcripts into one message for the AI
+    const transcript = queued.map(q => q.text).join(' ')
     debugLog(this.env.IS_DEV, 'Transcript:', transcript)
+
+    // Count only interviewee words so the denominator matches filler-counting rules
+    const wordCount = countWords(
+      queued.filter(q => !q.isInterviewer).map(q => q.text),
+    )
 
     try {
       this.messages.push({ role: 'user', content: transcript })
       const response = await this.aiGenerateText()
-      // Count words from the transcript text (strip the "[role] Name: " prefix)
-      const wordCount = countTranscriptWords(transcript)
       await this.handleAiResponse(response, wordCount)
     }
     finally {
@@ -242,7 +247,8 @@ export class AiRoom {
 
         // Format: [role] name: transcript text
         // e.g., "[interviewer] John Smith: Tell me about yourself"
-        this.transcriptQueue.push(`[${role}] ${name}: ${payload.text}`)
+        const formatted = `[${role}] ${name}: ${payload.text}`
+        this.transcriptQueue.push({ text: formatted, isInterviewer: role === 'interviewer' })
         // don't await this
         void this.processQueue()
       }
@@ -306,12 +312,16 @@ export class AiRoom {
 }
 
 /**
- * Count spoken words from a transcript string.
+ * Count spoken words from formatted transcript strings.
  * Strips the "[role] Name: " prefix and counts whitespace-separated words.
  */
-function countTranscriptWords(transcript: string): number {
-  // Remove all "[role] Name: " prefixes (there can be multiple joined transcripts)
-  const text = transcript.replace(/\[(?:interviewer|interviewee)\] [^:]+: /gi, '')
-  const words = text.trim().split(/\s+/).filter(w => w.length > 0)
-  return words.length
+function countWords(transcripts: string[]): number {
+  let total = 0
+  for (const t of transcripts) {
+    // Remove the "[role] Name: " prefix
+    const text = t.replace(/^\[[^\]]+\] [^:]+: /, '')
+    const words = text.trim().split(/\s+/).filter(w => w.length > 0)
+    total += words.length
+  }
+  return total
 }
