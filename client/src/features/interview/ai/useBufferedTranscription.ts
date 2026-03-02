@@ -72,6 +72,9 @@ export function useBufferedTranscription(
 
   useEffect(() => {
     // handle incremental sending from transcript (finalized words)
+    // Skip if finalTranscript is present — the final effect handles that case
+    if (finalTranscript)
+      return
     const words = getWords(transcript)
     const unsentWordCount = words.length - sentWordCount
     if (unsentWordCount >= maxWordsBuffer) {
