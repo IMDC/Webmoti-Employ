@@ -25,6 +25,8 @@ export class AiRoom {
   private systemPrompt = `
     Virtual Interview Assistant Notification System
 
+    Transcripts alternate between an interviewer and an interviewee, prefixed with their role (e.g. "[interviewer] Name:" or "[interviewee] Name:").
+
     For each transcript:
 
     1. Provide 1-2 concise sentences explaining the reasoning for the notification.  
@@ -37,7 +39,7 @@ export class AiRoom {
       - Otherwise, hint is [].
 
     2. Then provide a JSON object with these keys always:
-      - "fillerCount": number of filler words in this transcript (0 if none, never null). Only count these as fillers:
+      - "fillerCount": number of filler words in this transcript (0 if none, never null). Only count fillers from the INTERVIEWEE's speech — ignore the interviewer's filler words entirely. Only count these as fillers:
         * Hesitation sounds: "um", "uh", "er", "ah", "hmm"
         * "like" ONLY when used as a verbal crutch (e.g. "it was like, difficult"), NOT when expressing preference ("I like coding") or comparison ("something like React")
         * "you know" when used as a filler, not when genuinely asking
@@ -265,15 +267,23 @@ export class AiRoom {
   }
 
   async notifyClients(payload: NotificationMessage) {
-    this.sessions.forEach((_, session) => {
-      const sessionPayload: NotificationMessage = payload
+    this.sessions.forEach(({ isInterviewer: sessionIsInterviewer }, ws) => {
+      // In dev mode, use the dev override role instead of the session's actual role
+      const isInterviewer = this.devIsJohnDoNotUseThis
+        ? this.devIsJohnInterviewer
+        : sessionIsInterviewer
+
+      // Interviewers only receive hints — strip filler data and question timing
+      const sessionPayload: NotificationMessage = isInterviewer
+        ? { ...payload, fillerCount: 0, wordCount: 0, isQuestion: false }
+        : payload
 
       const notificationMessage: WebSocketMessage = {
         type: 'notification',
         payload: sessionPayload,
       }
 
-      session.send(JSON.stringify(notificationMessage))
+      ws.send(JSON.stringify(notificationMessage))
     })
   }
 
