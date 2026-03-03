@@ -64,7 +64,7 @@ export function useNotificationState() {
       }
     })
 
-    logger.log('Processed notification:', incoming)
+    logger.info('Processed notification:', incoming)
   }, [])
 
   return { notification, processNotification }

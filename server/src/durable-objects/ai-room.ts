@@ -4,7 +4,7 @@ import type { ModelMessage } from 'ai'
 import { groq } from '@ai-sdk/groq'
 import { NotificationMessage, WebSocketMessage } from '@webmoti-employ/shared'
 import { generateText } from 'ai'
-import { debugLog } from '@/utils/logger'
+import { debugLog, prodLog } from '@/utils/logger'
 
 export class AiRoom {
   private state: DurableObjectState
@@ -16,9 +16,15 @@ export class AiRoom {
 
   private devIsJohnDoNotUseThis = false
   private devIsJohnInterviewer = false
+  private pipelineCounter = 0
 
   private generating = false
-  private transcriptQueue: { text: string, isInterviewer: boolean }[] = []
+  private transcriptQueue: {
+    text: string
+    isInterviewer: boolean
+    status: 'partial' | 'final'
+    enqueuedAt: number
+  }[] = []
 
   private model = groq('meta-llama/llama-4-scout-17b-16e-instruct')
 
@@ -118,6 +124,15 @@ export class AiRoom {
     this.startPing()
   }
 
+  private nextPipelineId() {
+    this.pipelineCounter += 1
+    return `${Date.now()}-${this.pipelineCounter}`
+  }
+
+  private pipelineLog(event: string, details: Record<string, unknown>) {
+    prodLog('[AiRoom]', event, details)
+  }
+
   private startPing() {
     if (this.pingInterval)
       return
@@ -149,6 +164,11 @@ export class AiRoom {
     const isInterviewer = request.headers.get('x-is-interviewer') === 'true'
     const name = request.headers.get('x-name') ?? ''
     this.sessions.set(server, { name, isInterviewer })
+    this.pipelineLog('websocket.connected', {
+      connections: this.sessions.size,
+      isInterviewer,
+      userName: name,
+    })
 
     this.startPing()
     // debugLog(`New WebSocket connection established. Total connections: ${this.sessions.size}`)
@@ -156,9 +176,18 @@ export class AiRoom {
     return new Response(null, { status: 101, webSocket: client })
   }
 
-  async aiGenerateText() {
+  async aiGenerateText(pipelineId: string) {
+    const startedAt = Date.now()
     const result = await generateText({ model: this.model, messages: this.messages })
     const responseText = result.text
+    const durationMs = Date.now() - startedAt
+
+    this.pipelineLog('ai.generate.complete', {
+      pipelineId,
+      durationMs,
+      responseLength: responseText.length,
+      messageCount: this.messages.length,
+    })
 
     debugLog(this.env.IS_DEV, responseText)
 
@@ -172,9 +201,19 @@ export class AiRoom {
       return
 
     this.generating = true
+    const pipelineId = this.nextPipelineId()
+    const startedAt = Date.now()
 
     const queued = this.transcriptQueue
     this.transcriptQueue = [] // clear the queue immediately
+
+    const oldestEnqueuedAt = Math.min(...queued.map(q => q.enqueuedAt))
+    this.pipelineLog('pipeline.start', {
+      pipelineId,
+      queuedCount: queued.length,
+      queueWaitMs: startedAt - oldestEnqueuedAt,
+      queuedStatuses: queued.map(q => q.status),
+    })
 
     // combine all queued transcripts into one message for the AI
     const transcript = queued.map(q => q.text).join(' ')
@@ -187,8 +226,14 @@ export class AiRoom {
 
     try {
       this.messages.push({ role: 'user', content: transcript })
-      const response = await this.aiGenerateText()
-      await this.handleAiResponse(response, wordCount)
+      const response = await this.aiGenerateText(pipelineId)
+      await this.handleAiResponse(response, wordCount, pipelineId)
+
+      this.pipelineLog('pipeline.complete', {
+        pipelineId,
+        durationMs: Date.now() - startedAt,
+        remainingQueueCount: this.transcriptQueue.length,
+      })
     }
     finally {
       this.generating = false
@@ -198,7 +243,9 @@ export class AiRoom {
     }
   }
 
-  private async handleAiResponse(response: string, wordCount: number) {
+  private async handleAiResponse(response: string, wordCount: number, pipelineId: string) {
+    const startedAt = Date.now()
+
     function getResponseObject(response: string) {
     // match first {...} JSON block
       const match = response.match(/\{[\s\S]*\}/)
@@ -213,13 +260,29 @@ export class AiRoom {
       wordCount,
     })
 
+    this.pipelineLog('pipeline.parse.complete', {
+      pipelineId,
+      parseDurationMs: Date.now() - startedAt,
+      wordCount,
+    })
+
     if (!notificationResult.success) {
       console.error('Failed to parse generated notification:', notificationResult.error)
       console.error('Invalid generation is:', response)
+      this.pipelineLog('pipeline.parse.failed', {
+        pipelineId,
+      })
       return
     }
 
-    this.notifyClients(notificationResult.data)
+    const notifyStartedAt = Date.now()
+    const notifiedCount = this.notifyClients(notificationResult.data)
+    this.pipelineLog('pipeline.notify.complete', {
+      pipelineId,
+      notifyDurationMs: Date.now() - notifyStartedAt,
+      notifiedCount,
+      totalDurationMs: Date.now() - startedAt,
+    })
   }
 
   // Handles messages received from any connected client.
@@ -248,7 +311,18 @@ export class AiRoom {
         // Format: [role] name: transcript text
         // e.g., "[interviewer] John Smith: Tell me about yourself"
         const formatted = `[${role}] ${name}: ${payload.text}`
-        this.transcriptQueue.push({ text: formatted, isInterviewer: role === 'interviewer' })
+        this.transcriptQueue.push({
+          text: formatted,
+          isInterviewer: role === 'interviewer',
+          status: payload.status,
+          enqueuedAt: Date.now(),
+        })
+        this.pipelineLog('transcript.enqueued', {
+          queueCount: this.transcriptQueue.length,
+          status: payload.status,
+          textLength: payload.text.length,
+          role,
+        })
         // don't await this
         void this.processQueue()
       }
@@ -273,7 +347,8 @@ export class AiRoom {
     })
   }
 
-  async notifyClients(payload: NotificationMessage) {
+  notifyClients(payload: NotificationMessage) {
+    let notifiedCount = 0
     this.sessions.forEach(({ isInterviewer: sessionIsInterviewer }, ws) => {
       // In dev mode, use the dev override role instead of the session's actual role
       const isInterviewer = this.devIsJohnDoNotUseThis
@@ -291,13 +366,17 @@ export class AiRoom {
       }
 
       ws.send(JSON.stringify(notificationMessage))
+      notifiedCount += 1
     })
+
+    return notifiedCount
   }
 
   // Cleans up a session when a WebSocket connection is closed.
   async webSocketClose(ws: WebSocket): Promise<void> {
     console.warn('WebSocket connection closed.')
     this.sessions.delete(ws)
+    this.pipelineLog('websocket.closed', { remainingConnections: this.sessions.size })
     if (this.sessions.size === 0) {
       this.stopPing()
     }
@@ -308,6 +387,7 @@ export class AiRoom {
   async webSocketError(ws: WebSocket, error: any): Promise<void> {
     console.error('WebSocket error:', error)
     this.sessions.delete(ws)
+    this.pipelineLog('websocket.error', { remainingConnections: this.sessions.size })
   }
 }
 

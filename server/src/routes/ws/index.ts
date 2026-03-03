@@ -4,6 +4,7 @@ import { Hono } from 'hono'
 import z from 'zod'
 import { requireDb, useDb } from '@/middleware/useDb'
 import { useQueryAuth } from '@/middleware/useQueryAuth'
+import { prodLog } from '@/utils/logger'
 import { getInterviews } from '../interviews/db-queries'
 
 const wsRoute = new Hono<AppContext>()
@@ -20,16 +21,30 @@ wsRoute.get(
   '/',
   zValidator('query', WsRequestQuery),
   async (c) => {
+    const requestStartedAt = Date.now()
     const { sessionId } = c.req.query()
     const db = requireDb(c)
     const user = c.var.user
     const userEmail = user.email.toLowerCase()
 
+    prodLog('[wsRoute] upgrade.request', {
+      sessionId,
+      userId: user.id,
+      userEmail,
+    })
+
     const objectId = c.env.AI_ROOM.idFromName(sessionId)
     const durableObjectStub = c.env.AI_ROOM.get(objectId)
 
     // pass both userId and userEmail so both the creator and invited users can find the interview
+    const interviewLookupStartedAt = Date.now()
     const interviews = await getInterviews(db, { userId: c.var.user.id, userEmail, sessionId })
+    prodLog('[wsRoute] interview.lookup.complete', {
+      sessionId,
+      durationMs: Date.now() - interviewLookupStartedAt,
+      resultCount: interviews.length,
+    })
+
     if (!interviews.length) {
       return c.json({ error: 'Interview not found' }, 404)
     }
@@ -49,7 +64,15 @@ wsRoute.get(
     req.headers.set('x-name', user.name)
 
     // Forward that request to the Durable Object stub.
-    return durableObjectStub.fetch(req)
+    const durableFetchStartedAt = Date.now()
+    const response = await durableObjectStub.fetch(req)
+    prodLog('[wsRoute] durable.fetch.complete', {
+      sessionId,
+      status: response.status,
+      durationMs: Date.now() - durableFetchStartedAt,
+      totalDurationMs: Date.now() - requestStartedAt,
+    })
+    return response
   },
 )
 

@@ -63,7 +63,7 @@ export function useBufferedTranscription(
     const unsentWords = words.slice(sentWordCount)
     const textToSend = unsentWords.join(' ')
     if (textToSend) {
-      logger.log('final transcript:', textToSend)
+      logger.info('final transcript:', textToSend)
       sendTranscript({ text: textToSend, status: 'final' })
     }
     setSentWordCount(0)
@@ -82,7 +82,7 @@ export function useBufferedTranscription(
       const nextIndex = sentWordCount + maxWordsBuffer
       const wordsToSend = words.slice(sentWordCount, nextIndex).join(' ')
       if (wordsToSend) {
-        logger.log('partial transcript:', wordsToSend)
+        logger.info('partial transcript:', wordsToSend)
         sendTranscript({ text: wordsToSend, status: 'partial' })
         setSentWordCount(nextIndex)
         // don't reset transcript here to avoid interrupting ongoing accumulation
