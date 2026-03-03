@@ -28,8 +28,9 @@ wsRoute.get(
     const objectId = c.env.AI_ROOM.idFromName(sessionId)
     const durableObjectStub = c.env.AI_ROOM.get(objectId)
 
-    const interviews = await getInterviews(db, { userId: c.var.user.id, sessionId })
-    if (!interviews) {
+    // pass both userId and userEmail so both the creator and invited users can find the interview
+    const interviews = await getInterviews(db, { userId: c.var.user.id, userEmail, sessionId })
+    if (!interviews.length) {
       return c.json({ error: 'Interview not found' }, 404)
     }
 
