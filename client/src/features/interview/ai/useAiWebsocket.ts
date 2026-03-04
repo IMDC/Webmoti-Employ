@@ -82,6 +82,9 @@ export function useAiWebsocket({ onNotification }: UseAiWebsocketOptions) {
       else if (msg.type === 'reasoning') {
         logger.info('AI reasoning:', msg.payload)
       }
+      else if (msg.type === 'broadcastTranscript') {
+        logger.info('Transcript:', msg.payload)
+      }
       else if (msg.type === 'ping') {
         sendWebsocketMessage({ type: 'pong' })
       }

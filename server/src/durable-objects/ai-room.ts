@@ -133,6 +133,14 @@ export class AiRoom {
       status: payload.status,
       enqueuedAt: Date.now(),
     })
+
+    // broadcast to all clients so they can log the transcript
+    const broadcastMsg: WebSocketMessage = {
+      type: 'broadcastTranscript',
+      payload: formatted,
+    }
+    void this.broadcastMessage(broadcastMsg)
+
     // don't await this
     void this.processQueue()
   }
