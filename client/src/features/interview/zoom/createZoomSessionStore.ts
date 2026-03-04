@@ -220,7 +220,12 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         leave: async () => {
           logger.log('Leaving zoom session...')
           // stopping video also stops audio so the mic indicator goes away in google chrome
-          await get().actions.stopVideo()
+          try {
+            await get().actions.stopVideo()
+          }
+          catch {
+            // camera may already be closed — safe to ignore
+          }
           unsubscribeStatisticsEvents()
           resetStatisticsState()
           set({ callState: 'left', participants: new Map() })
