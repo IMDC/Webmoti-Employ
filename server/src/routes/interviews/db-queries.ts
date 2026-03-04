@@ -120,6 +120,24 @@ export async function getInterviews(
   return nestInterviews(interviewRows)
 }
 
+/**
+ * Find a single interview by sessionId, optionally scoped to a specific user.
+ * Returns the interview if found (and accessible by the user), or null otherwise.
+ */
+export async function findInterviewBySessionId(
+  db: Kysely<DB>,
+  sessionId: string,
+  options?: {
+    userId?: string
+    userEmail?: string
+    isUpcoming?: boolean
+    onlyScheduledInterviews?: boolean
+  },
+): Promise<InterviewResponse | null> {
+  const results = await getInterviews(db, { ...options, sessionId })
+  return results[0] ?? null
+}
+
 export async function createInterview(
   db: Kysely<DB>,
   creatorId: string,

@@ -3,7 +3,7 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { requireDb, useDb } from '../../middleware/useDb'
 import { zValidator } from '../../utils/validator-wrapper'
-import { createInterview, getInterviews } from '../interviews/db-queries'
+import { createInterview, findInterviewBySessionId } from '../interviews/db-queries'
 import { generateZoomApiJwt, generateZoomVideoJwt } from './jwt'
 import { ZoomClient } from './ZoomClient'
 
@@ -70,25 +70,26 @@ sessionsRoute.get(
     // First check if this session is a scheduled session
     // ----------------------------------------------------
 
-    const hasScheduledAccess = await getInterviews(
+    const hasScheduledAccess = await findInterviewBySessionId(
       db,
+      sessionId,
       {
         userId: user.id,
         userEmail,
-        sessionId,
         isUpcoming: true,
       },
     )
-    if (hasScheduledAccess.length > 0)
+    if (hasScheduledAccess)
       return returnJoinToken()
 
     // check if user is unauthorized
 
-    const scheduledButNotYou = await getInterviews(
+    const scheduledButNotYou = await findInterviewBySessionId(
       db,
-      { sessionId, isUpcoming: true, onlyScheduledInterviews: true },
+      sessionId,
+      { isUpcoming: true, onlyScheduledInterviews: true },
     )
-    if (scheduledButNotYou.length)
+    if (scheduledButNotYou)
       return c.json({ error: 'Unauthorized' }, 401)
 
     // ----------------------------------------------------

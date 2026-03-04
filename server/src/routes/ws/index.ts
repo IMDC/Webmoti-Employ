@@ -4,7 +4,7 @@ import { Hono } from 'hono'
 import z from 'zod'
 import { requireDb, useDb } from '@/middleware/useDb'
 import { useQueryAuth } from '@/middleware/useQueryAuth'
-import { getInterviews } from '../interviews/db-queries'
+import { findInterviewBySessionId } from '../interviews/db-queries'
 
 const wsRoute = new Hono<AppContext>()
 
@@ -29,13 +29,12 @@ wsRoute.get(
     const durableObjectStub = c.env.AI_ROOM.get(objectId)
 
     // pass both userId and userEmail so both the creator and invited users can find the interview
-    const interviews = await getInterviews(db, { userId: c.var.user.id, userEmail, sessionId })
-    if (!interviews.length) {
+    const interview = await findInterviewBySessionId(db, sessionId, { userId: c.var.user.id, userEmail })
+    if (!interview) {
       return c.json({ error: 'Interview not found' }, 404)
     }
 
-    // assume since we're using sessionId there will be only 1 interview returned
-    const invites = interviews[0].invites
+    const invites = interview.invites
     const isInterviewer = invites.find(i => i.email === userEmail)?.isInterviewer ?? false
 
     // create a new request with extra information included as headers
