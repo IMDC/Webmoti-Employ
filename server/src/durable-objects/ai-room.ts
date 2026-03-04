@@ -246,9 +246,27 @@ export class AiRoom {
   private async handleAiResponse(response: string, wordCount: number, pipelineId: string) {
     const startedAt = Date.now()
 
-    function getResponseObject(response: string) {
-    // match first {...} JSON block
-      const match = response.match(/\{[\s\S]*\}/)
+    // split reasoning text (everything before the first JSON block) from the JSON
+    const jsonMatch = response.match(/\{[\s\S]*\}/)
+    let reasoningText = ''
+    let jsonText = response
+    if (jsonMatch) {
+      reasoningText = response.slice(0, jsonMatch.index).trim()
+      jsonText = jsonMatch[0]
+    }
+
+    // broadcast reasoning text if we extracted any
+    if (reasoningText) {
+      const reasoningMsg: WebSocketMessage = {
+        type: 'reasoning',
+        payload: reasoningText,
+      }
+      await this.broadcastMessage(reasoningMsg)
+    }
+
+    function getResponseObject(_response: string) {
+      // match first {...} JSON block
+      const match = _response.match(/\{[\s\S]*\}/)
       if (!match) {
         throw new Error('No JSON found in response')
       }
@@ -256,7 +274,7 @@ export class AiRoom {
     }
 
     const notificationResult = NotificationMessage.safeParse({
-      ...getResponseObject(response),
+      ...getResponseObject(jsonText),
       wordCount,
     })
 
