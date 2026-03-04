@@ -70,27 +70,19 @@ sessionsRoute.get(
     // First check if this session is a scheduled session
     // ----------------------------------------------------
 
-    const hasScheduledAccess = await findInterviewBySessionId(
-      db,
-      sessionId,
-      {
-        userId: user.id,
-        userEmail,
-        isUpcoming: true,
-      },
-    )
-    if (hasScheduledAccess)
-      return returnJoinToken()
+    const interview = await findInterviewBySessionId(db, sessionId, { isUpcoming: true })
 
-    // check if user is unauthorized
+    if (interview) {
+      const hasAccess = interview.creatorId === user.id
+        || interview.invites.some(i => i.email === userEmail)
 
-    const scheduledButNotYou = await findInterviewBySessionId(
-      db,
-      sessionId,
-      { isUpcoming: true, onlyScheduledInterviews: true },
-    )
-    if (scheduledButNotYou)
-      return c.json({ error: 'Unauthorized' }, 401)
+      if (hasAccess)
+        return returnJoinToken()
+
+      // Block unauthorized access to scheduled (non-instant) interviews
+      if (!interview.isInstant)
+        return c.json({ error: 'Unauthorized' }, 401)
+    }
 
     // ----------------------------------------------------
     // If not scheduled, check if live
