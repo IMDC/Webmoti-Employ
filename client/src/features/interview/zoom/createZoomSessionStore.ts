@@ -219,6 +219,8 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         },
         leave: async () => {
           logger.log('Leaving zoom session...')
+          // stopping video also stops audio so the mic indicator goes away in google chrome
+          await get().actions.stopVideo()
           unsubscribeStatisticsEvents()
           resetStatisticsState()
           set({ callState: 'left', participants: new Map() })
@@ -327,7 +329,10 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         },
         cleanup: async () => {
           logger.log('Cleaning up zoom client...')
-          unsubscribeStatisticsEvents()
+          // Only unsubscribe if leave() hasn't already done it
+          if (get().callState === 'joined') {
+            unsubscribeStatisticsEvents()
+          }
           resetStatisticsState()
           client().off('user-added', handleUserAdded)
           client().off('user-removed', handleUserRemoved)

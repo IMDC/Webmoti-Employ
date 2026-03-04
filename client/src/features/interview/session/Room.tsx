@@ -61,8 +61,8 @@ export function Room() {
     setIsAudioOn,
     startVideo,
     stopVideo,
-    startAudio,
-    stopAudio,
+    muteAudio,
+    unmuteAudio,
   } = useZoomSessionActions()
   const isVideoOn = useIsVideoOn()
   const isAudioOn = useIsAudioOn()
@@ -101,11 +101,11 @@ export function Room() {
 
     if (isAudioOn) {
       setIsAudioOn(false)
-      await stopAudio()
+      await muteAudio()
     }
     else {
       setIsAudioOn(true)
-      await startAudio()
+      await unmuteAudio()
     }
   }
 
