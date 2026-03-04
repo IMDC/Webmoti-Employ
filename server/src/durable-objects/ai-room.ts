@@ -215,9 +215,9 @@ export class AiRoom {
         ? this.devIsJohnInterviewer
         : sessionIsInterviewer
 
-      // Interviewers only receive hints — strip filler data, question timing, and off-topic
+      // Interviewers only receive hints — strip filler data and off-topic
       const sessionPayload: NotificationMessage = isInterviewer
-        ? { ...payload, fillerCount: 0, wordCount: 0, isQuestion: false, offTopic: false }
+        ? { ...payload, fillerCount: 0, wordCount: 0, offTopic: false }
         : payload
 
       const notificationMessage: WebSocketMessage = {

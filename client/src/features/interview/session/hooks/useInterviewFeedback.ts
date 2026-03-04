@@ -2,15 +2,15 @@ import type { NotificationMessage } from '@webmoti-employ/shared'
 import type { EyeContactStatus } from './useEyeContact'
 import { useEyeContact } from './useEyeContact'
 import { useFillerWarning } from './useFillerWarning'
-import { useQuestionCountup } from './useQuestionCountup'
+import { useTopicCountup } from './useTopicCountup'
 
 export interface InterviewFeedback {
-  /** Hint keywords for the current question (empty when none) */
+  /** Hint keywords for the current topic (empty when none) */
   hint: string[]
   showHint: boolean
   showOffTopic: boolean
   showFillerWarning: boolean
-  /** Seconds since the current question was asked (0 when idle) */
+  /** Seconds since the current topic started (0 when idle) */
   countupSeconds: number
   /** Eye-contact status: 'good' | 'bad' | null (no data) */
   eyeContact: EyeContactStatus
@@ -25,7 +25,7 @@ export function useInterviewFeedback(
   onLookingChange?: (looking: boolean) => void,
 ): InterviewFeedback {
   const showFillerWarning = useFillerWarning(notification)
-  const countupSeconds = useQuestionCountup(notification)
+  const countupSeconds = useTopicCountup(notification)
   const eyeContact = useEyeContact(onLookingChange)
 
   return {

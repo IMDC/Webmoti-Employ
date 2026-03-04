@@ -12,7 +12,6 @@ const FILLER_WINDOW_SIZE = 5
  * Handles:
  * - Sliding window of filler/word counts (size FILLER_WINDOW_SIZE, reset on newTopic)
  * - Hint persistence (keeps previous hints until new ones arrive)
- * - Question stickiness (stays true until a new topic resets it)
  */
 export function useNotificationState() {
   const [notification, setNotification] = useState<NotificationMessage>(
@@ -46,7 +45,6 @@ export function useNotificationState() {
       if (incoming.newTopic) {
         return {
           hint: incoming.hint,
-          isQuestion: incoming.isQuestion,
           fillerCount: totalFillers,
           wordCount: totalWords,
           newTopic: true,
@@ -56,7 +54,6 @@ export function useNotificationState() {
 
       return {
         hint: incoming.hint.length > 0 ? incoming.hint : prev.hint,
-        isQuestion: prev.isQuestion || incoming.isQuestion,
         fillerCount: totalFillers,
         wordCount: totalWords,
         newTopic: false,
