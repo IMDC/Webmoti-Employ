@@ -26,6 +26,7 @@ overrides:
   vitest: 3.2.4
 
 catalog:
+  '@zoom/videosdk': 2.3.14
   better-auth: 1.4.17
   zod: 4.3.6
 
