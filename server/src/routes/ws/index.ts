@@ -28,10 +28,19 @@ wsRoute.get(
     const objectId = c.env.AI_ROOM.idFromName(sessionId)
     const durableObjectStub = c.env.AI_ROOM.get(objectId)
 
-    // pass both userId and userEmail so both the creator and invited users can find the interview
-    const interview = await findInterviewBySessionId(db, sessionId, { userId: c.var.user.id, userEmail })
+    // find the interview without user scoping, then check access in code
+    const interview = await findInterviewBySessionId(db, sessionId)
     if (!interview) {
       return c.json({ error: 'Interview not found' }, 404)
+    }
+
+    // for scheduled interviews, verify the user is the creator or an invitee
+    if (!interview.isInstant) {
+      const isCreator = interview.creatorId === user.id
+      const isInvited = interview.invites.some(i => i.email === userEmail)
+      if (!isCreator && !isInvited) {
+        return c.json({ error: 'Unauthorized' }, 401)
+      }
     }
 
     const invites = interview.invites
