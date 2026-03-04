@@ -5,7 +5,11 @@ export const TranscriptMessage = z.object({
   status: z.enum(['final', 'partial']),
 })
 
-export const NotificationMessage = z.object({
+export const InterviewerNotification = z.object({
+  hint: z.array(z.string()).default([]),
+})
+
+export const IntervieweeNotification = z.object({
   hint: z.array(z.string()).default([]),
   fillerCount: z.number().default(0),
   wordCount: z.number().default(0),
@@ -20,7 +24,8 @@ export const DevIsJohnDoNotUseThisMessage = z.object({
 
 export const WebSocketMessage = z.discriminatedUnion('type', [
   z.object({ type: z.literal('transcript'), payload: TranscriptMessage }),
-  z.object({ type: z.literal('notification'), payload: NotificationMessage }),
+  z.object({ type: z.literal('interviewerNotification'), payload: InterviewerNotification }),
+  z.object({ type: z.literal('intervieweeNotification'), payload: IntervieweeNotification }),
   z.object({ type: z.literal('ping') }),
   z.object({ type: z.literal('pong') }),
   z.object({ type: z.literal('devIsJohnDoNotUseThis'), payload: DevIsJohnDoNotUseThisMessage }),
@@ -30,5 +35,6 @@ export const WebSocketMessage = z.discriminatedUnion('type', [
 
 export type WebSocketMessage = z.infer<typeof WebSocketMessage>
 export type TranscriptMessage = z.infer<typeof TranscriptMessage>
-export type NotificationMessage = z.infer<typeof NotificationMessage>
+export type InterviewerNotification = z.infer<typeof InterviewerNotification>
+export type IntervieweeNotification = z.infer<typeof IntervieweeNotification>
 export type DevIsJohnDoNotUseThisMessage = z.infer<typeof DevIsJohnDoNotUseThisMessage>

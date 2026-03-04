@@ -1,6 +1,6 @@
 // https://dzone.com/articles/serverless-websocket-real-time-apps
 
-import type { NotificationMessage } from '@webmoti-employ/shared'
+import type { IntervieweeNotification } from '@webmoti-employ/shared'
 import type { ModelMessage } from 'ai'
 import { groq } from '@ai-sdk/groq'
 import { WebSocketMessage } from '@webmoti-employ/shared'
@@ -207,7 +207,7 @@ export class AiRoom {
     })
   }
 
-  private notifyClients(payload: NotificationMessage) {
+  private notifyClients(payload: IntervieweeNotification) {
     let notifiedCount = 0
     this.sessions.forEach(({ isInterviewer: sessionIsInterviewer }, ws) => {
       // In dev mode, use the dev override role instead of the session's actual role
@@ -215,17 +215,11 @@ export class AiRoom {
         ? this.devIsJohnInterviewer
         : sessionIsInterviewer
 
-      // Interviewers only receive hints — strip filler data and off-topic
-      const sessionPayload: NotificationMessage = isInterviewer
-        ? { ...payload, fillerCount: 0, wordCount: 0, offTopic: false }
-        : payload
+      const message: WebSocketMessage = isInterviewer
+        ? { type: 'interviewerNotification', payload: { hint: payload.hint } }
+        : { type: 'intervieweeNotification', payload }
 
-      const notificationMessage: WebSocketMessage = {
-        type: 'notification',
-        payload: sessionPayload,
-      }
-
-      ws.send(JSON.stringify(notificationMessage))
+      ws.send(JSON.stringify(message))
       notifiedCount += 1
     })
 

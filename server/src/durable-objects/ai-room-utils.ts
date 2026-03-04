@@ -1,11 +1,11 @@
-import { NotificationMessage } from '@webmoti-employ/shared'
+import { IntervieweeNotification } from '@webmoti-employ/shared'
 
 /**
  * Splits an AI response into reasoning text (before the JSON) and the parsed notification object.
  */
 export function parseAiResponse(response: string, wordCount: number): {
   reasoningText: string
-  notification: NotificationMessage | null
+  notification: IntervieweeNotification | null
 } {
   // split reasoning text (everything before the first JSON block) from the JSON
   const jsonMatch = response.match(/\{[\s\S]*\}/)
@@ -16,7 +16,7 @@ export function parseAiResponse(response: string, wordCount: number): {
     jsonText = jsonMatch[0]
   }
 
-  const notificationResult = NotificationMessage.safeParse({
+  const notificationResult = IntervieweeNotification.safeParse({
     ...extractJsonObject(jsonText),
     wordCount,
   })

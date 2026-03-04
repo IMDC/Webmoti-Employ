@@ -1,4 +1,5 @@
-import type { NotificationMessage, TranscriptMessage } from '@webmoti-employ/shared'
+import type { TranscriptMessage } from '@webmoti-employ/shared'
+import type { NotificationState } from './NotificationState'
 import { WebSocketMessage } from '@webmoti-employ/shared'
 
 import { useCallback } from 'react'
@@ -9,7 +10,7 @@ import { useRoomName } from '../zoom/useZoomSessionStore'
 
 interface UseAiWebsocketOptions {
   /** Called with each raw notification from the server */
-  onNotification: (notification: NotificationMessage) => void
+  onNotification: (notification: NotificationState) => void
 }
 
 /**
@@ -72,8 +73,11 @@ export function useAiWebsocket({ onNotification }: UseAiWebsocketOptions) {
       }
 
       const msg = result.data
-      if (msg.type === 'notification') {
-        onNotification(msg.payload)
+      if (msg.type === 'intervieweeNotification') {
+        onNotification({ role: 'interviewee', ...msg.payload })
+      }
+      else if (msg.type === 'interviewerNotification') {
+        onNotification({ role: 'interviewer', ...msg.payload })
       }
       else if (msg.type === 'reasoning') {
         logger.info('AI reasoning:', msg.payload)

@@ -1,7 +1,7 @@
-import type { NotificationMessage } from '@webmoti-employ/shared'
-import { NotificationMessage as NotificationMessageSchema } from '@webmoti-employ/shared'
+import type { IntervieweeNotificationState, InterviewerNotificationState, NotificationState } from './NotificationState'
 import { useCallback, useRef, useState } from 'react'
 import { logger } from '@/utils/logger'
+import { DEFAULT_INTERVIEWEE_STATE } from './NotificationState'
 
 /** Number of recent notifications to consider for filler percentage */
 const FILLER_WINDOW_SIZE = 5
@@ -10,19 +10,33 @@ const FILLER_WINDOW_SIZE = 5
  * Aggregates raw AI notification messages into a single notification state.
  *
  * Handles:
- * - Sliding window of filler/word counts (size FILLER_WINDOW_SIZE, reset on newTopic)
- * - Hint persistence (keeps previous hints until new ones arrive)
+ * - Interviewer: hint persistence only
+ * - Interviewee: sliding window of filler/word counts (size FILLER_WINDOW_SIZE, reset on newTopic)
+ *   and hint persistence
  */
 export function useNotificationState() {
-  const [notification, setNotification] = useState<NotificationMessage>(
-    NotificationMessageSchema.parse({}),
+  const [notification, setNotification] = useState<NotificationState>(
+    DEFAULT_INTERVIEWEE_STATE,
   )
 
-  // Ring buffer of recent { fillerCount, wordCount } for sliding window
+  // Ring buffer of recent { fillerCount, wordCount } for sliding window (interviewee only)
   const recentRef = useRef<{ fillerCount: number, wordCount: number }[]>([])
 
-  const processNotification = useCallback((incoming: NotificationMessage) => {
-    // Update sliding window outside of state updater to avoid double-mutation
+  const processNotification = useCallback((incoming: NotificationState) => {
+    if (incoming.role === 'interviewer') {
+      setNotification((prev: NotificationState) => {
+        const prevHint = prev.role === 'interviewer' ? prev.hint : []
+        const state: InterviewerNotificationState = {
+          role: 'interviewer',
+          hint: incoming.hint.length > 0 ? incoming.hint : prevHint,
+        }
+        return state
+      })
+      logger.info('Processed interviewer notification:', incoming)
+      return
+    }
+
+    // Interviewee path
     if (incoming.newTopic) {
       recentRef.current = [{ fillerCount: incoming.fillerCount, wordCount: incoming.wordCount }]
     }
@@ -41,27 +55,32 @@ export function useNotificationState() {
       totalWords += entry.wordCount
     }
 
-    setNotification((prev) => {
+    setNotification((prev: NotificationState) => {
+      const prevHint = prev.hint
       if (incoming.newTopic) {
-        return {
+        const state: IntervieweeNotificationState = {
+          role: 'interviewee',
           hint: incoming.hint,
           fillerCount: totalFillers,
           wordCount: totalWords,
           newTopic: true,
           offTopic: false,
         }
+        return state
       }
 
-      return {
-        hint: incoming.hint.length > 0 ? incoming.hint : prev.hint,
+      const state: IntervieweeNotificationState = {
+        role: 'interviewee',
+        hint: incoming.hint.length > 0 ? incoming.hint : prevHint,
         fillerCount: totalFillers,
         wordCount: totalWords,
         newTopic: false,
         offTopic: incoming.offTopic,
       }
+      return state
     })
 
-    logger.info('Processed notification:', incoming)
+    logger.info('Processed interviewee notification:', incoming)
   }, [])
 
   return { notification, processNotification }

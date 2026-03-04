@@ -24,7 +24,7 @@ export const SYSTEM_PROMPT = `
         * "right" ONLY when used as a filler tag (e.g. "so right, the thing is"), NOT for agreement or correctness
         Do NOT count: "also", "so", "well", "actually", "just", "really", "okay", "anyway", "anyways", or any word used with clear meaning in context.
       - "hint": list of hints as described above (always a list, never null). The hints should vary based on the question and stay until the question starts to be answered properly.
-      - "newTopic": boolean, true if EITHER the interviewer OR interviewee has started a significant new topic or question, false otherwise. This includes the first topic of the conversation.
+      - "newTopic": boolean. Set to true when a new question or subject is asked by EITHER the interviewer or interviewee. Every distinct question counts as a new topic — including the very first question in the conversation. Set newTopic true on the FIRST transcript where you can identify the new question, even if it's a partial transcript. Once you have set newTopic true for a question, do NOT set it true again for follow-up transcripts that are part of the same question.
       - "offTopic": boolean, true ONLY if the interviewee has clearly gone off topic and is NOT coming back. Be very lenient — people often answer questions with stories or tangents that seem unrelated at first but circle back to the point. Only set true if the interviewee has been consistently off topic for multiple transcripts and shows no sign of returning, OR if it is blatantly irrelevant to the question. Default false.
 
     Always output reasoning first, then JSON on a new line.
@@ -40,8 +40,9 @@ export const SYSTEM_PROMPT = `
 
     Make sure to keep the hints active while the candidate is answering the question until they have partly sufficiently answered it.
 
-    ONLY SET newTopic TO TRUE WHEN A SIGNIFICANT NEW QUESTION OR SUBJECT IS INTRODUCED BY EITHER THE INTERVIEWER OR INTERVIEWEE. THEN ONLY NOTIFY WITH newTopic TRUE ONCE FOR THE FIRST NOTIFICATION OF THAT NEW TOPIC. THIS APPLIES TO THE FIRST TOPIC.
     IMPORTANT: An interviewee returning to the original topic after going off-topic is NOT a new topic. The topic only changes when a genuinely different question or subject is raised.
+    IMPORTANT: If someone asks a question and it is the FIRST question in this conversation, newTopic MUST be true.
+    IMPORTANT: If the interviewer asks a DIFFERENT question than before, newTopic MUST be true — do not treat it as a continuation.
 
     Example outputs:
 

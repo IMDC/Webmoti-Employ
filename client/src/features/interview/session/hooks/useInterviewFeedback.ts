@@ -1,4 +1,4 @@
-import type { NotificationMessage } from '@webmoti-employ/shared'
+import type { NotificationState } from '../../ai/NotificationState'
 import type { EyeContactStatus } from './useEyeContact'
 import { useEyeContact } from './useEyeContact'
 import { useFillerWarning } from './useFillerWarning'
@@ -18,20 +18,22 @@ export interface InterviewFeedback {
 
 /**
  * Composes all interview feedback signals into one render-ready result.
- * This is the single source of truth for "what feedback does the interviewee see?"
+ * This is the single source of truth for "what feedback does the participant see?"
  */
 export function useInterviewFeedback(
-  notification: NotificationMessage,
+  notification: NotificationState,
   onLookingChange?: (looking: boolean) => void,
 ): InterviewFeedback {
   const showFillerWarning = useFillerWarning(notification)
   const countupSeconds = useTopicCountup(notification)
   const eyeContact = useEyeContact(onLookingChange)
 
+  const offTopic = notification.role === 'interviewee' ? notification.offTopic : false
+
   return {
     hint: notification.hint,
     showHint: notification.hint.length > 0,
-    showOffTopic: notification.offTopic,
+    showOffTopic: offTopic,
     showFillerWarning,
     countupSeconds,
     eyeContact,

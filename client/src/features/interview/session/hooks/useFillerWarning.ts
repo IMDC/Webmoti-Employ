@@ -1,4 +1,4 @@
-import type { NotificationMessage } from '@webmoti-employ/shared'
+import type { NotificationState } from '../../ai/NotificationState'
 import { useEffect } from 'react'
 import { logger } from '@/utils/logger'
 
@@ -10,10 +10,11 @@ const FILLER_THRESHOLD = 0.08
 
 /**
  * Derives whether to show a filler-word warning from the aggregated notification.
- * Owns all threshold constants so they're easy to find and tune.
+ * Only applies to interviewee notifications; always false for interviewer.
  */
-export function useFillerWarning(notification: NotificationMessage) {
-  const { fillerCount, wordCount } = notification
+export function useFillerWarning(notification: NotificationState) {
+  const fillerCount = notification.role === 'interviewee' ? notification.fillerCount : 0
+  const wordCount = notification.role === 'interviewee' ? notification.wordCount : 0
 
   const showFillerWarning = wordCount >= FILLER_MIN_WORDS
     && fillerCount / wordCount >= FILLER_THRESHOLD

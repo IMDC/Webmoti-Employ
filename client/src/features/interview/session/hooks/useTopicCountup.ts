@@ -1,12 +1,12 @@
-import type { NotificationMessage } from '@webmoti-employ/shared'
+import type { NotificationState } from '../../ai/NotificationState'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 /**
  * Counts seconds since the current topic started.
- * Resets and restarts on each new topic.
+ * Resets and restarts on each new topic. Only applies to interviewee notifications.
  */
-export function useTopicCountup(notification: NotificationMessage) {
-  const { newTopic } = notification
+export function useTopicCountup(notification: NotificationState) {
+  const newTopic = notification.role === 'interviewee' ? notification.newTopic : false
 
   const [seconds, setSeconds] = useState(0)
   const intervalRef = useRef<number | null>(null)
