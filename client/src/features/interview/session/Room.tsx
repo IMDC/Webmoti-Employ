@@ -49,7 +49,7 @@ export function Room() {
   const { sendTranscript, sendDevIsJohnDoNotUseMessage } = useAiWebsocket({
     onNotification: processNotification,
   })
-  useBufferedTranscription(5, sendTranscript)
+  useBufferedTranscription(sendTranscript)
 
   const [isLookingAtInterviewer, setIsLookingAtInterviewer] = useState(false)
   const interviewFeedback = useInterviewFeedback(notification, setIsLookingAtInterviewer)

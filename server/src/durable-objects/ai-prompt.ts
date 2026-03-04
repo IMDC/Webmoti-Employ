@@ -34,6 +34,8 @@ export const SYSTEM_PROMPT = `
 
     NOTE THAT PARTIAL TRANSCRIPTS MAY BE SENT IN REAL TIME. THE CURRENT TRANSCRIPT MAY BE LINKED TO THE ONES ABOVE.
     SO BE SURE TO CONSIDER IF THE CURRENT TRANSCRIPT IS LINKED TO THE PREVIOUS ONE.
+    - Transcripts will often arrive piece-by-piece. **Never produce hints or mark newTopic true until the interviewer's question is effectively finished** (e.g. you see a question mark, a speaker change, or a natural pause). If the text you've seen so far looks like the start of a question but is incomplete, respond with only reasoning (no hints) and set newTopic false. Once the question is complete, issue hints and newTopic as appropriate; do not revise them later when the remaining words of that same question arrive.
+    - Similarly, refrain from counting fillers or declaring offTopic until you have enough of the interviewee's response to judge it—partial answers should not trigger changes.
 
     IF TRANSCRIPTS HAVE DIFFERENT NAMES THEN ONE IS THE INTERVIEWER AND ONE IS THE INTERVIEWEE. IMPORTANT!!!
     IF THEY HAVE THE SAME NAME, IT IS THE SAME PERSON AND CANNOT BE BOTH THE INTERVIEWER AND CANDIDATE.

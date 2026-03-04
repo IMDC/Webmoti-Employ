@@ -5,8 +5,9 @@ import { notifyError } from '@/utils/utils'
 import { useIsAudioOn } from '../zoom/useZoomSessionStore'
 import { useSpeechRecognition } from './useSpeechRecognition'
 
+const maxWordsBuffer = 5
+
 export function useBufferedTranscription(
-  maxWordsBuffer: number,
   sendTranscript: (transcript: TranscriptMessage) => void,
 ) {
   const isAudioEnabled = useIsAudioOn()
@@ -88,7 +89,7 @@ export function useBufferedTranscription(
         // don't reset transcript here to avoid interrupting ongoing accumulation
       }
     }
-  }, [transcript, sentWordCount, sendTranscript, maxWordsBuffer, finalTranscript])
+  }, [transcript, sentWordCount, sendTranscript, finalTranscript])
 }
 
 function getWords(text: string): string[] {
