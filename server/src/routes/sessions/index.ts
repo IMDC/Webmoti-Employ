@@ -86,7 +86,7 @@ sessionsRoute.get(
 
     const scheduledButNotYou = await getInterviews(
       db,
-      { sessionId, isUpcoming: true },
+      { sessionId, isUpcoming: true, onlyScheduledInterviews: true },
     )
     if (scheduledButNotYou.length)
       return c.json({ error: 'Unauthorized' }, 401)
