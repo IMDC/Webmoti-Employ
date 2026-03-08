@@ -63,6 +63,10 @@ export function useAiWebsocket({ onNotification }: UseAiWebsocketOptions) {
     sendWebsocketMessage(websocketMsg)
   }, [sendWebsocketMessage])
 
+  const sendResetMessages = useCallback(() => {
+    sendWebsocketMessage({ type: 'resetMessages' })
+  }, [sendWebsocketMessage])
+
   function handleMessage(event: MessageEvent) {
     try {
       const parsed = JSON.parse(event.data)
@@ -97,5 +101,6 @@ export function useAiWebsocket({ onNotification }: UseAiWebsocketOptions) {
   return {
     sendTranscript,
     sendDevIsJohnDoNotUseMessage,
+    sendResetMessages,
   }
 }

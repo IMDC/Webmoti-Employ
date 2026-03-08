@@ -81,6 +81,9 @@ export class AiRoom {
       if (websocketMsg.type === 'transcript') {
         this.handleTranscript(ws, websocketMsg.payload)
       }
+      else if (websocketMsg.type === 'resetMessages') {
+        this.resetMessages()
+      }
       else if (websocketMsg.type === 'devIsJohnDoNotUseThis') {
         const payload = websocketMsg.payload
         this.devIsJohnDoNotUseThis = payload.isJohn
@@ -109,6 +112,12 @@ export class AiRoom {
   async webSocketError(ws: WebSocket, error: any): Promise<void> {
     console.error('WebSocket error:', error)
     this.sessions.delete(ws)
+  }
+
+  private resetMessages() {
+    this.messages = [{ role: 'system', content: SYSTEM_PROMPT }]
+    this.transcriptQueue = []
+    debugLog(this.env.IS_DEV, 'AI messages reset')
   }
 
   // ── Transcript handling ──────────────────────────────────────────────

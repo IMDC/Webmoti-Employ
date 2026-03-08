@@ -33,6 +33,7 @@ export const WebSocketMessage = z.discriminatedUnion('type', [
   z.object({ type: z.literal('reasoning'), payload: z.string() }),
   // transcript text broadcast to all clients (formatted as "[role] name: text")
   z.object({ type: z.literal('broadcastTranscript'), payload: z.string() }),
+  z.object({ type: z.literal('resetMessages') }),
 ])
 
 export type WebSocketMessage = z.infer<typeof WebSocketMessage>

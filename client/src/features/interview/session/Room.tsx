@@ -46,7 +46,7 @@ export function Room() {
   const [isChatOpen, setIsChatOpen] = useState(false)
 
   const { notification, processNotification } = useNotificationState()
-  const { sendTranscript, sendDevIsJohnDoNotUseMessage } = useAiWebsocket({
+  const { sendTranscript, sendDevIsJohnDoNotUseMessage, sendResetMessages } = useAiWebsocket({
     onNotification: processNotification,
   })
   useBufferedTranscription(sendTranscript)
@@ -214,6 +214,7 @@ export function Room() {
                 }}
                 onToggleLayoutModal={openLayoutModal}
                 sendDevIsJohnDoNotUseThis={sendDevIsJohnDoNotUseMessage}
+                sendResetMessages={sendResetMessages}
               />
             )
           : (

@@ -20,9 +20,10 @@ interface ControlsMenuProps {
   onLayoutOpen?: () => void
   isMobile?: boolean
   sendDevIsJohnDoNotUseThis?: (isJohn: boolean, isInterviewer: boolean) => void
+  sendResetMessages?: () => void
 }
 
-export function ControlsMenu({ onLayoutOpen, isMobile, sendDevIsJohnDoNotUseThis }: ControlsMenuProps) {
+export function ControlsMenu({ onLayoutOpen, isMobile, sendDevIsJohnDoNotUseThis, sendResetMessages }: ControlsMenuProps) {
   const { setIsSettingsOpen } = useAppActions()
   const isVideoBlurred = useIsVideoBlurred()
   const { blurVideo } = useZoomSessionActions()
@@ -127,6 +128,14 @@ export function ControlsMenu({ onLayoutOpen, isMobile, sendDevIsJohnDoNotUseThis
             bg={isJohnCandidatePressed ? 'blue' : undefined}
           >
             DEV: John (candidate)
+          </Menu.Item>
+
+          <Menu.Divider />
+          <Menu.Item
+            color="red"
+            onClick={() => sendResetMessages?.()}
+          >
+            DEV: Reset AI Messages
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>
