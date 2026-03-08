@@ -5,6 +5,7 @@ import { useRealtimeEventListener } from '@speechmatics/real-time-client-react'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { logger } from '@/utils/logger'
 import { notifyError } from '@/utils/utils'
+import { useSelectedAudioInputDevice } from '../zoom/useDeviceStore'
 import { useTranscriptionManager } from './TranscriptionManagerContext'
 
 interface Word {
@@ -90,6 +91,7 @@ function transcriptReducer(state: State, action: Action): State {
 
 export function useSpeechRecognition() {
   const { startRecording, stopRecording, audioContext } = usePCMAudioRecorderContext()
+  const selectedAudioInputDevice = useSelectedAudioInputDevice()
   const {
     startTranscriptionSession,
     stopTranscriptionSession,
@@ -166,7 +168,13 @@ export function useSpeechRecognition() {
             logger.error('[SpeechRecognition] AudioContext is closed, cannot start recording')
             return
           }
-          const options: StartRecordingOptions = { audioContext }
+          const options: StartRecordingOptions = {
+            audioContext,
+            // use recordingOptions with exact constraint so the browser doesn't silently fall back to another device
+            recordingOptions: selectedAudioInputDevice
+              ? { deviceId: { exact: selectedAudioInputDevice } }
+              : undefined,
+          }
           await startRecording(options)
           isRecordingRef.current = true
           setListening(true)
@@ -180,7 +188,44 @@ export function useSpeechRecognition() {
       }
       startRec()
     }
-  }, [transcriptionStarted, isRecognitionReady, socketState, listening, startRecording, audioContext, hasNotifiedUser])
+  }, [
+    transcriptionStarted,
+    isRecognitionReady,
+    socketState,
+    listening,
+    startRecording,
+    audioContext,
+    hasNotifiedUser,
+    selectedAudioInputDevice,
+  ])
+
+  // restart recording when the selected mic changes
+  useEffect(() => {
+    if (!isRecordingRef.current || !audioContext || audioContext.state === 'closed')
+      return
+
+    const restart = async () => {
+      stopRecording()
+      isRecordingRef.current = false
+      try {
+        await startRecording({
+          recordingOptions: selectedAudioInputDevice
+            ? { deviceId: { exact: selectedAudioInputDevice } }
+            : undefined,
+        })
+        isRecordingRef.current = true
+      }
+      catch (err: any) {
+        logger.error('[SpeechRecognition] Failed to restart recording after mic switch:', err)
+      }
+    }
+    restart()
+  }, [
+    selectedAudioInputDevice,
+    stopRecording,
+    startRecording,
+    audioContext,
+  ])
 
   const abortListening = useCallback(() => {
     // here we only stop recording audio, but keep transcription active.
