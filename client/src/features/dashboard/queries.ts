@@ -89,3 +89,34 @@ export function useScheduleInterview() {
 
   return { scheduleInterviewMutation, isScheduleInterviewPending }
 }
+
+// ----------------------------------------------------------------
+// DELETE interview
+
+async function deleteInterviewRequest(interviewId: number) {
+  const authToken = getLocalBearerToken()
+  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/interviews/${interviewId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  })
+
+  if (!response.ok) {
+    throw new HttpError('Failed to delete interview', response.status)
+  }
+}
+
+export function useDeleteInterview() {
+  const queryClient = useQueryClient()
+
+  const { mutateAsync: deleteInterviewMutation, isPending: isDeleteInterviewPending }
+    = useMutation({
+      mutationFn: (interviewId: number) => deleteInterviewRequest(interviewId),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.interviews })
+      },
+    })
+
+  return { deleteInterviewMutation, isDeleteInterviewPending }
+}

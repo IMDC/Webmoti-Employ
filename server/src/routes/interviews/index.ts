@@ -5,7 +5,7 @@ import { Hono } from 'hono'
 import z from 'zod'
 import { requireDb, useDb } from '../../middleware/useDb'
 import { zValidator } from '../../utils/validator-wrapper'
-import { createInterview, getInterviews } from './db-queries'
+import { createInterview, deleteInterview, getInterviews } from './db-queries'
 
 const interviewsRoute = new Hono<AppContext>()
 interviewsRoute.use(useDb)
@@ -69,5 +69,30 @@ interviewsRoute.post('/', zValidator('json', PostNewInterview), async (c) => {
 
   return c.json({ sessionId }, 201)
 })
+
+interviewsRoute.delete(
+  '/:id',
+  zValidator('param', z.object({ id: z.coerce.number().int() })),
+  async (c) => {
+    const db = requireDb(c)
+    const user = c.var.user
+    const { id } = c.req.valid('param')
+
+    // verify the user is the creator
+    const [interview] = await getInterviews(db, { userId: user.id })
+      .then(interviews => interviews.filter(i => i.id === id))
+
+    if (!interview) {
+      return c.json({ error: 'Interview not found' }, 404)
+    }
+
+    if (interview.creatorId !== user.id) {
+      return c.json({ error: 'Only the creator can delete an interview' }, 403)
+    }
+
+    await deleteInterview(db, id)
+    return c.body(null, 204)
+  },
+)
 
 export default interviewsRoute

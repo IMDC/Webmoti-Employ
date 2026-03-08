@@ -1,6 +1,6 @@
 import type { InterviewResponse } from '@webmoti-employ/shared'
-import { Avatar, Badge, Button, Card, Divider, Flex, Group, Stack, Text } from '@mantine/core'
-import { IconReport, IconTie, IconVideoFilled } from '@tabler/icons-react'
+import { ActionIcon, Avatar, Badge, Button, Card, Divider, Flex, Group, Stack, Text, Tooltip } from '@mantine/core'
+import { IconReport, IconTie, IconTrash, IconVideoFilled } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
 import { GoogleAvatar } from '@/components/GoogleAvatar'
@@ -9,6 +9,7 @@ import { UserList } from '@/components/UserList'
 import { useUser } from '@/features/auth/hooks/useUserStore'
 import { useInviteProfiles } from '@/features/interview/profiles/useInviteProfiles'
 import { getInterviewLink } from '@/utils/utils'
+import { useDeleteInterview } from '../queries'
 
 function counterpartInfo(
   interview: InterviewResponse,
@@ -47,6 +48,8 @@ export function InterviewCard({ interview }: InterviewCardProps) {
 
   const user = useUser()
   const { displayLine, pics, youAreInterviewer } = counterpartInfo(interview, profiles, user.email)
+  const isCreator = interview.creatorId === user.id
+  const { deleteInterviewMutation, isDeleteInterviewPending } = useDeleteInterview()
 
   const isEnded = interview.endTime ? interview.endTime < DateTime.local().toJSDate() : false
 
@@ -66,11 +69,25 @@ export function InterviewCard({ interview }: InterviewCardProps) {
             { youAreInterviewer ? 'Interviewer' : 'Interviewee' }
           </Badge>
         </Group>
-        <UserList
-          users={interview.invites ?? []}
-          profiles={profiles}
-          isLoadingProfiles={isLoadingProfiles}
-        />
+        <Group gap="xs">
+          <UserList
+            users={interview.invites ?? []}
+            profiles={profiles}
+            isLoadingProfiles={isLoadingProfiles}
+          />
+          {isCreator && (
+            <Tooltip label="Delete interview">
+              <ActionIcon
+                variant="subtle"
+                color="red"
+                loading={isDeleteInterviewPending}
+                onClick={() => deleteInterviewMutation(interview.id)}
+              >
+                <IconTrash size={16} />
+              </ActionIcon>
+            </Tooltip>
+          )}
+        </Group>
       </Group>
 
       <Stack justify="center" align="center" flex="grow" mt="sm">
