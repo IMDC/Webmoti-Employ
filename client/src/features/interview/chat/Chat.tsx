@@ -17,6 +17,7 @@ import { useVirtualizer } from '@tanstack/react-virtual'
 import Linkify from 'linkify-react'
 import { DateTime } from 'luxon'
 import { useEffect, useRef, useState } from 'react'
+import { isElectron } from '@/utils/utils'
 import { useZoomParticipants } from '../zoom/useZoomSessionStore'
 import { useChatActions, useChatMessages } from './useChatStore'
 
@@ -52,7 +53,24 @@ function Message({ chatMessage, participants, profiles, isLoadingProfiles }: Mes
           <strong style={{ marginRight: 5 }}>
             {displayName}
           </strong>
-          <Linkify>{message}</Linkify>
+          <Linkify options={{
+            target: '_blank',
+            rel: 'noopener noreferrer',
+            attributes: isElectron()
+              ? {
+                  onClick: (event: React.MouseEvent<HTMLAnchorElement>) => {
+                    event.preventDefault()
+                    const href = event.currentTarget.href
+                    if (href) {
+                      window.electron.openExternalUrl(href)
+                    }
+                  },
+                }
+              : undefined,
+          }}
+          >
+            {message}
+          </Linkify>
         </Text>
       </Skeleton>
     </Flex>
