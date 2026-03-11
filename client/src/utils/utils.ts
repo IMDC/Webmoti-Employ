@@ -32,6 +32,18 @@ export function showErrorNotification(title: string, message?: string) {
   })
 }
 
+export function notifyWarning(title: string, message?: string) {
+  const id = hashString(title + (message ?? ''))
+
+  notifications.show({
+    id,
+    title,
+    message,
+    color: 'yellow',
+    autoClose: message && message.length > 100 ? 8000 : 5000,
+  })
+}
+
 export function notifyError(title: string, error?: unknown) {
   if (error !== undefined) {
     logger.error(title, error)

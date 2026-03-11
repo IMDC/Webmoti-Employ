@@ -19,12 +19,12 @@ import type {
 } from '@zoom/videosdk'
 import type { StoreApi } from 'zustand'
 import type { DeviceStore } from './createDeviceStore'
+import { notifications } from '@mantine/notifications'
 import ZoomVideo, { ActiveMediaFailedCode, AudioChangeAction, ConnectionState, LeaveAudioSource, MutedSource, VideoActiveState, VideoQuality } from '@zoom/videosdk'
 import { createStore } from 'zustand'
-import { notifications } from '@mantine/notifications'
 import { appStore } from '@/useAppStore'
 import { logger } from '@/utils/logger'
-import { isExecutedFailure, notifyError } from '@/utils/utils'
+import { isExecutedFailure, notifyError, notifyWarning } from '@/utils/utils'
 
 export interface ZoomSessionActions {
   setIsAudioOn: (value: boolean) => void
@@ -637,12 +637,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
     }
     else if (action === AudioChangeAction.Muted) {
       if (source === MutedSource.PassiveByMuteOne || source === MutedSource.PassiveByMuteAll) {
-        notifications.show({
-          id: 'muted-by-host',
-          title: 'Muted by host',
-          message: 'The host has muted your audio.',
-          color: 'yellow',
-        })
+        notifyWarning('Muted by host', 'The host has muted your audio.')
         zoomSessionStore.setState({ isAudioOn: false })
       }
     }
@@ -659,12 +654,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
   }
 
   function handleSpeakingWhileMuted() {
-    notifications.show({
-      id: 'speaking-while-muted',
-      title: 'You are muted',
-      message: 'You are speaking while muted. Unmute to be heard.',
-      color: 'yellow',
-    })
+    notifyWarning('You are muted', 'You are speaking while muted. Unmute to be heard.')
   }
 
   function handleVideoAspectRatioChange(payload: Parameters<typeof event_video_aspect_ratio_change>[0]) {
