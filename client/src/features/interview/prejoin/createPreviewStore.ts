@@ -52,6 +52,11 @@ export function createPreviewStore(
           set({ localVideoTrack: track })
         }
         catch (error) {
+          // "no elements in sequence" happens when leaving the room while camera is starting
+          if (error instanceof Error && error.message.includes('no elements in sequence')) {
+            logger.log('Camera start aborted (element removed during transition)')
+            return
+          }
           notifyError('Failed to start camera', error)
         }
       },
