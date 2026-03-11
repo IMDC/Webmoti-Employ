@@ -5,13 +5,24 @@ import { useStore } from 'zustand'
 
 export const UserStoreContext = createContext<StoreApi<UserStore> | null>(null)
 
-function useUserStore<T>(selector: (state: UserStore) => T): T {
+function useUserStoreApi() {
   const store = use(UserStoreContext)
   if (!store) {
-    throw new Error('useUserStore must be used within a UserContextProvider')
+    throw new Error('useUserStoreApi must be used within a UserContextProvider')
   }
-  return useStore(store, selector)
+  return store
+}
+
+function useUserStore<T>(selector: (state: UserStore) => T): T {
+  return useStore(useUserStoreApi(), selector)
 }
 
 export const useUser = () => useUserStore(s => s.user)
 export const useSession = () => useUserStore(s => s.session)
+
+export function useUpdateUser() {
+  const store = useUserStoreApi()
+  return (updates: Partial<UserStore['user']>) => {
+    store.setState(state => ({ user: { ...state.user, ...updates } }))
+  }
+}

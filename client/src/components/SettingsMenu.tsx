@@ -1,5 +1,6 @@
-import { Button, Group, Modal, Stack, Switch, Text } from '@mantine/core'
+import { Button, Group, Modal, Stack, Switch, Text, TextInput } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
+import { useUpdateDisplayName } from '@/features/auth/hooks/useUpdateDisplayName'
 import { useAppActions, useAppIsColorblindModeOn, useAppIsSettingsOpen } from '@/useAppStore'
 import { AboutModal } from './AboutModal'
 import { ColorSchemeToggle } from './ColorSchemeToggle'
@@ -8,6 +9,8 @@ export function SettingsMenu() {
   const isSettingsOpened = useAppIsSettingsOpen()
   const { setIsSettingsOpen, setIsColorblindModeOn } = useAppActions()
   const isColorblindModeOn = useAppIsColorblindModeOn()
+
+  const { displayName, setDisplayName, isSaving, isChanged, save } = useUpdateDisplayName()
 
   const [isAboutModalOpened, { open: openAboutModal, close: closeAboutModal }] = useDisclosure(false)
 
@@ -23,6 +26,22 @@ export function SettingsMenu() {
         }}
       >
         <Stack>
+          <Group align="end">
+            <TextInput
+              label="Display name"
+              value={displayName}
+              onChange={event => setDisplayName(event.currentTarget.value)}
+              style={{ flex: 1 }}
+            />
+            <Button
+              onClick={save}
+              loading={isSaving}
+              disabled={!isChanged}
+            >
+              Save
+            </Button>
+          </Group>
+
           <Switch
             label="Colour blind mode"
             checked={isColorblindModeOn}
