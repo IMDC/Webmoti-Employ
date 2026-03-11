@@ -17,7 +17,7 @@ interface Session {
 interface QueuedTranscript {
   text: string
   isInterviewer: boolean
-  status: 'partial' | 'final'
+  // status: 'partial' | 'final'
   enqueuedAt: number
 }
 
@@ -139,7 +139,6 @@ export class AiRoom {
     this.transcriptQueue.push({
       text: formatted,
       isInterviewer: role === 'interviewer',
-      status: payload.status,
       enqueuedAt: Date.now(),
     })
 

@@ -1,11 +1,11 @@
 import type { TranscriptMessage } from '@webmoti-employ/shared'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import { logger } from '@/utils/logger'
 import { notifyError } from '@/utils/utils'
 import { useIsAudioOn } from '../zoom/useZoomSessionStore'
 import { useSpeechRecognition } from './useSpeechRecognition'
 
-const maxWordsBuffer = 5
+// const maxWordsBuffer = 5
 
 export function useBufferedTranscription(
   sendTranscript: (transcript: TranscriptMessage) => void,
@@ -13,14 +13,14 @@ export function useBufferedTranscription(
   const isAudioEnabled = useIsAudioOn()
   const {
     resetTranscript,
-    transcript,
+    // transcript,
     finalTranscript,
     listening,
     startListening,
     abortListening,
   } = useSpeechRecognition()
   // track the amount of words sent (useful for incremental sending)
-  const [sentWordCount, setSentWordCount] = useState(0)
+  // const [sentWordCount, setSentWordCount] = useState(0)
 
   const startTranscribing = useCallback(async () => {
     try {
@@ -56,42 +56,36 @@ export function useBufferedTranscription(
   }, [isAudioEnabled, startTranscribing, stopTranscribing])
 
   useEffect(() => {
-    // handle final transcript when the user stops speaking (EndOfUtterance)
     if (!finalTranscript) {
       return
     }
-    const words = getWords(finalTranscript)
-    const unsentWords = words.slice(sentWordCount)
-    const textToSend = unsentWords.join(' ')
-    if (textToSend) {
-      logger.info('final transcript:', textToSend)
-      sendTranscript({ text: textToSend, status: 'final' })
-    }
-    setSentWordCount(0)
+    logger.info('final transcript:', finalTranscript)
+    sendTranscript({ text: finalTranscript, status: 'final' })
     resetTranscript()
-  }, [finalTranscript, sentWordCount, resetTranscript, sendTranscript])
+  }, [finalTranscript, resetTranscript, sendTranscript])
 
-  useEffect(() => {
-    // handle incremental sending from transcript (finalized words)
-    // Skip if finalTranscript is present — the final effect handles that case
-    if (finalTranscript)
-      return
-    const words = getWords(transcript)
-    const unsentWordCount = words.length - sentWordCount
-    if (unsentWordCount >= maxWordsBuffer) {
-      // send exactly maxWordsBuffer words at a time
-      const nextIndex = sentWordCount + maxWordsBuffer
-      const wordsToSend = words.slice(sentWordCount, nextIndex).join(' ')
-      if (wordsToSend) {
-        logger.info('partial transcript:', wordsToSend)
-        sendTranscript({ text: wordsToSend, status: 'partial' })
-        setSentWordCount(nextIndex)
-        // don't reset transcript here to avoid interrupting ongoing accumulation
-      }
-    }
-  }, [transcript, sentWordCount, sendTranscript, finalTranscript])
+  // Partial buffering: send every maxWordsBuffer words incrementally
+  // useEffect(() => {
+  //   // handle incremental sending from transcript (finalized words)
+  //   // Skip if finalTranscript is present — the final effect handles that case
+  //   if (finalTranscript)
+  //     return
+  //   const words = getWords(transcript)
+  //   const unsentWordCount = words.length - sentWordCount
+  //   if (unsentWordCount >= maxWordsBuffer) {
+  //     // send exactly maxWordsBuffer words at a time
+  //     const nextIndex = sentWordCount + maxWordsBuffer
+  //     const wordsToSend = words.slice(sentWordCount, nextIndex).join(' ')
+  //     if (wordsToSend) {
+  //       logger.info('partial transcript:', wordsToSend)
+  //       sendTranscript({ text: wordsToSend, status: 'partial' })
+  //       setSentWordCount(nextIndex)
+  //       // don't reset transcript here to avoid interrupting ongoing accumulation
+  //     }
+  //   }
+  // }, [transcript, sentWordCount, sendTranscript, finalTranscript])
 }
 
-function getWords(text: string): string[] {
-  return text.trim().split(/\s+/).filter(Boolean)
-}
+// function getWords(text: string): string[] {
+//   return text.trim().split(/\s+/).filter(Boolean)
+// }

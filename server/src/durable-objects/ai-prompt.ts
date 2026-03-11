@@ -24,7 +24,7 @@ export const SYSTEM_PROMPT = `
         * "right" ONLY when used as a filler tag (e.g. "so right, the thing is"), NOT for agreement or correctness
         Do NOT count: "also", "so", "well", "actually", "just", "really", "okay", "anyway", "anyways", or any word used with clear meaning in context.
       - "hint": list of hints as described above (always a list, never null). The hints should vary based on the question and stay until the question starts to be answered properly.
-      - "newTopic": boolean. Set to true when a new question or subject is asked by EITHER the interviewer or interviewee. Every distinct question counts as a new topic — including the very first question in the conversation. Set newTopic true on the FIRST transcript where you can identify the new question, even if it's a partial transcript. Once you have set newTopic true for a question, do NOT set it true again for follow-up transcripts that are part of the same question.
+      - "newTopic": boolean. Set to true when a new question or subject is asked by EITHER the interviewer or interviewee. Every distinct question counts as a new topic — including the very first question in the conversation. Set newTopic true on the FIRST transcript where you can identify the new question. Once you have set newTopic true for a question, do NOT set it true again for follow-up transcripts that are part of the same question.
       - "offTopic": boolean, true ONLY if the interviewee has clearly gone off topic and is NOT coming back. Be very lenient — people often answer questions with stories or tangents that seem unrelated at first but circle back to the point. Only set true if the interviewee has been consistently off topic for multiple transcripts and shows no sign of returning, OR if it is blatantly irrelevant to the question. Default false.
 
     Always output reasoning first, then JSON on a new line.
@@ -32,10 +32,8 @@ export const SYSTEM_PROMPT = `
     EVEN IF THE TRANSCRIPT SEEMS IRRELEVANT TO THE INTERVIEW!
     DO NOT MAKE UP TRANSCRIPTS, JUST NOTIFY WITH NULL IF NOT RELEVANT.
 
-    NOTE THAT PARTIAL TRANSCRIPTS MAY BE SENT IN REAL TIME. THE CURRENT TRANSCRIPT MAY BE LINKED TO THE ONES ABOVE.
+    NOTE THAT TRANSCRIPTS ARE SENT AFTER EACH COMPLETE UTTERANCE. THE CURRENT TRANSCRIPT MAY BE LINKED TO THE ONES ABOVE.
     SO BE SURE TO CONSIDER IF THE CURRENT TRANSCRIPT IS LINKED TO THE PREVIOUS ONE.
-    - Transcripts will often arrive piece-by-piece. **Never produce hints or mark newTopic true until the interviewer's question is effectively finished** (e.g. you see a question mark, a speaker change, or a natural pause). If the text you've seen so far looks like the start of a question but is incomplete, respond with only reasoning (no hints) and set newTopic false. Once the question is complete, issue hints and newTopic as appropriate; do not revise them later when the remaining words of that same question arrive.
-    - Similarly, refrain from counting fillers or declaring offTopic until you have enough of the interviewee's response to judge it—partial answers should not trigger changes.
 
     IF TRANSCRIPTS HAVE DIFFERENT NAMES THEN ONE IS THE INTERVIEWER AND ONE IS THE INTERVIEWEE. IMPORTANT!!!
     IF THEY HAVE THE SAME NAME, IT IS THE SAME PERSON AND CANNOT BE BOTH THE INTERVIEWER AND CANDIDATE.
