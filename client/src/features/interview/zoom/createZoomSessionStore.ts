@@ -1,11 +1,15 @@
 import type {
   AudioQosData,
+  event_active_media_failed,
   event_audio_statistic_data_change,
+  event_connection_change,
+  event_current_audio_change,
   event_device_permission_change,
   event_network_quality_change,
   event_peer_video_state_change,
   event_system_resource_usage_change,
   event_video_active_change,
+  event_video_aspect_ratio_change,
   event_video_statistic_data_change,
   MediaDevice,
   Participant,
@@ -15,8 +19,9 @@ import type {
 } from '@zoom/videosdk'
 import type { StoreApi } from 'zustand'
 import type { DeviceStore } from './createDeviceStore'
-import ZoomVideo, { VideoActiveState, VideoQuality } from '@zoom/videosdk'
+import ZoomVideo, { ActiveMediaFailedCode, AudioChangeAction, ConnectionState, LeaveAudioSource, MutedSource, VideoActiveState, VideoQuality } from '@zoom/videosdk'
 import { createStore } from 'zustand'
+import { notifications } from '@mantine/notifications'
 import { appStore } from '@/useAppStore'
 import { logger } from '@/utils/logger'
 import { isExecutedFailure, notifyError } from '@/utils/utils'
@@ -123,13 +128,12 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       newClient.on('device-permission-change', handlePermissionChange)
       newClient.on('video-active-change', handleActiveSpeakerChange)
       newClient.on('network-quality-change', handleNetworkQualityChange)
-
-      // TODO
-      // client.on('active-media-failed', );
-      // client.on('current-audio-change', );
-      // client.on('auto-play-audio-failed', );
-      // client.on('video-aspect-ratio-change', );
-      // others... https://developers.zoom.us/docs/video-sdk/web/handle-events/
+      newClient.on('connection-change', handleConnectionChange)
+      newClient.on('active-media-failed', handleActiveMediaFailed)
+      newClient.on('current-audio-change', handleCurrentAudioChange)
+      newClient.on('auto-play-audio-failed', handleAutoPlayAudioFailed)
+      newClient.on('speaking-while-muted', handleSpeakingWhileMuted)
+      newClient.on('video-aspect-ratio-change', handleVideoAspectRatioChange)
 
       return newClient
     }
@@ -347,6 +351,12 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           client().off('device-permission-change', handlePermissionChange)
           client().off('video-active-change', handleActiveSpeakerChange)
           client().off('network-quality-change', handleNetworkQualityChange)
+          client().off('connection-change', handleConnectionChange)
+          client().off('active-media-failed', handleActiveMediaFailed)
+          client().off('current-audio-change', handleCurrentAudioChange)
+          client().off('auto-play-audio-failed', handleAutoPlayAudioFailed)
+          client().off('speaking-while-muted', handleSpeakingWhileMuted)
+          client().off('video-aspect-ratio-change', handleVideoAspectRatioChange)
 
           logger.log('Destroying zoom client')
           await ZoomVideo.destroyClient()
@@ -569,6 +579,101 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
     }
     catch (err) {
       logger.error(`Error handling peer-video-state-change for user ${userId}`, err)
+    }
+  }
+
+  function handleConnectionChange(payload: Parameters<typeof event_connection_change>[0]) {
+    if (payload.state === ConnectionState.Closed) {
+      zoomSessionStore.setState({ callState: 'left' })
+    }
+    else if (payload.state === ConnectionState.Reconnecting) {
+      notifications.show({
+        id: 'connection-reconnecting',
+        title: 'Reconnecting',
+        message: 'Connection lost. Attempting to reconnect...',
+        color: 'yellow',
+        autoClose: false,
+      })
+    }
+    else if (payload.state === ConnectionState.Connected) {
+      notifications.hide('connection-reconnecting')
+    }
+    else if (payload.state === ConnectionState.Fail) {
+      notifyError('Connection failed', payload.reason ?? 'Failed to connect to the session.')
+      zoomSessionStore.setState({ callState: 'left' })
+    }
+  }
+
+  function handleActiveMediaFailed(payload: Parameters<typeof event_active_media_failed>[0]) {
+    const { code, message } = payload
+
+    if (
+      [ActiveMediaFailedCode.CameraPermissionReset, ActiveMediaFailedCode.MicrophonePermissionReset, ActiveMediaFailedCode.MicrophoneMuted].includes(code)
+    ) {
+      notifyError('Permission issue', message)
+    }
+    else if (
+      [ActiveMediaFailedCode.AudioStreamMuted, ActiveMediaFailedCode.AudioPlaybackInterrupted, ActiveMediaFailedCode.VideoStreamMuted].includes(code)
+    ) {
+      notifications.show({
+        id: 'media-interrupted',
+        title: 'Media interrupted',
+        message: 'Click anywhere on the page to resume.',
+        color: 'yellow',
+      })
+    }
+    else {
+      notifyError('Media error', message)
+    }
+  }
+
+  function handleCurrentAudioChange(payload: Parameters<typeof event_current_audio_change>[0]) {
+    const { action, source } = payload
+
+    if (action === AudioChangeAction.Leave) {
+      if (source === LeaveAudioSource.EndedBySystem || source === LeaveAudioSource.MicrophoneError) {
+        notifyError('Audio ended', 'Audio was stopped due to a system error.')
+      }
+    }
+    else if (action === AudioChangeAction.Muted) {
+      if (source === MutedSource.PassiveByMuteOne || source === MutedSource.PassiveByMuteAll) {
+        notifications.show({
+          id: 'muted-by-host',
+          title: 'Muted by host',
+          message: 'The host has muted your audio.',
+          color: 'yellow',
+        })
+        zoomSessionStore.setState({ isAudioOn: false })
+      }
+    }
+  }
+
+  function handleAutoPlayAudioFailed() {
+    notifications.show({
+      id: 'auto-play-failed',
+      title: 'Audio playback blocked',
+      message: 'Click anywhere on the page to enable audio.',
+      color: 'yellow',
+      autoClose: false,
+    })
+  }
+
+  function handleSpeakingWhileMuted() {
+    notifications.show({
+      id: 'speaking-while-muted',
+      title: 'You are muted',
+      message: 'You are speaking while muted. Unmute to be heard.',
+      color: 'yellow',
+    })
+  }
+
+  function handleVideoAspectRatioChange(payload: Parameters<typeof event_video_aspect_ratio_change>[0]) {
+    const { userId, aspectRatio } = payload
+    const videoPlayerElement = document.querySelector(
+      `[data-user-id="${userId}"] video-player`,
+    ) as HTMLElement | null
+    if (videoPlayerElement) {
+      videoPlayerElement.style.aspectRatio = String(aspectRatio)
     }
   }
 
