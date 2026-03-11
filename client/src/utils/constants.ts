@@ -6,3 +6,6 @@ export const HEADER_HEIGHT = 60
 export const HEADER_SIDE_PADDING = 10
 
 export const ELECTRON_PROTOCOL_SCHEME = 'webmoti-employ'
+
+export const VIDEO_CAPTURE_WIDTH = 1920
+export const VIDEO_CAPTURE_HEIGHT = 1080

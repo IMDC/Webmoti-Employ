@@ -23,6 +23,7 @@ import { notifications } from '@mantine/notifications'
 import ZoomVideo, { ActiveMediaFailedCode, AudioChangeAction, ConnectionState, LeaveAudioSource, MutedSource, VideoActiveState, VideoQuality } from '@zoom/videosdk'
 import { createStore } from 'zustand'
 import { appStore } from '@/useAppStore'
+import { VIDEO_CAPTURE_HEIGHT, VIDEO_CAPTURE_WIDTH } from '@/utils/constants'
 import { logger } from '@/utils/logger'
 import { isExecutedFailure, notifyError, notifyWarning } from '@/utils/utils'
 
@@ -198,6 +199,8 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
             if (granted && isVideoOn) {
               await stream.startVideo({
                 cameraId: selectedVideoDevice ?? undefined,
+                captureWidth: VIDEO_CAPTURE_WIDTH,
+                captureHeight: VIDEO_CAPTURE_HEIGHT,
                 virtualBackground: {
                   imageUrl: isVideoBlurred ? 'blur' : undefined,
                 },
@@ -237,7 +240,12 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         },
         startVideo: async () => {
           logger.log('Starting video...')
-          await stream().startVideo()
+          await stream().startVideo(
+            {
+              captureWidth: VIDEO_CAPTURE_WIDTH,
+              captureHeight: VIDEO_CAPTURE_HEIGHT,
+            },
+          )
           updateParticipants()
         },
         stopVideo: async () => {
@@ -253,6 +261,8 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
             await stream().startVideo(
               {
                 cameraId: selectedVideoDevice ?? undefined,
+                captureWidth: VIDEO_CAPTURE_WIDTH,
+                captureHeight: VIDEO_CAPTURE_HEIGHT,
                 virtualBackground: {
                   imageUrl: isBlurred ? 'blur' : undefined,
                 },
