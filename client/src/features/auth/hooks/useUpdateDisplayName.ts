@@ -4,33 +4,43 @@ import { authClient } from '@/lib/auth-client'
 import { notifyError } from '@/utils/utils'
 import { useUpdateUser, useUser } from './useUserStore'
 
-export function useUpdateDisplayName() {
+export function useEditProfile() {
   const user = useUser()
   const updateUser = useUpdateUser()
 
-  const [displayName, setDisplayName] = useState(user.name)
+  const [name, setName] = useState(user.name)
+  const [image, setImage] = useState(user.image ?? '')
   const [isSaving, setIsSaving] = useState(false)
 
-  const isChanged = displayName.trim() !== '' && displayName !== user.name
+  const isNameChanged = name.trim() !== '' && name !== user.name
+  const isImageChanged = image.trim() !== (user.image ?? '')
+  const isChanged = isNameChanged || isImageChanged
 
   async function save() {
-    const trimmedName = displayName.trim()
+    const trimmedName = name.trim()
+    const trimmedImage = image.trim()
     setIsSaving(true)
     try {
-      await authClient.updateUser({ name: trimmedName })
-      updateUser({ name: trimmedName })
+      const updates: Record<string, string> = {}
+      if (isNameChanged)
+        updates.name = trimmedName
+      if (isImageChanged)
+        updates.image = trimmedImage || undefined as unknown as string
+
+      await authClient.updateUser(updates)
+      updateUser(updates)
       notifications.show({
-        title: 'Display name updated',
-        message: `Your display name has been changed to "${trimmedName}".`,
+        title: 'Profile updated',
+        message: 'Your profile has been updated.',
       })
     }
     catch (error) {
-      notifyError('Failed to update display name', error)
+      notifyError('Failed to update profile', error)
     }
     finally {
       setIsSaving(false)
     }
   }
 
-  return { displayName, setDisplayName, isSaving, isChanged, save }
+  return { name, setName, image, setImage, isSaving, isChanged, save }
 }

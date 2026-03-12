@@ -1,5 +1,6 @@
 import { Button, Group, Modal, Stack, Text, TextInput } from '@mantine/core'
-import { useUpdateDisplayName } from '../hooks/useUpdateDisplayName'
+import { GoogleAvatar } from '@/components/GoogleAvatar'
+import { useEditProfile } from '../hooks/useUpdateDisplayName'
 
 interface EditProfileModalProps {
   isOpen: boolean
@@ -7,7 +8,7 @@ interface EditProfileModalProps {
 }
 
 export function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
-  const { displayName, setDisplayName, isSaving, isChanged, save } = useUpdateDisplayName()
+  const { name, setName, image, setImage, isSaving, isChanged, save } = useEditProfile()
 
   async function handleSave() {
     await save()
@@ -25,21 +26,31 @@ export function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
       }}
     >
       <Stack>
-        <Group align="end">
-          <TextInput
-            label="Name"
-            value={displayName}
-            onChange={event => setDisplayName(event.currentTarget.value)}
-            style={{ flex: 1 }}
-          />
-          <Button
-            onClick={handleSave}
-            loading={isSaving}
-            disabled={!isChanged}
-          >
-            Save
-          </Button>
+        <Group justify="center">
+          <GoogleAvatar src={image || undefined} size="xl" />
         </Group>
+
+        <TextInput
+          label="Profile picture URL"
+          placeholder="https://example.com/photo.jpg"
+          value={image}
+          onChange={event => setImage(event.currentTarget.value)}
+        />
+
+        <TextInput
+          label="Name"
+          value={name}
+          onChange={event => setName(event.currentTarget.value)}
+        />
+
+        <Button
+          onClick={handleSave}
+          loading={isSaving}
+          disabled={!isChanged}
+          fullWidth
+        >
+          Save
+        </Button>
       </Stack>
     </Modal>
   )
