@@ -110,6 +110,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       await newClient.init('en-US', 'Global', {
         patchJsMedia: true,
         leaveOnPageUnload: true,
+        stayAwake: true,
       })
 
       // there's some bug with zoom where the client hasn't finished initializing here.
@@ -563,6 +564,9 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
   function handleUserUpdated(payload: Participant[]) {
     payload.forEach((user) => {
       logger.log(`User ${user.userId} was updated`)
+      if (user.isInFailover) {
+        logger.warn(`User ${user.userId} is in failover (reconnecting)`)
+      }
     })
     updateParticipants()
   }
@@ -644,6 +648,11 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
       if (source === LeaveAudioSource.EndedBySystem || source === LeaveAudioSource.MicrophoneError) {
         notifyError('Audio ended', 'Audio was stopped due to a system error.')
       }
+      else {
+        // Audio was disconnected (e.g. phone call or another app took the mic)
+        notifyWarning('Audio disconnected', 'Your audio was disconnected. Please re-enable audio to be heard.')
+      }
+      zoomSessionStore.setState({ isAudioOn: false })
     }
     else if (action === AudioChangeAction.Muted) {
       if (source === MutedSource.PassiveByMuteOne || source === MutedSource.PassiveByMuteAll) {
