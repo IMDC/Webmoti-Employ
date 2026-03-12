@@ -32,6 +32,11 @@ export function getAuth(env: CloudflareBindings): ReturnType<typeof betterAuth> 
       // this is a workaround to fix "state_mismatch" error when signing in with better-auth@1.4 and above
       skipStateCookieCheck: true,
     },
+    user: {
+      deleteUser: {
+        enabled: true,
+      },
+    },
     database: {
       // use local db when provided
       db: getDb(IS_DEV

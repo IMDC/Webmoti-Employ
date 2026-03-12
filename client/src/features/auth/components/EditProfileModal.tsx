@@ -1,5 +1,8 @@
-import { Button, Group, Modal, Stack, Text, TextInput } from '@mantine/core'
+import { Button, Divider, Group, Modal, Stack, Text, TextInput } from '@mantine/core'
+import { useState } from 'react'
 import { GoogleAvatar } from '@/components/GoogleAvatar'
+import { authClient } from '@/lib/auth-client'
+import { notifyError, removeLocalBearerToken } from '@/utils/utils'
 import { useEditProfile } from '../hooks/useUpdateDisplayName'
 
 interface EditProfileModalProps {
@@ -9,10 +12,26 @@ interface EditProfileModalProps {
 
 export function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
   const { name, setName, image, setImage, isSaving, isChanged, save } = useEditProfile()
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   async function handleSave() {
     await save()
     onClose()
+  }
+
+  async function handleDelete() {
+    setIsDeleting(true)
+    try {
+      await authClient.deleteUser({})
+      removeLocalBearerToken()
+      window.location.reload()
+    }
+    catch (error) {
+      notifyError('Failed to delete account', error)
+      setIsDeleting(false)
+      setIsConfirmingDelete(false)
+    }
   }
 
   return (
@@ -51,6 +70,41 @@ export function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
         >
           Save
         </Button>
+
+        <Divider />
+
+        {isConfirmingDelete
+          ? (
+              <Stack gap="xs">
+                <Text size="sm" c="red">Are you sure? This action cannot be undone.</Text>
+                <Group grow>
+                  <Button
+                    variant="default"
+                    onClick={() => setIsConfirmingDelete(false)}
+                    disabled={isDeleting}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    color="red"
+                    onClick={handleDelete}
+                    loading={isDeleting}
+                  >
+                    Delete Account
+                  </Button>
+                </Group>
+              </Stack>
+            )
+          : (
+              <Button
+                variant="subtle"
+                color="red"
+                fullWidth
+                onClick={() => setIsConfirmingDelete(true)}
+              >
+                Delete Account
+              </Button>
+            )}
       </Stack>
     </Modal>
   )
