@@ -6,9 +6,10 @@ updates:
       interval: weekly
     cooldown:
       default-days: 14
+    open-pull-requests-limit: 10
 
     groups:
-      minor:
+      version-updates:
         applies-to: version-updates
         patterns:
           - '*'
@@ -18,16 +19,6 @@ updates:
           - 'eslint-plugin*'
         update-types:
           - minor
-
-      patch:
-        applies-to: version-updates
-        patterns:
-          - '*'
-        exclude-patterns:
-          - '@antfu/eslint-config'
-          - '@eslint-react/eslint-plugin'
-          - 'eslint-plugin*'
-        update-types:
           - patch
 
       eslint:
