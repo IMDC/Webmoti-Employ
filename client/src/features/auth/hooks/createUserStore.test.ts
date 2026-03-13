@@ -1,4 +1,4 @@
-import { makeSession, makeUser } from '@test-utils/../test-utils/factories'
+import { makeSession, makeUser } from '@test-utils'
 import { createUserStore } from './createUserStore'
 
 describe('createUserStore', () => {

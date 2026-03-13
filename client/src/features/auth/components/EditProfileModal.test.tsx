@@ -1,5 +1,5 @@
 import { render, screen, userEvent } from '@test-utils'
-import { makeUser } from '@test-utils/../test-utils/factories'
+import { makeUser } from '@test-utils'
 import { createUserStore } from '@/features/auth/hooks/createUserStore'
 import { UserStoreContext } from '@/features/auth/hooks/useUserStore'
 import { EditProfileModal } from './EditProfileModal'

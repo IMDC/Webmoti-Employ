@@ -30,6 +30,9 @@ export default defineConfig({
     setupFiles: './vitest.setup.mjs',
     // exclude playwright tests in tests/
     exclude: ['node_modules', 'dist', 'tests/**'],
+    env: {
+      VITE_API_BASE_URL: 'http://localhost:5173/api',
+    },
   },
   server: {
     proxy: {

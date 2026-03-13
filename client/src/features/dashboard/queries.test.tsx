@@ -1,7 +1,7 @@
 import type { InterviewResponse } from '@webmoti-employ/shared'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { createTestQueryClient, renderHook, server, waitFor } from '@test-utils'
-import { makeInterview, resetFactories } from '@test-utils/../test-utils/factories'
+import { makeInterview, resetFactories } from '@test-utils'
 import { http, HttpResponse } from 'msw'
 import { useDeleteInterview, useInterviews, useScheduleInterview } from './queries'
 

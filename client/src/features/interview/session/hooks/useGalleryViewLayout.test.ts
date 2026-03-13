@@ -1,10 +1,11 @@
 import { layoutIsTooSmall } from './useGalleryViewLayout'
 
 // GALLERY_VIEW_ASPECT_RATIO = 16/9, GALLERY_VIEW_MARGIN = 3
-// layoutIsTooSmall returns true when the layout fits within the container
+// layoutIsTooSmall returns true when the layout fits in the container
+// (i.e. the video size is small enough — used in binary search to find the max size)
 
 describe('layoutIsTooSmall (gallery view layout helper)', () => {
-  it('returns true when layout fits in container', () => {
+  it('returns true when video size fits in container (could be larger)', () => {
     // 1 participant, video width 200, container 800x600
     // videoHeight = 200 / (16/9) = 112.5
     // columns = floor(800/200) = 4, rows = ceil(1/4) = 1
@@ -12,7 +13,7 @@ describe('layoutIsTooSmall (gallery view layout helper)', () => {
     expect(layoutIsTooSmall(200, 1, 800, 600)).toBe(true)
   })
 
-  it('returns false when layout exceeds container height', () => {
+  it('returns false when video size makes layout exceed container height', () => {
     // 10 participants, video width 400, container 800x300
     // videoHeight = 400 / (16/9) = 225
     // columns = floor(800/400) = 2, rows = ceil(10/2) = 5

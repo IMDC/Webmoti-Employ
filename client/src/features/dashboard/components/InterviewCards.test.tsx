@@ -1,6 +1,6 @@
 import type { InterviewResponse } from '@webmoti-employ/shared'
 import { render, screen, server } from '@test-utils'
-import { makeInterview, makeUser, resetFactories } from '@test-utils/../test-utils/factories'
+import { makeInterview, makeUser, resetFactories } from '@test-utils'
 import { DateTime } from 'luxon'
 import { http, HttpResponse } from 'msw'
 import { createUserStore } from '@/features/auth/hooks/createUserStore'

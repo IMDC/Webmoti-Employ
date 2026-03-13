@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { makeSession } from '@test-utils/../test-utils/factories'
+import { makeSession } from '@test-utils'
 import { act, renderHook } from '@testing-library/react'
 import { createUserStore } from './createUserStore'
 import { UserStoreContext, useSession, useUpdateUser, useUser } from './useUserStore'
