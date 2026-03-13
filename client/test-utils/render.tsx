@@ -1,8 +1,8 @@
 import type {
   RenderResult,
 } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MantineProvider } from '@mantine/core'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render as rtlRender } from '@testing-library/react'
 import { theme } from '../src/theme'
 
