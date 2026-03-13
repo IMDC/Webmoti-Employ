@@ -27,23 +27,23 @@
     "create-migration": "node scripts/create-migration-file.js"
   },
   "dependencies": {
-    "@ai-sdk/groq": "3.0.15",
+    "@ai-sdk/groq": "3.0.25",
     "@hono-rate-limiter/cloudflare": "^0.2.2",
     "@hono/zod-validator": "^0.7.6",
     "@speechmatics/auth": "^0.1.0",
     "@webmoti-employ/shared": "workspace:^",
     "@zoom/videosdk": "catalog:",
-    "ai": "6.0.49",
+    "ai": "6.0.104",
     "better-auth": "catalog:",
     "hono": "4.12.7",
     "hono-rate-limiter": "^0.5.3",
     "jose": "^6.1.3",
-    "kysely": "^0.28.10",
+    "kysely": "^0.28.11",
     "pg": "8.19.0",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.12.6",
+    "@cloudflare/vitest-pool-workers": "^0.12.18",
     "@types/pg": "^8.16.0",
     "cross-env": "^10.1.0",
     "dotenv": "^17.3.1",

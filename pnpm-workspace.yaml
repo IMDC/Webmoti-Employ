@@ -28,7 +28,7 @@ overrides:
 
 catalog:
   '@zoom/videosdk': 2.3.14
-  better-auth: 1.4.17
+  better-auth: 1.4.19
   zod: 4.3.6
 
 onlyBuiltDependencies:
