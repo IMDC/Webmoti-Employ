@@ -35,7 +35,7 @@ vi.mock('@/routes/profiles/db-queries', () => ({
   getProfilesByEmails: mockGetProfilesByEmails,
 }))
 
-describe('pOST /profiles', () => {
+describe('post /profiles', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockGetSession.mockResolvedValue({

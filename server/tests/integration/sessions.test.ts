@@ -58,7 +58,7 @@ vi.mock('@/routes/sessions/ZoomClient', () => ({
   })),
 }))
 
-describe('gET /sessions (create instant meeting)', () => {
+describe('get /sessions (create instant meeting)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockGetSession.mockResolvedValue({
@@ -110,7 +110,7 @@ describe('gET /sessions (create instant meeting)', () => {
   })
 })
 
-describe('gET /sessions/:sessionId (join session)', () => {
+describe('get /sessions/:sessionId (join session)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockGetSession.mockResolvedValue({

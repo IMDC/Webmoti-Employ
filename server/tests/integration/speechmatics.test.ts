@@ -31,7 +31,7 @@ vi.mock('@speechmatics/auth', () => ({
   createSpeechmaticsJWT: mockCreateSpeechmaticsJWT,
 }))
 
-describe('pOST /speechmatics/token', () => {
+describe('post /speechmatics/token', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockGetSession.mockResolvedValue({

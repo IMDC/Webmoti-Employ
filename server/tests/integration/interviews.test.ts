@@ -41,7 +41,7 @@ vi.mock('@/routes/interviews/db-queries', () => ({
   cleanupInstantInterviews: vi.fn(),
 }))
 
-describe('gET /interviews', () => {
+describe('get /interviews', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     resetFactories()
@@ -94,7 +94,7 @@ describe('gET /interviews', () => {
   })
 })
 
-describe('pOST /interviews', () => {
+describe('post /interviews', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     resetFactories()
@@ -224,7 +224,7 @@ describe('pOST /interviews', () => {
   })
 })
 
-describe('dELETE /interviews/:id', () => {
+describe('delete /interviews/:id', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     resetFactories()
