@@ -11,6 +11,23 @@ export default defineWorkersConfig({
     poolOptions: {
       workers: {
         wrangler: { configPath: './wrangler.jsonc' },
+        miniflare: {
+          bindings: {
+            ZOOM_VIDEO_SDK_KEY: 'test-zoom-sdk-key',
+            ZOOM_VIDEO_SDK_SECRET: 'test-zoom-sdk-secret',
+            ZOOM_API_KEY: 'test-zoom-api-key',
+            ZOOM_API_SECRET: 'test-zoom-api-secret',
+            GOOGLE_CLIENT_ID: 'test-google-id',
+            GOOGLE_CLIENT_SECRET: 'test-google-secret',
+            BETTER_AUTH_SECRET: 'test-auth-secret',
+            BETTER_AUTH_URL: 'http://localhost:8787',
+            CORS_ORIGIN: 'http://localhost:5173',
+            GROQ_API_KEY: 'test-groq-key',
+            SPEECHMATICS_API_KEY: 'test-speechmatics-key',
+            ALLOWED_EMAILS: '*',
+            IS_DEV: 'true',
+          },
+        },
       },
     },
     alias: {

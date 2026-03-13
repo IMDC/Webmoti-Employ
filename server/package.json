@@ -15,7 +15,7 @@
     "db:typegen": "kysely-codegen",
     "db:better-auth-gen": "pnpm dlx @better-auth/cli@latest generate --config ./better-auth.config.ts --output ./src/db/better-auth-schema.sql",
     "postinstall": "node scripts/postinstall.js",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc -b --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "migrate:better-auth:local": "cross-env MIGRATION_TARGET=LOCAL pnpm dlx @better-auth/cli@latest migrate --config ./better-auth.config.ts && pnpm db:typegen",
