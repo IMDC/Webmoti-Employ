@@ -153,6 +153,7 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
         {...form.getInputProps(`invites.${index}.isInterviewer`, { type: 'checkbox' })}
       />
       <ActionIcon
+        aria-label="Remove invite"
         color={getHighlightColor(isColorblindModeOn)}
         onClick={() => form.removeListItem('invites', index)}
       >

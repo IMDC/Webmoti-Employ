@@ -80,6 +80,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
               <ActionIcon
                 variant="subtle"
                 color="red"
+                aria-label="Delete interview"
                 loading={isDeleteInterviewPending}
                 onClick={() => deleteInterviewMutation(interview.id)}
               >

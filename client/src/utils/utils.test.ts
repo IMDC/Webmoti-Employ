@@ -87,19 +87,26 @@ describe('utils', () => {
       expect(retrieved).toBe(encodeURIComponent(token))
     })
 
+    it('setLocalBearerToken stores both token and expiry key', () => {
+      setLocalBearerToken('my-token')
+
+      expect(localStorage.getItem('bearer_token')).toBe(encodeURIComponent('my-token'))
+      expect(localStorage.getItem('bearer_token_expiry')).toBeTruthy()
+    })
+
     it('should return null when no token exists', () => {
       const result = getLocalBearerToken()
       expect(result).toBeNull()
     })
 
-    it('should return null when token is expired', () => {
+    it('should return null and clear storage when token is expired', () => {
       const token = 'expired-token'
       localStorage.setItem('bearer_token', token)
-      // Set expiry to past date
       localStorage.setItem('bearer_token_expiry', DateTime.now().minus({ days: 1 }).toISO())
 
       const result = getLocalBearerToken()
       expect(result).toBeNull()
+      expect(localStorage.getItem('bearer_token')).toBeNull()
     })
 
     it('should remove bearer token', () => {

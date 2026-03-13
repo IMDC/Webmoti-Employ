@@ -1,6 +1,12 @@
-import { vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, vi } from 'vitest'
+import { server } from './test-utils/msw/server'
 
 import '@testing-library/jest-dom/vitest'
+
+// ---- MSW server lifecycle ----
+beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }))
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 const { getComputedStyle } = window
 window.getComputedStyle = elt => getComputedStyle(elt)
