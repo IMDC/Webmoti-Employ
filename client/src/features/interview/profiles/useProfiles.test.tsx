@@ -1,14 +1,12 @@
 import type { Participant } from '@zoom/videosdk'
 import type { ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { server } from '@test-utils'
+import { API_BASE, server } from '@test-utils'
 import { renderHook, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { useInviteProfiles } from './useInviteProfiles'
 import { useParticipantProfiles } from './useParticipantProfiles'
 import { useProfiles } from './useProfiles'
-
-const API_BASE = 'http://localhost:5173/api'
 
 function createWrapper() {
   const queryClient = new QueryClient({

@@ -1,8 +1,6 @@
-import { server } from '@test-utils'
+import { API_BASE, server } from '@test-utils'
 import { http, HttpResponse } from 'msw'
 import { getSpeechmaticsJWT, RECORDING_SAMPLE_RATE, SPEECHMATICS_CONFIG } from './speechmatics-utils'
-
-const API_BASE = 'http://localhost:5173/api'
 
 beforeEach(() => {
   // Set a bearer token so the fetch can use it

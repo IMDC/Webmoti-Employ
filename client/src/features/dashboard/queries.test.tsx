@@ -1,6 +1,7 @@
 import type { InterviewResponse } from '@webmoti-employ/shared'
 import { QueryClientProvider } from '@tanstack/react-query'
 import {
+  API_BASE,
   createTestQueryClient,
   makeInterview,
   renderHook,
@@ -10,8 +11,6 @@ import {
 } from '@test-utils'
 import { http, HttpResponse } from 'msw'
 import { useDeleteInterview, useInterviews, useScheduleInterview } from './queries'
-
-const API_BASE = 'http://localhost:5173/api'
 
 function wrapper({ children }: { children: React.ReactNode }) {
   const queryClient = createTestQueryClient()

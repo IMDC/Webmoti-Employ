@@ -1,5 +1,6 @@
 import type { InterviewResponse } from '@webmoti-employ/shared'
 import {
+  API_BASE,
   makeInterview,
   makeUser,
   render,
@@ -12,8 +13,6 @@ import { http, HttpResponse } from 'msw'
 import { createUserStore } from '@/features/auth/hooks/createUserStore'
 import { UserStoreContext } from '@/features/auth/hooks/useUserStore'
 import { InterviewCards } from './InterviewCards'
-
-const API_BASE = 'http://localhost:5173/api'
 
 // Mock TanStack Router's Link to render a plain anchor
 vi.mock('@tanstack/react-router', () => ({

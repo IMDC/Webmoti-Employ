@@ -1,10 +1,8 @@
-import { makeUser, render, screen, server, userEvent } from '@test-utils'
+import { API_BASE, makeUser, render, screen, server, userEvent } from '@test-utils'
 import { http, HttpResponse } from 'msw'
 import { createUserStore } from '@/features/auth/hooks/createUserStore'
 import { UserStoreContext } from '@/features/auth/hooks/useUserStore'
 import { ScheduleForm } from './ScheduleForm'
-
-const API_BASE = 'http://localhost:5173/api'
 
 function makeUserStore() {
   return createUserStore({
@@ -67,10 +65,10 @@ describe('scheduleForm', () => {
     const emailInputs = screen.getAllByPlaceholderText('Email')
     expect(emailInputs).toHaveLength(2)
 
-    // Remove the first one (find trash icon buttons)
-    const trashButtons = document.querySelectorAll('.tabler-icon-trash')
-    expect(trashButtons.length).toBe(2)
-    await user.click(trashButtons[0].closest('button')!)
+    // Remove the first one
+    const trashButtons = screen.getAllByRole('button', { name: 'Remove invite' })
+    expect(trashButtons).toHaveLength(2)
+    await user.click(trashButtons[0])
 
     expect(screen.getAllByPlaceholderText('Email')).toHaveLength(1)
   })

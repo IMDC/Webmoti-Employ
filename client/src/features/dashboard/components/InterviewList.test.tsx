@@ -1,4 +1,5 @@
 import {
+  API_BASE,
   makeInterview,
   makeUser,
   render,
@@ -8,12 +9,10 @@ import {
   userEvent,
 } from '@test-utils'
 import { DateTime } from 'luxon'
-import { http, HttpResponse } from 'msw'
+import { delay, http, HttpResponse } from 'msw'
 import { createUserStore } from '@/features/auth/hooks/createUserStore'
 import { UserStoreContext } from '@/features/auth/hooks/useUserStore'
 import { InterviewList } from './InterviewList'
-
-const API_BASE = 'http://localhost:5173/api'
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({ children, to, params, ...props }: any) => {
@@ -66,9 +65,8 @@ describe('interviewList', () => {
   it('shows loading skeletons while fetching', () => {
     // Default handler returns empty but we want the request to stay pending
     server.use(
-      http.get(`${API_BASE}/interviews`, () => {
-        // Never resolve — simulates pending state
-        return new Promise(() => {})
+      http.get(`${API_BASE}/interviews`, async () => {
+        await delay('infinite')
       }),
     )
 

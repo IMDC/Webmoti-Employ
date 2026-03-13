@@ -1,8 +1,6 @@
-import { server } from '@test-utils'
+import { API_BASE, server } from '@test-utils'
 import { http, HttpResponse } from 'msw'
 import { resolveProfiles } from './resolveProfiles'
-
-const API_BASE = 'http://localhost:5173/api'
 
 beforeEach(() => {
   localStorage.setItem('bearer_token', 'test-token')
