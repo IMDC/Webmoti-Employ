@@ -1,6 +1,5 @@
 # this 3 day minimum is to avoid supply chain attacks
-# but right now it conflicts with Dependabot cooldown so disable it for now
-# minimumReleaseAge: 4320
+minimumReleaseAge: 4320
 
 # shellEmulator makes Ctrl C not work on Windows
 # eslint-disable-next-line pnpm/yaml-enforce-settings
