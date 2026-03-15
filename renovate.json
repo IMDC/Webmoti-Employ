@@ -1,6 +1,48 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "config:recommended",
+    "schedule:weekly",
+    "helpers:pinGitHubActionDigests",
+    ":configMigration",
+    "abandonments:recommended"
+  ],
+  "prConcurrentLimit": 10,
+  "minimumReleaseAge": "7 days",
+  "packageRules": [
+    {
+      "description": "Group non-eslint npm minor updates",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor"],
+      "matchPackageNames": ["!/eslint/"],
+      "groupName": "minor updates"
+    },
+    {
+      "description": "Group non-eslint npm patch updates",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["patch"],
+      "matchPackageNames": ["!/eslint/"],
+      "groupName": "patch updates"
+    },
+    {
+      "description": "Group eslint-related minor/patch updates",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": ["/eslint/"],
+      "groupName": "eslint"
+    },
+    {
+      "description": "Python/uv: only allow major updates",
+      "matchManagers": ["pep621"],
+      "matchFileNames": ["electron/python/**"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "enabled": false
+    },
+    {
+      "description": "Python/uv: monthly schedule",
+      "matchManagers": ["pep621"],
+      "matchFileNames": ["electron/python/**"],
+      "schedule": ["* 0-3 1 * *"]
+    }
   ]
 }
