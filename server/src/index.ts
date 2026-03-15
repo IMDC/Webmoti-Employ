@@ -28,7 +28,7 @@ const app = new Hono<AppContext>()
 app.use(async (c, next) => {
   const corsMiddleware = cors({
     origin: c.env.CORS_ORIGIN,
-    allowMethods: ['GET', 'POST', 'OPTIONS'],
+    allowMethods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
     exposeHeaders: ['Content-Length'],
     maxAge: 600,
