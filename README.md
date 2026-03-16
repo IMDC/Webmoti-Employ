@@ -18,7 +18,7 @@ WebMoti-Employ is an app that uses eyetracking to deliver real-time feedback dur
   - [AI speech analysis](#ai-speech-analysis)
 - [Setup](#setup)
 - [CI/CD](#cicd)
-- [Dependabot](#dependabot)
+- [Renovate](#renovate)
 - [Desktop App](#desktop-app)
 - [Deploying](#deploying)
 - [VSCode Auto Formatting Code](#vscode-auto-formatting-code)
@@ -164,23 +164,29 @@ We use Github actions for CI/CD automation. There are five main workflows:
    - Checks for changes in `electron/package.json` `version` field
    - If changed, packages the electron app for Windows, Linux, and MacOS
    - Creates a Github release and uploads the packaged files
-5. `Dependabot Updates` ([More info here](#dependabot))
-   - Creates PRs for dependency updates
+5. `Python CI`
+   - Runs when files in `electron/python/` change
+   - Lints Python code with Ruff
+   - Runs Python tests with pytest
 
-## Dependabot
+## Renovate
 
-Dependabot checks for new dependencies for all `package.json` files in the project. It also does this for python in `electron/python/pyproject.toml`, but this doesn't work and always fails because Dependabot doesn't properly work for the `uv` package manager.
+Renovate checks for new dependencies for all `package.json` files in the project. It also handles Python dependencies in `electron/python/pyproject.toml`.
 
-All patch and minor versions are grouped in the `non-breaking` group in new pull requests. You can just merge these. Major updates are not grouped and have separate PRs for each one since they might break the code.
+npm updates are grouped into PRs by type:
+
+- `minor updates` — all non-eslint minor bumps grouped together
+- `patch updates` — all non-eslint patch bumps grouped together
+- `eslint` — eslint-related minor and patch bumps grouped together
+- Major updates are separate PRs since they might break the code
 
 Steps to update dependencies:
 
 1. Go to `Pull requests`
 2. Click one
-3. (optional) Comment `@dependabot rebase` if you made commits after this PR and there are conflicts, and wait for it to fix it
-4. Check that all checks passed
-5. Use the dropdown to switch to `Squash and merge`
-6. Click `Squash and merge`
+3. Check that all checks passed
+4. Use the dropdown to switch to `Squash and merge`
+5. Click `Squash and merge`
 
 ## Desktop App
 

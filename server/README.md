@@ -37,6 +37,10 @@ Then add secrets:
 5. Add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` ([more info](#google-oauth-setup))
 6. Add `CORS_ORIGIN`. This is the url of the client.
 7. Add `LOCAL_DATABASE_URL`. This is the same as the `WRANGLER_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` below.
+8. Add `GROQ_API_KEY`. Get this from the [Groq console](https://console.groq.com/keys).
+9. Add `SPEECHMATICS_API_KEY`. Get this from the [Speechmatics dashboard](https://portal.speechmatics.com/api-keys).
+10. Add `ALLOWED_EMAILS`. Comma-separated list of emails that are allowed to sign in. This is used to allow non TMU Google Accounts to sign in.
+11. `IS_DEV` is already set to `true` in `.dev.vars.example`. Remove this variable for production.
 
 Whenever you change any env variables in `.dev.vars`, run `pnpm run cf-typegen` ([more info here](https://developers.cloudflare.com/workers/wrangler/commands/#types)). For first time setup you don't need to do this since there is a postinstall script which will run this automatically.
 
@@ -46,6 +50,7 @@ Rename `.env.example` to `.env`. This hyperdrive variable doesn't get detected i
 
 1. Add `WRANGLER_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` ([see below for details](#local-database))
 2. Add `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET`, `DATABASE_URL`. Note that the database url is the Neon database url, not the local postgres url used above.
+3. `POSTINSTALL_CF_TYPEGEN` is already set to `true` in `.env.example`. This controls whether `cf-typegen` runs automatically on `pnpm install`.
 
 ### Local database
 
