@@ -36,3 +36,6 @@ onlyBuiltDependencies:
   - msw
   - sharp
   - workerd
+minimumReleaseAgeExclude:
+  # Renovate security update: wrangler@4.59.1
+  - wrangler@4.59.1
