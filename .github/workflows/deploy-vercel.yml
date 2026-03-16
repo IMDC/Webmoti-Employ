@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Create GitHub Deployment
-        uses: chrnorm/deployment-action@55729fcebec3d284f60f5bcabbd8376437d696b1
+        uses: chrnorm/deployment-action@51e93982518dc06e500fe65559032a439663aaac
         id: deployment
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
