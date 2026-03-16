@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - id: check
-        uses: EndBug/version-check@5102328418c0130d66ca712d755c303e93368ce2
+        uses: EndBug/version-check@64e0bcf20c144430d86339e527034ff8399c7d53
         with:
           diff-search: true
           file-name: electron/package.json
