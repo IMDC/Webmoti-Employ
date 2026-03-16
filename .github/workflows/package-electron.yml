@@ -112,7 +112,7 @@ jobs:
       # since we don't need artifacts after the workflow, we delete them all.
       # this is because of the github artifact storage limit (recalculated every 6-12 hours)
       - name: Delete artifacts
-        uses: geekyeggo/delete-artifact@f275313e70c08f6120db482d7a6b98377786765b
+        uses: geekyeggo/delete-artifact@d79b2442431e4adbc383d29a28e630374eceb303
         with:
           name: '*-dist'
           failOnError: false
