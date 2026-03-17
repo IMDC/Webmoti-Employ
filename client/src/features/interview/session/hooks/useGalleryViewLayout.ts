@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import { GALLERY_VIEW_ASPECT_RATIO, GALLERY_VIEW_MARGIN } from '@/utils/constants'
 import { useContainerDimensions } from './useContainerDimensions'
 
@@ -29,11 +29,10 @@ export default function useGalleryViewLayout(
   containerRef: React.RefObject<HTMLDivElement | null>,
 ) {
   const { width: rawWidth, height: rawHeight } = useContainerDimensions(containerRef)
-  const [participantVideoWidth, setParticipantVideoWidth] = useState(0)
 
-  useEffect(() => {
+  const participantVideoWidth = useMemo(() => {
     if (rawWidth === 0 || rawHeight === 0) {
-      return
+      return 0
     }
 
     const containerWidth = rawWidth - GALLERY_VIEW_MARGIN * 2
@@ -56,8 +55,7 @@ export default function useGalleryViewLayout(
       }
     }
 
-    const finalWidth = Math.ceil(minVideoWidth) - GALLERY_VIEW_MARGIN * 2
-    setParticipantVideoWidth(finalWidth)
+    return Math.ceil(minVideoWidth) - GALLERY_VIEW_MARGIN * 2
   }, [rawWidth, rawHeight, participantCount])
 
   return {
