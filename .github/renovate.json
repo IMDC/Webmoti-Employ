@@ -32,6 +32,11 @@
       "groupName": "eslint"
     },
     {
+      "description": "Pinned packages: disabled due to compatibility issues",
+      "matchPackageNames": ["wrangler", "vitest"],
+      "enabled": false
+    },
+    {
       "description": "Python/uv: only allow major updates",
       "matchManagers": ["pep621"],
       "matchFileNames": ["electron/python/**"],
