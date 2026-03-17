@@ -7,6 +7,7 @@
     ":configMigration"
   ],
   "timezone": "America/Toronto",
+  "enabledManagers": ["npm", "github-actions", "pyenv", "pep621"],
   "prConcurrentLimit": 10,
   "minimumReleaseAge": "7 days",
   "vulnerabilityAlerts": {
@@ -67,6 +68,13 @@
       "description": "Pin .python-version to 3.10, matching requires-python",
       "matchManagers": ["pyenv"],
       "matchFileNames": ["electron/python/**"],
+      "allowedVersions": "/^3\\.10/"
+    },
+    {
+      "description": "Pin requires-python to 3.10 (project cannot use other versions)",
+      "matchManagers": ["pep621"],
+      "matchFileNames": ["electron/python/**"],
+      "matchPackageNames": ["python"],
       "allowedVersions": "/^3\\.10/"
     },
     {
