@@ -58,6 +58,7 @@ export function createPreviewStore(
             return
           }
           notifyError('Failed to start camera', error)
+          zoomSessionStore.getState().actions.setIsVideoOn(false)
         }
       },
 
@@ -79,6 +80,12 @@ export function createPreviewStore(
         catch (error) {
           deviceStore.setState({ selectedVideoDevice: oldDeviceId })
           notifyError('Failed to switch camera', error)
+          // the failed switch may have left the track in a broken state; stop it cleanly
+          try {
+            await get().actions.stopCamera()
+          }
+          catch {}
+          zoomSessionStore.getState().actions.setIsVideoOn(false)
         }
       },
 

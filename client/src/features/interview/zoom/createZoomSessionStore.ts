@@ -241,13 +241,21 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         },
         startVideo: async () => {
           logger.log('Starting video...')
-          await stream().startVideo(
-            {
-              captureWidth: VIDEO_CAPTURE_WIDTH,
-              captureHeight: VIDEO_CAPTURE_HEIGHT,
-            },
-          )
-          updateParticipants()
+          const { selectedVideoDevice } = deviceStore.getState()
+          try {
+            await stream().startVideo(
+              {
+                cameraId: selectedVideoDevice ?? undefined,
+                captureWidth: VIDEO_CAPTURE_WIDTH,
+                captureHeight: VIDEO_CAPTURE_HEIGHT,
+              },
+            )
+            updateParticipants()
+          }
+          catch (error) {
+            set({ isVideoOn: false })
+            notifyError('Failed to start video', error)
+          }
         },
         stopVideo: async () => {
           logger.log('Stopping video...')
@@ -290,6 +298,12 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           catch (error) {
             deviceStore.setState({ selectedVideoDevice: oldDeviceId })
             notifyError('Failed to switch camera', error)
+            // the failed switch may have left the stream stopped; ensure state reflects it
+            try {
+              await stream().stopVideo()
+            }
+            catch {}
+            set({ isVideoOn: false })
           }
         },
         attachVideoPlayer: async (userId: number, element: VideoPlayer) => {
