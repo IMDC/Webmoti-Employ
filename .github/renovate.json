@@ -21,33 +21,46 @@
       "matchManagers": ["npm"],
       "matchUpdateTypes": ["minor"],
       "matchPackageNames": ["!/eslint/"],
-      "groupName": "minor updates"
+      "groupName": "minor updates group"
     },
     {
       "description": "Group non-eslint npm patch updates",
       "matchManagers": ["npm"],
       "matchUpdateTypes": ["patch"],
       "matchPackageNames": ["!/eslint/"],
-      "groupName": "patch updates"
+      "groupName": "patch updates group"
     },
     {
       "description": "Group eslint-related minor/patch updates",
       "matchManagers": ["npm"],
       "matchUpdateTypes": ["minor", "patch"],
       "matchPackageNames": ["/eslint/"],
-      "groupName": "eslint"
+      "groupName": "eslint group"
     },
     {
       "description": "Pinned packages: disabled due to compatibility issues",
       "matchPackageNames": ["wrangler", "vitest"],
       "enabled": false
     },
+    {
+      "description": "Separate better-auth updates (minor versions can be breaking)",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["better-auth"],
+      "groupName": "better-auth group",
+      "separateMajorMinor": true
+    },
     // GitHub Actions ----------------------------------------
     {
       "description": "Group GitHub Actions minor/patch updates",
       "matchManagers": ["github-actions"],
       "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "github actions"
+      "groupName": "github actions group"
+    },
+    {
+      "description": "Ignore digest-only updates for GitHub Actions (only notify on tagged releases)",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["digest"],
+      "enabled": false
     },
     // UV ---------------------------------------------------
     {
@@ -61,7 +74,7 @@
       "matchManagers": ["pep621"],
       "matchFileNames": ["electron/python/**"],
       "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "python dependencies"
+      "groupName": "python dependencies group"
     }
   ]
 }
