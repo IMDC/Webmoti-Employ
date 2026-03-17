@@ -4,8 +4,7 @@
     "config:recommended",
     "schedule:weekly",
     "helpers:pinGitHubActionDigests",
-    ":configMigration",
-    "abandonments:recommended"
+    ":configMigration"
   ],
   "timezone": "America/Toronto",
   "prConcurrentLimit": 10,
