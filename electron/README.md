@@ -1,6 +1,6 @@
 # @webmoti-employ/electron <!-- omit from toc -->
 
-This Electron app bundles the built React client so it can be run locally. It also runs the Tobii eyetracker using Python to send feedback to the client.
+The Electron app acts as a wrapper around the deployed React client. It runs the Tobii eyetracker using a Python server to send feedback to the client.
 
 - [Setup](#setup)
   - [uv](#uv)
