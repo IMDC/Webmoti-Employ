@@ -7,9 +7,16 @@
     ":configMigration",
     "abandonments:recommended"
   ],
+  "timezone": "America/Toronto",
   "prConcurrentLimit": 10,
   "minimumReleaseAge": "7 days",
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "schedule": ["at any time"],
+    "labels": ["security"]
+  },
   "packageRules": [
+    // NPM ---------------------------------------------------
     {
       "description": "Group non-eslint npm minor updates",
       "matchManagers": ["npm"],
@@ -36,18 +43,20 @@
       "matchPackageNames": ["wrangler", "vitest"],
       "enabled": false
     },
+    // GitHub Actions ----------------------------------------
     {
-      "description": "Python/uv: only allow major updates",
+      "description": "Group GitHub Actions minor/patch updates",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "github actions"
+    },
+    // UV ---------------------------------------------------
+    {
+      "description": "Group Python minor/patch updates",
       "matchManagers": ["pep621"],
       "matchFileNames": ["electron/python/**"],
       "matchUpdateTypes": ["minor", "patch"],
-      "enabled": false
-    },
-    {
-      "description": "Python/uv: monthly schedule",
-      "matchManagers": ["pep621"],
-      "matchFileNames": ["electron/python/**"],
-      "schedule": ["* 0-3 1 * *"]
+      "groupName": "python dependencies"
     }
   ]
 }
