@@ -52,6 +52,12 @@
     },
     // UV ---------------------------------------------------
     {
+      "description": "Pin .python-version to 3.10, matching requires-python",
+      "matchManagers": ["pyenv"],
+      "matchFileNames": ["electron/python/**"],
+      "allowedVersions": "/^3\\.10/"
+    },
+    {
       "description": "Group Python minor/patch updates",
       "matchManagers": ["pep621"],
       "matchFileNames": ["electron/python/**"],
