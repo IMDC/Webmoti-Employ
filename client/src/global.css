@@ -1,3 +1,5 @@
+/* ---- Meeting room -------- */
+
 video-player-container {
   height: 100%;
   width: 100%;
@@ -8,8 +10,27 @@ video-player {
   width: 100%;
 }
 
+/* ---- Dashboard and all app -------- */
+
 img,
 a {
   -webkit-user-drag: none;
   user-select: none;
+}
+
+/* ---- Admin page -------- */
+
+@keyframes admin-highlight-flash {
+  0%,
+  100% {
+    background-color: transparent;
+  }
+
+  30% {
+    background-color: var(--mantine-color-yellow-light);
+  }
+}
+
+.admin-highlight-row {
+  animation: admin-highlight-flash 2s ease-in-out;
 }

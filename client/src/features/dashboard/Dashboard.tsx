@@ -16,7 +16,6 @@ import {
   Transition,
 } from '@mantine/core'
 import { useDisclosure, useValidatedState, useWindowScroll } from '@mantine/hooks'
-import { notifications } from '@mantine/notifications'
 import {
   IconArrowUp,
   IconCalendarPlus,
@@ -27,7 +26,7 @@ import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { RightHeader } from '@/components/RightHeader'
 import { HEADER_HEIGHT, HEADER_SIDE_PADDING, OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
-import { getFirstName, isElectron } from '@/utils/utils'
+import { getFirstName, isElectron, notifySuccess } from '@/utils/utils'
 import { useUser } from '../auth/hooks/useUserStore'
 import { InterviewList } from './components/InterviewList'
 import { ScheduleForm } from './components/ScheduleForm'
@@ -90,10 +89,7 @@ export function Dashboard() {
           <ScheduleForm
             onSuccess={() => {
               closeScheduleModal()
-              notifications.show({
-                title: 'Interview scheduled',
-                message: 'Your interview has been successfully scheduled.',
-              })
+              notifySuccess('Interview scheduled', 'Your interview has been successfully scheduled.')
             }}
           />
         </Modal>

@@ -56,4 +56,20 @@ export class ZoomClient {
 
     return parsed.data.sessions
   }
+
+  async getAllLiveSessions() {
+    const today = new Date().toISOString().slice(0, 10)
+    const params = new URLSearchParams({
+      type: 'live',
+      from: today,
+      to: today,
+    })
+    const data = await this.request('/sessions', params)
+    const parsed = SessionsGetRequest.safeParse(data)
+    if (!parsed.success) {
+      throw new Error(z.prettifyError(parsed.error))
+    }
+
+    return parsed.data.sessions
+  }
 }

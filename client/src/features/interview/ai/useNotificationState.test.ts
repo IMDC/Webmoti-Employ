@@ -73,7 +73,7 @@ describe('useNotificationState', () => {
     it('sliding window drops oldest entry after 5 notifications', () => {
       const { result } = renderHook(() => useNotificationState())
 
-      // Push 6 notifications — window size is 5, so first should be dropped
+      // Push 6 notifications (window size is 5, so first should be dropped)
       for (let i = 1; i <= 6; i++) {
         act(() => {
           result.current.processNotification({

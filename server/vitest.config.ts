@@ -24,7 +24,7 @@ export default defineWorkersConfig({
             CORS_ORIGIN: 'http://localhost:5173',
             GROQ_API_KEY: 'test-groq-key',
             SPEECHMATICS_API_KEY: 'test-speechmatics-key',
-            ALLOWED_EMAILS: '',
+            ADMIN_EMAILS: '',
             IS_DEV: '',
             LOCAL_DATABASE_URL: 'postgresql://test:test@localhost:5432/test_db',
           },

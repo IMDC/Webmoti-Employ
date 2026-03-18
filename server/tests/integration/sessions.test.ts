@@ -122,10 +122,10 @@ describe('get /sessions/:sessionId (join session)', () => {
     mockSearchLiveSessions.mockResolvedValue([])
   })
 
-  it('returns join token for scheduled interview when user is creator', async () => {
+  it('returns join token for scheduled interview when user is host', async () => {
     const interview = makeInterview({
       sessionId: VALID_UUID,
-      creatorId: TEST_USER.id,
+      hostId: TEST_USER.id,
     })
     mockFindInterviewBySessionId.mockResolvedValue(interview)
 
@@ -141,7 +141,7 @@ describe('get /sessions/:sessionId (join session)', () => {
   it('returns join token for scheduled interview when user is invited', async () => {
     const interview = makeInterview({
       sessionId: VALID_UUID,
-      creatorId: 'other-user-id',
+      hostId: 'other-user-id',
       invites: [
         { id: 1, interviewId: 1, email: TEST_USER.email, isInterviewer: false },
       ],
@@ -160,7 +160,7 @@ describe('get /sessions/:sessionId (join session)', () => {
   it('returns 401 for scheduled non-instant interview when user has no access', async () => {
     const interview = makeInterview({
       sessionId: VALID_UUID,
-      creatorId: 'other-user-id',
+      hostId: 'other-user-id',
       isInstant: false,
       invites: [
         { id: 1, interviewId: 1, email: 'someone-else@example.com', isInterviewer: false },
@@ -230,7 +230,7 @@ describe('get /sessions/:sessionId (join session)', () => {
   it('generates JWT with participant role (0) when joining', async () => {
     const interview = makeInterview({
       sessionId: VALID_UUID,
-      creatorId: TEST_USER.id,
+      hostId: TEST_USER.id,
     })
     mockFindInterviewBySessionId.mockResolvedValue(interview)
 

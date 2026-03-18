@@ -73,7 +73,7 @@ sessionsRoute.get(
     const interview = await findInterviewBySessionId(db, sessionId, { isUpcoming: true })
 
     if (interview) {
-      const hasAccess = interview.creatorId === user.id
+      const hasAccess = interview.hostId === user.id
         || interview.invites.some(i => i.email === userEmail)
 
       if (hasAccess)

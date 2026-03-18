@@ -6,7 +6,7 @@ export function makeInterview(overrides?: Partial<InterviewResponse>): Interview
   interviewCounter++
   return {
     id: interviewCounter,
-    creatorId: 'test-user-id',
+    hostId: 'test-user-id',
     startTime: new Date('2026-04-01T10:00:00Z'),
     endTime: new Date('2026-04-01T11:00:00Z'),
     sessionId: crypto.randomUUID(),

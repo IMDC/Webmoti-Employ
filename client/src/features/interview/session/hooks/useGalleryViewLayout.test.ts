@@ -2,7 +2,7 @@ import { layoutIsTooSmall } from './useGalleryViewLayout'
 
 // GALLERY_VIEW_ASPECT_RATIO = 16/9, GALLERY_VIEW_MARGIN = 3
 // layoutIsTooSmall returns true when the layout fits in the container
-// (i.e. the video size is small enough — used in binary search to find the max size)
+// i.e. the video size is small enough (used in binary search to find the max size)
 
 describe('layoutIsTooSmall (gallery view layout helper)', () => {
   it('returns true when video size fits in container (could be larger)', () => {
