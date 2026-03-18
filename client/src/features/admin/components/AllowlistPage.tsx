@@ -86,8 +86,8 @@ export function AllowlistPage() {
                   <Table.Tr key={`admin-${adminEmail}`}>
                     <Table.Td>
                       <Group gap="xs">
-                        {adminEmail}
                         <Badge size="xs" color="violet">Admin</Badge>
+                        {adminEmail}
                       </Group>
                     </Table.Td>
                     <Table.Td>
