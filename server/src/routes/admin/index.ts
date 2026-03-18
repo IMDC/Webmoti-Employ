@@ -11,9 +11,9 @@ import { ZoomClient } from '../sessions/ZoomClient'
 import { addToAllowlist, deleteUser, getAllowlist, getAllUsers, removeFromAllowlist } from './db-queries'
 
 const adminRoute = new Hono<AppContext>()
-adminRoute.use(useDb)
 
 // accessible to any authenticated user (returns whether the user is an admin)
+// registered before useDb since it doesn't need a DB connection
 adminRoute.get('/check', (c) => {
   const user = c.var.user
   const adminEmails = c.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) ?? []
@@ -21,7 +21,8 @@ adminRoute.get('/check', (c) => {
   return c.json({ isAdmin })
 })
 
-// all routes below require admin
+// all routes below require DB and admin
+adminRoute.use(useDb)
 adminRoute.use(useAdmin)
 
 // ── Overview Stats ─────────────────────────────────────────
@@ -250,9 +251,15 @@ adminRoute.delete(
 // ── Live Sessions ──────────────────────────────────────────
 
 adminRoute.get('/live-sessions', async (c) => {
-  const apiToken = await generateZoomApiJwt(c.env.ZOOM_API_KEY, c.env.ZOOM_API_SECRET)
-  const client = new ZoomClient(apiToken)
-  const sessions = await client.getAllLiveSessions()
+  let sessions: Awaited<ReturnType<ZoomClient['getAllLiveSessions']>>
+  try {
+    const apiToken = await generateZoomApiJwt(c.env.ZOOM_API_KEY, c.env.ZOOM_API_SECRET)
+    const client = new ZoomClient(apiToken)
+    sessions = await client.getAllLiveSessions()
+  }
+  catch {
+    return c.json({ error: 'Failed to fetch live sessions from Zoom' }, 502)
+  }
 
   // Enrich with interview data by matching session_name to interview sessionId
   const db = requireDb(c)

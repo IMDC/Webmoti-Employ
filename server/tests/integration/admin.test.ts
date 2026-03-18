@@ -21,13 +21,27 @@ const {
   mockDeleteUser,
   mockDb,
   mockExecuteTakeFirst,
+  mockExecuteTakeFirstOrThrow,
+  mockExecute,
+  // zoom
+  mockGenerateZoomApiJwt,
+  mockGetAllLiveSessions,
 } = vi.hoisted(() => {
   const mockExecuteTakeFirst = vi.fn()
-  // chainable query builder mock for direct db queries (e.g. DELETE interviews existence check)
+  const mockExecuteTakeFirstOrThrow = vi.fn()
+  const mockExecute = vi.fn()
+  // chainable query builder mock for direct db queries
   const queryChain: any = {}
   queryChain.select = vi.fn().mockReturnValue(queryChain)
   queryChain.where = vi.fn().mockReturnValue(queryChain)
+  queryChain.innerJoin = vi.fn().mockReturnValue(queryChain)
+  queryChain.orderBy = vi.fn().mockReturnValue(queryChain)
+  queryChain.limit = vi.fn().mockReturnValue(queryChain)
   queryChain.executeTakeFirst = mockExecuteTakeFirst
+  queryChain.executeTakeFirstOrThrow = mockExecuteTakeFirstOrThrow
+  queryChain.execute = mockExecute
+
+  const mockGetAllLiveSessions = vi.fn()
 
   return {
     mockGetSession: vi.fn(),
@@ -42,8 +56,17 @@ const {
     mockDb: {
       destroy: vi.fn(),
       selectFrom: vi.fn().mockReturnValue(queryChain),
+      fn: {
+        countAll: vi.fn().mockReturnValue({
+          as: vi.fn().mockReturnValue('count_expression'),
+        }),
+      },
     },
     mockExecuteTakeFirst,
+    mockExecuteTakeFirstOrThrow,
+    mockExecute,
+    mockGenerateZoomApiJwt: vi.fn().mockResolvedValue('mock-jwt-token'),
+    mockGetAllLiveSessions,
   }
 })
 
@@ -86,6 +109,16 @@ vi.mock('@/routes/admin/db-queries', () => ({
   removeFromAllowlist: mockRemoveFromAllowlist,
   getAllUsers: mockGetAllUsers,
   deleteUser: mockDeleteUser,
+}))
+
+vi.mock('@/routes/sessions/jwt', () => ({
+  generateZoomApiJwt: mockGenerateZoomApiJwt,
+}))
+
+vi.mock('@/routes/sessions/ZoomClient', () => ({
+  ZoomClient: vi.fn().mockImplementation(() => ({
+    getAllLiveSessions: mockGetAllLiveSessions,
+  })),
 }))
 
 // ── GET /admin/check ───────────────────────────────────────
@@ -526,5 +559,125 @@ describe('delete /admin/interviews/:id', () => {
     }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
 
     expect(res.status).toBe(400)
+  })
+})
+
+// ── GET /admin/overview ────────────────────────────────────
+
+describe('get /admin/overview', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockGetSession.mockResolvedValue({
+      user: TEST_USER,
+      session: TEST_SESSION,
+    })
+  })
+
+  it('returns stats and interview lists', async () => {
+    // count queries: user, interview, allowlist, admin overlap
+    mockExecuteTakeFirstOrThrow
+      .mockResolvedValueOnce({ count: '10' })
+      .mockResolvedValueOnce({ count: '25' })
+      .mockResolvedValueOnce({ count: '3' })
+      .mockResolvedValueOnce({ count: '1' })
+
+    const recentInterview = { id: 1, hostId: TEST_USER.id, startTime: new Date('2026-03-01'), isInstant: false, hostName: 'Test User' }
+    const upcomingInterview = { id: 2, hostId: TEST_USER.id, startTime: new Date('2026-04-01'), isInstant: true, hostName: 'Test User' }
+
+    // execute queries: recent interviews, upcoming interviews
+    mockExecute
+      .mockResolvedValueOnce([recentInterview])
+      .mockResolvedValueOnce([upcomingInterview])
+
+    mockGetAllLiveSessions.mockResolvedValue([{ session_name: 'session-1' }])
+
+    const res = await app.request('/admin/overview', {
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(200)
+    const body = await res.json<any>()
+    expect(body.stats.totalUsers).toBe(10)
+    expect(body.stats.totalInterviews).toBe(25)
+    expect(body.stats.liveSessionCount).toBe(1)
+    expect(body.recentInterviews).toHaveLength(1)
+    expect(body.upcomingInterviews).toHaveLength(1)
+  })
+
+  it('returns 0 live sessions when Zoom API fails', async () => {
+    mockExecuteTakeFirstOrThrow
+      .mockResolvedValueOnce({ count: '0' })
+      .mockResolvedValueOnce({ count: '0' })
+      .mockResolvedValueOnce({ count: '0' })
+      .mockResolvedValueOnce({ count: '0' })
+    mockExecute
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+    mockGetAllLiveSessions.mockRejectedValue(new Error('Zoom unavailable'))
+
+    const res = await app.request('/admin/overview', {
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(200)
+    const body = await res.json<any>()
+    expect(body.stats.liveSessionCount).toBe(0)
+  })
+})
+
+// ── GET /admin/live-sessions ───────────────────────────────
+
+describe('get /admin/live-sessions', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockGetSession.mockResolvedValue({
+      user: TEST_USER,
+      session: TEST_SESSION,
+    })
+  })
+
+  it('returns enriched sessions with interview ids', async () => {
+    mockGetAllLiveSessions.mockResolvedValue([
+      { session_name: 'session-uuid-1', user_count: 3 },
+      { session_name: 'session-uuid-2', user_count: 1 },
+    ])
+    // db query to match sessions to interviews
+    mockExecute.mockResolvedValueOnce([
+      { id: 5, sessionId: 'session-uuid-1', hostId: TEST_USER.id },
+    ])
+
+    const res = await app.request('/admin/live-sessions', {
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(200)
+    const body = await res.json<any>()
+    expect(body.sessions).toHaveLength(2)
+    expect(body.sessions[0].interviewId).toBe(5)
+    expect(body.sessions[1].interviewId).toBeNull()
+  })
+
+  it('returns empty array when no live sessions', async () => {
+    mockGetAllLiveSessions.mockResolvedValue([])
+
+    const res = await app.request('/admin/live-sessions', {
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(200)
+    const body = await res.json<any>()
+    expect(body.sessions).toEqual([])
+  })
+
+  it('returns 502 when Zoom API fails', async () => {
+    mockGetAllLiveSessions.mockRejectedValue(new Error('Zoom unavailable'))
+
+    const res = await app.request('/admin/live-sessions', {
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(502)
+    const body = await res.json<any>()
+    expect(body.error).toContain('Zoom')
   })
 })

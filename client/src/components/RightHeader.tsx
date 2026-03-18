@@ -15,7 +15,7 @@ export function RightHeader() {
       <Text ff="monospace">{time}</Text>
       {isAdmin && (
         <Tooltip label="Admin">
-          <ActionIcon component={Link} to="/admin" variant="subtle" size="lg">
+          <ActionIcon component={Link} to="/admin" variant="subtle" size="lg" aria-label="Admin">
             <IconShieldCog size={20} />
           </ActionIcon>
         </Tooltip>

@@ -26,6 +26,9 @@ export async function up(db: Kysely<any>): Promise<void> {
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
+  // remove rows with NULL added_by_id before restoring NOT NULL constraint
+  await db.deleteFrom('allowlist').where('added_by_id', 'is', null).execute()
+
   await db.schema
     .alterTable('public.allowlist')
     .dropConstraint('allowlist_added_by_id_fkey')

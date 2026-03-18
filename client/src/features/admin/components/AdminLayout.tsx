@@ -1,7 +1,7 @@
 import { AppShell, Divider, Group, NavLink, Title } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { IconArrowLeft, IconCalendarPlus, IconDashboard, IconList, IconTie, IconUsers, IconVideo } from '@tabler/icons-react'
-import { Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
+import { Navigate, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
 import { Loading } from '@/components/Loading'
 import { UserButton } from '@/features/auth/components/UserButton'
 import { useIsAdmin } from '../queries'
@@ -27,8 +27,7 @@ export function AdminLayout() {
   }
 
   if (!isAdmin) {
-    navigate({ to: '/' })
-    return null
+    return <Navigate to="/" />
   }
 
   function handleNav(path: string) {
