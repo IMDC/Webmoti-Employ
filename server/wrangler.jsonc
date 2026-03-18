@@ -2,6 +2,8 @@
   "$schema": "https://unpkg.com/wrangler@latest/config-schema.json",
   "name": "webmoti-employ",
   "main": "src/index.ts",
+  // we don't want wrangler to overwrite the Text type ADMIN_EMAILS variable that's set in the dashboard
+  "keep_vars": true,
   "compatibility_date": "2025-06-28",
   "compatibility_flags": ["nodejs_compat"],
   "hyperdrive": [
