@@ -95,7 +95,7 @@ describe('useScheduleInterview', () => {
     const { result } = renderHook(() => useScheduleInterview(), { wrapper })
 
     const sessionId = await result.current.scheduleInterviewMutation({
-      creatorId: 'test-user-id',
+      hostId: 'test-user-id',
       startTime: new Date(),
       endTime: new Date(Date.now() + 3600000),
       isInstant: false,
@@ -119,7 +119,7 @@ describe('useScheduleInterview', () => {
 
     await expect(
       result.current.scheduleInterviewMutation({
-        creatorId: 'test-user-id',
+        hostId: 'test-user-id',
         startTime: new Date(),
         endTime: new Date(Date.now() + 3600000),
         isInstant: false,
@@ -138,7 +138,7 @@ describe('useScheduleInterview', () => {
 
     await expect(
       result.current.scheduleInterviewMutation({
-        creatorId: 'test-user-id',
+        hostId: 'test-user-id',
         startTime: new Date(),
         endTime: new Date(Date.now() + 3600000),
         isInstant: false,

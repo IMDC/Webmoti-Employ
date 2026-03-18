@@ -42,7 +42,7 @@ interviewsRoute.post('/', zValidator('json', PostNewInterview), async (c) => {
     return c.json({ error: 'You cannot invite yourself' }, 400)
   }
 
-  // add creator as participant
+  // add host as participant
   const invites: NewInterviewInvite[] = [
     ...data.invites || [],
     {
@@ -60,7 +60,7 @@ interviewsRoute.post('/', zValidator('json', PostNewInterview), async (c) => {
 
   const sessionId = await createInterview(
     db,
-    data.creatorId,
+    data.hostId,
     data.startTime,
     data.endTime,
     false,
@@ -78,7 +78,7 @@ interviewsRoute.delete(
     const user = c.var.user
     const { id } = c.req.valid('param')
 
-    // verify the user is the creator
+    // verify the user is the host
     const [interview] = await getInterviews(db, { userId: user.id })
       .then(interviews => interviews.filter(i => i.id === id))
 
@@ -86,8 +86,8 @@ interviewsRoute.delete(
       return c.json({ error: 'Interview not found' }, 404)
     }
 
-    if (interview.creatorId !== user.id) {
-      return c.json({ error: 'Only the creator can delete an interview' }, 403)
+    if (interview.hostId !== user.id) {
+      return c.json({ error: 'Only the host can delete an interview' }, 403)
     }
 
     await deleteInterview(db, id)

@@ -46,16 +46,31 @@ export function getAuth(env: CloudflareBindings): ReturnType<typeof betterAuth> 
     },
     baseURL: env.BETTER_AUTH_URL,
     secret: env.BETTER_AUTH_SECRET,
-    // only allow TMU accounts and whitelisted emails
+    // only allow emails in the allowlist or admin list
     databaseHooks: {
       user: {
         create: {
           before: async ({ email }) => {
-            const isTmu = email?.toLowerCase().endsWith('@torontomu.ca')
-            const allowedEmails = env.ALLOWED_EMAILS?.split(',').map(e => e.trim().toLowerCase()) ?? []
-            const isWhitelisted = email ? allowedEmails.includes(email.toLowerCase()) : false
+            if (!email) {
+              throw new APIError('BAD_REQUEST', { message: 'Google account not allowed' })
+            }
 
-            if (!isTmu && !isWhitelisted) {
+            const adminEmails = env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) ?? []
+            if (adminEmails.includes(email.toLowerCase())) {
+              return
+            }
+
+            const db = getDb(IS_DEV
+              ? env.LOCAL_DATABASE_URL
+              : env.HYPERDRIVE.connectionString)
+
+            const allowed = await db
+              .selectFrom('allowlist')
+              .where('email', '=', email.toLowerCase())
+              .select('id')
+              .executeTakeFirst()
+
+            if (!allowed) {
               throw new APIError('BAD_REQUEST', { message: 'Google account not allowed' })
             }
           },

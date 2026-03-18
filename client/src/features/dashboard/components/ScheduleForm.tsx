@@ -101,7 +101,7 @@ export function ScheduleForm({ onSuccess }: ScheduleFormProps) {
 
     try {
       const sessionId = await scheduleInterviewMutation({
-        creatorId: user.id,
+        hostId: user.id,
         startTime: startTimeDate,
         endTime: endTimeDate,
         invites,

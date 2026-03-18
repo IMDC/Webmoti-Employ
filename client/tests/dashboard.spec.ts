@@ -26,7 +26,7 @@ const mockSession = {
 function makeInterview(overrides: Record<string, unknown> = {}) {
   return {
     id: 1,
-    creatorId: 'test-user-id',
+    hostId: 'test-user-id',
     startTime: new Date().toISOString(),
     endTime: new Date(Date.now() + 3600000).toISOString(),
     isInstant: false,

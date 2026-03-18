@@ -25,7 +25,7 @@ export async function getInterviews(
   const interviewRows = await db
     .with('relevant_interviews', db =>
       // -----------------------------------------------------------------
-      // first find all interviews the user is a creator of or invited to
+      // first find all interviews the user is a host of or invited to
       // -----------------------------------------------------------------
       db
         .selectFrom('interview')
@@ -36,7 +36,7 @@ export async function getInterviews(
           if (userId || userEmail) {
             const orConditions: Expression<SqlBool>[] = []
             if (userId) {
-              orConditions.push(eb('interview.creatorId', '=', userId))
+              orConditions.push(eb('interview.hostId', '=', userId))
             }
             if (userEmail) {
               orConditions.push(eb('interviewInvite.email', '=', userEmail))
@@ -75,7 +75,7 @@ export async function getInterviews(
     .where('interview.id', 'in', db => db.selectFrom('relevant_interviews').select('id'))
     .select([
       'interview.id',
-      'interview.creatorId',
+      'interview.hostId',
       'interview.startTime',
       'interview.endTime',
       'interview.sessionId',
@@ -97,8 +97,8 @@ export async function getInterviews(
       let interview = interviewMap.get(row.id)
       // if this interview hasn't been added to the map yet
       if (!interview) {
-        const { id, creatorId, startTime, endTime, sessionId, createdAt, updatedAt, isInstant } = row
-        interview = { id, creatorId, startTime, endTime, sessionId, invites: [], createdAt, updatedAt, isInstant }
+        const { id, hostId, startTime, endTime, sessionId, createdAt, updatedAt, isInstant } = row
+        interview = { id, hostId, startTime, endTime, sessionId, invites: [], createdAt, updatedAt, isInstant }
         interviewMap.set(row.id, interview)
       }
 
@@ -140,7 +140,7 @@ export async function findInterviewBySessionId(
 
 export async function createInterview(
   db: Kysely<DB>,
-  creatorId: string,
+  hostId: string,
   startTime: Date,
   endTime: Date | null,
   isInstant: boolean,
@@ -152,7 +152,7 @@ export async function createInterview(
     // first add the interview to the table
     const newInterview = await trx
       .insertInto('interview')
-      .values({ creatorId, startTime, endTime, isInstant })
+      .values({ hostId, startTime, endTime, isInstant })
       .returning(['interview.id', 'interview.sessionId'])
       .executeTakeFirstOrThrow()
 

@@ -110,7 +110,7 @@ describe('post /interviews', () => {
       method: 'POST',
       headers: jsonAuthHeaders(),
       body: JSON.stringify({
-        creatorId: TEST_USER.id,
+        hostId: TEST_USER.id,
         startTime: '2026-04-01T10:00:00Z',
         endTime: '2026-04-01T11:00:00Z',
         isInstant: false,
@@ -127,7 +127,7 @@ describe('post /interviews', () => {
       method: 'POST',
       headers: jsonAuthHeaders(),
       body: JSON.stringify({
-        creatorId: TEST_USER.id,
+        hostId: TEST_USER.id,
         startTime: '2026-04-01T10:00:00Z',
         endTime: '2026-04-01T11:00:00Z',
         isInstant: false,
@@ -138,7 +138,7 @@ describe('post /interviews', () => {
     }, env)
 
     expect(res.status).toBe(201)
-    // verify createInterview was called with the invites + creator added
+    // verify createInterview was called with the invites + host added
     expect(mockCreateInterview).toHaveBeenCalledWith(
       expect.anything(),
       TEST_USER.id,
@@ -157,7 +157,7 @@ describe('post /interviews', () => {
       method: 'POST',
       headers: jsonAuthHeaders(),
       body: JSON.stringify({
-        creatorId: TEST_USER.id,
+        hostId: TEST_USER.id,
         startTime: '2026-04-01T10:00:00Z',
         endTime: '2026-04-01T11:00:00Z',
         isInstant: false,
@@ -177,7 +177,7 @@ describe('post /interviews', () => {
       method: 'POST',
       headers: jsonAuthHeaders(),
       body: JSON.stringify({
-        creatorId: TEST_USER.id,
+        hostId: TEST_USER.id,
         startTime: '2026-04-01T10:00:00Z',
         endTime: '2026-04-01T11:00:00Z',
         isInstant: false,
@@ -197,7 +197,7 @@ describe('post /interviews', () => {
       method: 'POST',
       headers: jsonAuthHeaders(),
       body: JSON.stringify({
-        creatorId: TEST_USER.id,
+        hostId: TEST_USER.id,
         startTime: '2026-04-01T10:00:00Z',
         endTime: '2026-04-01T11:00:00Z',
         isInstant: false,
@@ -234,8 +234,8 @@ describe('delete /interviews/:id', () => {
     })
   })
 
-  it('deletes an interview when user is creator', async () => {
-    const interview = makeInterview({ id: 5, creatorId: TEST_USER.id })
+  it('deletes an interview when user is host', async () => {
+    const interview = makeInterview({ id: 5, hostId: TEST_USER.id })
     mockGetInterviews.mockResolvedValue([interview])
     mockDeleteInterview.mockResolvedValue(undefined)
 
@@ -259,9 +259,9 @@ describe('delete /interviews/:id', () => {
     expect(res.status).toBe(404)
   })
 
-  it('returns 403 when user is not the creator', async () => {
-    // user is invited (so getInterviews returns it) but not the creator
-    const interview = makeInterview({ id: 5, creatorId: 'other-user-id' })
+  it('returns 403 when user is not the host', async () => {
+    // user is invited (so getInterviews returns it) but not the host
+    const interview = makeInterview({ id: 5, hostId: 'other-user-id' })
     mockGetInterviews.mockResolvedValue([interview])
 
     const res = await app.request('/interviews/5', {

@@ -96,17 +96,17 @@ describe('interviewCards', () => {
     expect(joinButtons).toHaveLength(5)
   })
 
-  it('shows delete button for creator only', () => {
+  it('shows delete button for host only', () => {
     const interviews: InterviewResponse[] = [
       makeInterview({
-        creatorId: 'test-user-id', // matches our test user
+        hostId: 'test-user-id', // matches our test user
         invites: [
           { id: 1, interviewId: 1, email: 'test@torontomu.ca', isInterviewer: true },
           { id: 2, interviewId: 1, email: 'other@example.com', isInterviewer: false },
         ],
       }),
       makeInterview({
-        creatorId: 'other-user-id', // does NOT match
+        hostId: 'other-user-id', // does NOT match
         invites: [
           { id: 3, interviewId: 2, email: 'test@torontomu.ca', isInterviewer: false },
           { id: 4, interviewId: 2, email: 'other@example.com', isInterviewer: true },
@@ -116,7 +116,7 @@ describe('interviewCards', () => {
 
     renderWithUser(<InterviewCards interviews={interviews} />)
 
-    // Only creator's card should have the delete button
+    // Only host's card should have the delete button
     const deleteButtons = screen.getAllByLabelText('Delete interview')
     expect(deleteButtons).toHaveLength(1)
   })

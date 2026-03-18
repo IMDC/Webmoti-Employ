@@ -13,7 +13,7 @@ export const NewInterviewInvite = DbInterviewInvite.omit({
 
 export const DbInterview = z.object({
   id: z.number(),
-  creatorId: z.string(),
+  hostId: z.string(),
   startTime: z.coerce.date(),
   endTime: z.coerce.date().nullable(),
   isInstant: z.boolean(),

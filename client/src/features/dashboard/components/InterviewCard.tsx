@@ -48,7 +48,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
 
   const user = useUser()
   const { displayLine, pics, youAreInterviewer } = counterpartInfo(interview, profiles, user.email)
-  const isCreator = interview.creatorId === user.id
+  const isHost = interview.hostId === user.id
   const { deleteInterviewMutation, isDeleteInterviewPending } = useDeleteInterview()
 
   const isEnded = interview.endTime ? interview.endTime < DateTime.local().toJSDate() : false
@@ -75,7 +75,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
             profiles={profiles}
             isLoadingProfiles={isLoadingProfiles}
           />
-          {isCreator && (
+          {isHost && (
             <Tooltip label="Delete interview">
               <ActionIcon
                 variant="subtle"

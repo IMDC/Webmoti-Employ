@@ -34,11 +34,11 @@ wsRoute.get(
       return c.json({ error: 'Interview not found' }, 404)
     }
 
-    // for scheduled interviews, verify the user is the creator or an invitee
+    // for scheduled interviews, verify the user is the host or an invitee
     if (!interview.isInstant) {
-      const isCreator = interview.creatorId === user.id
+      const isHost = interview.hostId === user.id
       const isInvited = interview.invites.some(i => i.email === userEmail)
-      if (!isCreator && !isInvited) {
+      if (!isHost && !isInvited) {
         return c.json({ error: 'Unauthorized' }, 401)
       }
     }

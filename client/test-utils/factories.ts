@@ -22,7 +22,7 @@ export function makeInterview(overrides: Partial<InterviewResponse> = {}): Inter
   const now = new Date()
   return {
     id: interviewCounter,
-    creatorId: 'test-user-id',
+    hostId: 'test-user-id',
     startTime: now,
     endTime: null,
     isInstant: false,
