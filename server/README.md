@@ -39,8 +39,7 @@ Then add secrets:
 7. Add `LOCAL_DATABASE_URL`. This is the same as the `WRANGLER_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` below.
 8. Add `GROQ_API_KEY`. Get this from the [Groq console](https://console.groq.com/keys).
 9. Add `SPEECHMATICS_API_KEY`. Get this from the [Speechmatics dashboard](https://portal.speechmatics.com/api-keys).
-10. Add `ALLOWED_EMAILS`. Comma-separated list of emails that are allowed to sign in. This is used to allow non TMU Google Accounts to sign in.
-11. `IS_DEV` is already set to `true` in `.dev.vars.example`. Remove this variable for production.
+10. `IS_DEV` is already set to `true` in `.dev.vars.example`. Remove this variable for production.
 
 Whenever you change any env variables in `.dev.vars`, run `pnpm run cf-typegen` ([more info here](https://developers.cloudflare.com/workers/wrangler/commands/#types)). For first time setup you don't need to do this since there is a postinstall script which will run this automatically.
 

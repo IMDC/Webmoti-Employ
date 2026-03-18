@@ -1,0 +1,66 @@
+import { Alert, Badge, Group, Loader, Stack, Table, Text, Title } from '@mantine/core'
+import { DateTime } from 'luxon'
+import { useLiveSessions } from '../queries'
+
+export function LiveSessionsPage() {
+  const { data: sessions, isPending, error } = useLiveSessions()
+
+  if (error) {
+    return <Alert color="red">Failed to load live sessions</Alert>
+  }
+
+  return (
+    <Stack>
+      <Group>
+        <Title order={3}>Live Sessions</Title>
+        <Badge size="sm" variant="dot" color="green">Auto-refreshing</Badge>
+      </Group>
+      <Text c="dimmed" size="sm">Currently active interview sessions.</Text>
+
+      {isPending
+        ? <Loader />
+        : (
+            <Table striped highlightOnHover>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Session</Table.Th>
+                  <Table.Th>Started</Table.Th>
+                  <Table.Th>Participants</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {sessions?.map(session => (
+                  <Table.Tr key={session.id}>
+                    <Table.Td>
+                      <Text size="sm" ff="monospace">
+                        {session.session_name.slice(0, 8)}
+                        ...
+                      </Text>
+                    </Table.Td>
+                    <Table.Td>
+                      <Text size="sm">
+                        {DateTime.fromJSDate(session.start_time).toLocaleString(DateTime.DATETIME_MED)}
+                      </Text>
+                    </Table.Td>
+                    <Table.Td>
+                      <Badge size="sm" variant="light">
+                        {session.user_count}
+                        {' '}
+                        {session.user_count === 1 ? 'user' : 'users'}
+                      </Badge>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+                {sessions?.length === 0 && (
+                  <Table.Tr>
+                    <Table.Td colSpan={3}>
+                      <Text c="dimmed" ta="center">No active sessions</Text>
+                    </Table.Td>
+                  </Table.Tr>
+                )}
+              </Table.Tbody>
+            </Table>
+          )}
+    </Stack>
+  )
+}

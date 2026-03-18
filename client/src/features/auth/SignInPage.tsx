@@ -38,7 +38,7 @@ export function SignInPage() {
             Continue to WebMoti-Employ
           </Title>
           <Text size="sm" c="dimmed" ta="center">
-            Sign in with your TMU Google account
+            Sign in with your Google account
           </Text>
           <Button
             onClick={handleGoogleLogin}

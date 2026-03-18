@@ -14,9 +14,15 @@ import { Route as authenticatedRouteRouteImport } from './routes/(authenticated)
 import { Route as authenticatedIndexRouteImport } from './routes/(authenticated)/index'
 import { Route as AuthElectronRouteImport } from './routes/auth.electron'
 import { Route as authenticatedInterviewRouteRouteImport } from './routes/(authenticated)/interview/route'
+import { Route as authenticatedAdminRouteRouteImport } from './routes/(authenticated)/admin/route'
 import { Route as authenticatedInterviewIndexRouteImport } from './routes/(authenticated)/interview/index'
+import { Route as authenticatedAdminIndexRouteImport } from './routes/(authenticated)/admin/index'
 import { Route as authenticatedInterviewIdRouteImport } from './routes/(authenticated)/interview/$id'
 import { Route as authenticatedEndIdRouteImport } from './routes/(authenticated)/end.$id'
+import { Route as authenticatedAdminUsersRouteImport } from './routes/(authenticated)/admin/users'
+import { Route as authenticatedAdminLiveSessionsRouteImport } from './routes/(authenticated)/admin/live-sessions'
+import { Route as authenticatedAdminInterviewsRouteImport } from './routes/(authenticated)/admin/interviews'
+import { Route as authenticatedAdminAllowlistRouteImport } from './routes/(authenticated)/admin/allowlist'
 import { Route as authenticatedInterviewPrejoinRouteRouteImport } from './routes/(authenticated)/interview/prejoin/route'
 import { Route as authenticatedInterviewPrejoinIndexRouteImport } from './routes/(authenticated)/interview/prejoin/index'
 import { Route as authenticatedInterviewPrejoinIdRouteImport } from './routes/(authenticated)/interview/prejoin/$id'
@@ -46,12 +52,22 @@ const authenticatedInterviewRouteRoute =
     path: '/interview',
     getParentRoute: () => authenticatedRouteRoute,
   } as any)
+const authenticatedAdminRouteRoute = authenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => authenticatedRouteRoute,
+} as any)
 const authenticatedInterviewIndexRoute =
   authenticatedInterviewIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => authenticatedInterviewRouteRoute,
   } as any)
+const authenticatedAdminIndexRoute = authenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => authenticatedAdminRouteRoute,
+} as any)
 const authenticatedInterviewIdRoute =
   authenticatedInterviewIdRouteImport.update({
     id: '/$id',
@@ -63,6 +79,29 @@ const authenticatedEndIdRoute = authenticatedEndIdRouteImport.update({
   path: '/end/$id',
   getParentRoute: () => authenticatedRouteRoute,
 } as any)
+const authenticatedAdminUsersRoute = authenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => authenticatedAdminRouteRoute,
+} as any)
+const authenticatedAdminLiveSessionsRoute =
+  authenticatedAdminLiveSessionsRouteImport.update({
+    id: '/live-sessions',
+    path: '/live-sessions',
+    getParentRoute: () => authenticatedAdminRouteRoute,
+  } as any)
+const authenticatedAdminInterviewsRoute =
+  authenticatedAdminInterviewsRouteImport.update({
+    id: '/interviews',
+    path: '/interviews',
+    getParentRoute: () => authenticatedAdminRouteRoute,
+  } as any)
+const authenticatedAdminAllowlistRoute =
+  authenticatedAdminAllowlistRouteImport.update({
+    id: '/allowlist',
+    path: '/allowlist',
+    getParentRoute: () => authenticatedAdminRouteRoute,
+  } as any)
 const authenticatedInterviewPrejoinRouteRoute =
   authenticatedInterviewPrejoinRouteRouteImport.update({
     id: '/prejoin',
@@ -84,12 +123,18 @@ const authenticatedInterviewPrejoinIdRoute =
 
 export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
+  '/admin': typeof authenticatedAdminRouteRouteWithChildren
   '/interview': typeof authenticatedInterviewRouteRouteWithChildren
   '/auth/electron': typeof AuthElectronRoute
   '/': typeof authenticatedIndexRoute
   '/interview/prejoin': typeof authenticatedInterviewPrejoinRouteRouteWithChildren
+  '/admin/allowlist': typeof authenticatedAdminAllowlistRoute
+  '/admin/interviews': typeof authenticatedAdminInterviewsRoute
+  '/admin/live-sessions': typeof authenticatedAdminLiveSessionsRoute
+  '/admin/users': typeof authenticatedAdminUsersRoute
   '/end/$id': typeof authenticatedEndIdRoute
   '/interview/$id': typeof authenticatedInterviewIdRoute
+  '/admin/': typeof authenticatedAdminIndexRoute
   '/interview/': typeof authenticatedInterviewIndexRoute
   '/interview/prejoin/$id': typeof authenticatedInterviewPrejoinIdRoute
   '/interview/prejoin/': typeof authenticatedInterviewPrejoinIndexRoute
@@ -98,8 +143,13 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/auth/electron': typeof AuthElectronRoute
   '/': typeof authenticatedIndexRoute
+  '/admin/allowlist': typeof authenticatedAdminAllowlistRoute
+  '/admin/interviews': typeof authenticatedAdminInterviewsRoute
+  '/admin/live-sessions': typeof authenticatedAdminLiveSessionsRoute
+  '/admin/users': typeof authenticatedAdminUsersRoute
   '/end/$id': typeof authenticatedEndIdRoute
   '/interview/$id': typeof authenticatedInterviewIdRoute
+  '/admin': typeof authenticatedAdminIndexRoute
   '/interview': typeof authenticatedInterviewIndexRoute
   '/interview/prejoin/$id': typeof authenticatedInterviewPrejoinIdRoute
   '/interview/prejoin': typeof authenticatedInterviewPrejoinIndexRoute
@@ -108,12 +158,18 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/(authenticated)': typeof authenticatedRouteRouteWithChildren
   '/sign-in': typeof SignInRoute
+  '/(authenticated)/admin': typeof authenticatedAdminRouteRouteWithChildren
   '/(authenticated)/interview': typeof authenticatedInterviewRouteRouteWithChildren
   '/auth/electron': typeof AuthElectronRoute
   '/(authenticated)/': typeof authenticatedIndexRoute
   '/(authenticated)/interview/prejoin': typeof authenticatedInterviewPrejoinRouteRouteWithChildren
+  '/(authenticated)/admin/allowlist': typeof authenticatedAdminAllowlistRoute
+  '/(authenticated)/admin/interviews': typeof authenticatedAdminInterviewsRoute
+  '/(authenticated)/admin/live-sessions': typeof authenticatedAdminLiveSessionsRoute
+  '/(authenticated)/admin/users': typeof authenticatedAdminUsersRoute
   '/(authenticated)/end/$id': typeof authenticatedEndIdRoute
   '/(authenticated)/interview/$id': typeof authenticatedInterviewIdRoute
+  '/(authenticated)/admin/': typeof authenticatedAdminIndexRoute
   '/(authenticated)/interview/': typeof authenticatedInterviewIndexRoute
   '/(authenticated)/interview/prejoin/$id': typeof authenticatedInterviewPrejoinIdRoute
   '/(authenticated)/interview/prejoin/': typeof authenticatedInterviewPrejoinIndexRoute
@@ -122,12 +178,18 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/sign-in'
+    | '/admin'
     | '/interview'
     | '/auth/electron'
     | '/'
     | '/interview/prejoin'
+    | '/admin/allowlist'
+    | '/admin/interviews'
+    | '/admin/live-sessions'
+    | '/admin/users'
     | '/end/$id'
     | '/interview/$id'
+    | '/admin/'
     | '/interview/'
     | '/interview/prejoin/$id'
     | '/interview/prejoin/'
@@ -136,8 +198,13 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/auth/electron'
     | '/'
+    | '/admin/allowlist'
+    | '/admin/interviews'
+    | '/admin/live-sessions'
+    | '/admin/users'
     | '/end/$id'
     | '/interview/$id'
+    | '/admin'
     | '/interview'
     | '/interview/prejoin/$id'
     | '/interview/prejoin'
@@ -145,12 +212,18 @@ export interface FileRouteTypes {
     | '__root__'
     | '/(authenticated)'
     | '/sign-in'
+    | '/(authenticated)/admin'
     | '/(authenticated)/interview'
     | '/auth/electron'
     | '/(authenticated)/'
     | '/(authenticated)/interview/prejoin'
+    | '/(authenticated)/admin/allowlist'
+    | '/(authenticated)/admin/interviews'
+    | '/(authenticated)/admin/live-sessions'
+    | '/(authenticated)/admin/users'
     | '/(authenticated)/end/$id'
     | '/(authenticated)/interview/$id'
+    | '/(authenticated)/admin/'
     | '/(authenticated)/interview/'
     | '/(authenticated)/interview/prejoin/$id'
     | '/(authenticated)/interview/prejoin/'
@@ -199,12 +272,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedInterviewRouteRouteImport
       parentRoute: typeof authenticatedRouteRoute
     }
+    '/(authenticated)/admin': {
+      id: '/(authenticated)/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof authenticatedAdminRouteRouteImport
+      parentRoute: typeof authenticatedRouteRoute
+    }
     '/(authenticated)/interview/': {
       id: '/(authenticated)/interview/'
       path: '/'
       fullPath: '/interview/'
       preLoaderRoute: typeof authenticatedInterviewIndexRouteImport
       parentRoute: typeof authenticatedInterviewRouteRoute
+    }
+    '/(authenticated)/admin/': {
+      id: '/(authenticated)/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof authenticatedAdminIndexRouteImport
+      parentRoute: typeof authenticatedAdminRouteRoute
     }
     '/(authenticated)/interview/$id': {
       id: '/(authenticated)/interview/$id'
@@ -219,6 +306,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/end/$id'
       preLoaderRoute: typeof authenticatedEndIdRouteImport
       parentRoute: typeof authenticatedRouteRoute
+    }
+    '/(authenticated)/admin/users': {
+      id: '/(authenticated)/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof authenticatedAdminUsersRouteImport
+      parentRoute: typeof authenticatedAdminRouteRoute
+    }
+    '/(authenticated)/admin/live-sessions': {
+      id: '/(authenticated)/admin/live-sessions'
+      path: '/live-sessions'
+      fullPath: '/admin/live-sessions'
+      preLoaderRoute: typeof authenticatedAdminLiveSessionsRouteImport
+      parentRoute: typeof authenticatedAdminRouteRoute
+    }
+    '/(authenticated)/admin/interviews': {
+      id: '/(authenticated)/admin/interviews'
+      path: '/interviews'
+      fullPath: '/admin/interviews'
+      preLoaderRoute: typeof authenticatedAdminInterviewsRouteImport
+      parentRoute: typeof authenticatedAdminRouteRoute
+    }
+    '/(authenticated)/admin/allowlist': {
+      id: '/(authenticated)/admin/allowlist'
+      path: '/allowlist'
+      fullPath: '/admin/allowlist'
+      preLoaderRoute: typeof authenticatedAdminAllowlistRouteImport
+      parentRoute: typeof authenticatedAdminRouteRoute
     }
     '/(authenticated)/interview/prejoin': {
       id: '/(authenticated)/interview/prejoin'
@@ -243,6 +358,28 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface authenticatedAdminRouteRouteChildren {
+  authenticatedAdminAllowlistRoute: typeof authenticatedAdminAllowlistRoute
+  authenticatedAdminInterviewsRoute: typeof authenticatedAdminInterviewsRoute
+  authenticatedAdminLiveSessionsRoute: typeof authenticatedAdminLiveSessionsRoute
+  authenticatedAdminUsersRoute: typeof authenticatedAdminUsersRoute
+  authenticatedAdminIndexRoute: typeof authenticatedAdminIndexRoute
+}
+
+const authenticatedAdminRouteRouteChildren: authenticatedAdminRouteRouteChildren =
+  {
+    authenticatedAdminAllowlistRoute: authenticatedAdminAllowlistRoute,
+    authenticatedAdminInterviewsRoute: authenticatedAdminInterviewsRoute,
+    authenticatedAdminLiveSessionsRoute: authenticatedAdminLiveSessionsRoute,
+    authenticatedAdminUsersRoute: authenticatedAdminUsersRoute,
+    authenticatedAdminIndexRoute: authenticatedAdminIndexRoute,
+  }
+
+const authenticatedAdminRouteRouteWithChildren =
+  authenticatedAdminRouteRoute._addFileChildren(
+    authenticatedAdminRouteRouteChildren,
+  )
 
 interface authenticatedInterviewPrejoinRouteRouteChildren {
   authenticatedInterviewPrejoinIdRoute: typeof authenticatedInterviewPrejoinIdRoute
@@ -281,12 +418,14 @@ const authenticatedInterviewRouteRouteWithChildren =
   )
 
 interface authenticatedRouteRouteChildren {
+  authenticatedAdminRouteRoute: typeof authenticatedAdminRouteRouteWithChildren
   authenticatedInterviewRouteRoute: typeof authenticatedInterviewRouteRouteWithChildren
   authenticatedIndexRoute: typeof authenticatedIndexRoute
   authenticatedEndIdRoute: typeof authenticatedEndIdRoute
 }
 
 const authenticatedRouteRouteChildren: authenticatedRouteRouteChildren = {
+  authenticatedAdminRouteRoute: authenticatedAdminRouteRouteWithChildren,
   authenticatedInterviewRouteRoute:
     authenticatedInterviewRouteRouteWithChildren,
   authenticatedIndexRoute: authenticatedIndexRoute,

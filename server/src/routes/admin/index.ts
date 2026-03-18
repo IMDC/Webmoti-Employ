@@ -12,6 +12,16 @@ import { addToAllowlist, getAllowlist, getAllUsers, removeFromAllowlist } from '
 
 const adminRoute = new Hono<AppContext>()
 adminRoute.use(useDb)
+
+// accessible to any authenticated user — returns whether the user is an admin
+adminRoute.get('/check', (c) => {
+  const user = c.var.user
+  const adminEmails = c.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) ?? []
+  const isAdmin = adminEmails.includes(user.email.toLowerCase())
+  return c.json({ isAdmin })
+})
+
+// all routes below require admin
 adminRoute.use(useAdmin)
 
 // ── Allowlist ──────────────────────────────────────────────

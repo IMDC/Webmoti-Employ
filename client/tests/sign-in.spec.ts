@@ -5,7 +5,7 @@ test.describe('Sign-in page', () => {
     await page.goto('/sign-in')
 
     await expect(page.getByText('Continue to WebMoti-Employ')).toBeVisible()
-    await expect(page.getByText('Sign in with your TMU Google account')).toBeVisible()
+    await expect(page.getByText('Sign in with your Google account')).toBeVisible()
     await expect(page.getByAltText('Continue with Google')).toBeVisible()
   })
 
