@@ -7,6 +7,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { AiRoom } from './durable-objects/ai-room'
 import { useAuth } from './middleware/useAuth'
+import adminRoute from './routes/admin'
 import authRoute from './routes/auth'
 import interviewsRoute from './routes/interviews'
 import profilesRoute from './routes/profiles'
@@ -60,6 +61,7 @@ protectedRoutes.use(cloudflareRateLimiter<AppContext>({
 protectedRoutes.route('/sessions', sessionsRoute)
 protectedRoutes.route('/interviews', interviewsRoute)
 protectedRoutes.route('/profiles', profilesRoute)
+protectedRoutes.route('/admin', adminRoute)
 protectedRoutes.route('/ws', wsRoute)
 protectedRoutes.route('/speechmatics', speechmaticsRoute)
 
