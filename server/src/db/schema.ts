@@ -27,9 +27,16 @@ export interface Account {
   userId: string;
 }
 
+export interface Allowlist {
+  createdAt: Generated<Timestamp>;
+  email: string;
+  id: Generated<number>;
+  addedById: string;
+}
+
 export interface Interview {
   createdAt: Generated<Timestamp>;
-  creatorId: string;
+  hostId: string;
   endTime: Timestamp | null;
   id: Generated<number>;
   isInstant: Generated<boolean>;
@@ -78,6 +85,7 @@ export interface Verification {
 
 export interface DB {
   account: Account;
+  allowlist: Allowlist;
   interview: Interview;
   interviewInvite: InterviewInvite;
   session: Session;

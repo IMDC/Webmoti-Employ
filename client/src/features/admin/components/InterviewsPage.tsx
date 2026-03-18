@@ -1,7 +1,7 @@
 import {
-  ActionIcon,
   Alert,
   Badge,
+  Center,
   Group,
   Loader,
   Stack,
@@ -10,14 +10,26 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core'
-import { IconTrash } from '@tabler/icons-react'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
+import { useEffect, useRef } from 'react'
+import { DeleteButton } from '@/components/DeleteButton'
 import { notifyError } from '@/utils/utils'
 import { useAdminDeleteInterview, useAdminInterviews } from '../queries'
+import { AdminBurger } from './AdminBurger'
 
 export function InterviewsPage() {
   const { data: interviews, isPending, error } = useAdminInterviews()
   const deleteMutation = useAdminDeleteInterview()
+  const navigate = useNavigate()
+  const { highlight } = useSearch({ strict: false }) as { highlight?: number }
+  const highlightRef = useRef<HTMLTableRowElement>(null)
+
+  useEffect(() => {
+    if (highlight && highlightRef.current) {
+      highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [highlight, interviews])
 
   async function handleDelete(id: number) {
     try {
@@ -34,17 +46,21 @@ export function InterviewsPage() {
 
   return (
     <Stack>
-      <Title order={3}>Interviews</Title>
+      <Group>
+        <AdminBurger />
+        <Title order={3}>Interviews</Title>
+      </Group>
       <Text c="dimmed" size="sm">All scheduled and instant interviews.</Text>
 
       {isPending
-        ? <Loader />
+        ? <Center h="60vh"><Loader type="dots" /></Center>
         : (
             <Table striped highlightOnHover>
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>ID</Table.Th>
                   <Table.Th>Type</Table.Th>
+                  <Table.Th>Host</Table.Th>
                   <Table.Th>Start Time</Table.Th>
                   <Table.Th>Participants</Table.Th>
                   <Table.Th />
@@ -52,7 +68,11 @@ export function InterviewsPage() {
               </Table.Thead>
               <Table.Tbody>
                 {interviews?.map(interview => (
-                  <Table.Tr key={interview.id}>
+                  <Table.Tr
+                    key={interview.id}
+                    ref={highlight === interview.id ? highlightRef : undefined}
+                    className={highlight === interview.id ? 'admin-highlight-row' : undefined}
+                  >
                     <Table.Td>
                       <Text size="sm" ff="monospace">{interview.id}</Text>
                     </Table.Td>
@@ -62,6 +82,18 @@ export function InterviewsPage() {
                       </Badge>
                     </Table.Td>
                     <Table.Td>
+                      <Tooltip label={interview.hostEmail ?? interview.hostId}>
+                        <Badge
+                          size="xs"
+                          variant="outline"
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => navigate({ to: '/admin/users', search: { highlight: interview.hostId } })}
+                        >
+                          {interview.hostName ?? interview.hostEmail ?? interview.hostId}
+                        </Badge>
+                      </Tooltip>
+                    </Table.Td>
+                    <Table.Td>
                       <Text size="sm">
                         {DateTime.fromJSDate(interview.startTime).toLocaleString(DateTime.DATETIME_MED)}
                       </Text>
@@ -69,29 +101,39 @@ export function InterviewsPage() {
                     <Table.Td>
                       <Group gap={4}>
                         {interview.invites.map(invite => (
-                          <Badge key={invite.id} size="xs" variant="outline">
-                            {invite.email.split('@')[0]}
-                          </Badge>
+                          <Tooltip key={invite.id} label={invite.email}>
+                            {invite.userId
+                              ? (
+                                  <Badge
+                                    size="xs"
+                                    variant="outline"
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => navigate({ to: '/admin/users', search: { highlight: invite.userId! } })}
+                                  >
+                                    {invite.name ?? invite.email.split('@')[0]}
+                                  </Badge>
+                                )
+                              : (
+                                  <Badge size="xs" variant="outline" color="gray">
+                                    {invite.email.split('@')[0]}
+                                  </Badge>
+                                )}
+                          </Tooltip>
                         ))}
                       </Group>
                     </Table.Td>
                     <Table.Td>
-                      <Tooltip label="Delete">
-                        <ActionIcon
-                          variant="subtle"
-                          color="red"
-                          loading={deleteMutation.isPending}
-                          onClick={() => handleDelete(interview.id)}
-                        >
-                          <IconTrash size={16} />
-                        </ActionIcon>
-                      </Tooltip>
+                      <DeleteButton
+                        label="Delete"
+                        loading={deleteMutation.isPending}
+                        onClick={() => handleDelete(interview.id)}
+                      />
                     </Table.Td>
                   </Table.Tr>
                 ))}
                 {interviews?.length === 0 && (
                   <Table.Tr>
-                    <Table.Td colSpan={5}>
+                    <Table.Td colSpan={6}>
                       <Text c="dimmed" ta="center">No interviews found</Text>
                     </Table.Td>
                   </Table.Tr>

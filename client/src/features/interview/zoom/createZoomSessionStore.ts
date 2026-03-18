@@ -232,7 +232,7 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
             await get().actions.stopVideo()
           }
           catch {
-            // camera may already be closed — safe to ignore
+            // camera may already be closed, safe to ignore
           }
           unsubscribeStatisticsEvents()
           resetStatisticsState()

@@ -1,6 +1,5 @@
-import type { AppContext } from '../..'
-import type { DB } from '../../db/schema'
 import type { Kysely } from 'kysely'
+import type { DB } from '../../db/schema'
 
 export async function getAllowlist(db: Kysely<DB>) {
   return await db
@@ -31,4 +30,11 @@ export async function getAllUsers(db: Kysely<DB>) {
     .select(['id', 'email', 'name', 'image', 'createdAt'])
     .orderBy('createdAt', 'desc')
     .execute()
+}
+
+export async function deleteUser(db: Kysely<DB>, userId: string) {
+  return await db
+    .deleteFrom('user')
+    .where('id', '=', userId)
+    .executeTakeFirstOrThrow()
 }

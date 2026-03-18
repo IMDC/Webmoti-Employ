@@ -8,12 +8,12 @@ import { zValidator } from '../../utils/validator-wrapper'
 import { createInterview, deleteInterview, getInterviews } from '../interviews/db-queries'
 import { generateZoomApiJwt } from '../sessions/jwt'
 import { ZoomClient } from '../sessions/ZoomClient'
-import { addToAllowlist, getAllowlist, getAllUsers, removeFromAllowlist } from './db-queries'
+import { addToAllowlist, deleteUser, getAllowlist, getAllUsers, removeFromAllowlist } from './db-queries'
 
 const adminRoute = new Hono<AppContext>()
 adminRoute.use(useDb)
 
-// accessible to any authenticated user — returns whether the user is an admin
+// accessible to any authenticated user (returns whether the user is an admin)
 adminRoute.get('/check', (c) => {
   const user = c.var.user
   const adminEmails = c.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) ?? []
@@ -24,12 +24,87 @@ adminRoute.get('/check', (c) => {
 // all routes below require admin
 adminRoute.use(useAdmin)
 
+// ── Overview Stats ─────────────────────────────────────────
+
+adminRoute.get('/overview', async (c) => {
+  const db = requireDb(c)
+  const adminEmails = c.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) ?? []
+
+  const [userCountResult, interviewCountResult, allowlistCountResult, recentInterviews, upcomingInterviews] = await Promise.all([
+    db.selectFrom('user').select(db.fn.countAll<string>().as('count')).executeTakeFirstOrThrow(),
+    db.selectFrom('interview').select(db.fn.countAll<string>().as('count')).executeTakeFirstOrThrow(),
+    db.selectFrom('allowlist').select(db.fn.countAll<string>().as('count')).executeTakeFirstOrThrow(),
+    db.selectFrom('interview')
+      .innerJoin('user', 'user.id', 'interview.hostId')
+      .select([
+        'interview.id as id',
+        'interview.hostId as hostId',
+        'interview.startTime as startTime',
+        'interview.isInstant as isInstant',
+        'user.name as hostName',
+      ])
+      .where('interview.startTime', '<=', new Date())
+      .orderBy('interview.startTime', 'desc')
+      .limit(5)
+      .execute(),
+    db.selectFrom('interview')
+      .innerJoin('user', 'user.id', 'interview.hostId')
+      .select([
+        'interview.id as id',
+        'interview.hostId as hostId',
+        'interview.startTime as startTime',
+        'interview.isInstant as isInstant',
+        'user.name as hostName',
+      ])
+      .where('interview.startTime', '>', new Date())
+      .orderBy('interview.startTime', 'asc')
+      .limit(5)
+      .execute(),
+  ])
+
+  // Get live session count
+  let liveSessionCount = 0
+  try {
+    const apiToken = await generateZoomApiJwt(c.env.ZOOM_API_KEY, c.env.ZOOM_API_SECRET)
+    const client = new ZoomClient(apiToken)
+    const sessions = await client.getAllLiveSessions()
+    liveSessionCount = sessions.length
+  }
+  catch {
+    // Zoom API may be unavailable, continue with 0
+  }
+
+  return c.json({
+    stats: {
+      totalUsers: Number(userCountResult.count),
+      totalInterviews: Number(interviewCountResult.count),
+      allowlistSize: Number(allowlistCountResult.count) + adminEmails.length,
+      liveSessionCount,
+    },
+    recentInterviews: recentInterviews.map(i => ({
+      id: i.id,
+      hostId: i.hostId,
+      hostName: i.hostName,
+      startTime: i.startTime,
+      isInstant: i.isInstant,
+    })),
+    upcomingInterviews: upcomingInterviews.map(i => ({
+      id: i.id,
+      hostId: i.hostId,
+      hostName: i.hostName,
+      startTime: i.startTime,
+      isInstant: i.isInstant,
+    })),
+  })
+})
+
 // ── Allowlist ──────────────────────────────────────────────
 
 adminRoute.get('/allowlist', async (c) => {
   const db = requireDb(c)
+  const adminEmails = c.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) ?? []
   const allowlist = await getAllowlist(db)
-  return c.json({ allowlist })
+  return c.json({ allowlist, adminEmails })
 })
 
 const AddAllowlistBody = z.object({
@@ -64,12 +139,47 @@ adminRoute.get('/users', async (c) => {
   return c.json({ users })
 })
 
+adminRoute.delete(
+  '/users/:id',
+  zValidator('param', z.object({ id: z.string() })),
+  async (c) => {
+    const db = requireDb(c)
+    const { id } = c.req.valid('param')
+
+    // prevent admin from deleting themselves
+    if (id === c.var.user.id) {
+      return c.json({ error: 'Cannot delete yourself' }, 400)
+    }
+
+    await deleteUser(db, id)
+    return c.body(null, 204)
+  },
+)
+
 // ── Interviews ─────────────────────────────────────────────
 
 adminRoute.get('/interviews', async (c) => {
   const db = requireDb(c)
   const interviews = await getInterviews(db)
-  return c.json({ interviews })
+  const users = await getAllUsers(db)
+
+  // enrich invites with user names where available
+  const userMap = new Map(users.map(u => [u.email.toLowerCase(), u]))
+  const enriched = interviews.map((interview) => {
+    const host = users.find(u => u.id === interview.hostId)
+    return {
+      ...interview,
+      hostName: host?.name ?? null,
+      hostEmail: host?.email ?? null,
+      invites: interview.invites.map(invite => ({
+        ...invite,
+        name: userMap.get(invite.email.toLowerCase())?.name ?? null,
+        userId: userMap.get(invite.email.toLowerCase())?.id ?? null,
+      })),
+    }
+  })
+
+  return c.json({ interviews: enriched })
 })
 
 const AdminNewInterview = z.object({
@@ -130,7 +240,28 @@ adminRoute.get('/live-sessions', async (c) => {
   const apiToken = await generateZoomApiJwt(c.env.ZOOM_API_KEY, c.env.ZOOM_API_SECRET)
   const client = new ZoomClient(apiToken)
   const sessions = await client.getAllLiveSessions()
-  return c.json({ sessions })
+
+  // Enrich with interview data by matching session_name to interview sessionId
+  const db = requireDb(c)
+  const sessionNames = sessions.map(s => s.session_name)
+  const interviews = sessionNames.length > 0
+    ? await db.selectFrom('interview')
+        .select(['id', 'sessionId', 'hostId'])
+        .where('sessionId', 'in', sessionNames)
+        .execute()
+    : []
+
+  const interviewMap = new Map(interviews.map(i => [i.sessionId, i]))
+
+  const enriched = sessions.map((s) => {
+    const interview = interviewMap.get(s.session_name)
+    return {
+      ...s,
+      interviewId: interview?.id ?? null,
+    }
+  })
+
+  return c.json({ sessions: enriched })
 })
 
 export default adminRoute

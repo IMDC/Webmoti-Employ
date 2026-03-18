@@ -164,7 +164,7 @@ test.describe('Dashboard', () => {
 
     await page.goto('/')
 
-    // "Today" tab is active by default — should show today's interview
+    // "Today" tab is active by default, should show today's interview
     await expect(page.getByText('Interviewer')).toBeVisible()
 
     // switch to "Upcoming" tab

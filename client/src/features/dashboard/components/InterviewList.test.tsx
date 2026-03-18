@@ -132,7 +132,7 @@ describe('interviewList', () => {
 
     renderWithUser(<InterviewList />)
 
-    // Wait for data to load — should show exactly 1 interview card (today's)
+    // Wait for data to load (should show exactly 1 interview card (today's))
     const joinButtons = await screen.findAllByText('Join')
     expect(joinButtons).toHaveLength(1)
 
@@ -223,7 +223,7 @@ describe('interviewList', () => {
   it('shows "No interviews to show" when filtered list is empty', async () => {
     const user = userEvent.setup()
 
-    // Only a today interview — upcoming/past tabs should be empty
+    // Only a today interview, upcoming/past tabs should be empty
     const todayInterview = makeInterview({
       startTime: todayAt(14),
       endTime: todayAt(15),
@@ -244,7 +244,7 @@ describe('interviewList', () => {
     // Wait for data
     await screen.findAllByText('Join')
 
-    // Switch to upcoming — should have 0 filtered results
+    // Switch to upcoming (should have 0 filtered results)
     await user.click(screen.getByText('Upcoming'))
 
     expect(screen.getByText('No interviews to show')).toBeInTheDocument()

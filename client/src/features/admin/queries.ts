@@ -16,6 +16,7 @@ function authHeaders() {
 
 export const adminQueryKeys = {
   isAdmin: ['admin', 'check'] as const,
+  overview: ['admin', 'overview'] as const,
   allowlist: ['admin', 'allowlist'] as const,
   users: ['admin', 'users'] as const,
   interviews: ['admin', 'interviews'] as const,
@@ -49,6 +50,66 @@ export function useIsAdmin() {
   })
 }
 
+// ── Overview ───────────────────────────────────────────────
+
+const OverviewStats = z.object({
+  totalUsers: z.number(),
+  totalInterviews: z.number(),
+  allowlistSize: z.number(),
+  liveSessionCount: z.number(),
+})
+
+const OverviewRecentInterview = z.object({
+  id: z.number(),
+  hostId: z.string(),
+  hostName: z.string().nullable(),
+  startTime: z.coerce.date(),
+  isInstant: z.boolean(),
+})
+
+const OverviewUpcomingInterview = z.object({
+  id: z.number(),
+  hostId: z.string(),
+  hostName: z.string().nullable(),
+  startTime: z.coerce.date(),
+  isInstant: z.boolean(),
+})
+
+const OverviewResponse = z.object({
+  stats: OverviewStats,
+  recentInterviews: z.array(OverviewRecentInterview),
+  upcomingInterviews: z.array(OverviewUpcomingInterview),
+})
+
+// eslint-disable-next-line ts/no-redeclare
+export type OverviewStats = z.infer<typeof OverviewStats>
+// eslint-disable-next-line ts/no-redeclare
+export type OverviewRecentInterview = z.infer<typeof OverviewRecentInterview>
+// eslint-disable-next-line ts/no-redeclare
+export type OverviewUpcomingInterview = z.infer<typeof OverviewUpcomingInterview>
+
+async function getOverview() {
+  const response = await fetch(`${API_BASE}/admin/overview`, {
+    headers: authHeaders(),
+  })
+  if (!response.ok) {
+    throw new HttpError('Failed to fetch overview', response.status)
+  }
+  const json = await response.json()
+  const result = OverviewResponse.safeParse(json)
+  if (!result.success) {
+    throw new Error(z.prettifyError(result.error))
+  }
+  return result.data
+}
+
+export function useAdminOverview() {
+  return useQuery({
+    queryKey: adminQueryKeys.overview,
+    queryFn: getOverview,
+  })
+}
+
 // ── Allowlist ──────────────────────────────────────────────
 
 const AllowlistEntry = z.object({
@@ -60,6 +121,7 @@ const AllowlistEntry = z.object({
 
 const AllowlistResponse = z.object({
   allowlist: z.array(AllowlistEntry),
+  adminEmails: z.array(z.string()),
 })
 
 // eslint-disable-next-line ts/no-redeclare
@@ -77,7 +139,7 @@ async function getAllowlist() {
   if (!result.success) {
     throw new Error(z.prettifyError(result.error))
   }
-  return result.data.allowlist
+  return result.data
 }
 
 export function useAllowlist() {
@@ -164,12 +226,33 @@ export function useAdminUsers() {
   })
 }
 
+export function useAdminDeleteUser() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`${API_BASE}/admin/users/${id}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
+      if (!response.ok) {
+        const data = await response.json()
+        throw new HttpError('Failed to delete user', response.status, data)
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminQueryKeys.users })
+    },
+  })
+}
+
 // ── Interviews ─────────────────────────────────────────────
 
 const InterviewsResponse = z.object({
   interviews: z.array(z.object({
     id: z.number(),
     hostId: z.string(),
+    hostName: z.string().nullable(),
+    hostEmail: z.string().nullable(),
     startTime: z.coerce.date(),
     endTime: z.coerce.date().nullable(),
     isInstant: z.boolean(),
@@ -181,6 +264,8 @@ const InterviewsResponse = z.object({
       interviewId: z.number(),
       email: z.string(),
       isInterviewer: z.boolean(),
+      name: z.string().nullable(),
+      userId: z.string().nullable(),
     })),
   })),
 })
@@ -234,6 +319,7 @@ const LiveSession = z.object({
   start_time: z.coerce.date(),
   end_time: z.literal(''),
   user_count: z.number(),
+  interviewId: z.number().nullable(),
 })
 
 const LiveSessionsResponse = z.object({
@@ -263,5 +349,45 @@ export function useLiveSessions() {
     queryKey: adminQueryKeys.liveSessions,
     queryFn: getLiveSessions,
     refetchInterval: 10_000,
+  })
+}
+
+// ── Schedule Interview (Admin) ─────────────────────────────
+
+interface AdminNewInterview {
+  hostId: string
+  startTime: Date
+  endTime: Date | null
+  isInstant: boolean
+  invites: { email: string, isInterviewer: boolean }[]
+}
+
+const ScheduleResponse = z.object({ sessionId: z.uuidv4() })
+
+async function adminScheduleInterview(data: AdminNewInterview) {
+  const response = await fetch(`${API_BASE}/admin/interviews`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  })
+  if (!response.ok) {
+    const body = await response.json()
+    throw new HttpError('Failed to schedule interview', response.status, body)
+  }
+  const json = await response.json()
+  const result = ScheduleResponse.safeParse(json)
+  if (!result.success) {
+    throw new Error(z.prettifyError(result.error))
+  }
+  return result.data.sessionId
+}
+
+export function useAdminScheduleInterview() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: adminScheduleInterview,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminQueryKeys.interviews })
+    },
   })
 }

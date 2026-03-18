@@ -1,9 +1,47 @@
-import { Alert, Avatar, Group, Loader, Stack, Table, Text, Title } from '@mantine/core'
+import {
+  Alert,
+  Avatar,
+  Center,
+  Group,
+  Loader,
+  Stack,
+  Table,
+  Text,
+  Title,
+} from '@mantine/core'
+import { useSearch } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
-import { useAdminUsers } from '../queries'
+import { useEffect, useRef } from 'react'
+import { DeleteButton } from '@/components/DeleteButton'
+import { notifyError, notifyWarning } from '@/utils/utils'
+import { useAdminDeleteUser, useAdminUsers } from '../queries'
+import { AdminBurger } from './AdminBurger'
 
 export function UsersPage() {
   const { data: users, isPending, error } = useAdminUsers()
+  const deleteMutation = useAdminDeleteUser()
+  const { highlight } = useSearch({ strict: false }) as { highlight?: string }
+  const highlightRef = useRef<HTMLTableRowElement>(null)
+
+  useEffect(() => {
+    if (highlight && highlightRef.current) {
+      highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [highlight, users])
+
+  async function handleDelete(id: string) {
+    try {
+      await deleteMutation.mutateAsync(id)
+    }
+    catch (err: unknown) {
+      if (err && typeof err === 'object' && 'status' in err && err.status === 400) {
+        notifyWarning('Cannot delete your own account')
+      }
+      else {
+        notifyError('Failed to delete user', err)
+      }
+    }
+  }
 
   if (error) {
     return <Alert color="red">Failed to load users</Alert>
@@ -11,11 +49,14 @@ export function UsersPage() {
 
   return (
     <Stack>
-      <Title order={3}>Users</Title>
+      <Group>
+        <AdminBurger />
+        <Title order={3}>Users</Title>
+      </Group>
       <Text c="dimmed" size="sm">All registered accounts.</Text>
 
       {isPending
-        ? <Loader />
+        ? <Center h="60vh"><Loader type="dots" /></Center>
         : (
             <Table striped highlightOnHover>
               <Table.Thead>
@@ -23,11 +64,16 @@ export function UsersPage() {
                   <Table.Th>User</Table.Th>
                   <Table.Th>Email</Table.Th>
                   <Table.Th>Joined</Table.Th>
+                  <Table.Th />
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
                 {users?.map(user => (
-                  <Table.Tr key={user.id}>
+                  <Table.Tr
+                    key={user.id}
+                    ref={highlight === user.id ? highlightRef : undefined}
+                    className={highlight === user.id ? 'admin-highlight-row' : undefined}
+                  >
                     <Table.Td>
                       <Group gap="sm">
                         <Avatar src={user.image} size="sm" radius="xl" />
@@ -42,11 +88,18 @@ export function UsersPage() {
                         {DateTime.fromJSDate(user.createdAt).toLocaleString(DateTime.DATE_MED)}
                       </Text>
                     </Table.Td>
+                    <Table.Td>
+                      <DeleteButton
+                        label="Delete user"
+                        loading={deleteMutation.isPending}
+                        onClick={() => handleDelete(user.id)}
+                      />
+                    </Table.Td>
                   </Table.Tr>
                 ))}
                 {users?.length === 0 && (
                   <Table.Tr>
-                    <Table.Td colSpan={3}>
+                    <Table.Td colSpan={4}>
                       <Text c="dimmed" ta="center">No users found</Text>
                     </Table.Td>
                   </Table.Tr>
@@ -54,6 +107,7 @@ export function UsersPage() {
               </Table.Tbody>
             </Table>
           )}
+
     </Stack>
   )
 }

@@ -20,6 +20,8 @@ import { Route as authenticatedAdminIndexRouteImport } from './routes/(authentic
 import { Route as authenticatedInterviewIdRouteImport } from './routes/(authenticated)/interview/$id'
 import { Route as authenticatedEndIdRouteImport } from './routes/(authenticated)/end.$id'
 import { Route as authenticatedAdminUsersRouteImport } from './routes/(authenticated)/admin/users'
+import { Route as authenticatedAdminScheduleRouteImport } from './routes/(authenticated)/admin/schedule'
+import { Route as authenticatedAdminOverviewRouteImport } from './routes/(authenticated)/admin/overview'
 import { Route as authenticatedAdminLiveSessionsRouteImport } from './routes/(authenticated)/admin/live-sessions'
 import { Route as authenticatedAdminInterviewsRouteImport } from './routes/(authenticated)/admin/interviews'
 import { Route as authenticatedAdminAllowlistRouteImport } from './routes/(authenticated)/admin/allowlist'
@@ -84,6 +86,18 @@ const authenticatedAdminUsersRoute = authenticatedAdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => authenticatedAdminRouteRoute,
 } as any)
+const authenticatedAdminScheduleRoute =
+  authenticatedAdminScheduleRouteImport.update({
+    id: '/schedule',
+    path: '/schedule',
+    getParentRoute: () => authenticatedAdminRouteRoute,
+  } as any)
+const authenticatedAdminOverviewRoute =
+  authenticatedAdminOverviewRouteImport.update({
+    id: '/overview',
+    path: '/overview',
+    getParentRoute: () => authenticatedAdminRouteRoute,
+  } as any)
 const authenticatedAdminLiveSessionsRoute =
   authenticatedAdminLiveSessionsRouteImport.update({
     id: '/live-sessions',
@@ -131,6 +145,8 @@ export interface FileRoutesByFullPath {
   '/admin/allowlist': typeof authenticatedAdminAllowlistRoute
   '/admin/interviews': typeof authenticatedAdminInterviewsRoute
   '/admin/live-sessions': typeof authenticatedAdminLiveSessionsRoute
+  '/admin/overview': typeof authenticatedAdminOverviewRoute
+  '/admin/schedule': typeof authenticatedAdminScheduleRoute
   '/admin/users': typeof authenticatedAdminUsersRoute
   '/end/$id': typeof authenticatedEndIdRoute
   '/interview/$id': typeof authenticatedInterviewIdRoute
@@ -146,6 +162,8 @@ export interface FileRoutesByTo {
   '/admin/allowlist': typeof authenticatedAdminAllowlistRoute
   '/admin/interviews': typeof authenticatedAdminInterviewsRoute
   '/admin/live-sessions': typeof authenticatedAdminLiveSessionsRoute
+  '/admin/overview': typeof authenticatedAdminOverviewRoute
+  '/admin/schedule': typeof authenticatedAdminScheduleRoute
   '/admin/users': typeof authenticatedAdminUsersRoute
   '/end/$id': typeof authenticatedEndIdRoute
   '/interview/$id': typeof authenticatedInterviewIdRoute
@@ -166,6 +184,8 @@ export interface FileRoutesById {
   '/(authenticated)/admin/allowlist': typeof authenticatedAdminAllowlistRoute
   '/(authenticated)/admin/interviews': typeof authenticatedAdminInterviewsRoute
   '/(authenticated)/admin/live-sessions': typeof authenticatedAdminLiveSessionsRoute
+  '/(authenticated)/admin/overview': typeof authenticatedAdminOverviewRoute
+  '/(authenticated)/admin/schedule': typeof authenticatedAdminScheduleRoute
   '/(authenticated)/admin/users': typeof authenticatedAdminUsersRoute
   '/(authenticated)/end/$id': typeof authenticatedEndIdRoute
   '/(authenticated)/interview/$id': typeof authenticatedInterviewIdRoute
@@ -186,6 +206,8 @@ export interface FileRouteTypes {
     | '/admin/allowlist'
     | '/admin/interviews'
     | '/admin/live-sessions'
+    | '/admin/overview'
+    | '/admin/schedule'
     | '/admin/users'
     | '/end/$id'
     | '/interview/$id'
@@ -201,6 +223,8 @@ export interface FileRouteTypes {
     | '/admin/allowlist'
     | '/admin/interviews'
     | '/admin/live-sessions'
+    | '/admin/overview'
+    | '/admin/schedule'
     | '/admin/users'
     | '/end/$id'
     | '/interview/$id'
@@ -220,6 +244,8 @@ export interface FileRouteTypes {
     | '/(authenticated)/admin/allowlist'
     | '/(authenticated)/admin/interviews'
     | '/(authenticated)/admin/live-sessions'
+    | '/(authenticated)/admin/overview'
+    | '/(authenticated)/admin/schedule'
     | '/(authenticated)/admin/users'
     | '/(authenticated)/end/$id'
     | '/(authenticated)/interview/$id'
@@ -314,6 +340,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedAdminUsersRouteImport
       parentRoute: typeof authenticatedAdminRouteRoute
     }
+    '/(authenticated)/admin/schedule': {
+      id: '/(authenticated)/admin/schedule'
+      path: '/schedule'
+      fullPath: '/admin/schedule'
+      preLoaderRoute: typeof authenticatedAdminScheduleRouteImport
+      parentRoute: typeof authenticatedAdminRouteRoute
+    }
+    '/(authenticated)/admin/overview': {
+      id: '/(authenticated)/admin/overview'
+      path: '/overview'
+      fullPath: '/admin/overview'
+      preLoaderRoute: typeof authenticatedAdminOverviewRouteImport
+      parentRoute: typeof authenticatedAdminRouteRoute
+    }
     '/(authenticated)/admin/live-sessions': {
       id: '/(authenticated)/admin/live-sessions'
       path: '/live-sessions'
@@ -363,6 +403,8 @@ interface authenticatedAdminRouteRouteChildren {
   authenticatedAdminAllowlistRoute: typeof authenticatedAdminAllowlistRoute
   authenticatedAdminInterviewsRoute: typeof authenticatedAdminInterviewsRoute
   authenticatedAdminLiveSessionsRoute: typeof authenticatedAdminLiveSessionsRoute
+  authenticatedAdminOverviewRoute: typeof authenticatedAdminOverviewRoute
+  authenticatedAdminScheduleRoute: typeof authenticatedAdminScheduleRoute
   authenticatedAdminUsersRoute: typeof authenticatedAdminUsersRoute
   authenticatedAdminIndexRoute: typeof authenticatedAdminIndexRoute
 }
@@ -372,6 +414,8 @@ const authenticatedAdminRouteRouteChildren: authenticatedAdminRouteRouteChildren
     authenticatedAdminAllowlistRoute: authenticatedAdminAllowlistRoute,
     authenticatedAdminInterviewsRoute: authenticatedAdminInterviewsRoute,
     authenticatedAdminLiveSessionsRoute: authenticatedAdminLiveSessionsRoute,
+    authenticatedAdminOverviewRoute: authenticatedAdminOverviewRoute,
+    authenticatedAdminScheduleRoute: authenticatedAdminScheduleRoute,
     authenticatedAdminUsersRoute: authenticatedAdminUsersRoute,
     authenticatedAdminIndexRoute: authenticatedAdminIndexRoute,
   }

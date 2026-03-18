@@ -175,9 +175,9 @@ Renovate checks for new dependencies for all `package.json` files in the project
 
 npm updates are grouped into PRs by type:
 
-- `minor updates` — all non-eslint minor bumps grouped together
-- `patch updates` — all non-eslint patch bumps grouped together
-- `eslint` — eslint-related minor and patch bumps grouped together
+- `minor updates`: all non-eslint minor bumps grouped together
+- `patch updates`: all non-eslint patch bumps grouped together
+- `eslint`: eslint-related minor and patch bumps grouped together
 - Major updates are separate PRs since they might break the code
 
 Steps to update dependencies:

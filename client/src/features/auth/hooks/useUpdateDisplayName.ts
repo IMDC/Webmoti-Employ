@@ -1,7 +1,6 @@
-import { notifications } from '@mantine/notifications'
 import { useState } from 'react'
 import { authClient } from '@/lib/auth-client'
-import { notifyError } from '@/utils/utils'
+import { notifyError, notifySuccess } from '@/utils/utils'
 import { useUpdateUser, useUser } from './useUserStore'
 
 export function useEditProfile() {
@@ -29,10 +28,7 @@ export function useEditProfile() {
 
       await authClient.updateUser(updates)
       updateUser(updates)
-      notifications.show({
-        title: 'Profile updated',
-        message: 'Your profile has been updated.',
-      })
+      notifySuccess('Profile updated', 'Your profile has been updated.')
     }
     catch (error) {
       notifyError('Failed to update profile', error)

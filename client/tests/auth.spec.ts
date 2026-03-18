@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test.describe('Auth — expired token', () => {
+test.describe('Auth (expired token)', () => {
   test('clears expired token and shows error notification', async ({ page }) => {
     // set an expired bearer token
     await page.addInitScript(() => {

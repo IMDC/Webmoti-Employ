@@ -15,7 +15,7 @@ export const SYSTEM_PROMPT = `
       - Otherwise, hint is [].
 
     2. Then provide a JSON object with these keys always:
-      - "fillerCount": number of filler words in this transcript (0 if none, never null). Only count fillers from the INTERVIEWEE's speech — ignore the interviewer's filler words entirely. Only count these as fillers:
+      - "fillerCount": number of filler words in this transcript (0 if none, never null). Only count fillers from the INTERVIEWEE's speech, ignore the interviewer's filler words entirely. Only count these as fillers:
         * Hesitation sounds: "um", "uh", "er", "ah", "hmm"
         * "like" ONLY when used as a verbal crutch (e.g. "it was like, difficult"), NOT when expressing preference ("I like coding") or comparison ("something like React")
         * "you know" when used as a filler, not when genuinely asking
@@ -24,8 +24,8 @@ export const SYSTEM_PROMPT = `
         * "right" ONLY when used as a filler tag (e.g. "so right, the thing is"), NOT for agreement or correctness
         Do NOT count: "also", "so", "well", "actually", "just", "really", "okay", "anyway", "anyways", or any word used with clear meaning in context.
       - "hint": list of hints as described above (always a list, never null). The hints should vary based on the question and stay until the question starts to be answered properly.
-      - "newTopic": boolean. Set to true when a new question or subject is asked by EITHER the interviewer or interviewee. Every distinct question counts as a new topic — including the very first question in the conversation. Set newTopic true on the FIRST transcript where you can identify the new question. Once you have set newTopic true for a question, do NOT set it true again for follow-up transcripts that are part of the same question.
-      - "offTopic": boolean, true ONLY if the interviewee has clearly gone off topic and is NOT coming back. Be very lenient — people often answer questions with stories or tangents that seem unrelated at first but circle back to the point. Only set true if the interviewee has been consistently off topic for multiple transcripts and shows no sign of returning, OR if it is blatantly irrelevant to the question. Default false.
+      - "newTopic": boolean. Set to true when a new question or subject is asked by EITHER the interviewer or interviewee. Every distinct question counts as a new topic, including the very first question in the conversation. Set newTopic true on the FIRST transcript where you can identify the new question. Once you have set newTopic true for a question, do NOT set it true again for follow-up transcripts that are part of the same question.
+      - "offTopic": boolean, true ONLY if the interviewee has clearly gone off topic and is NOT coming back. Be very lenient, people often answer questions with stories or tangents that seem unrelated at first but circle back to the point. Only set true if the interviewee has been consistently off topic for multiple transcripts and shows no sign of returning, OR if it is blatantly irrelevant to the question. Default false.
 
     Always output reasoning first, then JSON on a new line.
     NEVER ACT AS A LANGUAGE MODEL AND ADDRESS THE USER. ONLY PROVIDE REASONING THEN JSON.
@@ -42,7 +42,7 @@ export const SYSTEM_PROMPT = `
 
     IMPORTANT: An interviewee returning to the original topic after going off-topic is NOT a new topic. The topic only changes when a genuinely different question or subject is raised.
     IMPORTANT: If someone asks a question and it is the FIRST question in this conversation, newTopic MUST be true.
-    IMPORTANT: If the interviewer asks a DIFFERENT question than before, newTopic MUST be true — do not treat it as a continuation.
+    IMPORTANT: If the interviewer asks a DIFFERENT question than before, newTopic MUST be true, do not treat it as a continuation.
 
     Example outputs:
 

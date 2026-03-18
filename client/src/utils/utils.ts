@@ -32,6 +32,14 @@ export function showErrorNotification(title: string, message?: string) {
   })
 }
 
+export function notifySuccess(title: string, message?: string) {
+  notifications.show({
+    title,
+    message,
+    color: 'green',
+  })
+}
+
 export function notifyWarning(title: string, message?: string) {
   const id = hashString(title + (message ?? ''))
 

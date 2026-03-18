@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw'
 
 export const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5173/api'
 
-/** Default MSW handlers — return empty/success for all known endpoints. */
+/** Default MSW handlers (return empty/success for all known endpoints) */
 export const handlers = [
   // GET /interviews
   http.get(`${API_BASE}/interviews`, () => {

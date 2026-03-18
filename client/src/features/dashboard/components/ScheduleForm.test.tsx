@@ -176,7 +176,7 @@ describe('scheduleForm', () => {
     // Submit
     await user.click(screen.getByText('Schedule interview'))
 
-    // onSuccess should NOT be called — the form should still be visible
+    // onSuccess should NOT be called (the form should still be visible)
     await vi.waitFor(() => {
       expect(screen.getByText('Schedule interview')).toBeInTheDocument()
     })

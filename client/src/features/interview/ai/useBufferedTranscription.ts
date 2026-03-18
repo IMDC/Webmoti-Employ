@@ -67,7 +67,7 @@ export function useBufferedTranscription(
   // Partial buffering: send every maxWordsBuffer words incrementally
   // useEffect(() => {
   //   // handle incremental sending from transcript (finalized words)
-  //   // Skip if finalTranscript is present — the final effect handles that case
+  //   // Skip if finalTranscript is present, the final effect handles that case
   //   if (finalTranscript)
   //     return
   //   const words = getWords(transcript)

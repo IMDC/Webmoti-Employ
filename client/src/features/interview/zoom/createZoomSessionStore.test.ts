@@ -2,7 +2,7 @@ import type { DeviceStore } from './createDeviceStore'
 import { createStore } from 'zustand'
 import { createZoomSessionStore } from './createZoomSessionStore'
 
-// Mock only the SDK import — we only test state management, not actual Zoom calls
+// Mock only the SDK import (we only test state management, not actual Zoom calls)
 vi.mock('@zoom/videosdk', () => ({
   default: {
     checkSystemRequirements: vi.fn(() => ({ video: true, audio: true })),
