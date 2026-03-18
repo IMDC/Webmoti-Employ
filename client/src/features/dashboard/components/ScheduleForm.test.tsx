@@ -37,7 +37,7 @@ describe('scheduleForm', () => {
     expect(screen.getByText('Interview date')).toBeInTheDocument()
     expect(screen.getByText('Interview time')).toBeInTheDocument()
     expect(screen.getByText('Schedule interview')).toBeInTheDocument()
-    expect(screen.getByText('You haven\'t invited anyone')).toBeInTheDocument()
+    expect(screen.getByText('No invites added yet')).toBeInTheDocument()
     expect(screen.getByText('Add invitation')).toBeInTheDocument()
     expect(screen.getByText('Open Google Calendar')).toBeInTheDocument()
   })
@@ -50,8 +50,8 @@ describe('scheduleForm', () => {
 
     expect(screen.getByPlaceholderText('Email')).toBeInTheDocument()
     expect(screen.getByText('Interviewer')).toBeInTheDocument()
-    // "You haven't invited anyone" should be gone
-    expect(screen.queryByText('You haven\'t invited anyone')).not.toBeInTheDocument()
+    // "No invites added yet" should be gone
+    expect(screen.queryByText('No invites added yet')).not.toBeInTheDocument()
   })
 
   it('removes an invite row when clicking the trash button', async () => {

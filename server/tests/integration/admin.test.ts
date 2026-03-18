@@ -1,0 +1,495 @@
+import { env } from 'cloudflare:test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import app from '../../src'
+import { authHeaders, jsonAuthHeaders, OTHER_USER, TEST_SESSION, TEST_USER } from '../helpers/auth'
+import { makeInterview, resetFactories } from '../helpers/factories'
+
+const ADMIN_EMAIL = TEST_USER.email
+
+const {
+  mockGetSession,
+  // interview db-queries
+  mockGetInterviews,
+  mockCreateInterview,
+  mockDeleteInterview,
+  // admin db-queries
+  mockGetAllowlist,
+  mockAddToAllowlist,
+  mockRemoveFromAllowlist,
+  mockGetAllUsers,
+  mockDeleteUser,
+  mockDb,
+} = vi.hoisted(() => ({
+  mockGetSession: vi.fn(),
+  mockGetInterviews: vi.fn(),
+  mockCreateInterview: vi.fn(),
+  mockDeleteInterview: vi.fn(),
+  mockGetAllowlist: vi.fn(),
+  mockAddToAllowlist: vi.fn(),
+  mockRemoveFromAllowlist: vi.fn(),
+  mockGetAllUsers: vi.fn(),
+  mockDeleteUser: vi.fn(),
+  mockDb: { destroy: vi.fn() },
+}))
+
+vi.mock('@/lib/getAuth', () => ({
+  getAuth: () => ({
+    api: { getSession: mockGetSession },
+  }),
+}))
+
+vi.mock('@/middleware/useDb', () => ({
+  useDb: async (c: any, next: any) => {
+    c.set('db', mockDb)
+    await next()
+  },
+  requireDb: () => mockDb,
+}))
+
+// mock useAdmin to allow the admin email through
+vi.mock('@/middleware/useAdmin', () => ({
+  useAdmin: async (c: any, next: any) => {
+    const user = c.var.user
+    if (user.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+      return c.json({ error: 'Forbidden' }, 403)
+    }
+    return next()
+  },
+}))
+
+vi.mock('@/routes/interviews/db-queries', () => ({
+  getInterviews: mockGetInterviews,
+  createInterview: mockCreateInterview,
+  deleteInterview: mockDeleteInterview,
+  findInterviewBySessionId: vi.fn(),
+  cleanupInstantInterviews: vi.fn(),
+}))
+
+vi.mock('@/routes/admin/db-queries', () => ({
+  getAllowlist: mockGetAllowlist,
+  addToAllowlist: mockAddToAllowlist,
+  removeFromAllowlist: mockRemoveFromAllowlist,
+  getAllUsers: mockGetAllUsers,
+  deleteUser: mockDeleteUser,
+}))
+
+// ── GET /admin/check ───────────────────────────────────────
+
+describe('get /admin/check', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('returns isAdmin true for admin user', async () => {
+    mockGetSession.mockResolvedValue({
+      user: TEST_USER,
+      session: TEST_SESSION,
+    })
+
+    const res = await app.request('/admin/check', {
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(200)
+    const body = await res.json<any>()
+    expect(body.isAdmin).toBe(true)
+  })
+
+  it('returns isAdmin false for non-admin user', async () => {
+    mockGetSession.mockResolvedValue({
+      user: OTHER_USER,
+      session: TEST_SESSION,
+    })
+
+    const res = await app.request('/admin/check', {
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(200)
+    const body = await res.json<any>()
+    expect(body.isAdmin).toBe(false)
+  })
+})
+
+// ── GET /admin/allowlist ───────────────────────────────────
+
+describe('get /admin/allowlist', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockGetSession.mockResolvedValue({
+      user: TEST_USER,
+      session: TEST_SESSION,
+    })
+  })
+
+  it('returns allowlist and admin emails', async () => {
+    const mockEntries = [
+      { id: 1, email: 'a@example.com', addedById: TEST_USER.id, createdAt: new Date() },
+    ]
+    mockGetAllowlist.mockResolvedValue(mockEntries)
+
+    const res = await app.request('/admin/allowlist', {
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(200)
+    const body = await res.json<any>()
+    expect(body.allowlist).toHaveLength(1)
+    expect(body.adminEmails).toContain(ADMIN_EMAIL)
+  })
+
+  it('returns 403 for non-admin user', async () => {
+    mockGetSession.mockResolvedValue({
+      user: OTHER_USER,
+      session: TEST_SESSION,
+    })
+
+    const res = await app.request('/admin/allowlist', {
+      headers: authHeaders(),
+    }, env)
+
+    expect(res.status).toBe(403)
+  })
+})
+
+// ── POST /admin/allowlist ──────────────────────────────────
+
+describe('post /admin/allowlist', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockGetSession.mockResolvedValue({
+      user: TEST_USER,
+      session: TEST_SESSION,
+    })
+  })
+
+  it('adds email to allowlist and returns 201', async () => {
+    const entry = { id: 2, email: 'new@example.com', addedById: TEST_USER.id, createdAt: new Date() }
+    mockAddToAllowlist.mockResolvedValue(entry)
+
+    const res = await app.request('/admin/allowlist', {
+      method: 'POST',
+      headers: jsonAuthHeaders(),
+      body: JSON.stringify({ email: 'new@example.com' }),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(201)
+    const body = await res.json<any>()
+    expect(body.entry.email).toBe('new@example.com')
+    expect(mockAddToAllowlist).toHaveBeenCalledWith(expect.anything(), 'new@example.com', TEST_USER.id)
+  })
+
+  it('returns 400 for invalid email', async () => {
+    const res = await app.request('/admin/allowlist', {
+      method: 'POST',
+      headers: jsonAuthHeaders(),
+      body: JSON.stringify({ email: 'not-an-email' }),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(400)
+  })
+})
+
+// ── DELETE /admin/allowlist/:id ────────────────────────────
+
+describe('delete /admin/allowlist/:id', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockGetSession.mockResolvedValue({
+      user: TEST_USER,
+      session: TEST_SESSION,
+    })
+  })
+
+  it('removes entry and returns 204', async () => {
+    mockRemoveFromAllowlist.mockResolvedValue(undefined)
+
+    const res = await app.request('/admin/allowlist/1', {
+      method: 'DELETE',
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(204)
+    expect(mockRemoveFromAllowlist).toHaveBeenCalledWith(expect.anything(), 1)
+  })
+
+  it('returns 400 for non-integer id', async () => {
+    const res = await app.request('/admin/allowlist/abc', {
+      method: 'DELETE',
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(400)
+  })
+})
+
+// ── GET /admin/users ───────────────────────────────────────
+
+describe('get /admin/users', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockGetSession.mockResolvedValue({
+      user: TEST_USER,
+      session: TEST_SESSION,
+    })
+  })
+
+  it('returns all users', async () => {
+    const users = [
+      { id: TEST_USER.id, email: TEST_USER.email, name: TEST_USER.name, image: TEST_USER.image, createdAt: new Date() },
+      { id: OTHER_USER.id, email: OTHER_USER.email, name: OTHER_USER.name, image: OTHER_USER.image, createdAt: new Date() },
+    ]
+    mockGetAllUsers.mockResolvedValue(users)
+
+    const res = await app.request('/admin/users', {
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(200)
+    const body = await res.json<any>()
+    expect(body.users).toHaveLength(2)
+  })
+})
+
+// ── DELETE /admin/users/:id ────────────────────────────────
+
+describe('delete /admin/users/:id', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockGetSession.mockResolvedValue({
+      user: TEST_USER,
+      session: TEST_SESSION,
+    })
+  })
+
+  it('deletes user and returns 204', async () => {
+    mockDeleteUser.mockResolvedValue(undefined)
+
+    const res = await app.request(`/admin/users/${OTHER_USER.id}`, {
+      method: 'DELETE',
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(204)
+    expect(mockDeleteUser).toHaveBeenCalledWith(expect.anything(), OTHER_USER.id)
+  })
+
+  it('returns 400 when deleting yourself', async () => {
+    const res = await app.request(`/admin/users/${TEST_USER.id}`, {
+      method: 'DELETE',
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(400)
+    const body = await res.json<any>()
+    expect(body.error).toContain('yourself')
+  })
+})
+
+// ── GET /admin/interviews ──────────────────────────────────
+
+describe('get /admin/interviews', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    resetFactories()
+    mockGetSession.mockResolvedValue({
+      user: TEST_USER,
+      session: TEST_SESSION,
+    })
+  })
+
+  it('returns enriched interviews with host and invite names', async () => {
+    const interview = makeInterview({
+      hostId: TEST_USER.id,
+      invites: [
+        { id: 1, interviewId: 1, email: TEST_USER.email, isInterviewer: true },
+        { id: 2, interviewId: 1, email: OTHER_USER.email, isInterviewer: false },
+      ],
+    })
+    mockGetInterviews.mockResolvedValue([interview])
+
+    const users = [
+      { id: TEST_USER.id, email: TEST_USER.email, name: TEST_USER.name, image: TEST_USER.image, createdAt: new Date() },
+      { id: OTHER_USER.id, email: OTHER_USER.email, name: OTHER_USER.name, image: OTHER_USER.image, createdAt: new Date() },
+    ]
+    mockGetAllUsers.mockResolvedValue(users)
+
+    const res = await app.request('/admin/interviews', {
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(200)
+    const body = await res.json<any>()
+    expect(body.interviews).toHaveLength(1)
+    expect(body.interviews[0].hostName).toBe(TEST_USER.name)
+    expect(body.interviews[0].hostEmail).toBe(TEST_USER.email)
+    // invites should be enriched with names
+    const hostInvite = body.interviews[0].invites.find((i: any) => i.email === TEST_USER.email)
+    expect(hostInvite.name).toBe(TEST_USER.name)
+    expect(hostInvite.userId).toBe(TEST_USER.id)
+  })
+
+  it('returns empty array when no interviews exist', async () => {
+    mockGetInterviews.mockResolvedValue([])
+    mockGetAllUsers.mockResolvedValue([])
+
+    const res = await app.request('/admin/interviews', {
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(200)
+    const body = await res.json<any>()
+    expect(body.interviews).toEqual([])
+  })
+
+  it('calls getInterviews without user-scoped filters', async () => {
+    mockGetInterviews.mockResolvedValue([])
+    mockGetAllUsers.mockResolvedValue([])
+
+    await app.request('/admin/interviews', {
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    // admin route calls getInterviews(db) with no filters
+    expect(mockGetInterviews).toHaveBeenCalledWith(expect.anything())
+  })
+})
+
+// ── POST /admin/interviews ─────────────────────────────────
+
+describe('post /admin/interviews', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    resetFactories()
+    mockGetSession.mockResolvedValue({
+      user: TEST_USER,
+      session: TEST_SESSION,
+    })
+    mockCreateInterview.mockResolvedValue('generated-session-uuid')
+  })
+
+  it('creates interview and returns 201', async () => {
+    const res = await app.request('/admin/interviews', {
+      method: 'POST',
+      headers: jsonAuthHeaders(),
+      body: JSON.stringify({
+        hostId: OTHER_USER.id,
+        startTime: '2026-04-01T10:00:00Z',
+        endTime: '2026-04-01T11:00:00Z',
+        isInstant: false,
+        invites: [
+          { email: 'candidate@example.com', isInterviewer: false },
+        ],
+      }),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(201)
+    const body = await res.json<any>()
+    expect(body.sessionId).toBe('generated-session-uuid')
+  })
+
+  it('does not add admin as participant (unlike user route)', async () => {
+    await app.request('/admin/interviews', {
+      method: 'POST',
+      headers: jsonAuthHeaders(),
+      body: JSON.stringify({
+        hostId: OTHER_USER.id,
+        startTime: '2026-04-01T10:00:00Z',
+        endTime: '2026-04-01T11:00:00Z',
+        isInstant: false,
+        invites: [
+          { email: 'candidate@example.com', isInterviewer: false },
+        ],
+      }),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    // admin route passes invites as-is without adding the admin user
+    expect(mockCreateInterview).toHaveBeenCalledWith(
+      expect.anything(),
+      OTHER_USER.id,
+      expect.any(Date),
+      expect.any(Date),
+      false,
+      [{ email: 'candidate@example.com', isInterviewer: false }],
+    )
+  })
+
+  it('rejects duplicate invite emails with 400', async () => {
+    const res = await app.request('/admin/interviews', {
+      method: 'POST',
+      headers: jsonAuthHeaders(),
+      body: JSON.stringify({
+        hostId: OTHER_USER.id,
+        startTime: '2026-04-01T10:00:00Z',
+        endTime: '2026-04-01T11:00:00Z',
+        isInstant: false,
+        invites: [
+          { email: 'dup@example.com', isInterviewer: false },
+          { email: 'dup@example.com', isInterviewer: true },
+        ],
+      }),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(400)
+    const body = await res.json<any>()
+    expect(body.error).toContain('unique')
+  })
+
+  it('returns 400 for missing required fields', async () => {
+    const res = await app.request('/admin/interviews', {
+      method: 'POST',
+      headers: jsonAuthHeaders(),
+      body: JSON.stringify({}),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(400)
+  })
+})
+
+// ── DELETE /admin/interviews/:id ───────────────────────────
+
+describe('delete /admin/interviews/:id', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    resetFactories()
+    mockGetSession.mockResolvedValue({
+      user: TEST_USER,
+      session: TEST_SESSION,
+    })
+  })
+
+  it('deletes interview and returns 204', async () => {
+    const interview = makeInterview({ id: 7 })
+    mockGetInterviews.mockResolvedValue([interview])
+    mockDeleteInterview.mockResolvedValue(undefined)
+
+    const res = await app.request('/admin/interviews/7', {
+      method: 'DELETE',
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(204)
+    expect(mockDeleteInterview).toHaveBeenCalledWith(expect.anything(), 7)
+  })
+
+  it('returns 404 when interview not found', async () => {
+    mockGetInterviews.mockResolvedValue([])
+
+    const res = await app.request('/admin/interviews/999', {
+      method: 'DELETE',
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(404)
+  })
+
+  it('returns 400 for non-integer id', async () => {
+    const res = await app.request('/admin/interviews/abc', {
+      method: 'DELETE',
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(400)
+  })
+})
