@@ -115,7 +115,7 @@ export function useAdminOverview() {
 const AllowlistEntry = z.object({
   id: z.number(),
   email: z.string(),
-  addedById: z.string(),
+  addedById: z.string().nullable(),
   createdAt: z.coerce.date(),
 })
 

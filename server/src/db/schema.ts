@@ -31,7 +31,7 @@ export interface Allowlist {
   createdAt: Generated<Timestamp>;
   email: string;
   id: Generated<number>;
-  addedById: string;
+  addedById: string | null;
 }
 
 export interface Interview {

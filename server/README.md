@@ -40,6 +40,7 @@ Then add secrets:
 8. Add `GROQ_API_KEY`. Get this from the [Groq console](https://console.groq.com/keys).
 9. Add `SPEECHMATICS_API_KEY`. Get this from the [Speechmatics dashboard](https://portal.speechmatics.com/api-keys).
 10. `IS_DEV` is already set to `true` in `.dev.vars.example`. Remove this variable for production.
+11. Add `ADMIN_EMAILS`. Comma-separated list of admin email addresses. These users can access the admin dashboard and are always allowed to sign in (bypassing the allowlist).
 
 Whenever you change any env variables in `.dev.vars`, run `pnpm run cf-typegen` ([more info here](https://developers.cloudflare.com/workers/wrangler/commands/#types)). For first time setup you don't need to do this since there is a postinstall script which will run this automatically.
 
@@ -85,7 +86,7 @@ Steps:
 4. Go to cloudflare dashboard and then to your worker
 5. In `Settings` > `Variables and Secrets`, add everything in `.dev.vars` except `DATABASE_URL` and `LOCAL_DATABASE_URL`. You can copy the whole env and paste it into the `Variable name` field which speeds up the process (make sure you exclude the two database ones).
 6. For `BETTER_AUTH_URL`, set this to the url of the server (the deployed cloudflare worker). Set `CORS_ORIGIN` to the deployed client vercel url.
-7. Set the type of all the secrets to `Secret` instead of `Text` (Except for ALLOWED_EMAILS, set that to `Text` since you may edit this sometimes)
+7. Set the type of all the secrets to `Secret` instead of `Text` (Except for ADMIN_EMAILS, set that to `Text` since you may edit this sometimes)
 8. Press `Deploy`
 9. Get the deployed server url and set it in Vercel for client as `VITE_API_BASE_URL`
 10. [Deploy client](../client/README.md#deploying), get the url, and set `CORS_ORIGIN` secret in Cloudflare

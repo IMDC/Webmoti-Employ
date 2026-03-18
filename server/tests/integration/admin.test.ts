@@ -20,18 +20,32 @@ const {
   mockGetAllUsers,
   mockDeleteUser,
   mockDb,
-} = vi.hoisted(() => ({
-  mockGetSession: vi.fn(),
-  mockGetInterviews: vi.fn(),
-  mockCreateInterview: vi.fn(),
-  mockDeleteInterview: vi.fn(),
-  mockGetAllowlist: vi.fn(),
-  mockAddToAllowlist: vi.fn(),
-  mockRemoveFromAllowlist: vi.fn(),
-  mockGetAllUsers: vi.fn(),
-  mockDeleteUser: vi.fn(),
-  mockDb: { destroy: vi.fn() },
-}))
+  mockExecuteTakeFirst,
+} = vi.hoisted(() => {
+  const mockExecuteTakeFirst = vi.fn()
+  // chainable query builder mock for direct db queries (e.g. DELETE interviews existence check)
+  const queryChain: any = {}
+  queryChain.select = vi.fn().mockReturnValue(queryChain)
+  queryChain.where = vi.fn().mockReturnValue(queryChain)
+  queryChain.executeTakeFirst = mockExecuteTakeFirst
+
+  return {
+    mockGetSession: vi.fn(),
+    mockGetInterviews: vi.fn(),
+    mockCreateInterview: vi.fn(),
+    mockDeleteInterview: vi.fn(),
+    mockGetAllowlist: vi.fn(),
+    mockAddToAllowlist: vi.fn(),
+    mockRemoveFromAllowlist: vi.fn(),
+    mockGetAllUsers: vi.fn(),
+    mockDeleteUser: vi.fn(),
+    mockDb: {
+      destroy: vi.fn(),
+      selectFrom: vi.fn().mockReturnValue(queryChain),
+    },
+    mockExecuteTakeFirst,
+  }
+})
 
 vi.mock('@/lib/getAuth', () => ({
   getAuth: () => ({
@@ -203,7 +217,7 @@ describe('delete /admin/allowlist/:id', () => {
   })
 
   it('removes entry and returns 204', async () => {
-    mockRemoveFromAllowlist.mockResolvedValue(undefined)
+    mockRemoveFromAllowlist.mockResolvedValue(true)
 
     const res = await app.request('/admin/allowlist/1', {
       method: 'DELETE',
@@ -212,6 +226,17 @@ describe('delete /admin/allowlist/:id', () => {
 
     expect(res.status).toBe(204)
     expect(mockRemoveFromAllowlist).toHaveBeenCalledWith(expect.anything(), 1)
+  })
+
+  it('returns 404 when entry does not exist', async () => {
+    mockRemoveFromAllowlist.mockResolvedValue(false)
+
+    const res = await app.request('/admin/allowlist/999', {
+      method: 'DELETE',
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(404)
   })
 
   it('returns 400 for non-integer id', async () => {
@@ -264,7 +289,7 @@ describe('delete /admin/users/:id', () => {
   })
 
   it('deletes user and returns 204', async () => {
-    mockDeleteUser.mockResolvedValue(undefined)
+    mockDeleteUser.mockResolvedValue(true)
 
     const res = await app.request(`/admin/users/${OTHER_USER.id}`, {
       method: 'DELETE',
@@ -273,6 +298,17 @@ describe('delete /admin/users/:id', () => {
 
     expect(res.status).toBe(204)
     expect(mockDeleteUser).toHaveBeenCalledWith(expect.anything(), OTHER_USER.id)
+  })
+
+  it('returns 404 when user does not exist', async () => {
+    mockDeleteUser.mockResolvedValue(false)
+
+    const res = await app.request(`/admin/users/${OTHER_USER.id}`, {
+      method: 'DELETE',
+      headers: authHeaders(),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(404)
   })
 
   it('returns 400 when deleting yourself', async () => {
@@ -460,8 +496,7 @@ describe('delete /admin/interviews/:id', () => {
   })
 
   it('deletes interview and returns 204', async () => {
-    const interview = makeInterview({ id: 7 })
-    mockGetInterviews.mockResolvedValue([interview])
+    mockExecuteTakeFirst.mockResolvedValue({ id: 7 })
     mockDeleteInterview.mockResolvedValue(undefined)
 
     const res = await app.request('/admin/interviews/7', {
@@ -474,7 +509,7 @@ describe('delete /admin/interviews/:id', () => {
   })
 
   it('returns 404 when interview not found', async () => {
-    mockGetInterviews.mockResolvedValue([])
+    mockExecuteTakeFirst.mockResolvedValue(undefined)
 
     const res = await app.request('/admin/interviews/999', {
       method: 'DELETE',

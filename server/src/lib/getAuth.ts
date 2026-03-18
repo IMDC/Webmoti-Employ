@@ -12,6 +12,9 @@ import { socialBearer } from './socialBearerPlugin'
  */
 export function getAuth(env: CloudflareBindings): ReturnType<typeof betterAuth> {
   const IS_DEV = env.IS_DEV
+  const db = getDb(IS_DEV
+    ? env.LOCAL_DATABASE_URL
+    : env.HYPERDRIVE.connectionString)
 
   return betterAuth({
     ...betterAuthOptions,
@@ -38,10 +41,7 @@ export function getAuth(env: CloudflareBindings): ReturnType<typeof betterAuth> 
       },
     },
     database: {
-      // use local db when provided
-      db: getDb(IS_DEV
-        ? env.LOCAL_DATABASE_URL
-        : env.HYPERDRIVE.connectionString),
+      db,
       type: 'postgres',
     },
     baseURL: env.BETTER_AUTH_URL,
@@ -59,10 +59,6 @@ export function getAuth(env: CloudflareBindings): ReturnType<typeof betterAuth> 
             if (adminEmails.includes(email.toLowerCase())) {
               return
             }
-
-            const db = getDb(IS_DEV
-              ? env.LOCAL_DATABASE_URL
-              : env.HYPERDRIVE.connectionString)
 
             const allowed = await db
               .selectFrom('allowlist')

@@ -18,10 +18,11 @@ export async function addToAllowlist(db: Kysely<DB>, email: string, addedById: s
 }
 
 export async function removeFromAllowlist(db: Kysely<DB>, id: number) {
-  return await db
+  const result = await db
     .deleteFrom('allowlist')
     .where('id', '=', id)
-    .executeTakeFirstOrThrow()
+    .executeTakeFirst()
+  return Number(result.numDeletedRows) > 0
 }
 
 export async function getAllUsers(db: Kysely<DB>) {
@@ -33,8 +34,9 @@ export async function getAllUsers(db: Kysely<DB>) {
 }
 
 export async function deleteUser(db: Kysely<DB>, userId: string) {
-  return await db
+  const result = await db
     .deleteFrom('user')
     .where('id', '=', userId)
-    .executeTakeFirstOrThrow()
+    .executeTakeFirst()
+  return Number(result.numDeletedRows) > 0
 }

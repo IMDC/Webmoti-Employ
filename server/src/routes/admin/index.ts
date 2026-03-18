@@ -30,10 +30,14 @@ adminRoute.get('/overview', async (c) => {
   const db = requireDb(c)
   const adminEmails = c.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) ?? []
 
-  const [userCountResult, interviewCountResult, allowlistCountResult, recentInterviews, upcomingInterviews] = await Promise.all([
+  const [userCountResult, interviewCountResult, allowlistCountResult, adminOverlapResult, recentInterviews, upcomingInterviews] = await Promise.all([
     db.selectFrom('user').select(db.fn.countAll<string>().as('count')).executeTakeFirstOrThrow(),
     db.selectFrom('interview').select(db.fn.countAll<string>().as('count')).executeTakeFirstOrThrow(),
     db.selectFrom('allowlist').select(db.fn.countAll<string>().as('count')).executeTakeFirstOrThrow(),
+    // count admin emails already in the allowlist to avoid double-counting
+    adminEmails.length > 0
+      ? db.selectFrom('allowlist').select(db.fn.countAll<string>().as('count')).where('email', 'in', adminEmails).executeTakeFirstOrThrow()
+      : Promise.resolve({ count: '0' }),
     db.selectFrom('interview')
       .innerJoin('user', 'user.id', 'interview.hostId')
       .select([
@@ -78,7 +82,7 @@ adminRoute.get('/overview', async (c) => {
     stats: {
       totalUsers: Number(userCountResult.count),
       totalInterviews: Number(interviewCountResult.count),
-      allowlistSize: Number(allowlistCountResult.count) + adminEmails.length,
+      allowlistSize: Number(allowlistCountResult.count) + adminEmails.length - Number(adminOverlapResult.count),
       liveSessionCount,
     },
     recentInterviews: recentInterviews.map(i => ({
@@ -126,7 +130,10 @@ adminRoute.delete(
   async (c) => {
     const db = requireDb(c)
     const { id } = c.req.valid('param')
-    await removeFromAllowlist(db, id)
+    const deleted = await removeFromAllowlist(db, id)
+    if (!deleted) {
+      return c.json({ error: 'Allowlist entry not found' }, 404)
+    }
     return c.body(null, 204)
   },
 )
@@ -151,7 +158,10 @@ adminRoute.delete(
       return c.json({ error: 'Cannot delete yourself' }, 400)
     }
 
-    await deleteUser(db, id)
+    const deleted = await deleteUser(db, id)
+    if (!deleted) {
+      return c.json({ error: 'User not found' }, 404)
+    }
     return c.body(null, 204)
   },
 )
@@ -165,8 +175,9 @@ adminRoute.get('/interviews', async (c) => {
 
   // enrich invites with user names where available
   const userMap = new Map(users.map(u => [u.email.toLowerCase(), u]))
+  const hostMap = new Map(users.map(u => [u.id, u]))
   const enriched = interviews.map((interview) => {
-    const host = users.find(u => u.id === interview.hostId)
+    const host = hostMap.get(interview.hostId)
     return {
       ...interview,
       hostName: host?.name ?? null,
@@ -222,8 +233,10 @@ adminRoute.delete(
     const db = requireDb(c)
     const { id } = c.req.valid('param')
 
-    const [interview] = await getInterviews(db)
-      .then(interviews => interviews.filter(i => i.id === id))
+    const interview = await db.selectFrom('interview')
+      .select('id')
+      .where('id', '=', id)
+      .executeTakeFirst()
 
     if (!interview) {
       return c.json({ error: 'Interview not found' }, 404)
