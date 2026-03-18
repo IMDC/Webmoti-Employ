@@ -91,52 +91,56 @@ export function ControlsMenu({ onLayoutOpen, isMobile, sendDevIsJohnDoNotUseThis
             Statistics
           </Menu.Item>
 
-          <Menu.Item
-            closeMenuOnClick={false}
-            onMouseDown={() => {
-              setIsJohnInterviewerPressed(true)
-              sendDevIsJohnDoNotUseThis?.(true, true)
-            }}
-            onMouseUp={() => {
-              setIsJohnInterviewerPressed(false)
-              sendDevIsJohnDoNotUseThis?.(false, true)
-            }}
-            onMouseLeave={() => {
-              setIsJohnInterviewerPressed(false)
-              sendDevIsJohnDoNotUseThis?.(false, true)
-            }}
-            leftSection={<IconUserFilled size={14} />}
-            bg={isJohnInterviewerPressed ? 'blue' : undefined}
-          >
-            DEV: John (interviewer)
-          </Menu.Item>
-          <Menu.Item
-            closeMenuOnClick={false}
-            onMouseDown={() => {
-              setIsJohnCandidatePressed(true)
-              sendDevIsJohnDoNotUseThis?.(true, false)
-            }}
-            onMouseUp={() => {
-              setIsJohnCandidatePressed(false)
-              sendDevIsJohnDoNotUseThis?.(false, false)
-            }}
-            onMouseLeave={() => {
-              setIsJohnCandidatePressed(false)
-              sendDevIsJohnDoNotUseThis?.(false, false)
-            }}
-            leftSection={<IconUserFilled size={14} />}
-            bg={isJohnCandidatePressed ? 'blue' : undefined}
-          >
-            DEV: John (candidate)
-          </Menu.Item>
+          {import.meta.env.DEV && (
+            <>
+              <Menu.Item
+                closeMenuOnClick={false}
+                onMouseDown={() => {
+                  setIsJohnInterviewerPressed(true)
+                  sendDevIsJohnDoNotUseThis?.(true, true)
+                }}
+                onMouseUp={() => {
+                  setIsJohnInterviewerPressed(false)
+                  sendDevIsJohnDoNotUseThis?.(false, true)
+                }}
+                onMouseLeave={() => {
+                  setIsJohnInterviewerPressed(false)
+                  sendDevIsJohnDoNotUseThis?.(false, true)
+                }}
+                leftSection={<IconUserFilled size={14} />}
+                bg={isJohnInterviewerPressed ? 'blue' : undefined}
+              >
+                DEV: John (interviewer)
+              </Menu.Item>
+              <Menu.Item
+                closeMenuOnClick={false}
+                onMouseDown={() => {
+                  setIsJohnCandidatePressed(true)
+                  sendDevIsJohnDoNotUseThis?.(true, false)
+                }}
+                onMouseUp={() => {
+                  setIsJohnCandidatePressed(false)
+                  sendDevIsJohnDoNotUseThis?.(false, false)
+                }}
+                onMouseLeave={() => {
+                  setIsJohnCandidatePressed(false)
+                  sendDevIsJohnDoNotUseThis?.(false, false)
+                }}
+                leftSection={<IconUserFilled size={14} />}
+                bg={isJohnCandidatePressed ? 'blue' : undefined}
+              >
+                DEV: John (candidate)
+              </Menu.Item>
 
-          <Menu.Divider />
-          <Menu.Item
-            color="red"
-            onClick={() => sendResetMessages?.()}
-          >
-            DEV: Reset AI Messages
-          </Menu.Item>
+              <Menu.Divider />
+              <Menu.Item
+                color="red"
+                onClick={() => sendResetMessages?.()}
+              >
+                DEV: Reset AI Messages
+              </Menu.Item>
+            </>
+          )}
         </Menu.Dropdown>
       </Menu>
 
