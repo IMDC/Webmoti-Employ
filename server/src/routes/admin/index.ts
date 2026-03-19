@@ -294,4 +294,46 @@ adminRoute.get('/live-sessions', async (c) => {
   return c.json({ sessions: enriched })
 })
 
+// ── Session History ────────────────────────────────────────
+
+adminRoute.get('/session-history', async (c) => {
+  const from = c.req.query('from')
+  const to = c.req.query('to')
+  if (!from || !to) {
+    return c.json({ error: 'Missing required query params: from, to (yyyy-mm-dd)' }, 400)
+  }
+
+  let pastSessions: Awaited<ReturnType<ZoomClient['getPastSessions']>>
+  try {
+    const apiToken = await generateZoomApiJwt(c.env.ZOOM_API_KEY, c.env.ZOOM_API_SECRET)
+    const client = new ZoomClient(apiToken)
+    pastSessions = await client.getPastSessions(from, to)
+  }
+  catch {
+    return c.json({ error: 'Failed to fetch session history from Zoom' }, 502)
+  }
+
+  // Enrich with interview data by matching session_key to interview sessionId
+  const db = requireDb(c)
+  const sessionKeys = pastSessions.sessions.map(s => s.session_key).filter(Boolean)
+  const interviews = sessionKeys.length > 0
+    ? await db.selectFrom('interview')
+        .select(['id', 'sessionId'])
+        .where('sessionId', 'in', sessionKeys)
+        .execute()
+    : []
+
+  const interviewMap = new Map(interviews.map(i => [i.sessionId, i]))
+
+  const enriched = pastSessions.sessions.map((s) => {
+    const interview = interviewMap.get(s.session_key)
+    return {
+      ...s,
+      interviewId: interview?.id ?? null,
+    }
+  })
+
+  return c.json({ sessions: enriched, from: pastSessions.from, to: pastSessions.to })
+})
+
 export default adminRoute
