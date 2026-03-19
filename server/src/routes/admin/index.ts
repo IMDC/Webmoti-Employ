@@ -4,6 +4,7 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { useAdmin } from '../../middleware/useAdmin'
 import { requireDb, useDb } from '../../middleware/useDb'
+import { getAdminEmails } from '../../utils/admin-emails'
 import { zValidator } from '../../utils/validator-wrapper'
 import { createInterview, deleteInterview, getInterviews } from '../interviews/db-queries'
 import { generateZoomApiJwt } from '../sessions/jwt'
@@ -16,7 +17,7 @@ const adminRoute = new Hono<AppContext>()
 // registered before useDb since it doesn't need a DB connection
 adminRoute.get('/check', (c) => {
   const user = c.var.user
-  const adminEmails = c.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) ?? []
+  const adminEmails = getAdminEmails(c.env.ADMIN_EMAILS)
   const isAdmin = adminEmails.includes(user.email.toLowerCase())
   return c.json({ isAdmin })
 })
@@ -29,7 +30,7 @@ adminRoute.use(useAdmin)
 
 adminRoute.get('/overview', async (c) => {
   const db = requireDb(c)
-  const adminEmails = c.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) ?? []
+  const adminEmails = getAdminEmails(c.env.ADMIN_EMAILS)
 
   const [userCountResult, interviewCountResult, allowlistCountResult, adminOverlapResult, recentInterviews, upcomingInterviews] = await Promise.all([
     db.selectFrom('user').select(db.fn.countAll<string>().as('count')).executeTakeFirstOrThrow(),
@@ -107,7 +108,7 @@ adminRoute.get('/overview', async (c) => {
 
 adminRoute.get('/allowlist', async (c) => {
   const db = requireDb(c)
-  const adminEmails = c.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) ?? []
+  const adminEmails = getAdminEmails(c.env.ADMIN_EMAILS)
   const allowlist = await getAllowlist(db)
   return c.json({ allowlist, adminEmails })
 })
@@ -143,8 +144,9 @@ adminRoute.delete(
 
 adminRoute.get('/users', async (c) => {
   const db = requireDb(c)
+  const adminEmails = getAdminEmails(c.env.ADMIN_EMAILS)
   const users = await getAllUsers(db)
-  return c.json({ users })
+  return c.json({ users, adminEmails })
 })
 
 adminRoute.delete(
@@ -157,6 +159,14 @@ adminRoute.delete(
     // prevent admin from deleting themselves
     if (id === c.var.user.id) {
       return c.json({ error: 'Cannot delete yourself' }, 400)
+    }
+
+    // prevent deleting other admins
+    const adminEmails = getAdminEmails(c.env.ADMIN_EMAILS)
+    const allUsers = await getAllUsers(db)
+    const targetUser = allUsers.find(u => u.id === id)
+    if (targetUser && adminEmails.includes(targetUser.email.toLowerCase())) {
+      return c.json({ error: 'Cannot delete an admin user' }, 403)
     }
 
     const deleted = await deleteUser(db, id)

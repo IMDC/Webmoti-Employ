@@ -199,6 +199,7 @@ const UserEntry = z.object({
 
 const UsersResponse = z.object({
   users: z.array(UserEntry),
+  adminEmails: z.array(z.string()),
 })
 
 // eslint-disable-next-line ts/no-redeclare
@@ -216,13 +217,22 @@ async function getUsers() {
   if (!result.success) {
     throw new Error(z.prettifyError(result.error))
   }
-  return result.data.users
+  return result.data
 }
 
 export function useAdminUsers() {
   return useQuery({
     queryKey: adminQueryKeys.users,
     queryFn: getUsers,
+    select: data => data.users,
+  })
+}
+
+export function useAdminEmails() {
+  return useQuery({
+    queryKey: adminQueryKeys.users,
+    queryFn: getUsers,
+    select: data => data.adminEmails,
   })
 }
 

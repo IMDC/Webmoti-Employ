@@ -29,6 +29,7 @@ export function InterviewsPage() {
 
   const [showInstant, setShowInstant] = useState(false)
   const [dateRange, setDateRange] = useState<[string | null, string | null]>([null, null])
+  const [deletingId, setDeletingId] = useState<number | null>(null)
 
   useEffect(() => {
     if (highlight && highlightRef.current) {
@@ -55,11 +56,15 @@ export function InterviewsPage() {
   }, [interviews, showInstant, dateRange])
 
   async function handleDelete(id: number) {
+    setDeletingId(id)
     try {
       await deleteMutation.mutateAsync(id)
     }
     catch (err) {
       notifyError('Failed to delete interview', err)
+    }
+    finally {
+      setDeletingId(null)
     }
   }
 
@@ -164,7 +169,7 @@ export function InterviewsPage() {
                     <Table.Td>
                       <DeleteButton
                         label="Delete"
-                        loading={deleteMutation.isPending}
+                        loading={deletingId === interview.id}
                         onClick={() => handleDelete(interview.id)}
                       />
                     </Table.Td>

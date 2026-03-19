@@ -2,6 +2,7 @@ import { betterAuth } from 'better-auth'
 import { APIError } from 'better-auth/api'
 import { bearer } from 'better-auth/plugins'
 import { getDb } from '@/db/getDb'
+import { getAdminEmails } from '@/utils/admin-emails'
 import { betterAuthOptions } from './better-auth-options'
 import { socialBearer } from './socialBearerPlugin'
 
@@ -55,7 +56,7 @@ export function getAuth(env: CloudflareBindings): ReturnType<typeof betterAuth> 
               throw new APIError('BAD_REQUEST', { message: 'Google account not allowed' })
             }
 
-            const adminEmails = env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) ?? []
+            const adminEmails = getAdminEmails(env.ADMIN_EMAILS)
             if (adminEmails.includes(email.toLowerCase())) {
               return
             }

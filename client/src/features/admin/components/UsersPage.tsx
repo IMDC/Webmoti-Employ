@@ -11,17 +11,20 @@ import {
 } from '@mantine/core'
 import { useSearch } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { DeleteButton } from '@/components/DeleteButton'
 import { notifyError, notifyWarning } from '@/utils/utils'
-import { useAdminDeleteUser, useAdminUsers } from '../queries'
+import { useAdminDeleteUser, useAdminEmails, useAdminUsers } from '../queries'
+import { AdminBadge } from './AdminBadge'
 import { AdminBurger } from './AdminBurger'
 
 export function UsersPage() {
   const { data: users, isPending, error } = useAdminUsers()
+  const { data: adminEmails } = useAdminEmails()
   const deleteMutation = useAdminDeleteUser()
   const { highlight } = useSearch({ strict: false }) as { highlight?: string }
   const highlightRef = useRef<HTMLTableRowElement>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
     if (highlight && highlightRef.current) {
@@ -30,6 +33,7 @@ export function UsersPage() {
   }, [highlight, users])
 
   async function handleDelete(id: string) {
+    setDeletingId(id)
     try {
       await deleteMutation.mutateAsync(id)
     }
@@ -40,6 +44,9 @@ export function UsersPage() {
       else {
         notifyError('Failed to delete user', err)
       }
+    }
+    finally {
+      setDeletingId(null)
     }
   }
 
@@ -64,6 +71,7 @@ export function UsersPage() {
                   <Table.Th>User</Table.Th>
                   <Table.Th>Email</Table.Th>
                   <Table.Th>Joined</Table.Th>
+                  <Table.Th>Role</Table.Th>
                   <Table.Th />
                 </Table.Tr>
               </Table.Thead>
@@ -89,17 +97,22 @@ export function UsersPage() {
                       </Text>
                     </Table.Td>
                     <Table.Td>
-                      <DeleteButton
-                        label="Delete user"
-                        loading={deleteMutation.isPending}
-                        onClick={() => handleDelete(user.id)}
-                      />
+                      {adminEmails?.includes(user.email.toLowerCase()) && <AdminBadge />}
+                    </Table.Td>
+                    <Table.Td>
+                      {!adminEmails?.includes(user.email.toLowerCase()) && (
+                        <DeleteButton
+                          label="Delete user"
+                          loading={deletingId === user.id}
+                          onClick={() => handleDelete(user.id)}
+                        />
+                      )}
                     </Table.Td>
                   </Table.Tr>
                 ))}
                 {users?.length === 0 && (
                   <Table.Tr>
-                    <Table.Td colSpan={4}>
+                    <Table.Td colSpan={5}>
                       <Text c="dimmed" ta="center">No users found</Text>
                     </Table.Td>
                   </Table.Tr>

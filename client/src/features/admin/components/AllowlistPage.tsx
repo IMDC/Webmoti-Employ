@@ -1,6 +1,5 @@
 import {
   Alert,
-  Badge,
   Button,
   Center,
   Group,
@@ -17,6 +16,7 @@ import { useState } from 'react'
 import { DeleteButton } from '@/components/DeleteButton'
 import { notifyError } from '@/utils/utils'
 import { useAddToAllowlist, useAllowlist, useRemoveFromAllowlist } from '../queries'
+import { AdminBadge } from './AdminBadge'
 import { AdminBurger } from './AdminBurger'
 
 export function AllowlistPage() {
@@ -24,6 +24,7 @@ export function AllowlistPage() {
   const addMutation = useAddToAllowlist()
   const removeMutation = useRemoveFromAllowlist()
   const [email, setEmail] = useState('')
+  const [removingId, setRemovingId] = useState<number | null>(null)
 
   const allowlist = data?.allowlist
   const adminEmails = data?.adminEmails
@@ -78,21 +79,18 @@ export function AllowlistPage() {
                 <Table.Tr>
                   <Table.Th>Email</Table.Th>
                   <Table.Th>Added</Table.Th>
+                  <Table.Th>Role</Table.Th>
                   <Table.Th />
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
                 {adminEmails?.map(adminEmail => (
                   <Table.Tr key={`admin-${adminEmail}`}>
-                    <Table.Td>
-                      <Group gap="xs">
-                        <Badge size="xs" color="violet">Admin</Badge>
-                        {adminEmail}
-                      </Group>
-                    </Table.Td>
+                    <Table.Td>{adminEmail}</Table.Td>
                     <Table.Td>
                       <Text c="dimmed" size="sm">N/A</Text>
                     </Table.Td>
+                    <Table.Td><AdminBadge /></Table.Td>
                     <Table.Td />
                   </Table.Tr>
                 ))}
@@ -102,17 +100,26 @@ export function AllowlistPage() {
                     <Table.Td>
                       {DateTime.fromJSDate(entry.createdAt).toLocaleString(DateTime.DATE_MED)}
                     </Table.Td>
+                    <Table.Td />
                     <Table.Td>
                       <DeleteButton
-                        loading={removeMutation.isPending}
-                        onClick={() => removeMutation.mutate(entry.id)}
+                        loading={removingId === entry.id}
+                        onClick={async () => {
+                          setRemovingId(entry.id)
+                          try {
+                            await removeMutation.mutateAsync(entry.id)
+                          }
+                          finally {
+                            setRemovingId(null)
+                          }
+                        }}
                       />
                     </Table.Td>
                   </Table.Tr>
                 ))}
                 {allowlist?.length === 0 && adminEmails?.length === 0 && (
                   <Table.Tr>
-                    <Table.Td colSpan={3}>
+                    <Table.Td colSpan={4}>
                       <Text c="dimmed" ta="center">No emails in allowlist</Text>
                     </Table.Td>
                   </Table.Tr>
