@@ -51,11 +51,14 @@ export function InterviewCard({ interview }: InterviewCardProps) {
   const isHost = interview.hostId === user.id
   const { deleteInterviewMutation, isDeleteInterviewPending } = useDeleteInterview()
 
-  const isEnded = interview.endTime ? interview.endTime < DateTime.local().toJSDate() : false
+  const now = DateTime.local()
+  const startDt = DateTime.fromJSDate(interview.startTime).setZone('local')
+  const startedToday = startDt.hasSame(now, 'day')
+  // Today's meetings stay joinable all day
+  const isEnded = !startedToday && interview.endTime ? interview.endTime < now.toJSDate() : false
 
-  const formattedInterviewTime = DateTime.fromJSDate(interview.startTime)
-    .setZone('local')
-    .toLocaleString(DateTime.DATETIME_MED)
+  const formattedInterviewTime = startDt.toLocaleString(DateTime.DATETIME_MED)
+  const relativeTime = startedToday ? startDt.toRelative() : null
 
   return (
     <Card key={interview.id} shadow="sm" padding="sm" withBorder>
@@ -68,6 +71,11 @@ export function InterviewCard({ interview }: InterviewCardProps) {
           >
             { youAreInterviewer ? 'Interviewer' : 'Interviewee' }
           </Badge>
+          {relativeTime && (
+            <Badge variant="light" color="gray">
+              {relativeTime}
+            </Badge>
+          )}
         </Group>
         <Group gap="xs">
           <UserList

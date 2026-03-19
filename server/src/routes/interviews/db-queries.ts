@@ -49,11 +49,12 @@ export async function getInterviews(
           }
 
           if (isUpcoming) {
-            // filter using endTime since you could still join an interview after startTime
+            // allow joining if endTime hasn't passed, or if the meeting started today
             // also allow instant interviews since they have no endTime
             filters.push(
               eb.or([
                 eb('interview.endTime', '>=', sql<Date>`now()`),
+                eb('interview.startTime', '>=', sql<Date>`date_trunc('day', now())`),
                 eb('interview.isInstant', '=', true),
               ]),
             )
