@@ -1,3 +1,4 @@
+import type { SessionParticipant } from '../queries'
 import { Alert, Badge, Center, Group, Loader, Modal, Stack, Table, Text, Title, Tooltip } from '@mantine/core'
 import { DatePickerInput } from '@mantine/dates'
 import { useDisclosure } from '@mantine/hooks'
@@ -5,17 +6,12 @@ import { IconMicrophone, IconMovie, IconScreenShare, IconVideo } from '@tabler/i
 import { useNavigate } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
 import { useState } from 'react'
-import type { SessionParticipant } from '../queries'
 import { useSessionHistory, useSessionParticipants } from '../queries'
 import { AdminBurger } from './AdminBurger'
 
-function formatDate(date: Date): string {
-  return DateTime.fromJSDate(date).toFormat('yyyy-MM-dd')
-}
-
-function defaultDateRange(): [Date, Date] {
-  const to = new Date()
-  const from = DateTime.now().minus({ days: 7 }).toJSDate()
+function defaultDateRange(): [string, string] {
+  const to = DateTime.now().toFormat('yyyy-MM-dd')
+  const from = DateTime.now().minus({ days: 7 }).toFormat('yyyy-MM-dd')
   return [from, to]
 }
 
@@ -90,12 +86,12 @@ function ParticipantsTable({ participants }: { participants: SessionParticipant[
 
 export function SessionHistoryPage() {
   const [defaults] = useState(defaultDateRange)
-  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([defaults[0], defaults[1]])
+  const [dateRange, setDateRange] = useState<[string | null, string | null]>([defaults[0], defaults[1]])
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null)
   const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false)
 
-  const from = formatDate(dateRange[0] ?? defaults[0])
-  const to = formatDate(dateRange[1] ?? defaults[1])
+  const from = dateRange[0] ?? defaults[0]
+  const to = dateRange[1] ?? defaults[1]
 
   const { data: sessions, isPending, error } = useSessionHistory(from, to)
   const { data: participants, isPending: participantsLoading } = useSessionParticipants(selectedSessionId)
