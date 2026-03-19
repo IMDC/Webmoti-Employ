@@ -121,32 +121,58 @@ export class ZoomClient {
   }
 
   async getPastSessions(from: string, to: string) {
-    const params = new URLSearchParams({
-      type: 'past',
-      from,
-      to,
-      page_size: '300',
-    })
-    const data = await this.request('/sessions', params)
-    const parsed = PastSessionsResponse.safeParse(data)
-    if (!parsed.success) {
-      throw new Error(z.prettifyError(parsed.error))
-    }
+    const allSessions: PastSession[] = []
+    let nextPageToken: string | undefined
+    let meta: { from: string, to: string } | undefined
 
-    return parsed.data
+    do {
+      const params = new URLSearchParams({
+        type: 'past',
+        from,
+        to,
+        page_size: '300',
+      })
+      if (nextPageToken) {
+        params.set('next_page_token', nextPageToken)
+      }
+
+      const data = await this.request('/sessions', params)
+      const parsed = PastSessionsResponse.safeParse(data)
+      if (!parsed.success) {
+        throw new Error(z.prettifyError(parsed.error))
+      }
+
+      allSessions.push(...parsed.data.sessions)
+      meta ??= { from: parsed.data.from, to: parsed.data.to }
+      nextPageToken = parsed.data.next_page_token || undefined
+    } while (nextPageToken)
+
+    return { sessions: allSessions, from: meta!.from, to: meta!.to }
   }
 
   async getSessionUsers(sessionId: string) {
-    const params = new URLSearchParams({
-      type: 'past',
-      page_size: '300',
-    })
-    const data = await this.request(`/sessions/${encodeURIComponent(sessionId)}/users`, params)
-    const parsed = SessionUsersResponse.safeParse(data)
-    if (!parsed.success) {
-      throw new Error(z.prettifyError(parsed.error))
-    }
+    const allUsers: SessionUser[] = []
+    let nextPageToken: string | undefined
 
-    return parsed.data.users
+    do {
+      const params = new URLSearchParams({
+        type: 'past',
+        page_size: '300',
+      })
+      if (nextPageToken) {
+        params.set('next_page_token', nextPageToken)
+      }
+
+      const data = await this.request(`/sessions/${encodeURIComponent(sessionId)}/users`, params)
+      const parsed = SessionUsersResponse.safeParse(data)
+      if (!parsed.success) {
+        throw new Error(z.prettifyError(parsed.error))
+      }
+
+      allUsers.push(...parsed.data.users)
+      nextPageToken = parsed.data.next_page_token || undefined
+    } while (nextPageToken)
+
+    return allUsers
   }
 }

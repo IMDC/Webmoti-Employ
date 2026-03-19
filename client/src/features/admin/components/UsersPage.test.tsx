@@ -17,6 +17,7 @@ const usersData = {
     { id: 'u1', email: 'alice@example.com', name: 'Alice Smith', image: null, createdAt: '2026-01-10T00:00:00Z' },
     { id: 'u2', email: 'bob@example.com', name: 'Bob Jones', image: 'https://example.com/bob.jpg', createdAt: '2026-02-15T00:00:00Z' },
   ],
+  adminEmails: ['alice@example.com'],
 }
 
 beforeEach(() => {
@@ -64,7 +65,7 @@ describe('usersPage', () => {
   it('shows empty state when no users exist', async () => {
     server.use(
       http.get(`${API_BASE}/admin/users`, () => {
-        return HttpResponse.json({ users: [] })
+        return HttpResponse.json({ users: [], adminEmails: [] })
       }),
     )
 
@@ -73,12 +74,13 @@ describe('usersPage', () => {
     expect(await screen.findByText('No users found')).toBeInTheDocument()
   })
 
-  it('shows delete button for each user', async () => {
+  it('shows delete button for non-admin users', async () => {
     render(<UsersPage />)
 
     await screen.findByText('Alice Smith')
 
+    // Alice is in adminEmails so she has no delete button; only Bob does
     const deleteButtons = screen.getAllByLabelText('Delete user')
-    expect(deleteButtons).toHaveLength(2)
+    expect(deleteButtons).toHaveLength(1)
   })
 })

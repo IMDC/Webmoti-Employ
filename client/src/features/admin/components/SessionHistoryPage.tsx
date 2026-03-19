@@ -9,9 +9,13 @@ import type { SessionParticipant } from '../queries'
 import { useSessionHistory, useSessionParticipants } from '../queries'
 import { AdminBurger } from './AdminBurger'
 
-function defaultDateRange(): [string, string] {
-  const to = DateTime.now().toFormat('yyyy-MM-dd')
-  const from = DateTime.now().minus({ days: 7 }).toFormat('yyyy-MM-dd')
+function formatDate(date: Date): string {
+  return DateTime.fromJSDate(date).toFormat('yyyy-MM-dd')
+}
+
+function defaultDateRange(): [Date, Date] {
+  const to = new Date()
+  const from = DateTime.now().minus({ days: 7 }).toJSDate()
   return [from, to]
 }
 
@@ -86,12 +90,12 @@ function ParticipantsTable({ participants }: { participants: SessionParticipant[
 
 export function SessionHistoryPage() {
   const [defaults] = useState(defaultDateRange)
-  const [dateRange, setDateRange] = useState<[string | null, string | null]>([defaults[0], defaults[1]])
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([defaults[0], defaults[1]])
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null)
   const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false)
 
-  const from = dateRange[0] ?? defaults[0]
-  const to = dateRange[1] ?? defaults[1]
+  const from = formatDate(dateRange[0] ?? defaults[0])
+  const to = formatDate(dateRange[1] ?? defaults[1])
 
   const { data: sessions, isPending, error } = useSessionHistory(from, to)
   const { data: participants, isPending: participantsLoading } = useSessionParticipants(selectedSessionId)

@@ -3,6 +3,7 @@ import {
   render,
   screen,
   server,
+  userEvent,
 } from '@test-utils'
 import { http, HttpResponse } from 'msw'
 import { InterviewsPage } from './InterviewsPage'
@@ -67,6 +68,9 @@ describe('interviewsPage', () => {
 
     // Alice Smith appears in both Host and Participants columns
     expect((await screen.findAllByText('Alice Smith')).length).toBeGreaterThan(0)
+
+    // Bob's interview is instant, toggle the checkbox to show it
+    await userEvent.click(screen.getByLabelText('Show instant interviews'))
     expect(screen.getByText('Bob Jones')).toBeInTheDocument()
   })
 
@@ -74,8 +78,10 @@ describe('interviewsPage', () => {
     render(<InterviewsPage />)
 
     await screen.findAllByText('Alice Smith')
-
     expect(screen.getByText('Scheduled')).toBeInTheDocument()
+
+    // Bob's interview is instant, toggle the checkbox to show it
+    await userEvent.click(screen.getByLabelText('Show instant interviews'))
     expect(screen.getByText('Instant')).toBeInTheDocument()
   })
 
@@ -116,6 +122,9 @@ describe('interviewsPage', () => {
     render(<InterviewsPage />)
 
     await screen.findAllByText('Alice Smith')
+
+    // toggle to show instant interviews too
+    await userEvent.click(screen.getByLabelText('Show instant interviews'))
 
     const deleteButtons = screen.getAllByLabelText('Delete')
     expect(deleteButtons).toHaveLength(2)

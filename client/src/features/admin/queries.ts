@@ -22,6 +22,7 @@ export const adminQueryKeys = {
   interviews: ['admin', 'interviews'] as const,
   liveSessions: ['admin', 'live-sessions'] as const,
   sessionHistory: (from: string, to: string) => ['admin', 'session-history', from, to] as const,
+  sessionParticipants: (sessionId: string | null) => ['admin', 'session-participants', sessionId] as const,
 }
 
 // ── Admin Check ────────────────────────────────────────────
@@ -456,7 +457,7 @@ async function getSessionParticipants(sessionId: string) {
 
 export function useSessionParticipants(sessionId: string | null) {
   return useQuery({
-    queryKey: ['admin', 'session-participants', sessionId],
+    queryKey: adminQueryKeys.sessionParticipants(sessionId),
     queryFn: () => getSessionParticipants(sessionId!),
     enabled: !!sessionId,
   })
