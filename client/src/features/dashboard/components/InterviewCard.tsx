@@ -51,7 +51,10 @@ export function InterviewCard({ interview }: InterviewCardProps) {
   const isHost = interview.hostId === user.id
   const { deleteInterviewMutation, isDeleteInterviewPending } = useDeleteInterview()
 
-  const isEnded = interview.endTime ? interview.endTime < DateTime.local().toJSDate() : false
+  const now = DateTime.local()
+  const startedToday = DateTime.fromJSDate(interview.startTime).hasSame(now, 'day')
+  // Today's meetings stay joinable all day
+  const isEnded = !startedToday && interview.endTime ? interview.endTime < now.toJSDate() : false
 
   const formattedInterviewTime = DateTime.fromJSDate(interview.startTime)
     .setZone('local')
