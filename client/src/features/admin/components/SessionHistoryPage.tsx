@@ -120,7 +120,10 @@ export function SessionHistoryPage() {
           type="range"
           label="Date range"
           value={dateRange}
-          onChange={(v) => { setDateRange(v); setPage(1) }}
+          onChange={(v) => {
+            setDateRange(v)
+            setPage(1)
+          }}
           maxDate={new Date()}
           clearable={false}
           w={300}
