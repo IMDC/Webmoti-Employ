@@ -2,6 +2,7 @@ import {
   Alert,
   Badge,
   Center,
+  Checkbox,
   Group,
   Loader,
   Stack,
@@ -10,9 +11,10 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core'
+import { DatePickerInput } from '@mantine/dates'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { DeleteButton } from '@/components/DeleteButton'
 import { notifyError } from '@/utils/utils'
 import { useAdminDeleteInterview, useAdminInterviews } from '../queries'
@@ -25,11 +27,32 @@ export function InterviewsPage() {
   const { highlight } = useSearch({ strict: false }) as { highlight?: number }
   const highlightRef = useRef<HTMLTableRowElement>(null)
 
+  const [showInstant, setShowInstant] = useState(false)
+  const [dateRange, setDateRange] = useState<[string | null, string | null]>([null, null])
+
   useEffect(() => {
     if (highlight && highlightRef.current) {
       highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
   }, [highlight, interviews])
+
+  const filteredInterviews = useMemo(() => {
+    if (!interviews)
+      return []
+    return interviews.filter((interview) => {
+      if (!showInstant && interview.isInstant)
+        return false
+      if (dateRange[0] && interview.startTime < new Date(dateRange[0]))
+        return false
+      if (dateRange[1]) {
+        const endOfDay = new Date(dateRange[1])
+        endOfDay.setHours(23, 59, 59, 999)
+        if (interview.startTime > endOfDay)
+          return false
+      }
+      return true
+    })
+  }, [interviews, showInstant, dateRange])
 
   async function handleDelete(id: number) {
     try {
@@ -52,6 +75,22 @@ export function InterviewsPage() {
       </Group>
       <Text c="dimmed" size="sm">All scheduled and instant interviews.</Text>
 
+      <Group>
+        <Checkbox
+          label="Show instant interviews"
+          checked={showInstant}
+          onChange={e => setShowInstant(e.currentTarget.checked)}
+        />
+        <DatePickerInput
+          type="range"
+          placeholder="Filter by date range"
+          value={dateRange}
+          onChange={setDateRange}
+          clearable
+          w={280}
+        />
+      </Group>
+
       {isPending
         ? <Center h="60vh"><Loader type="dots" /></Center>
         : (
@@ -67,7 +106,7 @@ export function InterviewsPage() {
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {interviews?.map(interview => (
+                {filteredInterviews.map(interview => (
                   <Table.Tr
                     key={interview.id}
                     ref={highlight === interview.id ? highlightRef : undefined}
@@ -131,7 +170,7 @@ export function InterviewsPage() {
                     </Table.Td>
                   </Table.Tr>
                 ))}
-                {interviews?.length === 0 && (
+                {filteredInterviews.length === 0 && (
                   <Table.Tr>
                     <Table.Td colSpan={6}>
                       <Text c="dimmed" ta="center">No interviews found</Text>
