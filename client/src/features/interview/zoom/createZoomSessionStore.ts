@@ -26,6 +26,7 @@ import { appStore } from '@/useAppStore'
 import { VIDEO_CAPTURE_HEIGHT, VIDEO_CAPTURE_WIDTH } from '@/utils/constants'
 import { logger } from '@/utils/logger'
 import { isExecutedFailure, notifyError, notifyWarning } from '@/utils/utils'
+import { resolveDeviceId } from './createDeviceStore'
 
 export interface ZoomSessionActions {
   setIsAudioOn: (value: boolean) => void
@@ -198,8 +199,9 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
             const { isAudioOn, isVideoOn, isVideoBlurred } = get()
             const granted = appStore.getState().permissionState === 'granted'
             if (granted && isVideoOn) {
+              const videoDevices = deviceStore.getState().videoDevices
               await stream.startVideo({
-                cameraId: selectedVideoDevice ?? undefined,
+                cameraId: selectedVideoDevice ? resolveDeviceId(selectedVideoDevice, videoDevices) : undefined,
                 captureWidth: VIDEO_CAPTURE_WIDTH,
                 captureHeight: VIDEO_CAPTURE_HEIGHT,
                 virtualBackground: {
@@ -208,9 +210,11 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
               })
             }
             if (granted && isAudioOn) {
+              const audioInputDevices = deviceStore.getState().audioInputDevices
+              const audioOutputDevices = deviceStore.getState().audioOutputDevices
               await stream.startAudio({
-                microphoneId: selectedAudioInputDevice ?? undefined,
-                speakerId: selectedAudioOutputDevice ?? undefined,
+                microphoneId: selectedAudioInputDevice ? resolveDeviceId(selectedAudioInputDevice, audioInputDevices) : undefined,
+                speakerId: selectedAudioOutputDevice ? resolveDeviceId(selectedAudioOutputDevice, audioOutputDevices) : undefined,
               })
             }
 
@@ -241,11 +245,11 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
         },
         startVideo: async () => {
           logger.log('Starting video...')
-          const { selectedVideoDevice } = deviceStore.getState()
+          const { selectedVideoDevice, videoDevices } = deviceStore.getState()
           try {
             await stream().startVideo(
               {
-                cameraId: selectedVideoDevice ?? undefined,
+                cameraId: selectedVideoDevice ? resolveDeviceId(selectedVideoDevice, videoDevices) : undefined,
                 captureWidth: VIDEO_CAPTURE_WIDTH,
                 captureHeight: VIDEO_CAPTURE_HEIGHT,
               },
@@ -293,7 +297,8 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
             // setting the state before the async function call makes it appear instant.
             // it also prevents a weird bug where the state flips back right after changing.
             deviceStore.setState({ selectedVideoDevice: deviceId })
-            await stream().switchCamera(deviceId)
+            const resolved = resolveDeviceId(deviceId, deviceStore.getState().videoDevices)
+            await stream().switchCamera(resolved)
           }
           catch (error) {
             deviceStore.setState({ selectedVideoDevice: oldDeviceId })
@@ -343,7 +348,8 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           const oldDeviceId = deviceStore.getState().selectedAudioInputDevice
           try {
             deviceStore.setState({ selectedAudioInputDevice: deviceId })
-            await stream().switchMicrophone(deviceId)
+            const resolved = resolveDeviceId(deviceId, deviceStore.getState().audioInputDevices)
+            await stream().switchMicrophone(resolved)
           }
           catch (error) {
             deviceStore.setState({ selectedAudioInputDevice: oldDeviceId })
@@ -354,7 +360,8 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
           const oldDeviceId = deviceStore.getState().selectedAudioOutputDevice
           try {
             deviceStore.setState({ selectedAudioOutputDevice: deviceId })
-            await stream().switchSpeaker(deviceId)
+            const resolved = resolveDeviceId(deviceId, deviceStore.getState().audioOutputDevices)
+            await stream().switchSpeaker(resolved)
           }
           catch (error) {
             deviceStore.setState({ selectedAudioOutputDevice: oldDeviceId })
@@ -501,28 +508,54 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
     if (!stream)
       return
 
-    const filterRealDevices = (devices: MediaDevice[]) =>
-      devices.filter(
-        d => d.deviceId !== 'default' && d.deviceId !== 'communications',
-      )
+    // keep 'default' devices so the app can follow the system default
+    const filterFakeDevices = (devices: MediaDevice[]) =>
+      devices.filter(d => d.deviceId !== 'communications')
 
     // update state with new data
-    const cameras = filterRealDevices(stream.getCameraList())
-    const microphones = filterRealDevices(stream.getMicList())
-    const audioSpeakers = filterRealDevices(stream.getSpeakerList())
+    const cameras = filterFakeDevices(stream.getCameraList())
+    const microphones = filterFakeDevices(stream.getMicList())
+    const audioSpeakers = filterFakeDevices(stream.getSpeakerList())
 
+    const currentState = deviceStore.getState()
     const activeCamera = stream.getActiveCamera()
     const activeMic = stream.getActiveMicrophone()
     const activeSpeaker = stream.getActiveSpeaker()
+
+    // preserve 'default' selection so the app continues to follow the system default;
+    // otherwise fall back to the SDK's active device
+    const selectedAudioInputDevice = currentState.selectedAudioInputDevice === 'default' && microphones.find(d => d.deviceId === 'default')
+      ? 'default'
+      : activeMic
+    const selectedAudioOutputDevice = currentState.selectedAudioOutputDevice === 'default' && audioSpeakers.find(d => d.deviceId === 'default')
+      ? 'default'
+      : activeSpeaker
 
     deviceStore.setState({
       videoDevices: cameras,
       audioInputDevices: microphones,
       audioOutputDevices: audioSpeakers,
       selectedVideoDevice: activeCamera,
-      selectedAudioInputDevice: activeMic,
-      selectedAudioOutputDevice: activeSpeaker,
+      selectedAudioInputDevice,
+      selectedAudioOutputDevice,
     })
+
+    // if 'default' was selected, the system default may have changed to a different
+    // physical device -- resolve and switch the SDK to the new one
+    if (currentState.selectedAudioInputDevice === 'default') {
+      const newPhysicalId = resolveDeviceId('default', microphones)
+      if (newPhysicalId !== activeMic) {
+        try { await stream.switchMicrophone(newPhysicalId) }
+        catch (error) { logger.warn('Failed to follow default microphone', error) }
+      }
+    }
+    if (currentState.selectedAudioOutputDevice === 'default') {
+      const newPhysicalId = resolveDeviceId('default', audioSpeakers)
+      if (newPhysicalId !== activeSpeaker) {
+        try { await stream.switchSpeaker(newPhysicalId) }
+        catch (error) { logger.warn('Failed to follow default speaker', error) }
+      }
+    }
   }
 
   function handleNetworkQualityChange(payload: Parameters<typeof event_network_quality_change>[0]) {

@@ -62,7 +62,7 @@ describe('createDeviceStore', () => {
     expect(state.selectedAudioOutputDevice).toBe('spk-1')
   })
 
-  it('filters out dummy/invalid devices', async () => {
+  it('filters out dummy/invalid devices but keeps default', async () => {
     vi.mocked(ZoomVideo.getDevices).mockResolvedValue([
       device({ deviceId: '', label: 'No ID', kind: 'videoinput' }),
       device({ deviceId: 'valid', label: '', kind: 'videoinput' }),
@@ -78,8 +78,12 @@ describe('createDeviceStore', () => {
     const state = store.getState()
     expect(state.videoDevices).toHaveLength(1)
     expect(state.videoDevices[0].deviceId).toBe('real-cam')
-    expect(state.audioInputDevices).toHaveLength(1)
-    expect(state.audioInputDevices[0].deviceId).toBe('real-mic')
+    // 'default' is kept so the app follows the system default; 'communications' is filtered
+    expect(state.audioInputDevices).toHaveLength(2)
+    expect(state.audioInputDevices[0].deviceId).toBe('default')
+    expect(state.audioInputDevices[1].deviceId).toBe('real-mic')
+    // prefers 'default' device for audio selection
+    expect(state.selectedAudioInputDevice).toBe('default')
   })
 
   it('returns denied when no usable devices found', async () => {
@@ -101,6 +105,23 @@ describe('createDeviceStore', () => {
     const result = await store.getState().actions.initDevices()
 
     expect(result).toBe('skipped')
+  })
+
+  it('prefers default audio device when no default entry exists', async () => {
+    vi.mocked(ZoomVideo.getDevices).mockResolvedValue([
+      device({ deviceId: 'mic-1', label: 'Microphone 1', kind: 'audioinput' }),
+      device({ deviceId: 'mic-2', label: 'Microphone 2', kind: 'audioinput' }),
+      device({ deviceId: 'spk-1', label: 'Speaker 1', kind: 'audiooutput' }),
+      device({ deviceId: 'cam-1', label: 'Camera', kind: 'videoinput' }),
+    ])
+
+    const store = createDeviceStore()
+    await store.getState().actions.initDevices()
+
+    const state = store.getState()
+    // falls back to first device when no 'default' entry
+    expect(state.selectedAudioInputDevice).toBe('mic-1')
+    expect(state.selectedAudioOutputDevice).toBe('spk-1')
   })
 
   it('cleanup resets permission state to idle', () => {
