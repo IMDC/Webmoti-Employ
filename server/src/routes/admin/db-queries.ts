@@ -40,3 +40,12 @@ export async function deleteUser(db: Kysely<DB>, userId: string) {
     .executeTakeFirst()
   return Number(result.numDeletedRows) > 0
 }
+
+export async function getUserEmail(db: Kysely<DB>, userId: string) {
+  const user = await db
+    .selectFrom('user')
+    .select('email')
+    .where('id', '=', userId)
+    .executeTakeFirst()
+  return user?.email.toLowerCase() ?? null
+}

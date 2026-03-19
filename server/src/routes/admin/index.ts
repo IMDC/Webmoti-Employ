@@ -9,7 +9,7 @@ import { zValidator } from '../../utils/validator-wrapper'
 import { createInterview, deleteInterview, getInterviews } from '../interviews/db-queries'
 import { generateZoomApiJwt } from '../sessions/jwt'
 import { ZoomClient } from '../sessions/ZoomClient'
-import { addToAllowlist, deleteUser, getAllowlist, getAllUsers, removeFromAllowlist } from './db-queries'
+import { addToAllowlist, deleteUser, getAllowlist, getAllUsers, getUserEmail, removeFromAllowlist } from './db-queries'
 
 const adminRoute = new Hono<AppContext>()
 
@@ -216,7 +216,18 @@ adminRoute.post('/interviews', zValidator('json', AdminNewInterview), async (c) 
   const db = requireDb(c)
   const data = c.req.valid('json')
 
-  const invites = data.invites ?? []
+  // Look up the host's email so we can auto-add them as a participant
+  const hostEmail = await getUserEmail(db, data.hostId)
+  if (!hostEmail) {
+    return c.json({ error: 'Host user not found' }, 404)
+  }
+
+  // Add host as participant (interviewer) if not already in the invite list
+  const explicitInvites = data.invites ?? []
+  const hostAlreadyInvited = explicitInvites.some(i => i.email.toLowerCase() === hostEmail)
+  const invites: NewInterviewInvite[] = hostAlreadyInvited
+    ? explicitInvites
+    : [...explicitInvites, { email: hostEmail, isInterviewer: true }]
 
   // no duplicate invites allowed
   const emails = invites.map(i => i.email.toLowerCase())

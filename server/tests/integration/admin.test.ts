@@ -19,6 +19,7 @@ const {
   mockRemoveFromAllowlist,
   mockGetAllUsers,
   mockDeleteUser,
+  mockGetUserEmail,
   mockDb,
   mockExecuteTakeFirst,
   mockExecuteTakeFirstOrThrow,
@@ -53,6 +54,7 @@ const {
     mockRemoveFromAllowlist: vi.fn(),
     mockGetAllUsers: vi.fn(),
     mockDeleteUser: vi.fn(),
+    mockGetUserEmail: vi.fn(),
     mockDb: {
       destroy: vi.fn(),
       selectFrom: vi.fn().mockReturnValue(queryChain),
@@ -109,6 +111,7 @@ vi.mock('@/routes/admin/db-queries', () => ({
   removeFromAllowlist: mockRemoveFromAllowlist,
   getAllUsers: mockGetAllUsers,
   deleteUser: mockDeleteUser,
+  getUserEmail: mockGetUserEmail,
 }))
 
 vi.mock('@/routes/sessions/jwt', () => ({
@@ -439,6 +442,8 @@ describe('post /admin/interviews', () => {
   })
 
   it('creates interview and returns 201', async () => {
+    mockGetUserEmail.mockResolvedValueOnce(OTHER_USER.email)
+
     const res = await app.request('/admin/interviews', {
       method: 'POST',
       headers: jsonAuthHeaders(),
@@ -458,7 +463,9 @@ describe('post /admin/interviews', () => {
     expect(body.sessionId).toBe('generated-session-uuid')
   })
 
-  it('does not add admin as participant (unlike user route)', async () => {
+  it('auto-adds host as interviewer participant', async () => {
+    mockGetUserEmail.mockResolvedValueOnce(OTHER_USER.email)
+
     await app.request('/admin/interviews', {
       method: 'POST',
       headers: jsonAuthHeaders(),
@@ -473,18 +480,98 @@ describe('post /admin/interviews', () => {
       }),
     }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
 
-    // admin route passes invites as-is without adding the admin user
+    // host should be auto-added as interviewer
     expect(mockCreateInterview).toHaveBeenCalledWith(
       expect.anything(),
       OTHER_USER.id,
       expect.any(Date),
       expect.any(Date),
       false,
-      [{ email: 'candidate@example.com', isInterviewer: false }],
+      [
+        { email: 'candidate@example.com', isInterviewer: false },
+        { email: OTHER_USER.email, isInterviewer: true },
+      ],
     )
   })
 
+  it('does not duplicate host if already in invite list', async () => {
+    mockGetUserEmail.mockResolvedValueOnce(OTHER_USER.email)
+
+    await app.request('/admin/interviews', {
+      method: 'POST',
+      headers: jsonAuthHeaders(),
+      body: JSON.stringify({
+        hostId: OTHER_USER.id,
+        startTime: '2026-04-01T10:00:00Z',
+        endTime: '2026-04-01T11:00:00Z',
+        isInstant: false,
+        invites: [
+          { email: OTHER_USER.email, isInterviewer: true },
+          { email: 'candidate@example.com', isInterviewer: false },
+        ],
+      }),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    // host already in list, should not be added again
+    expect(mockCreateInterview).toHaveBeenCalledWith(
+      expect.anything(),
+      OTHER_USER.id,
+      expect.any(Date),
+      expect.any(Date),
+      false,
+      [
+        { email: OTHER_USER.email, isInterviewer: true },
+        { email: 'candidate@example.com', isInterviewer: false },
+      ],
+    )
+  })
+
+  it('auto-adds host even with no explicit invites', async () => {
+    mockGetUserEmail.mockResolvedValueOnce(OTHER_USER.email)
+
+    await app.request('/admin/interviews', {
+      method: 'POST',
+      headers: jsonAuthHeaders(),
+      body: JSON.stringify({
+        hostId: OTHER_USER.id,
+        startTime: '2026-04-01T10:00:00Z',
+        endTime: '2026-04-01T11:00:00Z',
+        isInstant: false,
+      }),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(mockCreateInterview).toHaveBeenCalledWith(
+      expect.anything(),
+      OTHER_USER.id,
+      expect.any(Date),
+      expect.any(Date),
+      false,
+      [{ email: OTHER_USER.email, isInterviewer: true }],
+    )
+  })
+
+  it('returns 404 when host user not found', async () => {
+    mockGetUserEmail.mockResolvedValueOnce(null)
+
+    const res = await app.request('/admin/interviews', {
+      method: 'POST',
+      headers: jsonAuthHeaders(),
+      body: JSON.stringify({
+        hostId: 'nonexistent-id',
+        startTime: '2026-04-01T10:00:00Z',
+        endTime: '2026-04-01T11:00:00Z',
+        isInstant: false,
+      }),
+    }, { ...env, ADMIN_EMAILS: ADMIN_EMAIL })
+
+    expect(res.status).toBe(404)
+    const body = await res.json<any>()
+    expect(body.error).toContain('Host')
+  })
+
   it('rejects duplicate invite emails with 400', async () => {
+    mockGetUserEmail.mockResolvedValueOnce(OTHER_USER.email)
+
     const res = await app.request('/admin/interviews', {
       method: 'POST',
       headers: jsonAuthHeaders(),
