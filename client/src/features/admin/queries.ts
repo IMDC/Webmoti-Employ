@@ -403,7 +403,8 @@ async function getSessionHistory(from: string, to: string) {
   if (!result.success) {
     throw new Error(z.prettifyError(result.error))
   }
-  return result.data.sessions
+  // Sort by most recent first
+  return result.data.sessions.sort((a, b) => b.start_time.getTime() - a.start_time.getTime())
 }
 
 export function useSessionHistory(from: string, to: string) {

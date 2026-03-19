@@ -1,5 +1,5 @@
 import type { SessionParticipant } from '../queries'
-import { Alert, Badge, Center, Group, Loader, Modal, Stack, Table, Text, Title, Tooltip } from '@mantine/core'
+import { Alert, Badge, Center, Group, Loader, Modal, Pagination, Stack, Table, Text, Title, Tooltip } from '@mantine/core'
 import { DatePickerInput } from '@mantine/dates'
 import { useDisclosure } from '@mantine/hooks'
 import { IconMicrophone, IconMovie, IconScreenShare, IconVideo } from '@tabler/icons-react'
@@ -89,6 +89,8 @@ export function SessionHistoryPage() {
   const [dateRange, setDateRange] = useState<[string | null, string | null]>([defaults[0], defaults[1]])
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null)
   const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false)
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 20
 
   const from = dateRange[0] ?? defaults[0]
   const to = dateRange[1] ?? defaults[1]
@@ -96,6 +98,9 @@ export function SessionHistoryPage() {
   const { data: sessions, isPending, error } = useSessionHistory(from, to)
   const { data: participants, isPending: participantsLoading } = useSessionParticipants(selectedSessionId)
   const navigate = useNavigate()
+
+  const totalPages = Math.ceil((sessions?.length ?? 0) / PAGE_SIZE)
+  const paginatedSessions = sessions?.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   function handleRowClick(sessionId: string) {
     setSelectedSessionId(sessionId)
@@ -115,7 +120,7 @@ export function SessionHistoryPage() {
           type="range"
           label="Date range"
           value={dateRange}
-          onChange={v => setDateRange(v)}
+          onChange={(v) => { setDateRange(v); setPage(1) }}
           maxDate={new Date()}
           clearable={false}
           w={300}
@@ -140,7 +145,7 @@ export function SessionHistoryPage() {
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {sessions?.map(session => (
+                {paginatedSessions?.map(session => (
                   <Table.Tr key={session.id} style={{ cursor: 'pointer' }} onClick={() => handleRowClick(session.id)}>
                     <Table.Td>
                       <Text size="sm" ff="monospace">
@@ -209,6 +214,12 @@ export function SessionHistoryPage() {
               </Table.Tbody>
             </Table>
           )}
+
+      {totalPages > 1 && (
+        <Center>
+          <Pagination total={totalPages} value={page} onChange={setPage} />
+        </Center>
+      )}
 
       <Modal opened={modalOpened} onClose={closeModal} title="Session Participants" size="xl">
         {participantsLoading
