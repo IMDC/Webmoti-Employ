@@ -336,4 +336,37 @@ adminRoute.get('/session-history', async (c) => {
   return c.json({ sessions: enriched, from: pastSessions.from, to: pastSessions.to })
 })
 
+adminRoute.get('/session-history/:sessionId/participants', async (c) => {
+  const sessionId = c.req.param('sessionId')
+
+  try {
+    const apiToken = await generateZoomApiJwt(c.env.ZOOM_API_KEY, c.env.ZOOM_API_SECRET)
+    const client = new ZoomClient(apiToken)
+    const users = await client.getSessionUsers(sessionId)
+
+    // Zoom participant name is set to user.id when joining - look up real names
+    const userIds = users.map(u => u.name).filter(Boolean)
+    const db = requireDb(c)
+    const dbUsers = userIds.length > 0
+      ? await db.selectFrom('user').select(['id', 'name', 'email', 'image']).where('id', 'in', userIds).execute()
+      : []
+    const userMap = new Map(dbUsers.map(u => [u.id, u]))
+
+    const enriched = users.map((u) => {
+      const dbUser = userMap.get(u.name)
+      return {
+        ...u,
+        userName: dbUser?.name ?? null,
+        userEmail: dbUser?.email ?? null,
+        userImage: dbUser?.image ?? null,
+      }
+    })
+
+    return c.json({ participants: enriched })
+  }
+  catch {
+    return c.json({ error: 'Failed to fetch session participants from Zoom' }, 502)
+  }
+})
+
 export default adminRoute

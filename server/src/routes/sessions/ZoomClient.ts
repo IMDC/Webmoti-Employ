@@ -41,6 +41,29 @@ const PastSessionsResponse = z.object({
   next_page_token: z.string().optional(),
 })
 
+const SessionUser = z.object({
+  id: z.string(),
+  name: z.string().optional().default(''),
+  device: z.string().optional().default(''),
+  ip_address: z.string().optional().default(''),
+  location: z.string().optional().default(''),
+  network_type: z.string().optional().default(''),
+  data_center: z.string().optional().default(''),
+  join_time: z.coerce.date(),
+  leave_time: z.coerce.date(),
+  user_key: z.string().optional().default(''),
+  audio_quality: z.string().optional().default(''),
+  video_quality: z.string().optional().default(''),
+})
+
+// eslint-disable-next-line ts/no-redeclare
+export type SessionUser = z.infer<typeof SessionUser>
+
+const SessionUsersResponse = z.object({
+  users: z.array(SessionUser),
+  next_page_token: z.string().optional(),
+})
+
 export class ZoomClient {
   private readonly base = 'https://api.zoom.us/v2/videosdk'
   constructor(private jwt: string) {}
@@ -111,5 +134,19 @@ export class ZoomClient {
     }
 
     return parsed.data
+  }
+
+  async getSessionUsers(sessionId: string) {
+    const params = new URLSearchParams({
+      type: 'past',
+      page_size: '300',
+    })
+    const data = await this.request(`/sessions/${encodeURIComponent(sessionId)}/users`, params)
+    const parsed = SessionUsersResponse.safeParse(data)
+    if (!parsed.success) {
+      throw new Error(z.prettifyError(parsed.error))
+    }
+
+    return parsed.data.users
   }
 }
