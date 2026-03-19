@@ -113,6 +113,9 @@ jobs:
           else
             LOG=$(git log --oneline -- electron/)
           fi
+          if [ -z "$LOG" ]; then
+            LOG="No Electron changes detected."
+          fi
           {
             echo "body<<EOF"
             echo "$LOG"
