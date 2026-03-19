@@ -21,6 +21,8 @@ export const adminQueryKeys = {
   users: ['admin', 'users'] as const,
   interviews: ['admin', 'interviews'] as const,
   liveSessions: ['admin', 'live-sessions'] as const,
+  sessionHistory: (from: string, to: string) => ['admin', 'session-history', from, to] as const,
+  sessionParticipants: (sessionId: string | null) => ['admin', 'session-participants', sessionId] as const,
 }
 
 // ── Admin Check ────────────────────────────────────────────
@@ -359,6 +361,105 @@ export function useLiveSessions() {
     queryKey: adminQueryKeys.liveSessions,
     queryFn: getLiveSessions,
     refetchInterval: 10_000,
+  })
+}
+
+// ── Session History ────────────────────────────────────────
+
+const PastSession = z.object({
+  id: z.string(),
+  session_name: z.string(),
+  start_time: z.coerce.date(),
+  end_time: z.coerce.date(),
+  duration: z.string(),
+  user_count: z.number(),
+  has_voip: z.boolean(),
+  has_video: z.boolean(),
+  has_screen_share: z.boolean(),
+  has_recording: z.boolean(),
+  session_key: z.string(),
+  interviewId: z.number().nullable(),
+})
+
+// eslint-disable-next-line ts/no-redeclare
+export type PastSession = z.infer<typeof PastSession>
+
+const SessionHistoryResponse = z.object({
+  sessions: z.array(PastSession),
+  from: z.string(),
+  to: z.string(),
+})
+
+async function getSessionHistory(from: string, to: string) {
+  const params = new URLSearchParams({ from, to })
+  const response = await fetch(`${API_BASE}/admin/session-history?${params}`, {
+    headers: authHeaders(),
+  })
+  if (!response.ok) {
+    throw new HttpError('Failed to fetch session history', response.status)
+  }
+  const json = await response.json()
+  const result = SessionHistoryResponse.safeParse(json)
+  if (!result.success) {
+    throw new Error(z.prettifyError(result.error))
+  }
+  return result.data.sessions
+}
+
+export function useSessionHistory(from: string, to: string) {
+  return useQuery({
+    queryKey: adminQueryKeys.sessionHistory(from, to),
+    queryFn: () => getSessionHistory(from, to),
+  })
+}
+
+// ── Session Participants ───────────────────────────────────
+
+const SessionParticipant = z.object({
+  id: z.string(),
+  name: z.string(),
+  device: z.string(),
+  ip_address: z.string(),
+  location: z.string(),
+  network_type: z.string(),
+  data_center: z.string(),
+  join_time: z.coerce.date(),
+  leave_time: z.coerce.date(),
+  user_key: z.string(),
+  audio_quality: z.string(),
+  video_quality: z.string(),
+  userName: z.string().nullable(),
+  userEmail: z.string().nullable(),
+  userImage: z.string().nullable(),
+})
+
+// eslint-disable-next-line ts/no-redeclare
+export type SessionParticipant = z.infer<typeof SessionParticipant>
+
+const SessionParticipantsResponse = z.object({
+  participants: z.array(SessionParticipant),
+})
+
+async function getSessionParticipants(sessionId: string) {
+  const response = await fetch(`${API_BASE}/admin/session-history/${encodeURIComponent(sessionId)}/participants`, {
+    headers: authHeaders(),
+  })
+  if (!response.ok) {
+    throw new HttpError('Failed to fetch session participants', response.status)
+  }
+  const json = await response.json()
+  const result = SessionParticipantsResponse.safeParse(json)
+  if (!result.success) {
+    throw new Error(z.prettifyError(result.error))
+  }
+  return result.data.participants
+}
+
+export function useSessionParticipants(sessionId: string | null) {
+  return useQuery({
+    queryKey: adminQueryKeys.sessionParticipants(sessionId),
+    queryFn: () => getSessionParticipants(sessionId!),
+    enabled: !!sessionId,
   })
 }
 

@@ -1,6 +1,6 @@
 import { AppShell, Divider, Group, NavLink, Title } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconArrowLeft, IconCalendarPlus, IconDashboard, IconList, IconTie, IconUsers, IconVideo } from '@tabler/icons-react'
+import { IconArrowLeft, IconCalendarPlus, IconDashboard, IconHistory, IconList, IconTie, IconUsers, IconVideo } from '@tabler/icons-react'
 import { Navigate, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
 import { Loading } from '@/components/Loading'
 import { UserButton } from '@/features/auth/components/UserButton'
@@ -14,6 +14,7 @@ const navItems = [
   { label: 'Schedule', icon: IconCalendarPlus, path: '/admin/schedule' },
   { label: 'Interviews', icon: IconTie, path: '/admin/interviews' },
   { label: 'Live Sessions', icon: IconVideo, path: '/admin/live-sessions' },
+  { label: 'Session History', icon: IconHistory, path: '/admin/session-history' },
 ]
 
 export function AdminLayout() {

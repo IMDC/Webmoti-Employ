@@ -20,6 +20,7 @@ import { Route as authenticatedAdminIndexRouteImport } from './routes/(authentic
 import { Route as authenticatedInterviewIdRouteImport } from './routes/(authenticated)/interview/$id'
 import { Route as authenticatedEndIdRouteImport } from './routes/(authenticated)/end.$id'
 import { Route as authenticatedAdminUsersRouteImport } from './routes/(authenticated)/admin/users'
+import { Route as authenticatedAdminSessionHistoryRouteImport } from './routes/(authenticated)/admin/session-history'
 import { Route as authenticatedAdminScheduleRouteImport } from './routes/(authenticated)/admin/schedule'
 import { Route as authenticatedAdminOverviewRouteImport } from './routes/(authenticated)/admin/overview'
 import { Route as authenticatedAdminLiveSessionsRouteImport } from './routes/(authenticated)/admin/live-sessions'
@@ -86,6 +87,12 @@ const authenticatedAdminUsersRoute = authenticatedAdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => authenticatedAdminRouteRoute,
 } as any)
+const authenticatedAdminSessionHistoryRoute =
+  authenticatedAdminSessionHistoryRouteImport.update({
+    id: '/session-history',
+    path: '/session-history',
+    getParentRoute: () => authenticatedAdminRouteRoute,
+  } as any)
 const authenticatedAdminScheduleRoute =
   authenticatedAdminScheduleRouteImport.update({
     id: '/schedule',
@@ -147,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/admin/live-sessions': typeof authenticatedAdminLiveSessionsRoute
   '/admin/overview': typeof authenticatedAdminOverviewRoute
   '/admin/schedule': typeof authenticatedAdminScheduleRoute
+  '/admin/session-history': typeof authenticatedAdminSessionHistoryRoute
   '/admin/users': typeof authenticatedAdminUsersRoute
   '/end/$id': typeof authenticatedEndIdRoute
   '/interview/$id': typeof authenticatedInterviewIdRoute
@@ -164,6 +172,7 @@ export interface FileRoutesByTo {
   '/admin/live-sessions': typeof authenticatedAdminLiveSessionsRoute
   '/admin/overview': typeof authenticatedAdminOverviewRoute
   '/admin/schedule': typeof authenticatedAdminScheduleRoute
+  '/admin/session-history': typeof authenticatedAdminSessionHistoryRoute
   '/admin/users': typeof authenticatedAdminUsersRoute
   '/end/$id': typeof authenticatedEndIdRoute
   '/interview/$id': typeof authenticatedInterviewIdRoute
@@ -186,6 +195,7 @@ export interface FileRoutesById {
   '/(authenticated)/admin/live-sessions': typeof authenticatedAdminLiveSessionsRoute
   '/(authenticated)/admin/overview': typeof authenticatedAdminOverviewRoute
   '/(authenticated)/admin/schedule': typeof authenticatedAdminScheduleRoute
+  '/(authenticated)/admin/session-history': typeof authenticatedAdminSessionHistoryRoute
   '/(authenticated)/admin/users': typeof authenticatedAdminUsersRoute
   '/(authenticated)/end/$id': typeof authenticatedEndIdRoute
   '/(authenticated)/interview/$id': typeof authenticatedInterviewIdRoute
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/admin/live-sessions'
     | '/admin/overview'
     | '/admin/schedule'
+    | '/admin/session-history'
     | '/admin/users'
     | '/end/$id'
     | '/interview/$id'
@@ -225,6 +236,7 @@ export interface FileRouteTypes {
     | '/admin/live-sessions'
     | '/admin/overview'
     | '/admin/schedule'
+    | '/admin/session-history'
     | '/admin/users'
     | '/end/$id'
     | '/interview/$id'
@@ -246,6 +258,7 @@ export interface FileRouteTypes {
     | '/(authenticated)/admin/live-sessions'
     | '/(authenticated)/admin/overview'
     | '/(authenticated)/admin/schedule'
+    | '/(authenticated)/admin/session-history'
     | '/(authenticated)/admin/users'
     | '/(authenticated)/end/$id'
     | '/(authenticated)/interview/$id'
@@ -340,6 +353,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedAdminUsersRouteImport
       parentRoute: typeof authenticatedAdminRouteRoute
     }
+    '/(authenticated)/admin/session-history': {
+      id: '/(authenticated)/admin/session-history'
+      path: '/session-history'
+      fullPath: '/admin/session-history'
+      preLoaderRoute: typeof authenticatedAdminSessionHistoryRouteImport
+      parentRoute: typeof authenticatedAdminRouteRoute
+    }
     '/(authenticated)/admin/schedule': {
       id: '/(authenticated)/admin/schedule'
       path: '/schedule'
@@ -405,6 +425,7 @@ interface authenticatedAdminRouteRouteChildren {
   authenticatedAdminLiveSessionsRoute: typeof authenticatedAdminLiveSessionsRoute
   authenticatedAdminOverviewRoute: typeof authenticatedAdminOverviewRoute
   authenticatedAdminScheduleRoute: typeof authenticatedAdminScheduleRoute
+  authenticatedAdminSessionHistoryRoute: typeof authenticatedAdminSessionHistoryRoute
   authenticatedAdminUsersRoute: typeof authenticatedAdminUsersRoute
   authenticatedAdminIndexRoute: typeof authenticatedAdminIndexRoute
 }
@@ -416,6 +437,8 @@ const authenticatedAdminRouteRouteChildren: authenticatedAdminRouteRouteChildren
     authenticatedAdminLiveSessionsRoute: authenticatedAdminLiveSessionsRoute,
     authenticatedAdminOverviewRoute: authenticatedAdminOverviewRoute,
     authenticatedAdminScheduleRoute: authenticatedAdminScheduleRoute,
+    authenticatedAdminSessionHistoryRoute:
+      authenticatedAdminSessionHistoryRoute,
     authenticatedAdminUsersRoute: authenticatedAdminUsersRoute,
     authenticatedAdminIndexRoute: authenticatedAdminIndexRoute,
   }

@@ -545,15 +545,23 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
     if (currentState.selectedAudioInputDevice === 'default') {
       const newPhysicalId = resolveDeviceId('default', microphones)
       if (newPhysicalId !== activeMic) {
-        try { await stream.switchMicrophone(newPhysicalId) }
-        catch (error) { logger.warn('Failed to follow default microphone', error) }
+        try {
+          await stream.switchMicrophone(newPhysicalId)
+        }
+        catch (error) {
+          logger.warn('Failed to follow default microphone', error)
+        }
       }
     }
     if (currentState.selectedAudioOutputDevice === 'default') {
       const newPhysicalId = resolveDeviceId('default', audioSpeakers)
       if (newPhysicalId !== activeSpeaker) {
-        try { await stream.switchSpeaker(newPhysicalId) }
-        catch (error) { logger.warn('Failed to follow default speaker', error) }
+        try {
+          await stream.switchSpeaker(newPhysicalId)
+        }
+        catch (error) {
+          logger.warn('Failed to follow default speaker', error)
+        }
       }
     }
   }
