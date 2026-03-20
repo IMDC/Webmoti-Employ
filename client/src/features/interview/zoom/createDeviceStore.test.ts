@@ -1,6 +1,6 @@
 import ZoomVideo from '@zoom/videosdk'
 import { appStore } from '@/useAppStore'
-import { createDeviceStore } from './createDeviceStore'
+import { createDeviceStore, ensureDefaultDevice, resolveDefaultLabels, resolveDeviceId } from './createDeviceStore'
 
 vi.mock('@zoom/videosdk', () => ({
   default: {
@@ -55,11 +55,12 @@ describe('createDeviceStore', () => {
 
     const state = store.getState()
     expect(state.videoDevices).toHaveLength(2)
-    expect(state.audioInputDevices).toHaveLength(1)
-    expect(state.audioOutputDevices).toHaveLength(1)
+    // synthetic 'default' is injected since no real 'default' device exists
+    expect(state.audioInputDevices).toHaveLength(2)
+    expect(state.audioOutputDevices).toHaveLength(2)
     expect(state.selectedVideoDevice).toBe('cam-1')
-    expect(state.selectedAudioInputDevice).toBe('mic-1')
-    expect(state.selectedAudioOutputDevice).toBe('spk-1')
+    expect(state.selectedAudioInputDevice).toBe('default')
+    expect(state.selectedAudioOutputDevice).toBe('default')
   })
 
   it('filters out dummy/invalid devices but keeps default', async () => {
@@ -107,7 +108,7 @@ describe('createDeviceStore', () => {
     expect(result).toBe('skipped')
   })
 
-  it('prefers default audio device when no default entry exists', async () => {
+  it('injects synthetic default and selects it when no default entry exists', async () => {
     vi.mocked(ZoomVideo.getDevices).mockResolvedValue([
       device({ deviceId: 'mic-1', label: 'Microphone 1', kind: 'audioinput' }),
       device({ deviceId: 'mic-2', label: 'Microphone 2', kind: 'audioinput' }),
@@ -119,9 +120,11 @@ describe('createDeviceStore', () => {
     await store.getState().actions.initDevices()
 
     const state = store.getState()
-    // falls back to first device when no 'default' entry
-    expect(state.selectedAudioInputDevice).toBe('mic-1')
-    expect(state.selectedAudioOutputDevice).toBe('spk-1')
+    // synthetic 'default' entry is injected on non-Chromium browsers
+    expect(state.audioInputDevices[0]).toEqual({ deviceId: 'default', label: 'System default' })
+    expect(state.audioOutputDevices[0]).toEqual({ deviceId: 'default', label: 'System default' })
+    expect(state.selectedAudioInputDevice).toBe('default')
+    expect(state.selectedAudioOutputDevice).toBe('default')
   })
 
   it('cleanup resets permission state to idle', () => {
@@ -131,5 +134,139 @@ describe('createDeviceStore', () => {
     store.getState().actions.cleanup()
 
     expect(appStore.getState().permissionState).toBe('idle')
+  })
+})
+
+describe('ensureDefaultDevice', () => {
+  it('returns empty array unchanged', () => {
+    expect(ensureDefaultDevice([])).toEqual([])
+  })
+
+  it('does not inject when a default device already exists', () => {
+    const devices = [
+      { deviceId: 'default', label: 'Default - Mic' },
+      { deviceId: 'mic-1', label: 'Mic' },
+    ]
+    expect(ensureDefaultDevice(devices as any)).toBe(devices)
+  })
+
+  it('injects System default when no default exists', () => {
+    const devices = [
+      { deviceId: 'mic-1', label: 'Mic 1' },
+      { deviceId: 'mic-2', label: 'Mic 2' },
+    ]
+    const result = ensureDefaultDevice(devices as any)
+    expect(result).toHaveLength(3)
+    expect(result[0]).toEqual({ deviceId: 'default', label: 'System default' })
+  })
+})
+
+describe('resolveDeviceId', () => {
+  it('returns non-default device ids as-is', () => {
+    expect(resolveDeviceId('mic-1', [])).toBe('mic-1')
+  })
+
+  it('resolves Chromium default via label matching', () => {
+    const devices = [
+      { deviceId: 'default', label: 'Default - Realtek Audio' },
+      { deviceId: 'real-1', label: 'Realtek Audio' },
+    ]
+    expect(resolveDeviceId('default', devices as any)).toBe('real-1')
+  })
+
+  it('resolves synthetic System default to first real device', () => {
+    const devices = [
+      { deviceId: 'default', label: 'System default' },
+      { deviceId: 'mic-1', label: 'Microphone 1' },
+      { deviceId: 'mic-2', label: 'Microphone 2' },
+    ]
+    expect(resolveDeviceId('default', devices as any)).toBe('mic-1')
+  })
+
+  it('falls back to first real device when label matching fails', () => {
+    const devices = [
+      { deviceId: 'default', label: 'Unknown Label' },
+      { deviceId: 'mic-1', label: 'Microphone 1' },
+      { deviceId: 'mic-2', label: 'Microphone 2' },
+    ]
+    expect(resolveDeviceId('default', devices as any)).toBe('mic-1')
+  })
+})
+
+describe('resolveDefaultLabels', () => {
+  const mockGetUserMedia = vi.fn()
+  const mockEnumerateDevices = vi.fn()
+
+  beforeEach(() => {
+    Object.defineProperty(navigator, 'mediaDevices', {
+      value: {
+        getUserMedia: mockGetUserMedia,
+        enumerateDevices: mockEnumerateDevices,
+      },
+      configurable: true,
+    })
+  })
+
+  it('skips when no synthetic defaults exist', async () => {
+    const inputs = [{ deviceId: 'default', label: 'Default - Mic' }] as any
+    const outputs = [{ deviceId: 'default', label: 'Default - Speaker' }] as any
+    await resolveDefaultLabels(inputs, outputs)
+    expect(mockGetUserMedia).not.toHaveBeenCalled()
+  })
+
+  it('labels input default via getUserMedia detection', async () => {
+    const mockTrack = { getSettings: () => ({ deviceId: 'mic-1' }), stop: vi.fn() }
+    mockGetUserMedia.mockResolvedValue({ getAudioTracks: () => [mockTrack] })
+
+    const inputs = [
+      { deviceId: 'default', label: 'System default' },
+      { deviceId: 'mic-1', label: 'Realtek Microphone' },
+    ] as any
+    const outputs = [] as any
+
+    await resolveDefaultLabels(inputs, outputs)
+    expect(inputs[0].label).toBe('Default - Realtek Microphone')
+    expect(mockTrack.stop).toHaveBeenCalled()
+  })
+
+  it('labels output default via groupId matching', async () => {
+    const mockTrack = { getSettings: () => ({ deviceId: 'mic-1' }), stop: vi.fn() }
+    mockGetUserMedia.mockResolvedValue({ getAudioTracks: () => [mockTrack] })
+    mockEnumerateDevices.mockResolvedValue([
+      { deviceId: 'mic-1', kind: 'audioinput', groupId: 'group-a' },
+      { deviceId: 'spk-1', kind: 'audiooutput', groupId: 'group-a' },
+    ])
+
+    const inputs = [{ deviceId: 'default', label: 'System default' }, { deviceId: 'mic-1', label: 'Mic' }] as any
+    const outputs = [{ deviceId: 'default', label: 'System default' }, { deviceId: 'spk-1', label: 'Speakers' }] as any
+
+    await resolveDefaultLabels(inputs, outputs)
+    expect(outputs[0].label).toBe('Default - Speakers')
+  })
+
+  it('falls back to first real output when groupId matching fails', async () => {
+    const mockTrack = { getSettings: () => ({ deviceId: 'mic-1' }), stop: vi.fn() }
+    mockGetUserMedia.mockResolvedValue({ getAudioTracks: () => [mockTrack] })
+    mockEnumerateDevices.mockResolvedValue([
+      { deviceId: 'mic-1', kind: 'audioinput', groupId: 'group-a' },
+      { deviceId: 'spk-1', kind: 'audiooutput', groupId: 'group-b' },
+    ])
+
+    const inputs = [{ deviceId: 'default', label: 'System default' }, { deviceId: 'mic-1', label: 'Mic' }] as any
+    const outputs = [{ deviceId: 'default', label: 'System default' }, { deviceId: 'spk-1', label: 'Speakers' }] as any
+
+    await resolveDefaultLabels(inputs, outputs)
+    expect(outputs[0].label).toBe('Default - Speakers')
+  })
+
+  it('leaves labels as System default when getUserMedia fails', async () => {
+    mockGetUserMedia.mockRejectedValue(new Error('Not allowed'))
+
+    const inputs = [{ deviceId: 'default', label: 'System default' }] as any
+    const outputs = [{ deviceId: 'default', label: 'System default' }] as any
+
+    await resolveDefaultLabels(inputs, outputs)
+    expect(inputs[0].label).toBe('System default')
+    expect(outputs[0].label).toBe('System default')
   })
 })

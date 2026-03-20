@@ -26,7 +26,7 @@ import { appStore } from '@/useAppStore'
 import { VIDEO_CAPTURE_HEIGHT, VIDEO_CAPTURE_WIDTH } from '@/utils/constants'
 import { logger } from '@/utils/logger'
 import { isExecutedFailure, notifyError, notifyWarning } from '@/utils/utils'
-import { resolveDeviceId } from './createDeviceStore'
+import { ensureDefaultDevice, resolveDeviceId } from './createDeviceStore'
 
 export interface ZoomSessionActions {
   setIsAudioOn: (value: boolean) => void
@@ -512,15 +512,29 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
     const filterFakeDevices = (devices: MediaDevice[]) =>
       devices.filter(d => d.deviceId !== 'communications')
 
-    // update state with new data
-    const cameras = filterFakeDevices(stream.getCameraList())
-    const microphones = filterFakeDevices(stream.getMicList())
-    const audioSpeakers = filterFakeDevices(stream.getSpeakerList())
-
     const currentState = deviceStore.getState()
     const activeCamera = stream.getActiveCamera()
     const activeMic = stream.getActiveMicrophone()
     const activeSpeaker = stream.getActiveSpeaker()
+
+    // update state with new data
+    const cameras = filterFakeDevices(stream.getCameraList())
+    const microphones = ensureDefaultDevice(filterFakeDevices(stream.getMicList()))
+    const audioSpeakers = ensureDefaultDevice(filterFakeDevices(stream.getSpeakerList()))
+
+    // label synthetic defaults with the SDK's active device name
+    const defaultMic = microphones.find(d => d.deviceId === 'default' && d.label === 'System default')
+    if (defaultMic) {
+      const activeMicDevice = microphones.find(d => d.deviceId === activeMic)
+      if (activeMicDevice)
+        defaultMic.label = `Default - ${activeMicDevice.label}`
+    }
+    const defaultSpeaker = audioSpeakers.find(d => d.deviceId === 'default' && d.label === 'System default')
+    if (defaultSpeaker) {
+      const activeSpeakerDevice = audioSpeakers.find(d => d.deviceId === activeSpeaker)
+      if (activeSpeakerDevice)
+        defaultSpeaker.label = `Default - ${activeSpeakerDevice.label}`
+    }
 
     // preserve 'default' selection so the app continues to follow the system default;
     // otherwise fall back to the SDK's active device

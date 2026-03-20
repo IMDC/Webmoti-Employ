@@ -5,6 +5,64 @@ import { logger } from '@/utils/logger'
 import { notifyError } from '@/utils/utils'
 import { appStore } from '../../../useAppStore'
 
+// Non-Chromium browsers (Firefox/Safari) don't expose a virtual "default" device.
+// Adds a synthetic "System default" entry so the UI always offers a default option.
+export function ensureDefaultDevice(devices: MediaDevice[]): MediaDevice[] {
+  if (devices.length === 0 || devices.some(d => d.deviceId === 'default'))
+    return devices
+  return [{ deviceId: 'default', label: 'System default' }, ...devices]
+}
+
+// Updates synthetic "System default" labels to "Default - <device name>"
+// by detecting the actual default input device via getUserMedia.
+// For output, falls back to the first real device in the list.
+export async function resolveDefaultLabels(
+  audioInputDevices: MediaDevice[],
+  audioOutputDevices: MediaDevice[],
+): Promise<void> {
+  const syntheticInput = audioInputDevices.find(d => d.deviceId === 'default' && d.label === 'System default')
+  const syntheticOutput = audioOutputDevices.find(d => d.deviceId === 'default' && d.label === 'System default')
+
+  if (!syntheticInput && !syntheticOutput)
+    return
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    const track = stream.getAudioTracks()[0]
+    const detectedId = track.getSettings().deviceId
+    track.stop()
+
+    if (syntheticInput) {
+      const match = audioInputDevices.find(d => d.deviceId !== 'default' && d.deviceId === detectedId)
+      if (match)
+        syntheticInput.label = `Default - ${match.label}`
+    }
+
+    if (syntheticOutput) {
+      // detect output via groupId from the detected input device
+      const allDevices = await navigator.mediaDevices.enumerateDevices()
+      const inputInfo = allDevices.find(d => d.deviceId === detectedId)
+      if (inputInfo?.groupId) {
+        const outputInfo = allDevices.find(d => d.kind === 'audiooutput' && d.groupId === inputInfo.groupId)
+        if (outputInfo) {
+          const match = audioOutputDevices.find(d => d.deviceId !== 'default' && d.deviceId === outputInfo.deviceId)
+          if (match)
+            syntheticOutput.label = `Default - ${match.label}`
+        }
+      }
+      // fall back to first real output device if groupId matching failed
+      if (syntheticOutput.label === 'System default') {
+        const firstReal = audioOutputDevices.find(d => d.deviceId !== 'default' && d.deviceId !== 'communications')
+        if (firstReal)
+          syntheticOutput.label = `Default - ${firstReal.label}`
+      }
+    }
+  }
+  catch {
+    // getUserMedia failed; leave labels as "System default"
+  }
+}
+
 // Resolves the browser 'default' device id to the real physical device id
 // so the Zoom SDK can switch to it.
 export function resolveDeviceId(deviceId: string, devices: MediaDevice[]): string {
@@ -13,15 +71,22 @@ export function resolveDeviceId(deviceId: string, devices: MediaDevice[]): strin
   const defaultDevice = devices.find(d => d.deviceId === 'default')
   if (!defaultDevice)
     return deviceId
+  // Chromium labels the default device as "Default - <real device name>"
   const cleanLabel = defaultDevice.label.replace(/^Default\s*-\s*/, '')
   const physical = devices.find(d =>
     d.deviceId !== 'default' && d.deviceId !== 'communications' && d.label === cleanLabel,
   )
-  return physical?.deviceId ?? deviceId
+  if (physical)
+    return physical.deviceId
+  // Non-Chromium browsers don't have a "Default - ..." label;
+  // fall back to the first real device (typically the system default)
+  const firstReal = devices.find(d => d.deviceId !== 'default' && d.deviceId !== 'communications')
+  return firstReal?.deviceId ?? deviceId
 }
 
 export interface DeviceStoreActions {
   initDevices: () => Promise<PermissionState | 'skipped'>
+  refreshDevices: () => Promise<void>
   cleanup: () => void
 }
 
@@ -72,13 +137,15 @@ export function createDeviceStore() {
           .filter(d => d.kind === 'videoinput')
           .filter(isUsableDevice)
 
-        const audioInputDevices = devices
-          .filter(d => d.kind === 'audioinput')
-          .filter(isUsableDevice)
+        const audioInputDevices = ensureDefaultDevice(
+          devices.filter(d => d.kind === 'audioinput').filter(isUsableDevice),
+        )
 
-        const audioOutputDevices = devices
-          .filter(d => d.kind === 'audiooutput')
-          .filter(isUsableDevice)
+        const audioOutputDevices = ensureDefaultDevice(
+          devices.filter(d => d.kind === 'audiooutput').filter(isUsableDevice),
+        )
+
+        await resolveDefaultLabels(audioInputDevices, audioOutputDevices)
 
         // need to check for dummy devices when permission denied
         const hasPermission = [...videoDevices, ...audioInputDevices].length > 0
@@ -101,6 +168,32 @@ export function createDeviceStore() {
 
         appActions.setPermissionState('granted')
         return 'granted'
+      },
+
+      // re-enumerate devices and update lists (e.g. after a devicechange event)
+      refreshDevices: async () => {
+        const devices = await ZoomVideo.getDevices()
+
+        const isUsableDevice = (d: MediaDevice) =>
+          !!d.deviceId
+          && !!d.label
+          && d.deviceId !== 'communications'
+
+        const videoDevices = devices
+          .filter(d => d.kind === 'videoinput')
+          .filter(isUsableDevice)
+
+        const audioInputDevices = ensureDefaultDevice(
+          devices.filter(d => d.kind === 'audioinput').filter(isUsableDevice),
+        )
+
+        const audioOutputDevices = ensureDefaultDevice(
+          devices.filter(d => d.kind === 'audiooutput').filter(isUsableDevice),
+        )
+
+        await resolveDefaultLabels(audioInputDevices, audioOutputDevices)
+
+        set({ videoDevices, audioInputDevices, audioOutputDevices })
       },
 
       cleanup: () => {
