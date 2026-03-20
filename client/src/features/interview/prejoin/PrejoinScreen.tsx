@@ -1,4 +1,4 @@
-import { AppShell, Button, Flex, Group, Stack, Text, Title } from '@mantine/core'
+import { AppShell, Box, Button, Flex, Group, Stack, Text, Title } from '@mantine/core'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { Loading } from '@/components/Loading'
@@ -121,7 +121,10 @@ export function PrejoinScreen() {
             </Button>
           </Link>
 
-          <RightHeader />
+          {/* shift the header left to counteract the 100vw width */}
+          <Box mr="sm">
+            <RightHeader />
+          </Box>
         </Flex>
       </AppShell.Header>
 
