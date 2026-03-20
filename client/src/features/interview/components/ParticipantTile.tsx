@@ -1,4 +1,4 @@
-import { Card, Skeleton, Text, useMantineTheme } from '@mantine/core'
+import { Card, Text, useMantineTheme } from '@mantine/core'
 import { Corner } from '@/components/Corner'
 import { NoVideoBackground } from './NoVideoBackground'
 
@@ -51,13 +51,11 @@ export function ParticipantTile({
 
       {children}
 
-      {name && (
+      {name && !isLoadingProfiles && (
         <Corner position="bottom-left" yOffset={15} xOffset={15}>
-          <Skeleton visible={isLoadingProfiles}>
-            <Text size="sm" c="white">
-              {name}
-            </Text>
-          </Skeleton>
+          <Text size="sm" c="white">
+            {name}
+          </Text>
         </Corner>
       )}
     </Card>
