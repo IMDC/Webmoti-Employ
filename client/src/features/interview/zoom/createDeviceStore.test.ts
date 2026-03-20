@@ -24,6 +24,7 @@ function device(overrides: { deviceId?: string, label?: string, kind: MediaDevic
 
 beforeEach(() => {
   appStore.getState().actions.setPermissionState('idle')
+  localStorage.clear()
 })
 
 describe('createDeviceStore', () => {
@@ -134,6 +135,70 @@ describe('createDeviceStore', () => {
     store.getState().actions.cleanup()
 
     expect(appStore.getState().permissionState).toBe('idle')
+  })
+
+  it('restores saved device preferences from localStorage', async () => {
+    localStorage.setItem('webmoti-device-preferences', JSON.stringify({
+      videoDevice: 'cam-2',
+      audioInput: 'mic-2',
+      audioOutput: 'spk-2',
+    }))
+
+    vi.mocked(ZoomVideo.getDevices).mockResolvedValue([
+      device({ deviceId: 'cam-1', label: 'Camera 1', kind: 'videoinput' }),
+      device({ deviceId: 'cam-2', label: 'Camera 2', kind: 'videoinput' }),
+      device({ deviceId: 'mic-1', label: 'Mic 1', kind: 'audioinput' }),
+      device({ deviceId: 'mic-2', label: 'Mic 2', kind: 'audioinput' }),
+      device({ deviceId: 'spk-1', label: 'Speaker 1', kind: 'audiooutput' }),
+      device({ deviceId: 'spk-2', label: 'Speaker 2', kind: 'audiooutput' }),
+    ])
+
+    const store = createDeviceStore()
+    await store.getState().actions.initDevices()
+
+    const state = store.getState()
+    expect(state.selectedVideoDevice).toBe('cam-2')
+    expect(state.selectedAudioInputDevice).toBe('mic-2')
+    expect(state.selectedAudioOutputDevice).toBe('spk-2')
+  })
+
+  it('falls back to defaults when saved device no longer exists', async () => {
+    localStorage.setItem('webmoti-device-preferences', JSON.stringify({
+      videoDevice: 'cam-gone',
+      audioInput: 'mic-gone',
+      audioOutput: 'spk-gone',
+    }))
+
+    vi.mocked(ZoomVideo.getDevices).mockResolvedValue([
+      device({ deviceId: 'cam-1', label: 'Camera 1', kind: 'videoinput' }),
+      device({ deviceId: 'mic-1', label: 'Mic 1', kind: 'audioinput' }),
+      device({ deviceId: 'spk-1', label: 'Speaker 1', kind: 'audiooutput' }),
+    ])
+
+    const store = createDeviceStore()
+    await store.getState().actions.initDevices()
+
+    const state = store.getState()
+    expect(state.selectedVideoDevice).toBe('cam-1')
+    // synthetic 'default' is injected and preferred
+    expect(state.selectedAudioInputDevice).toBe('default')
+    expect(state.selectedAudioOutputDevice).toBe('default')
+  })
+
+  it('persists device selections to localStorage on change', async () => {
+    vi.mocked(ZoomVideo.getDevices).mockResolvedValue([
+      device({ deviceId: 'cam-1', label: 'Camera 1', kind: 'videoinput' }),
+      device({ deviceId: 'mic-1', label: 'Mic 1', kind: 'audioinput' }),
+      device({ deviceId: 'spk-1', label: 'Speaker 1', kind: 'audiooutput' }),
+    ])
+
+    const store = createDeviceStore()
+    await store.getState().actions.initDevices()
+
+    store.setState({ selectedAudioInputDevice: 'mic-1' })
+
+    const saved = JSON.parse(localStorage.getItem('webmoti-device-preferences')!)
+    expect(saved.audioInput).toBe('mic-1')
   })
 })
 

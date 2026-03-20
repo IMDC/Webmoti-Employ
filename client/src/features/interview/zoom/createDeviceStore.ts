@@ -5,6 +5,33 @@ import { logger } from '@/utils/logger'
 import { notifyError } from '@/utils/utils'
 import { appStore } from '../../../useAppStore'
 
+const DEVICE_PREFS_KEY = 'webmoti-device-preferences'
+
+interface DevicePreferences {
+  videoDevice: string | null
+  audioInput: string | null
+  audioOutput: string | null
+}
+
+function loadDevicePreferences(): DevicePreferences | null {
+  try {
+    const raw = localStorage.getItem(DEVICE_PREFS_KEY)
+    return raw ? JSON.parse(raw) : null
+  }
+  catch {
+    return null
+  }
+}
+
+function saveDevicePreferences(prefs: DevicePreferences): void {
+  try {
+    localStorage.setItem(DEVICE_PREFS_KEY, JSON.stringify(prefs))
+  }
+  catch {
+    // storage full or unavailable
+  }
+}
+
 // Non-Chromium browsers (Firefox/Safari) don't expose a virtual "default" device.
 // Adds a synthetic "System default" entry so the UI always offers a default option.
 export function ensureDefaultDevice(devices: MediaDevice[]): MediaDevice[] {
@@ -103,7 +130,7 @@ export interface DeviceStore {
 }
 
 export function createDeviceStore() {
-  return createStore<DeviceStore>(set => ({
+  const store = createStore<DeviceStore>(set => ({
     videoDevices: [],
     audioInputDevices: [],
     audioOutputDevices: [],
@@ -121,6 +148,8 @@ export function createDeviceStore() {
           return 'skipped'
         }
         appActions.setPermissionState('acquiring')
+
+        const prefs = loadDevicePreferences()
 
         // try catch doesn't work on this function
         const devices = await ZoomVideo.getDevices()
@@ -160,10 +189,16 @@ export function createDeviceStore() {
           videoDevices,
           audioInputDevices,
           audioOutputDevices,
-          selectedVideoDevice: videoDevices[0]?.deviceId ?? null,
-          // prefer the browser 'default' device so the app follows system default
-          selectedAudioInputDevice: audioInputDevices.find(d => d.deviceId === 'default')?.deviceId ?? audioInputDevices[0]?.deviceId ?? null,
-          selectedAudioOutputDevice: audioOutputDevices.find(d => d.deviceId === 'default')?.deviceId ?? audioOutputDevices[0]?.deviceId ?? null,
+          selectedVideoDevice:
+            (prefs?.videoDevice && videoDevices.some(d => d.deviceId === prefs.videoDevice) ? prefs.videoDevice : null)
+            ?? videoDevices[0]?.deviceId ?? null,
+          // prefer the saved device, then the browser 'default' device so the app follows system default
+          selectedAudioInputDevice:
+            (prefs?.audioInput && audioInputDevices.some(d => d.deviceId === prefs.audioInput) ? prefs.audioInput : null)
+            ?? audioInputDevices.find(d => d.deviceId === 'default')?.deviceId ?? audioInputDevices[0]?.deviceId ?? null,
+          selectedAudioOutputDevice:
+            (prefs?.audioOutput && audioOutputDevices.some(d => d.deviceId === prefs.audioOutput) ? prefs.audioOutput : null)
+            ?? audioOutputDevices.find(d => d.deviceId === 'default')?.deviceId ?? audioOutputDevices[0]?.deviceId ?? null,
         })
 
         appActions.setPermissionState('granted')
@@ -203,4 +238,21 @@ export function createDeviceStore() {
       },
     },
   }))
+
+  // persist device selections to localStorage whenever they change
+  store.subscribe((state, prev) => {
+    if (
+      state.selectedVideoDevice !== prev.selectedVideoDevice
+      || state.selectedAudioInputDevice !== prev.selectedAudioInputDevice
+      || state.selectedAudioOutputDevice !== prev.selectedAudioOutputDevice
+    ) {
+      saveDevicePreferences({
+        videoDevice: state.selectedVideoDevice,
+        audioInput: state.selectedAudioInputDevice,
+        audioOutput: state.selectedAudioOutputDevice,
+      })
+    }
+  })
+
+  return store
 }
