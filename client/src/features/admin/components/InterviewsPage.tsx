@@ -5,6 +5,7 @@ import {
   Checkbox,
   Group,
   Loader,
+  Pagination,
   Stack,
   Table,
   Text,
@@ -30,6 +31,8 @@ export function InterviewsPage() {
   const [showInstant, setShowInstant] = useState(false)
   const [dateRange, setDateRange] = useState<[string | null, string | null]>([null, null])
   const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 20
 
   useEffect(() => {
     if (highlight && highlightRef.current) {
@@ -54,6 +57,9 @@ export function InterviewsPage() {
       return true
     })
   }, [interviews, showInstant, dateRange])
+
+  const totalPages = Math.ceil(filteredInterviews.length / PAGE_SIZE)
+  const paginatedInterviews = filteredInterviews.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   async function handleDelete(id: number) {
     setDeletingId(id)
@@ -84,13 +90,19 @@ export function InterviewsPage() {
         <Checkbox
           label="Show instant interviews"
           checked={showInstant}
-          onChange={e => setShowInstant(e.currentTarget.checked)}
+          onChange={(e) => {
+            setShowInstant(e.currentTarget.checked)
+            setPage(1)
+          }}
         />
         <DatePickerInput
           type="range"
           placeholder="Filter by date range"
           value={dateRange}
-          onChange={setDateRange}
+          onChange={(val) => {
+            setDateRange(val)
+            setPage(1)
+          }}
           clearable
           w={280}
         />
@@ -111,7 +123,7 @@ export function InterviewsPage() {
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {filteredInterviews.map(interview => (
+                {paginatedInterviews.map(interview => (
                   <Table.Tr
                     key={interview.id}
                     ref={highlight === interview.id ? highlightRef : undefined}
@@ -185,6 +197,12 @@ export function InterviewsPage() {
               </Table.Tbody>
             </Table>
           )}
+
+      {totalPages > 1 && (
+        <Center>
+          <Pagination total={totalPages} value={page} onChange={setPage} />
+        </Center>
+      )}
     </Stack>
   )
 }
