@@ -38,7 +38,11 @@ function makeDeviceStore(overrides: Partial<DeviceStore> = {}) {
     selectedVideoDevice: 'cam-1',
     selectedAudioInputDevice: 'mic-1',
     selectedAudioOutputDevice: 'spk-1',
-    actions: { initDevices: vi.fn(), cleanup: vi.fn() },
+    actions: {
+      initDevices: vi.fn(),
+      cleanup: vi.fn(),
+      refreshDevices: vi.fn(),
+    },
     ...overrides,
   }))
 }
