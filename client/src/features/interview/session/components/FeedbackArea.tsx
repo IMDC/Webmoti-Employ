@@ -17,7 +17,7 @@ interface FeedbackAreaProps {
 export function FeedbackArea({ feedback }: FeedbackAreaProps) {
   const theme = useMantineTheme()
   const isXL = useMediaQuery(`(min-width: ${theme.breakpoints.xl})`)
-  const iconSize = isXL ? 48 : 24
+  const iconSize = isXL ? 64 : 36
 
   const {
     hint,
@@ -78,7 +78,7 @@ function FeedbackIcon({ icon, label, isActive }: {
   return (
     <Stack align="center" gap={0}>
       {icon}
-      <Text fz={{ base: 'sm', xl: 'lg' }} fw="bold">{label}</Text>
+      <Text fz={{ base: 'lg', xl: 'xl' }} fw="bold">{label}</Text>
     </Stack>
   )
 }
