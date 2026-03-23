@@ -78,7 +78,7 @@ function FeedbackIcon({ icon, label, isActive }: {
   return (
     <Stack align="center" gap={0}>
       {icon}
-      <Text fz={{ base: 'sm', xl: 'lg' }} c="dimmed" fw="bold">{label}</Text>
+      <Text fz={{ base: 'sm', xl: 'lg' }} fw="bold">{label}</Text>
     </Stack>
   )
 }
