@@ -77,8 +77,8 @@ function FeedbackIcon({ icon, label, isActive }: {
 
   return (
     <Stack align="center" gap={0}>
-      {icon}
-      <Text fz={{ base: 'lg', xl: 'xl' }} fw="bold">{label}</Text>
+      <div style={{ color: '#FFC107' }}>{icon}</div>
+      <Text fz={{ base: 'lg', xl: 'xl' }} fw="bold" c="#FFC107">{label}</Text>
     </Stack>
   )
 }
