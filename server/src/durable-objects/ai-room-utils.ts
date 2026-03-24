@@ -1,5 +1,8 @@
 import { IntervieweeNotification } from '@webmoti-employ/shared'
 
+const jsonRegex = /\{[\s\S]*\}/
+const wordRegex = /\s+/
+
 /**
  * Splits an AI response into reasoning text (before the JSON) and the parsed notification object.
  */
@@ -8,7 +11,7 @@ export function parseAiResponse(response: string, wordCount: number): {
   notification: IntervieweeNotification | null
 } {
   // split reasoning text (everything before the first JSON block) from the JSON
-  const jsonMatch = response.match(/\{[\s\S]*\}/)
+  const jsonMatch = response.match(jsonRegex)
   let reasoningText = ''
   let jsonText = response
   if (jsonMatch) {
@@ -35,7 +38,7 @@ export function parseAiResponse(response: string, wordCount: number): {
  */
 function extractJsonObject(text: string): Record<string, unknown> {
   // match first {...} JSON block
-  const match = text.match(/\{[\s\S]*\}/)
+  const match = text.match(jsonRegex)
   if (!match) {
     throw new Error('No JSON found in response')
   }
@@ -45,7 +48,7 @@ function extractJsonObject(text: string): Record<string, unknown> {
 export function countWords(transcripts: string[]): number {
   let total = 0
   for (const t of transcripts) {
-    const words = t.trim().split(/\s+/).filter(w => w.length > 0)
+    const words = t.trim().split(wordRegex).filter(w => w.length > 0)
     total += words.length
   }
   return total
