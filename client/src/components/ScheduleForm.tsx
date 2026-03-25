@@ -79,7 +79,7 @@ export function ScheduleForm({
     mode: 'uncontrolled',
     initialValues: {
       hostId: fixedHostId ?? '',
-      date: DateTime.local().plus({ days: 1 }).toISODate(),
+      date: DateTime.local().toISODate(),
       startTime: '09:00:00',
       invites: [],
       openGoogleCalendar: false,
@@ -98,6 +98,11 @@ export function ScheduleForm({
 
     const [hour, minute] = startTime.split(':').map(Number)
     const localDate = DateTime.fromISO(date, { zone: 'local' }).set({ hour, minute })
+
+    if (localDate < DateTime.local()) {
+      form.setFieldError('startTime', 'Time is in the past')
+      return
+    }
     const startTimeDate = localDate.toUTC().toJSDate()
     const endTimeDate = localDate.plus({ hours: 1 }).toUTC().toJSDate()
 
@@ -133,6 +138,16 @@ export function ScheduleForm({
       })
       .filter(dt => dt < now)
       .map(dt => dt.toFormat('HH:mm'))
+  }
+
+  function getMinTimeForToday(selectedDate: string): string | undefined {
+    const now = DateTime.local()
+    const selected = DateTime.fromISO(selectedDate, { zone: 'local' })
+
+    if (!now.hasSame(selected, 'day'))
+      return undefined
+
+    return now.toFormat('HH:mm')
   }
 
   const invites = form.values.invites.map((_, index) => (
@@ -191,7 +206,7 @@ export function ScheduleForm({
         <DatePickerInput
           withAsterisk
           minDate={DateTime.local().toJSDate()}
-          defaultDate={DateTime.local().plus({ days: 1 }).toJSDate()}
+          defaultDate={DateTime.local().toJSDate()}
           leftSection={<IconCalendarFilled size={16} />}
           label="Interview date"
           key={form.key('date')}
@@ -204,6 +219,7 @@ export function ScheduleForm({
               ? (
                   <TimeInput
                     leftSection={<IconClock size={16} />}
+                    min={getMinTimeForToday(form.values.date)}
                     key={form.key('startTime')}
                     value={form.getInputProps('startTime').value}
                     onChange={e => form.getInputProps('startTime').onChange(e.currentTarget.value ? `${e.currentTarget.value}:00` : '')}
