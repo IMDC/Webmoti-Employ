@@ -14,10 +14,10 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { DatePickerInput } from '@mantine/dates'
+import { IconCalendarOff } from '@tabler/icons-react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { IconCalendarOff } from '@tabler/icons-react'
 import { DeleteButton } from '@/components/DeleteButton'
 import { notifyError } from '@/utils/utils'
 import adminClasses from '../admin.module.css'
@@ -116,95 +116,95 @@ export function InterviewsPage() {
         : (
             <Table.ScrollContainer minWidth={700}>
               <Table striped highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>ID</Table.Th>
-                  <Table.Th>Type</Table.Th>
-                  <Table.Th>Host</Table.Th>
-                  <Table.Th>Start Time</Table.Th>
-                  <Table.Th>Participants</Table.Th>
-                  <Table.Th />
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {paginatedInterviews.map(interview => (
-                  <Table.Tr
-                    key={interview.id}
-                    ref={highlight === interview.id ? highlightRef : undefined}
-                    className={highlight === interview.id ? adminClasses.highlightRow : undefined}
-                  >
-                    <Table.Td>
-                      <Text size="sm" ff="monospace">{interview.id}</Text>
-                    </Table.Td>
-                    <Table.Td>
-                      <Badge size="sm" variant="light" color={interview.isInstant ? 'orange' : 'blue'}>
-                        {interview.isInstant ? 'Instant' : 'Scheduled'}
-                      </Badge>
-                    </Table.Td>
-                    <Table.Td>
-                      <Tooltip label={interview.hostEmail ?? interview.hostId}>
-                        <Badge
-                          size="xs"
-                          variant="outline"
-                          style={{ cursor: 'pointer' }}
-                          onClick={() => navigate({ to: '/admin/users', search: { highlight: interview.hostId } })}
-                        >
-                          {interview.hostName ?? interview.hostEmail ?? interview.hostId}
-                        </Badge>
-                      </Tooltip>
-                    </Table.Td>
-                    <Table.Td>
-                      <Text size="sm">
-                        {DateTime.fromJSDate(interview.startTime).toLocaleString(DateTime.DATETIME_MED)}
-                      </Text>
-                    </Table.Td>
-                    <Table.Td>
-                      <Group gap={4}>
-                        {interview.invites.map(invite => (
-                          <Tooltip key={invite.id} label={invite.email}>
-                            {invite.userId
-                              ? (
-                                  <Badge
-                                    size="xs"
-                                    variant="outline"
-                                    style={{ cursor: 'pointer' }}
-                                    onClick={() => navigate({ to: '/admin/users', search: { highlight: invite.userId! } })}
-                                  >
-                                    {invite.name ?? invite.email.split('@')[0]}
-                                  </Badge>
-                                )
-                              : (
-                                  <Badge size="xs" variant="outline" color="gray">
-                                    {invite.email.split('@')[0]}
-                                  </Badge>
-                                )}
-                          </Tooltip>
-                        ))}
-                      </Group>
-                    </Table.Td>
-                    <Table.Td>
-                      <DeleteButton
-                        label="Delete"
-                        loading={deletingId === interview.id}
-                        onClick={() => handleDelete(interview.id)}
-                      />
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
-                {filteredInterviews.length === 0 && (
+                <Table.Thead>
                   <Table.Tr>
-                    <Table.Td colSpan={6}>
-                      <Stack align="center" gap="xs" py="md">
-                        <ThemeIcon size={40} radius="xl" variant="light" color="gray">
-                          <IconCalendarOff size={20} />
-                        </ThemeIcon>
-                        <Text c="dimmed" ta="center">No interviews found</Text>
-                      </Stack>
-                    </Table.Td>
+                    <Table.Th>ID</Table.Th>
+                    <Table.Th>Type</Table.Th>
+                    <Table.Th>Host</Table.Th>
+                    <Table.Th>Start Time</Table.Th>
+                    <Table.Th>Participants</Table.Th>
+                    <Table.Th />
                   </Table.Tr>
-                )}
-              </Table.Tbody>
-            </Table>
+                </Table.Thead>
+                <Table.Tbody>
+                  {paginatedInterviews.map(interview => (
+                    <Table.Tr
+                      key={interview.id}
+                      ref={highlight === interview.id ? highlightRef : undefined}
+                      className={highlight === interview.id ? adminClasses.highlightRow : undefined}
+                    >
+                      <Table.Td>
+                        <Text size="sm" ff="monospace">{interview.id}</Text>
+                      </Table.Td>
+                      <Table.Td>
+                        <Badge size="sm" variant="light" color={interview.isInstant ? 'orange' : 'blue'}>
+                          {interview.isInstant ? 'Instant' : 'Scheduled'}
+                        </Badge>
+                      </Table.Td>
+                      <Table.Td>
+                        <Tooltip label={interview.hostEmail ?? interview.hostId}>
+                          <Badge
+                            size="xs"
+                            variant="outline"
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => navigate({ to: '/admin/users', search: { highlight: interview.hostId } })}
+                          >
+                            {interview.hostName ?? interview.hostEmail ?? interview.hostId}
+                          </Badge>
+                        </Tooltip>
+                      </Table.Td>
+                      <Table.Td>
+                        <Text size="sm">
+                          {DateTime.fromJSDate(interview.startTime).toLocaleString(DateTime.DATETIME_MED)}
+                        </Text>
+                      </Table.Td>
+                      <Table.Td>
+                        <Group gap={4}>
+                          {interview.invites.map(invite => (
+                            <Tooltip key={invite.id} label={invite.email}>
+                              {invite.userId
+                                ? (
+                                    <Badge
+                                      size="xs"
+                                      variant="outline"
+                                      style={{ cursor: 'pointer' }}
+                                      onClick={() => navigate({ to: '/admin/users', search: { highlight: invite.userId! } })}
+                                    >
+                                      {invite.name ?? invite.email.split('@')[0]}
+                                    </Badge>
+                                  )
+                                : (
+                                    <Badge size="xs" variant="outline" color="gray">
+                                      {invite.email.split('@')[0]}
+                                    </Badge>
+                                  )}
+                            </Tooltip>
+                          ))}
+                        </Group>
+                      </Table.Td>
+                      <Table.Td>
+                        <DeleteButton
+                          label="Delete"
+                          loading={deletingId === interview.id}
+                          onClick={() => handleDelete(interview.id)}
+                        />
+                      </Table.Td>
+                    </Table.Tr>
+                  ))}
+                  {filteredInterviews.length === 0 && (
+                    <Table.Tr>
+                      <Table.Td colSpan={6}>
+                        <Stack align="center" gap="xs" py="md">
+                          <ThemeIcon size={40} radius="xl" variant="light" color="gray">
+                            <IconCalendarOff size={20} />
+                          </ThemeIcon>
+                          <Text c="dimmed" ta="center">No interviews found</Text>
+                        </Stack>
+                      </Table.Td>
+                    </Table.Tr>
+                  )}
+                </Table.Tbody>
+              </Table>
             </Table.ScrollContainer>
           )}
 

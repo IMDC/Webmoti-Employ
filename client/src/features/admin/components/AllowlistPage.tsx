@@ -77,62 +77,62 @@ export function AllowlistPage() {
         : (
             <Table.ScrollContainer minWidth={500}>
               <Table striped highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>Email</Table.Th>
-                  <Table.Th>Added</Table.Th>
-                  <Table.Th>Role</Table.Th>
-                  <Table.Th />
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {adminEmails?.map(adminEmail => (
-                  <Table.Tr key={`admin-${adminEmail}`}>
-                    <Table.Td>{adminEmail}</Table.Td>
-                    <Table.Td>
-                      <Text c="dimmed" size="sm">N/A</Text>
-                    </Table.Td>
-                    <Table.Td><AdminBadge /></Table.Td>
-                    <Table.Td />
-                  </Table.Tr>
-                ))}
-                {allowlist?.map(entry => (
-                  <Table.Tr key={entry.id}>
-                    <Table.Td>{entry.email}</Table.Td>
-                    <Table.Td>
-                      {DateTime.fromJSDate(entry.createdAt).toLocaleString(DateTime.DATE_MED)}
-                    </Table.Td>
-                    <Table.Td />
-                    <Table.Td>
-                      <DeleteButton
-                        loading={removingId === entry.id}
-                        onClick={async () => {
-                          setRemovingId(entry.id)
-                          try {
-                            await removeMutation.mutateAsync(entry.id)
-                          }
-                          finally {
-                            setRemovingId(null)
-                          }
-                        }}
-                      />
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
-                {allowlist?.length === 0 && adminEmails?.length === 0 && (
+                <Table.Thead>
                   <Table.Tr>
-                    <Table.Td colSpan={4}>
-                      <Stack align="center" gap="xs" py="md">
-                        <ThemeIcon size={40} radius="xl" variant="light" color="gray">
-                          <IconMailOff size={20} />
-                        </ThemeIcon>
-                        <Text c="dimmed" ta="center">No emails in allowlist</Text>
-                      </Stack>
-                    </Table.Td>
+                    <Table.Th>Email</Table.Th>
+                    <Table.Th>Added</Table.Th>
+                    <Table.Th>Role</Table.Th>
+                    <Table.Th />
                   </Table.Tr>
-                )}
-              </Table.Tbody>
-            </Table>
+                </Table.Thead>
+                <Table.Tbody>
+                  {adminEmails?.map(adminEmail => (
+                    <Table.Tr key={`admin-${adminEmail}`}>
+                      <Table.Td>{adminEmail}</Table.Td>
+                      <Table.Td>
+                        <Text c="dimmed" size="sm">N/A</Text>
+                      </Table.Td>
+                      <Table.Td><AdminBadge /></Table.Td>
+                      <Table.Td />
+                    </Table.Tr>
+                  ))}
+                  {allowlist?.map(entry => (
+                    <Table.Tr key={entry.id}>
+                      <Table.Td>{entry.email}</Table.Td>
+                      <Table.Td>
+                        {DateTime.fromJSDate(entry.createdAt).toLocaleString(DateTime.DATE_MED)}
+                      </Table.Td>
+                      <Table.Td />
+                      <Table.Td>
+                        <DeleteButton
+                          loading={removingId === entry.id}
+                          onClick={async () => {
+                            setRemovingId(entry.id)
+                            try {
+                              await removeMutation.mutateAsync(entry.id)
+                            }
+                            finally {
+                              setRemovingId(null)
+                            }
+                          }}
+                        />
+                      </Table.Td>
+                    </Table.Tr>
+                  ))}
+                  {allowlist?.length === 0 && adminEmails?.length === 0 && (
+                    <Table.Tr>
+                      <Table.Td colSpan={4}>
+                        <Stack align="center" gap="xs" py="md">
+                          <ThemeIcon size={40} radius="xl" variant="light" color="gray">
+                            <IconMailOff size={20} />
+                          </ThemeIcon>
+                          <Text c="dimmed" ta="center">No emails in allowlist</Text>
+                        </Stack>
+                      </Table.Td>
+                    </Table.Tr>
+                  )}
+                </Table.Tbody>
+              </Table>
             </Table.ScrollContainer>
           )}
     </Stack>

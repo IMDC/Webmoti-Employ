@@ -29,12 +29,16 @@ import {
 import { Link } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
 import { RightHeader } from '@/components/RightHeader'
-import classes from './Dashboard.module.css'
-import { HEADER_HEIGHT, HEADER_SIDE_PADDING, OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
+import {
+  HEADER_HEIGHT,
+  HEADER_SIDE_PADDING,
+  OUTER_TOOLBAR_HEIGHT,
+} from '@/utils/constants'
 import { getFirstName, isElectron, notifySuccess } from '@/utils/utils'
 import { useUser } from '../auth/hooks/useUserStore'
 import { InterviewList } from './components/InterviewList'
 import { ScheduleForm } from './components/ScheduleForm'
+import classes from './Dashboard.module.css'
 import { JoinCodeInput } from './schema'
 
 declare const __APP_VERSION__: string
