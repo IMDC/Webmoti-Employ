@@ -172,8 +172,9 @@ export function useSpeechRecognition() {
           }
           const options: StartRecordingOptions = {
             audioContext,
-            // use recordingOptions with exact constraint so the browser doesn't silently fall back to another device
-            recordingOptions: selectedAudioInputDevice
+            // use recordingOptions with exact constraint so the browser doesn't silently fall back to another device.
+            // skip the constraint for synthetically-added 'default' device id (Firefox has no native 'default' device).
+            recordingOptions: selectedAudioInputDevice && selectedAudioInputDevice !== 'default'
               ? { deviceId: { exact: selectedAudioInputDevice } }
               : undefined,
           }
@@ -211,7 +212,8 @@ export function useSpeechRecognition() {
       isRecordingRef.current = false
       try {
         await startRecording({
-          recordingOptions: selectedAudioInputDevice
+          // skip the constraint for synthetically-added 'default' device id (Firefox has no native 'default' device)
+          recordingOptions: selectedAudioInputDevice && selectedAudioInputDevice !== 'default'
             ? { deviceId: { exact: selectedAudioInputDevice } }
             : undefined,
         })
