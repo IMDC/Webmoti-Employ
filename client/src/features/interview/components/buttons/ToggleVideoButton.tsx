@@ -22,6 +22,8 @@ export function ToggleVideoButton({ onToggleVideo }: ToggleVideoButtonProps) {
           px={{ base: 'sm', sm: 'md' }}
           onClick={onToggleVideo}
           disabled={permissionState === 'idle' || permissionState === 'acquiring'}
+          aria-label={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
+          aria-pressed={isVideoOn}
         >
           {isVideoOn
             ? <IconVideoFilled size={18} />

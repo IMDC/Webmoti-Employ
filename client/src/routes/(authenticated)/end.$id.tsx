@@ -1,4 +1,5 @@
 import { Button, Card, Center, Group, Stack, Text, ThemeIcon, Title, Transition } from '@mantine/core'
+import { useDocumentTitle } from '@mantine/hooks'
 import { IconCircleCheck, IconHome, IconVideo } from '@tabler/icons-react'
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
@@ -17,6 +18,8 @@ export const Route = createFileRoute('/(authenticated)/end/$id')({
 })
 
 function EndScreen() {
+  useDocumentTitle('Interview Complete | WebMoti-Employ')
+
   const { id } = Route.useParams()
   const [mounted, setMounted] = useState(false)
 

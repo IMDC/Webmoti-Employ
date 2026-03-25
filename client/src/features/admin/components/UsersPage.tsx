@@ -9,6 +9,7 @@ import {
   Text,
   Title,
 } from '@mantine/core'
+import { useDocumentTitle } from '@mantine/hooks'
 import { useSearch } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
 import { useEffect, useRef, useState } from 'react'
@@ -20,6 +21,8 @@ import { AdminBadge } from './AdminBadge'
 import { AdminBurger } from './AdminBurger'
 
 export function UsersPage() {
+  useDocumentTitle('Users | Admin | WebMoti-Employ')
+
   const { data: users, isPending, error } = useAdminUsers()
   const { data: adminEmails } = useAdminEmails()
   const deleteMutation = useAdminDeleteUser()

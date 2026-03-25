@@ -15,7 +15,7 @@ export function ChangeVideoPopover({ switchCamera }: ChangeVideoPopoverProps) {
     <Popover>
       <Popover.Target>
         <Tooltip color="gray" label="Change video device">
-          <Button variant="default" disabled={disableMediaButtons} px="xs">
+          <Button variant="default" disabled={disableMediaButtons} px="xs" aria-label="Change video device">
             <IconChevronUp size={18} />
           </Button>
         </Tooltip>

@@ -1,5 +1,6 @@
 import {
   Alert,
+  Anchor,
   Badge,
   Card,
   Center,
@@ -18,11 +19,14 @@ import {
   IconUsers,
 } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
+import { useDocumentTitle } from '@mantine/hooks'
 import { DateTime } from 'luxon'
 import { useAdminOverview } from '../queries'
 import { AdminBurger } from './AdminBurger'
 
 export function OverviewPage() {
+  useDocumentTitle('Overview | Admin | WebMoti-Employ')
+
   const { data, isPending, error } = useAdminOverview()
 
   if (error) {
@@ -92,9 +96,9 @@ function OverviewContent({ data }: { data: ReturnType<typeof useAdminOverview>['
         <Card withBorder>
           <Group justify="space-between" mb="sm">
             <Title order={5}>Recent Interviews</Title>
-            <Text size="xs" c="blue" style={{ cursor: 'pointer' }} onClick={() => navigate({ to: '/admin/interviews' })}>
+            <Anchor size="xs" onClick={() => navigate({ to: '/admin/interviews' })}>
               View all
-            </Text>
+            </Anchor>
           </Group>
           {recentInterviews.length === 0
             ? <Text c="dimmed" size="sm">No recent interviews</Text>
@@ -140,9 +144,9 @@ function OverviewContent({ data }: { data: ReturnType<typeof useAdminOverview>['
         <Card withBorder>
           <Group justify="space-between" mb="sm">
             <Title order={5}>Upcoming Interviews</Title>
-            <Text size="xs" c="blue" style={{ cursor: 'pointer' }} onClick={() => navigate({ to: '/admin/interviews' })}>
+            <Anchor size="xs" onClick={() => navigate({ to: '/admin/interviews' })}>
               View all
-            </Text>
+            </Anchor>
           </Group>
           {upcomingInterviews.length === 0
             ? <Text c="dimmed" size="sm">No upcoming interviews</Text>
@@ -196,19 +200,22 @@ function StatCard({ label, value, icon, color, onClick }: {
       withBorder
       style={{ cursor: 'pointer' }}
       onClick={onClick}
-      styles={theme => ({
-        root: {
-          'transition': 'box-shadow 150ms ease, transform 150ms ease',
-          '&:hover': {
-            boxShadow: theme.shadows.sm,
-            transform: 'translateY(-2px)',
-          },
-          '&:focus-visible': {
-            boxShadow: theme.shadows.sm,
-            transform: 'translateY(-2px)',
-          },
-        },
-      })}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onClick()
+        }
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = 'var(--mantine-shadow-sm)'
+        e.currentTarget.style.transform = 'translateY(-2px)'
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = 'none'
+        e.currentTarget.style.transform = 'none'
+      }}
     >
       <Group justify="space-between">
         <div>

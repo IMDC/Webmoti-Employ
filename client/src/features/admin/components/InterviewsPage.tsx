@@ -14,6 +14,7 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { DatePickerInput } from '@mantine/dates'
+import { useDocumentTitle } from '@mantine/hooks'
 import { IconCalendarOff } from '@tabler/icons-react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
@@ -25,6 +26,8 @@ import { useAdminDeleteInterview, useAdminInterviews } from '../queries'
 import { AdminBurger } from './AdminBurger'
 
 export function InterviewsPage() {
+  useDocumentTitle('Interviews | Admin | WebMoti-Employ')
+
   const { data: interviews, isPending, error } = useAdminInterviews()
   const deleteMutation = useAdminDeleteInterview()
   const navigate = useNavigate()
@@ -146,6 +149,7 @@ export function InterviewsPage() {
                           <Badge
                             size="xs"
                             variant="outline"
+                            component="button"
                             style={{ cursor: 'pointer' }}
                             onClick={() => navigate({ to: '/admin/users', search: { highlight: interview.hostId } })}
                           >
@@ -167,6 +171,7 @@ export function InterviewsPage() {
                                     <Badge
                                       size="xs"
                                       variant="outline"
+                                      component="button"
                                       style={{ cursor: 'pointer' }}
                                       onClick={() => navigate({ to: '/admin/users', search: { highlight: invite.userId! } })}
                                     >

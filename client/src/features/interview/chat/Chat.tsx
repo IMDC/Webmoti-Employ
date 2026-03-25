@@ -156,7 +156,7 @@ export function Chat({ onClose, profiles, isLoadingProfiles }: ChatProps) {
           </Text>
         </Group>
 
-        <ActionIcon variant="subtle" onClick={onClose}>
+        <ActionIcon variant="subtle" onClick={onClose} aria-label="Close chat">
           <IconX />
         </ActionIcon>
       </Group>
@@ -221,7 +221,7 @@ export function Chat({ onClose, profiles, isLoadingProfiles }: ChatProps) {
           }
         }}
         rightSection={(
-          <ActionIcon variant="subtle" onClick={sendMessage} disabled={!isChatTextValid}>
+          <ActionIcon variant="subtle" onClick={sendMessage} disabled={!isChatTextValid} aria-label="Send message">
             <IconSend stroke={1.5} />
           </ActionIcon>
         )}

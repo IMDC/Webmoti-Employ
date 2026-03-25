@@ -1,11 +1,14 @@
 import type { ScheduleData } from '@/components/ScheduleForm'
 import { Alert, Center, Group, Loader, Stack, Text, Title } from '@mantine/core'
+import { useDocumentTitle } from '@mantine/hooks'
 import { ScheduleForm } from '@/components/ScheduleForm'
 import { notifySuccess } from '@/utils/utils'
 import { useAdminScheduleInterview, useAdminUsers } from '../queries'
 import { AdminBurger } from './AdminBurger'
 
 export function AdminSchedulePage() {
+  useDocumentTitle('Schedule | Admin | WebMoti-Employ')
+
   const { data: users, isPending: usersLoading, error: usersError } = useAdminUsers()
   const scheduleMutation = useAdminScheduleInterview()
 

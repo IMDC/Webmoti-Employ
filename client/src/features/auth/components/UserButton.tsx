@@ -29,7 +29,7 @@ export function UserButton() {
         offset={8}
       >
         <Menu.Target>
-          <UnstyledButton>
+          <UnstyledButton aria-label="User menu">
             <GoogleAvatar src={user.image} size="md" />
           </UnstyledButton>
         </Menu.Target>

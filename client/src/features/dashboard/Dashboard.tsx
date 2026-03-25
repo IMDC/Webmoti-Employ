@@ -16,7 +16,7 @@ import {
   Title,
   Transition,
 } from '@mantine/core'
-import { useDisclosure, useValidatedState, useWindowScroll } from '@mantine/hooks'
+import { useDisclosure, useDocumentTitle, useValidatedState, useWindowScroll } from '@mantine/hooks'
 import {
   IconArrowUp,
   IconCalendarPlus,
@@ -53,6 +53,8 @@ function getGreeting(): { text: string, icon: React.ReactNode, color: string } {
 }
 
 export function Dashboard() {
+  useDocumentTitle('Dashboard | WebMoti-Employ')
+
   const [isScheduleModalOpened, { open: openScheduleModal, close: closeScheduleModal }]
     = useDisclosure(false)
 

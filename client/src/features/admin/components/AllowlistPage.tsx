@@ -12,6 +12,7 @@ import {
   Title,
 } from '@mantine/core'
 import { IconMailOff, IconPlus } from '@tabler/icons-react'
+import { useDocumentTitle } from '@mantine/hooks'
 import { DateTime } from 'luxon'
 import { useState } from 'react'
 import { DeleteButton } from '@/components/DeleteButton'
@@ -21,6 +22,8 @@ import { AdminBadge } from './AdminBadge'
 import { AdminBurger } from './AdminBurger'
 
 export function AllowlistPage() {
+  useDocumentTitle('Allowlist | Admin | WebMoti-Employ')
+
   const { data, isPending, error } = useAllowlist()
   const addMutation = useAddToAllowlist()
   const removeMutation = useRemoveFromAllowlist()

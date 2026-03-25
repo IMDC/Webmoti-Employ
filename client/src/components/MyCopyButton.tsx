@@ -11,7 +11,7 @@ export function MyCopyButton({ copyText, copyTooltip = 'Copy' }: MyCopyButtonPro
     <MantineCopyButton value={copyText} timeout={2000}>
       {({ copied, copy }) => (
         <Tooltip color="gray" label={copied ? 'Copied' : copyTooltip} withArrow position="right">
-          <ActionIcon color={copied ? 'teal' : 'gray'} variant="subtle" onClick={copy}>
+          <ActionIcon color={copied ? 'teal' : 'gray'} variant="subtle" onClick={copy} aria-label={copied ? 'Copied' : copyTooltip}>
             {copied ? <IconCheck size={16} /> : <IconCopy size={16} />}
           </ActionIcon>
         </Tooltip>

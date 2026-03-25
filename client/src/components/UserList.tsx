@@ -38,7 +38,7 @@ export function UserList({ users, profiles, isLoadingProfiles }: UserListProps) 
       shadow="md"
     >
       <Popover.Target>
-        <ActionIcon variant="default">
+        <ActionIcon variant="default" aria-label="View participants">
           <IconUserFilled size={16} />
         </ActionIcon>
       </Popover.Target>
