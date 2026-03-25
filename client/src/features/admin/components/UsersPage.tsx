@@ -21,7 +21,7 @@ import { AdminBadge } from './AdminBadge'
 import { AdminBurger } from './AdminBurger'
 
 export function UsersPage() {
-  useDocumentTitle('Users | Admin | WebMoti-Employ')
+  useDocumentTitle('Admin | WebMoti')
 
   const { data: users, isPending, error } = useAdminUsers()
   const { data: adminEmails } = useAdminEmails()

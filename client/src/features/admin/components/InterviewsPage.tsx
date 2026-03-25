@@ -26,7 +26,7 @@ import { useAdminDeleteInterview, useAdminInterviews } from '../queries'
 import { AdminBurger } from './AdminBurger'
 
 export function InterviewsPage() {
-  useDocumentTitle('Interviews | Admin | WebMoti-Employ')
+  useDocumentTitle('Admin | WebMoti')
 
   const { data: interviews, isPending, error } = useAdminInterviews()
   const deleteMutation = useAdminDeleteInterview()

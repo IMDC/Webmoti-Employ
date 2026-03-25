@@ -7,7 +7,7 @@ import { useAdminScheduleInterview, useAdminUsers } from '../queries'
 import { AdminBurger } from './AdminBurger'
 
 export function AdminSchedulePage() {
-  useDocumentTitle('Schedule | Admin | WebMoti-Employ')
+  useDocumentTitle('Admin | WebMoti')
 
   const { data: users, isPending: usersLoading, error: usersError } = useAdminUsers()
   const scheduleMutation = useAdminScheduleInterview()

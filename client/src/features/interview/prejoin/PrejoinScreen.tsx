@@ -21,7 +21,7 @@ import { PreviewTile } from './components/PreviewTile'
 import { useInterviewSession } from './queries'
 
 export function PrejoinScreen() {
-  useDocumentTitle('Pre-join | WebMoti-Employ')
+  useDocumentTitle('Pre-join | WebMoti')
 
   const navigate = useNavigate()
 

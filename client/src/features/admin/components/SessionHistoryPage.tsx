@@ -87,7 +87,7 @@ function ParticipantsTable({ participants }: { participants: SessionParticipant[
 }
 
 export function SessionHistoryPage() {
-  useDocumentTitle('Session History | Admin | WebMoti-Employ')
+  useDocumentTitle('Admin | WebMoti')
 
   const [defaults] = useState(defaultDateRange)
   const [dateRange, setDateRange] = useState<[string | null, string | null]>([defaults[0], defaults[1]])

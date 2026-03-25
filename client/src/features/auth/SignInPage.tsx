@@ -10,7 +10,7 @@ import GoogleSignInImg from './web_dark_rd_ctn.svg'
 const underscoreRegex = /_/g
 
 export function SignInPage() {
-  useDocumentTitle('Sign In | WebMoti-Employ')
+  useDocumentTitle('Sign In | WebMoti')
 
   const { redirectTo, error } = useSearch({ from: '/sign-in' })
   const [loading, setLoading] = useState(false)

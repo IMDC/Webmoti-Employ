@@ -53,7 +53,7 @@ function getGreeting(): { text: string, icon: React.ReactNode, color: string } {
 }
 
 export function Dashboard() {
-  useDocumentTitle('Dashboard | WebMoti-Employ')
+  useDocumentTitle('Dashboard | WebMoti')
 
   const [isScheduleModalOpened, { open: openScheduleModal, close: closeScheduleModal }]
     = useDisclosure(false)

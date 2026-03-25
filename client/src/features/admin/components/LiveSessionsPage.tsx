@@ -7,7 +7,7 @@ import { useLiveSessions } from '../queries'
 import { AdminBurger } from './AdminBurger'
 
 export function LiveSessionsPage() {
-  useDocumentTitle('Live Sessions | Admin | WebMoti-Employ')
+  useDocumentTitle('Admin | WebMoti')
 
   const { data: sessions, isPending, error } = useLiveSessions()
   const navigate = useNavigate()

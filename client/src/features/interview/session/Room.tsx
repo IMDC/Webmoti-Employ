@@ -41,7 +41,7 @@ export interface LayoutProps {
 }
 
 export function Room() {
-  useDocumentTitle('Interview | WebMoti-Employ')
+  useDocumentTitle('Interview | WebMoti')
 
   const participantStageRef = useRef<HTMLDivElement>(null)
 

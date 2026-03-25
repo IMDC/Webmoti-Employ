@@ -22,7 +22,7 @@ import { AdminBadge } from './AdminBadge'
 import { AdminBurger } from './AdminBurger'
 
 export function AllowlistPage() {
-  useDocumentTitle('Allowlist | Admin | WebMoti-Employ')
+  useDocumentTitle('Admin | WebMoti')
 
   const { data, isPending, error } = useAllowlist()
   const addMutation = useAddToAllowlist()

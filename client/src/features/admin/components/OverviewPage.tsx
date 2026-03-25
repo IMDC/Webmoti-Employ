@@ -25,7 +25,7 @@ import { useAdminOverview } from '../queries'
 import { AdminBurger } from './AdminBurger'
 
 export function OverviewPage() {
-  useDocumentTitle('Overview | Admin | WebMoti-Employ')
+  useDocumentTitle('Admin | WebMoti')
 
   const { data, isPending, error } = useAdminOverview()
 

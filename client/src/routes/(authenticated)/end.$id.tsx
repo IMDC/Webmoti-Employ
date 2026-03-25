@@ -18,7 +18,7 @@ export const Route = createFileRoute('/(authenticated)/end/$id')({
 })
 
 function EndScreen() {
-  useDocumentTitle('Interview Complete | WebMoti-Employ')
+  useDocumentTitle('Interview Complete | WebMoti')
 
   const { id } = Route.useParams()
   const [mounted, setMounted] = useState(false)
