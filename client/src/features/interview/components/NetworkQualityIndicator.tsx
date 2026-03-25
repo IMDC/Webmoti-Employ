@@ -9,7 +9,13 @@ export default function NetworkQualityIndicator({ level }: NetworkQualityProps) 
   const bars = [0, 1, 2, 3, 4]
 
   return (
-    <Group gap={1} align="end" justify="flex-end">
+    <Group
+      gap={1}
+      align="end"
+      justify="flex-end"
+      aria-label={level !== null ? `Network quality: ${level} of 5` : 'Network quality unavailable'}
+      role="img"
+    >
       {bars.map((bar, i) => (
         <Box
           key={bar}

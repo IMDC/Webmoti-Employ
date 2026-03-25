@@ -10,17 +10,19 @@ import { useEffect, useState } from 'react'
 import { HEADER_SIDE_PADDING, OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
 import { isElectron } from '@/utils/utils'
 
+interface ToolbarIconProps {
+  icon: React.ElementType
+  action: () => void
+  disabled?: boolean
+  ariaLabel: string
+}
+
 function ToolbarIcon({
   icon: IconComponent,
   action,
   disabled,
-  'aria-label': ariaLabel,
-}: {
-  icon: React.ElementType
-  action: () => void
-  disabled?: boolean
-  'aria-label': string
-}) {
+  ariaLabel,
+}: ToolbarIconProps) {
   return (
     <ActionIcon
       variant="subtle"
@@ -93,10 +95,28 @@ export function ElectronToolbar() {
         <Space w="xs" />
 
         {/* need to use arrow wrapper here to avoid electron clone error */}
-        <ToolbarIcon icon={IconArrowLeft} action={() => window.electron.goBackWindow()} disabled={!canGoBack} aria-label="Go back" />
-        <ToolbarIcon icon={IconArrowRight} action={() => window.electron.goForwardWindow()} disabled={!canGoForward} aria-label="Go forward" />
-        <ToolbarIcon icon={IconReload} action={() => window.electron.reloadWindow()} aria-label="Reload" />
-        <ToolbarIcon icon={IconTerminal2} action={() => window.electron.toggleConsoleWindow()} aria-label="Toggle console" />
+        <ToolbarIcon
+          icon={IconArrowLeft}
+          action={() => window.electron.goBackWindow()}
+          disabled={!canGoBack}
+          ariaLabel="Go back"
+        />
+        <ToolbarIcon
+          icon={IconArrowRight}
+          action={() => window.electron.goForwardWindow()}
+          disabled={!canGoForward}
+          ariaLabel="Go forward"
+        />
+        <ToolbarIcon
+          icon={IconReload}
+          action={() => window.electron.reloadWindow()}
+          ariaLabel="Reload"
+        />
+        <ToolbarIcon
+          icon={IconTerminal2}
+          action={() => window.electron.toggleConsoleWindow()}
+          ariaLabel="Toggle console"
+        />
       </Group>
     </Group>
   )

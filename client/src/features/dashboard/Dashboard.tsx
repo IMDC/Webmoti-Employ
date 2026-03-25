@@ -123,7 +123,7 @@ export function Dashboard() {
           >
             {/* Hero: time-of-day icon + greeting */}
             <Flex gap="md" align="center" direction={{ base: 'column', sm: 'row' }}>
-              <ThemeIcon className={classes.greetingIcon} size={48} radius="xl" variant="light" color={greeting.color}>
+              <ThemeIcon className={classes.greetingIcon} size={48} radius="xl" variant="light" color={greeting.color} aria-hidden="true">
                 {greeting.icon}
               </ThemeIcon>
               <div style={{ textAlign: 'inherit' }}>

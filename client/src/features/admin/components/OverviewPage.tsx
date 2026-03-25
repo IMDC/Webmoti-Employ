@@ -12,6 +12,7 @@ import {
   Text,
   Title,
 } from '@mantine/core'
+import { useDocumentTitle } from '@mantine/hooks'
 import {
   IconCalendarEvent,
   IconLivePhoto,
@@ -19,7 +20,6 @@ import {
   IconUsers,
 } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
-import { useDocumentTitle } from '@mantine/hooks'
 import { DateTime } from 'luxon'
 import { useAdminOverview } from '../queries'
 import { AdminBurger } from './AdminBurger'

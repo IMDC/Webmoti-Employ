@@ -90,6 +90,8 @@ export function InterviewCard({ interview }: InterviewCardProps) {
             bg={`var(--mantine-color-${statusColor}-5)`}
             bdrs="50%"
             style={{ flexShrink: 0 }}
+            aria-label={isEnded ? 'Ended' : startedToday ? 'Today' : 'Upcoming'}
+            role="img"
           />
           <Badge
             variant="gradient"
@@ -144,7 +146,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
                   <GoogleAvatar key={i} src={src} radius="xl" />
                 ))}
                 {pics.length > 3 && (
-                  <Avatar radius="xl">
+                  <Avatar radius="xl" aria-label={`${pics.length - 3} more participants`}>
                     +
                     {pics.length - 3}
                   </Avatar>

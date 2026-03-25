@@ -150,7 +150,7 @@ export function Chat({ onClose, profiles, isLoadingProfiles }: ChatProps) {
       {/* header */}
       <Group justify="space-between">
         <Group>
-          <IconMessages />
+          <IconMessages aria-hidden="true" />
           <Text size="lg" fw={600}>
             Chat
           </Text>

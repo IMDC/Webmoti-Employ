@@ -11,8 +11,8 @@ import {
   ThemeIcon,
   Title,
 } from '@mantine/core'
-import { IconMailOff, IconPlus } from '@tabler/icons-react'
 import { useDocumentTitle } from '@mantine/hooks'
+import { IconMailOff, IconPlus } from '@tabler/icons-react'
 import { DateTime } from 'luxon'
 import { useState } from 'react'
 import { DeleteButton } from '@/components/DeleteButton'
