@@ -93,24 +93,24 @@ export function PrejoinMenuBar() {
               <>
                 <Skeleton visible={permissionState !== 'granted'} h={18}>
                   {micLabel && (
-                    <Group gap={4} justify="center">
-                      <IconMicrophone size={14} style={{ opacity: 0.6 }} />
+                    <Group gap={4} justify="center" wrap="nowrap">
+                      <IconMicrophone size={14} style={{ opacity: 0.6, flexShrink: 0 }} />
                       <Text size="xs" c="dimmed" truncate>{micLabel}</Text>
                     </Group>
                   )}
                 </Skeleton>
                 <Skeleton visible={permissionState !== 'granted'} h={18}>
                   {speakerLabel && (
-                    <Group gap={4} justify="center">
-                      <IconVolume size={14} style={{ opacity: 0.6 }} />
+                    <Group gap={4} justify="center" wrap="nowrap">
+                      <IconVolume size={14} style={{ opacity: 0.6, flexShrink: 0 }} />
                       <Text size="xs" c="dimmed" truncate>{speakerLabel}</Text>
                     </Group>
                   )}
                 </Skeleton>
                 <Skeleton visible={permissionState !== 'granted'} h={18}>
                   {cameraLabel && (
-                    <Group gap={4} justify="center">
-                      <IconVideo size={14} style={{ opacity: 0.6 }} />
+                    <Group gap={4} justify="center" wrap="nowrap">
+                      <IconVideo size={14} style={{ opacity: 0.6, flexShrink: 0 }} />
                       <Text size="xs" c="dimmed" truncate>{cameraLabel}</Text>
                     </Group>
                   )}
