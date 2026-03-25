@@ -2,6 +2,12 @@ import { createTheme, DEFAULT_THEME } from '@mantine/core'
 
 export const theme = createTheme({
   // mantine theme override
+  fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+  headings: {
+    fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+    fontWeight: '700',
+  },
+  defaultRadius: 'md',
   colors: {
     // higher contrast dark theme: blacker backgrounds instead of default grayish
     dark: [

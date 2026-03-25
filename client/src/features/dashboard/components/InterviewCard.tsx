@@ -128,7 +128,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
       </Group>
 
       <Stack justify="center" align="center" flex="grow" mt="sm">
-        <Text fw="bolder" ff="monospace">
+        <Text fw="bolder">
           {formattedInterviewTime}
         </Text>
 

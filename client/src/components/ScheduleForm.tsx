@@ -308,7 +308,7 @@ export function ScheduleForm({
                 <Group justify="space-between">
                   <Group gap="xs">
                     <IconExternalLink size={16} style={{ opacity: 0.6 }} />
-                    <Text size="sm">Create Google Calendar Invite</Text>
+                    <Text size="sm">Create Google Calendar invite</Text>
                   </Group>
                   <Switch
                     size="sm"

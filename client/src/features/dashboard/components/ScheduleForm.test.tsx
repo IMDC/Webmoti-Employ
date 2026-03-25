@@ -57,7 +57,7 @@ describe('scheduleForm', () => {
     expect(screen.getByText('Schedule interview')).toBeInTheDocument()
     expect(screen.getByText('No participants invited yet')).toBeInTheDocument()
     expect(screen.getByText('Add invitation')).toBeInTheDocument()
-    expect(screen.getByText('Open Google Calendar')).toBeInTheDocument()
+    expect(screen.getByText('Create Google Calendar invite')).toBeInTheDocument()
   })
 
   it('adds an invite row when clicking Add invitation', async () => {
