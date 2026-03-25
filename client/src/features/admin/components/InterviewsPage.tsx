@@ -1,6 +1,7 @@
 import {
   Alert,
   Badge,
+  Button,
   Center,
   Checkbox,
   Group,
@@ -19,14 +20,15 @@ import { useNavigate, useSearch } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { DeleteButton } from '@/components/DeleteButton'
-import { notifyError } from '@/utils/utils'
+import { notifyError, notifySuccess } from '@/utils/utils'
 import adminClasses from '../admin.module.css'
-import { useAdminDeleteInterview, useAdminInterviews } from '../queries'
+import { useAdminClearInstantInterviews, useAdminDeleteInterview, useAdminInterviews } from '../queries'
 import { AdminBurger } from './AdminBurger'
 
 export function InterviewsPage() {
   const { data: interviews, isPending, error } = useAdminInterviews()
   const deleteMutation = useAdminDeleteInterview()
+  const clearInstantMutation = useAdminClearInstantInterviews()
   const navigate = useNavigate()
   const { highlight } = useSearch({ strict: false }) as { highlight?: number }
   const highlightRef = useRef<HTMLTableRowElement>(null)
@@ -109,6 +111,25 @@ export function InterviewsPage() {
           clearable
           w={280}
         />
+        <Button
+          variant="light"
+          color="red"
+          size="xs"
+          loading={clearInstantMutation.isPending}
+          onClick={async () => {
+            if (!window.confirm('Delete all instant interviews?'))
+              return
+            try {
+              const { deleted } = await clearInstantMutation.mutateAsync()
+              notifySuccess(`Cleared ${deleted} instant interview${deleted === 1 ? '' : 's'}`)
+            }
+            catch (err) {
+              notifyError('Failed to clear instant interviews', err)
+            }
+          }}
+        >
+          Clear instant interviews
+        </Button>
       </Group>
 
       {isPending

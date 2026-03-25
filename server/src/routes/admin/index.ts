@@ -248,6 +248,15 @@ adminRoute.post('/interviews', zValidator('json', AdminNewInterview), async (c) 
   return c.json({ sessionId }, 201)
 })
 
+adminRoute.delete('/interviews/instant', async (c) => {
+  const db = requireDb(c)
+  const result = await db
+    .deleteFrom('interview')
+    .where('isInstant', '=', true)
+    .executeTakeFirstOrThrow()
+  return c.json({ deleted: Number(result.numDeletedRows) })
+})
+
 adminRoute.delete(
   '/interviews/:id',
   zValidator('param', z.object({ id: z.coerce.number().int() })),

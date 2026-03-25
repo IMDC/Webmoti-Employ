@@ -322,6 +322,26 @@ export function useAdminDeleteInterview() {
   })
 }
 
+export function useAdminClearInstantInterviews() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`${API_BASE}/admin/interviews/instant`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
+      if (!response.ok) {
+        throw new HttpError('Failed to clear instant interviews', response.status)
+      }
+      return response.json() as Promise<{ deleted: number }>
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminQueryKeys.interviews })
+      queryClient.invalidateQueries({ queryKey: adminQueryKeys.overview })
+    },
+  })
+}
+
 // ── Live Sessions ──────────────────────────────────────────
 
 const LiveSession = z.object({
