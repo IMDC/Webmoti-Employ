@@ -65,6 +65,16 @@ interface ScheduleFormProps {
 
 const interviewTimeRange = getTimeRange({ startTime: '09:00', endTime: '16:00', interval: '00:30' })
 
+// Returns the next available 30-min slot from the time grid, or '09:00' if all have passed
+function getDefaultStartTime(): string {
+  const now = DateTime.local()
+  const nextSlot = interviewTimeRange.find((time) => {
+    const [hour, minute] = time.split(':').map(Number)
+    return now.set({ hour, minute, second: 0, millisecond: 0 }) >= now
+  })
+  return nextSlot ?? '09:00'
+}
+
 export function ScheduleForm({
   hostId: fixedHostId,
   hostOptions,
@@ -80,7 +90,7 @@ export function ScheduleForm({
     initialValues: {
       hostId: fixedHostId ?? '',
       date: DateTime.local().toISODate(),
-      startTime: '09:00:00',
+      startTime: getDefaultStartTime(),
       invites: [],
       openGoogleCalendar: false,
     },
@@ -227,7 +237,7 @@ export function ScheduleForm({
                 )
               : (
                   <TimeGrid
-                    defaultValue="09:00:00"
+                    defaultValue={getDefaultStartTime()}
                     data={interviewTimeRange}
                     disableTime={getDisabledTimesForToday(form.values.date)}
                     format="12h"
