@@ -16,7 +16,12 @@ import {
   Title,
   Transition,
 } from '@mantine/core'
-import { useDisclosure, useDocumentTitle, useValidatedState, useWindowScroll } from '@mantine/hooks'
+import {
+  useDisclosure,
+  useDocumentTitle,
+  useValidatedState,
+  useWindowScroll,
+} from '@mantine/hooks'
 import {
   IconArrowUp,
   IconCalendarPlus,
@@ -118,12 +123,19 @@ export function Dashboard() {
           <Stack
             gap="lg"
             px="md"
-            w={{ base: '100%', sm: 550, lg: 750 }}
+            w={{ base: '100%', sm: 650, lg: 800 }}
             mt={{ base: 30, sm: 50 }}
           >
             {/* Hero: time-of-day icon + greeting */}
             <Flex gap="md" align="center" direction={{ base: 'column', sm: 'row' }}>
-              <ThemeIcon className={classes.greetingIcon} size={48} radius="xl" variant="light" color={greeting.color} aria-hidden="true">
+              <ThemeIcon
+                className={classes.greetingIcon}
+                size={48}
+                radius="xl"
+                variant="light"
+                color={greeting.color}
+                aria-hidden="true"
+              >
                 {greeting.icon}
               </ThemeIcon>
               <div style={{ textAlign: 'inherit' }}>
@@ -157,7 +169,11 @@ export function Dashboard() {
                     placeholder="Enter interview code"
                     value={joinCode}
                     onChange={event => setJoinCode(event.currentTarget.value)}
-                    error={!isJoinCodeValid && joinCode.length > 0 ? 'Invalid interview code' : false}
+                    error={
+                      !isJoinCodeValid && joinCode.length > 0
+                        ? 'Invalid interview code'
+                        : false
+                    }
                     flex={1}
                     miw={0}
                     variant="unstyled"
