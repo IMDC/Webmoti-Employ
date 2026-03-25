@@ -44,6 +44,7 @@ export function InterviewCards({ interviews, pageSize = 5 }: InterviewCardsProps
           value={activePage}
           onChange={setActivePage}
           mt="sm"
+          aria-label="Interview pages"
         />
       )}
     </Stack>

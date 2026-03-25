@@ -1,4 +1,5 @@
 import { Button, Card, Center, Group, Stack, Text, ThemeIcon, Title, Transition } from '@mantine/core'
+import { useDocumentTitle } from '@mantine/hooks'
 import { IconCircleCheck, IconHome, IconVideo } from '@tabler/icons-react'
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
@@ -17,6 +18,8 @@ export const Route = createFileRoute('/(authenticated)/end/$id')({
 })
 
 function EndScreen() {
+  useDocumentTitle('Done | WebMoti')
+
   const { id } = Route.useParams()
   const [mounted, setMounted] = useState(false)
 
@@ -35,7 +38,7 @@ function EndScreen() {
               </ThemeIcon>
 
               <Stack align="center" gap="xs">
-                <Title order={2} ta="center">Interview Complete</Title>
+                <Title order={1} size="h2" ta="center">Interview Complete</Title>
                 <Text c="dimmed" ta="center">
                   Thanks for attending the interview.
                 </Text>

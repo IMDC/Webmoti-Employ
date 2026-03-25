@@ -12,3 +12,16 @@
 .highlightRow {
   animation: admin-highlight-flash 2s ease-in-out;
 }
+
+.statCard {
+  cursor: pointer;
+  transition:
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+
+.statCard:hover,
+.statCard:focus-visible {
+  box-shadow: var(--mantine-shadow-sm);
+  transform: translateY(-2px);
+}

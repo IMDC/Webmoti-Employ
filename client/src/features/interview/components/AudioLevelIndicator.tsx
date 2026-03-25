@@ -30,6 +30,8 @@ function AudioLevelIndicator({
           height="24"
           viewBox="0 0 24 24"
           data-testid="audio-indicator"
+          role="img"
+          aria-label="Audio level"
         >
           <defs>
             <clipPath id={clipPathId}>
@@ -63,6 +65,8 @@ function AudioLevelIndicator({
           viewBox="0 0 24 24"
           transform="translate(-0.5, 0)"
           data-testid="audio-mute-icon"
+          role="img"
+          aria-label="Microphone muted"
         >
           <g fill="none" fillRule="evenodd">
             <path

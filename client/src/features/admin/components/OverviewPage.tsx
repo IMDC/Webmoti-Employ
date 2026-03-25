@@ -1,5 +1,6 @@
 import {
   Alert,
+  Anchor,
   Badge,
   Card,
   Center,
@@ -11,18 +12,22 @@ import {
   Text,
   Title,
 } from '@mantine/core'
+import { useDocumentTitle } from '@mantine/hooks'
 import {
   IconCalendarEvent,
   IconLivePhoto,
   IconShieldCheck,
   IconUsers,
 } from '@tabler/icons-react'
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
+import adminClasses from '../admin.module.css'
 import { useAdminOverview } from '../queries'
 import { AdminBurger } from './AdminBurger'
 
 export function OverviewPage() {
+  useDocumentTitle('Admin | WebMoti')
+
   const { data, isPending, error } = useAdminOverview()
 
   if (error) {
@@ -92,9 +97,9 @@ function OverviewContent({ data }: { data: ReturnType<typeof useAdminOverview>['
         <Card withBorder>
           <Group justify="space-between" mb="sm">
             <Title order={5}>Recent Interviews</Title>
-            <Text size="xs" c="blue" style={{ cursor: 'pointer' }} onClick={() => navigate({ to: '/admin/interviews' })}>
+            <Anchor component={Link} to="/admin/interviews" size="xs">
               View all
-            </Text>
+            </Anchor>
           </Group>
           {recentInterviews.length === 0
             ? <Text c="dimmed" size="sm">No recent interviews</Text>
@@ -140,9 +145,9 @@ function OverviewContent({ data }: { data: ReturnType<typeof useAdminOverview>['
         <Card withBorder>
           <Group justify="space-between" mb="sm">
             <Title order={5}>Upcoming Interviews</Title>
-            <Text size="xs" c="blue" style={{ cursor: 'pointer' }} onClick={() => navigate({ to: '/admin/interviews' })}>
+            <Anchor component={Link} to="/admin/interviews" size="xs">
               View all
-            </Text>
+            </Anchor>
           </Group>
           {upcomingInterviews.length === 0
             ? <Text c="dimmed" size="sm">No upcoming interviews</Text>
@@ -194,21 +199,16 @@ function StatCard({ label, value, icon, color, onClick }: {
   return (
     <Card
       withBorder
-      style={{ cursor: 'pointer' }}
+      className={adminClasses.statCard}
       onClick={onClick}
-      styles={theme => ({
-        root: {
-          'transition': 'box-shadow 150ms ease, transform 150ms ease',
-          '&:hover': {
-            boxShadow: theme.shadows.sm,
-            transform: 'translateY(-2px)',
-          },
-          '&:focus-visible': {
-            boxShadow: theme.shadows.sm,
-            transform: 'translateY(-2px)',
-          },
-        },
-      })}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onClick()
+        }
+      }}
     >
       <Group justify="space-between">
         <div>

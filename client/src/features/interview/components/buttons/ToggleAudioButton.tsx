@@ -25,6 +25,8 @@ export function ToggleAudioButton({ onToggleMic }: ToggleAudioButtonProps) {
           px={{ base: 'sm', sm: 'md' }}
           onClick={onToggleMic}
           disabled={permissionState === 'idle' || permissionState === 'acquiring'}
+          aria-label={isAudioOn ? 'Turn off microphone' : 'Turn on microphone'}
+          aria-pressed={isAudioOn}
         >
           {isAudioOn
             ? <IconMicrophoneFilled size={18} />

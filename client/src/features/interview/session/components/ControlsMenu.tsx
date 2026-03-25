@@ -56,7 +56,7 @@ export function ControlsMenu({ onLayoutOpen, isMobile, sendDevIsJohnDoNotUseThis
       <Menu shadow="md" position="top-end">
         <Menu.Target>
           <Tooltip color="gray" label="Controls menu">
-            <Button variant="default" px={{ base: 5, sm: 'md' }}>
+            <Button variant="default" px={{ base: 5, sm: 'md' }} aria-label="Controls menu">
               {isMobile ? <IconDotsVertical size={18} /> : <IconMenu2 size={18} />}
             </Button>
           </Tooltip>

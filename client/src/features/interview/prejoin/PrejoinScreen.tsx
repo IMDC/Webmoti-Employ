@@ -1,4 +1,5 @@
 import { AppShell, Box, Button, Card, Flex, Group, Paper, Stack, Text, Title } from '@mantine/core'
+import { useDocumentTitle } from '@mantine/hooks'
 import { IconArrowLeft, IconLogin } from '@tabler/icons-react'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect } from 'react'
@@ -20,6 +21,8 @@ import { PreviewTile } from './components/PreviewTile'
 import { useInterviewSession } from './queries'
 
 export function PrejoinScreen() {
+  useDocumentTitle('Pre-join | WebMoti')
+
   const navigate = useNavigate()
 
   const { initDevices } = useDeviceStoreActions()

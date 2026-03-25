@@ -1,4 +1,4 @@
-import { Button, Center, Image, Stack, Text } from '@mantine/core'
+import { Button, Center, Image, Stack, Text, Title } from '@mantine/core'
 import { IconExclamationCircle } from '@tabler/icons-react'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
@@ -56,8 +56,8 @@ function ElectronAuthPage() {
     return (
       <Center h="100vh">
         <Stack align="center">
-          <IconExclamationCircle size={100} />
-          <Text fz="h2" fw="bold">{`Error signing in: ${error.replace(UNDERSCORE_RE, ' ')}`}</Text>
+          <IconExclamationCircle size={100} aria-hidden="true" />
+          <Title order={1} size="h2">{`Error signing in: ${error.replace(UNDERSCORE_RE, ' ')}`}</Title>
           <Button
             variant="gradient"
             onClick={() => {
@@ -84,13 +84,14 @@ function ElectronAuthPage() {
           src="/favicon.svg"
           height={125}
           fit="contain"
+          alt=""
           style={{
             filter: 'drop-shadow(0 0 35px rgba(0, 120, 255, 0.4))',
           }}
           mb="xl"
         />
 
-        <Text fz="h1" fw="bold">Launching WebMoti-Employ</Text>
+        <Title order={1} size="h1">Launching WebMoti-Employ</Title>
         <Text fw="lighter">You will be redirected in a few moments.</Text>
       </Stack>
     </Center>

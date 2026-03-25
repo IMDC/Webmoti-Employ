@@ -16,7 +16,7 @@ export function ChangeAudioPopover({ switchMicrophone, switchSpeaker }: ChangeAu
     <Popover>
       <Popover.Target>
         <Tooltip color="gray" label="Change audio device">
-          <Button variant="default" disabled={disableMediaButtons} px="xs">
+          <Button variant="default" disabled={disableMediaButtons} px="xs" aria-label="Change audio device">
             <IconChevronUp size={18} />
           </Button>
         </Tooltip>

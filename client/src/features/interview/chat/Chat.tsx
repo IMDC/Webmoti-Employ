@@ -150,13 +150,13 @@ export function Chat({ onClose, profiles, isLoadingProfiles }: ChatProps) {
       {/* header */}
       <Group justify="space-between">
         <Group>
-          <IconMessages />
+          <IconMessages aria-hidden="true" />
           <Text size="lg" fw={600}>
             Chat
           </Text>
         </Group>
 
-        <ActionIcon variant="subtle" onClick={onClose}>
+        <ActionIcon variant="subtle" onClick={onClose} aria-label="Close chat">
           <IconX />
         </ActionIcon>
       </Group>
@@ -221,7 +221,7 @@ export function Chat({ onClose, profiles, isLoadingProfiles }: ChatProps) {
           }
         }}
         rightSection={(
-          <ActionIcon variant="subtle" onClick={sendMessage} disabled={!isChatTextValid}>
+          <ActionIcon variant="subtle" onClick={sendMessage} disabled={!isChatTextValid} aria-label="Send message">
             <IconSend stroke={1.5} />
           </ActionIcon>
         )}

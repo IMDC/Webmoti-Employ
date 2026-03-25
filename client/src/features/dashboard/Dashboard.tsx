@@ -16,7 +16,7 @@ import {
   Title,
   Transition,
 } from '@mantine/core'
-import { useDisclosure, useValidatedState, useWindowScroll } from '@mantine/hooks'
+import { useDisclosure, useDocumentTitle, useValidatedState, useWindowScroll } from '@mantine/hooks'
 import {
   IconArrowUp,
   IconCalendarPlus,
@@ -53,6 +53,8 @@ function getGreeting(): { text: string, icon: React.ReactNode, color: string } {
 }
 
 export function Dashboard() {
+  useDocumentTitle('Dashboard | WebMoti')
+
   const [isScheduleModalOpened, { open: openScheduleModal, close: closeScheduleModal }]
     = useDisclosure(false)
 
@@ -121,7 +123,7 @@ export function Dashboard() {
           >
             {/* Hero: time-of-day icon + greeting */}
             <Flex gap="md" align="center" direction={{ base: 'column', sm: 'row' }}>
-              <ThemeIcon className={classes.greetingIcon} size={48} radius="xl" variant="light" color={greeting.color}>
+              <ThemeIcon className={classes.greetingIcon} size={48} radius="xl" variant="light" color={greeting.color} aria-hidden="true">
                 {greeting.icon}
               </ThemeIcon>
               <div style={{ textAlign: 'inherit' }}>

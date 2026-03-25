@@ -1,4 +1,5 @@
 import { Button, Card, Center, Stack, Text, Title, Transition } from '@mantine/core'
+import { useDocumentTitle } from '@mantine/hooks'
 import { useSearch } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { Loading } from '@/components/Loading'
@@ -9,6 +10,8 @@ import GoogleSignInImg from './web_dark_rd_ctn.svg'
 const underscoreRegex = /_/g
 
 export function SignInPage() {
+  useDocumentTitle('Sign In | WebMoti')
+
   const { redirectTo, error } = useSearch({ from: '/sign-in' })
   const [loading, setLoading] = useState(false)
   const [mounted, setMounted] = useState(false)

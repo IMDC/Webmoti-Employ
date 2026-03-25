@@ -1,4 +1,5 @@
 import { Alert, Badge, Center, Group, Loader, Stack, Table, Text, ThemeIcon, Title } from '@mantine/core'
+import { useDocumentTitle } from '@mantine/hooks'
 import { IconVideoOff } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
@@ -6,6 +7,8 @@ import { useLiveSessions } from '../queries'
 import { AdminBurger } from './AdminBurger'
 
 export function LiveSessionsPage() {
+  useDocumentTitle('Admin | WebMoti')
+
   const { data: sessions, isPending, error } = useLiveSessions()
   const navigate = useNavigate()
 

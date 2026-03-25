@@ -1,7 +1,7 @@
 import type { SessionParticipant } from '../queries'
 import { Alert, Badge, Center, Group, Loader, Modal, Pagination, Stack, Table, Text, Title, Tooltip } from '@mantine/core'
 import { DatePickerInput } from '@mantine/dates'
-import { useDisclosure } from '@mantine/hooks'
+import { useDisclosure, useDocumentTitle } from '@mantine/hooks'
 import { IconMicrophone, IconMovie, IconScreenShare, IconVideo } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
@@ -87,6 +87,8 @@ function ParticipantsTable({ participants }: { participants: SessionParticipant[
 }
 
 export function SessionHistoryPage() {
+  useDocumentTitle('Admin | WebMoti')
+
   const [defaults] = useState(defaultDateRange)
   const [dateRange, setDateRange] = useState<[string | null, string | null]>([defaults[0], defaults[1]])
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null)

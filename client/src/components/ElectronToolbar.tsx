@@ -10,18 +10,23 @@ import { useEffect, useState } from 'react'
 import { HEADER_SIDE_PADDING, OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
 import { isElectron } from '@/utils/utils'
 
+interface ToolbarIconProps {
+  icon: React.ElementType
+  action: () => void
+  disabled?: boolean
+  ariaLabel: string
+}
+
 function ToolbarIcon({
   icon: IconComponent,
   action,
   disabled,
-}: {
-  icon: React.ElementType
-  action: () => void
-  disabled?: boolean
-}) {
+  ariaLabel,
+}: ToolbarIconProps) {
   return (
     <ActionIcon
       variant="subtle"
+      aria-label={ariaLabel}
       onClick={disabled ? undefined : action}
       style={{ WebkitAppRegion: 'no-drag' }}
       // custom styles to not show background when disabled
@@ -74,6 +79,7 @@ export function ElectronToolbar() {
           h={15}
           w="auto"
           fit="contain"
+          alt=""
         />
         {!isMobile && (
           <Text
@@ -89,10 +95,28 @@ export function ElectronToolbar() {
         <Space w="xs" />
 
         {/* need to use arrow wrapper here to avoid electron clone error */}
-        <ToolbarIcon icon={IconArrowLeft} action={() => window.electron.goBackWindow()} disabled={!canGoBack} />
-        <ToolbarIcon icon={IconArrowRight} action={() => window.electron.goForwardWindow()} disabled={!canGoForward} />
-        <ToolbarIcon icon={IconReload} action={() => window.electron.reloadWindow()} />
-        <ToolbarIcon icon={IconTerminal2} action={() => window.electron.toggleConsoleWindow()} />
+        <ToolbarIcon
+          icon={IconArrowLeft}
+          action={() => window.electron.goBackWindow()}
+          disabled={!canGoBack}
+          ariaLabel="Go back"
+        />
+        <ToolbarIcon
+          icon={IconArrowRight}
+          action={() => window.electron.goForwardWindow()}
+          disabled={!canGoForward}
+          ariaLabel="Go forward"
+        />
+        <ToolbarIcon
+          icon={IconReload}
+          action={() => window.electron.reloadWindow()}
+          ariaLabel="Reload"
+        />
+        <ToolbarIcon
+          icon={IconTerminal2}
+          action={() => window.electron.toggleConsoleWindow()}
+          ariaLabel="Toggle console"
+        />
       </Group>
     </Group>
   )

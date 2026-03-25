@@ -1,6 +1,7 @@
 import { createTheme, DEFAULT_THEME } from '@mantine/core'
 
 export const theme = createTheme({
+  focusRing: 'auto',
   fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
   headings: {
     fontFamily: 'Inter, system-ui, -apple-system, sans-serif',

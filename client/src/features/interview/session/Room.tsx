@@ -3,7 +3,7 @@ import type { Participant } from '@zoom/videosdk'
 import type { Dispatch, FC, RefObject, SetStateAction } from 'react'
 import type { LayoutValue } from './components/ChangeLayoutModal/ChangeLayoutModal'
 import { AppShell, Box, em, Flex, Stack, useMantineTheme } from '@mantine/core'
-import { useDisclosure, useMediaQuery } from '@mantine/hooks'
+import { useDisclosure, useDocumentTitle, useMediaQuery } from '@mantine/hooks'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { useDeviceStoreActions } from '@/features/interview/zoom/useDeviceStore'
@@ -41,6 +41,8 @@ export interface LayoutProps {
 }
 
 export function Room() {
+  useDocumentTitle('Interview | WebMoti')
+
   const participantStageRef = useRef<HTMLDivElement>(null)
 
   const [isChatOpen, setIsChatOpen] = useState(false)

@@ -18,6 +18,8 @@ export function ToggleChatButton({ isChatOpen, onToggleChat }: ToggleChatButtonP
           radius={isChatOpen ? 'sm' : 'xl'}
           onClick={onToggleChat}
           px={{ base: 'sm', sm: 'md' }}
+          aria-label="Toggle chat"
+          aria-pressed={isChatOpen}
         >
           <IconMessageFilled size={18} />
         </Button>

@@ -35,6 +35,10 @@ function RootRoute() {
 
   return (
     <>
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+
       <AppShell
         header={{ height: isElectron() ? OUTER_TOOLBAR_HEIGHT : 0 }}
         styles={{
@@ -52,7 +56,7 @@ function RootRoute() {
           </AppShell.Header>
         )}
 
-        <AppShell.Main>
+        <AppShell.Main id="main-content">
           <Outlet />
         </AppShell.Main>
       </AppShell>
