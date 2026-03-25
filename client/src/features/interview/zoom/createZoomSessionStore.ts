@@ -538,10 +538,10 @@ export function createZoomSessionStore(deviceStore: StoreApi<DeviceStore>) {
 
     // preserve 'default' selection so the app continues to follow the system default;
     // otherwise fall back to the SDK's active device
-    const selectedAudioInputDevice = currentState.selectedAudioInputDevice === 'default' && microphones.find(d => d.deviceId === 'default')
+    const selectedAudioInputDevice = currentState.selectedAudioInputDevice === 'default' && microphones.some(d => d.deviceId === 'default')
       ? 'default'
       : activeMic
-    const selectedAudioOutputDevice = currentState.selectedAudioOutputDevice === 'default' && audioSpeakers.find(d => d.deviceId === 'default')
+    const selectedAudioOutputDevice = currentState.selectedAudioOutputDevice === 'default' && audioSpeakers.some(d => d.deviceId === 'default')
       ? 'default'
       : activeSpeaker
 

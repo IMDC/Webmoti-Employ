@@ -8,6 +8,8 @@ import { electronGoogleSignIn } from '@/lib/auth-client'
 import { ELECTRON_PROTOCOL_SCHEME } from '@/utils/constants'
 import { clearUrlParam, getUrlAuthToken } from '@/utils/utils'
 
+const UNDERSCORE_RE = /_/g
+
 export const Route = createFileRoute('/auth/electron')({
   component: ElectronAuthPage,
   validateSearch: z.object({
@@ -20,13 +22,13 @@ function ElectronAuthPage() {
   const [loading, setLoading] = useState(false)
 
   const [hasToken, setHasToken] = useState(false)
-  const effectRan = useRef(false)
+  const effectRanRef = useRef(false)
 
   useEffect(() => {
     // prevent the useEffect from running after already signing in to avoid infinite sign in
-    if (effectRan.current)
+    if (effectRanRef.current)
       return
-    effectRan.current = true
+    effectRanRef.current = true
 
     // because of a bug in the better-auth library, we pass the bearer token in the redirect url
     // (instead of in the headers)
@@ -55,7 +57,7 @@ function ElectronAuthPage() {
       <Center h="100vh">
         <Stack align="center">
           <IconExclamationCircle size={100} />
-          <Text fz="h2" fw="bold">{`Error signing in: ${error.replace(/_/g, ' ')}`}</Text>
+          <Text fz="h2" fw="bold">{`Error signing in: ${error.replace(UNDERSCORE_RE, ' ')}`}</Text>
           <Button
             variant="gradient"
             onClick={() => {

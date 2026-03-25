@@ -13,6 +13,8 @@ interface UseAiWebsocketOptions {
   onNotification: (notification: NotificationState) => void
 }
 
+const httpsRegex = /^https?:\/\//
+
 /**
  * WebSocket transport for the AI interview assistant.
  * Handles connection, sending transcripts, and dispatching incoming notifications.
@@ -23,7 +25,7 @@ export function useAiWebsocket({ onNotification }: UseAiWebsocketOptions) {
   const protocol = import.meta.env.DEV ? 'ws' : 'wss'
   const host = import.meta.env.DEV
     ? 'localhost:8787'
-    : import.meta.env.VITE_API_BASE_URL.replace(/^https?:\/\//, '')
+    : import.meta.env.VITE_API_BASE_URL.replace(httpsRegex, '')
   const socketUrl = `${protocol}://${host}/ws`
 
   const {

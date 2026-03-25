@@ -35,10 +35,10 @@ export function useDraggable(options: UseDraggableOptions = {}) {
   } = options
 
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 })
-  const dragging = useRef(false)
-  const startPointer = useRef<Position>({ x: 0, y: 0 })
-  const startPosition = useRef<Position>({ x: 0, y: 0 })
-  const dragBounds = useRef<DragBounds>({
+  const draggingRef = useRef(false)
+  const startPointerRef = useRef<Position>({ x: 0, y: 0 })
+  const startPositionRef = useRef<Position>({ x: 0, y: 0 })
+  const dragBoundsRef = useRef<DragBounds>({
     minX: Number.NEGATIVE_INFINITY,
     maxX: Number.POSITIVE_INFINITY,
     minY: Number.NEGATIVE_INFINITY,
@@ -47,13 +47,13 @@ export function useDraggable(options: UseDraggableOptions = {}) {
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
-      dragging.current = true
-      startPointer.current = { x: e.clientX, y: e.clientY }
-      startPosition.current = { ...position }
+      draggingRef.current = true
+      startPointerRef.current = { x: e.clientX, y: e.clientY }
+      startPositionRef.current = { ...position }
 
       const element = e.currentTarget as HTMLElement
       const elementRect = element.getBoundingClientRect()
-      dragBounds.current = {
+      dragBoundsRef.current = {
         minX: leftInset + margin - elementRect.left,
         maxX: window.innerWidth - rightInset - margin - elementRect.right,
         minY: topInset + margin - elementRect.top,
@@ -67,35 +67,35 @@ export function useDraggable(options: UseDraggableOptions = {}) {
   )
 
   const onPointerMove = useCallback((e: React.PointerEvent) => {
-    if (!dragging.current)
+    if (!draggingRef.current)
       return
 
-    const dx = e.clientX - startPointer.current.x
-    const dy = e.clientY - startPointer.current.y
+    const dx = e.clientX - startPointerRef.current.x
+    const dy = e.clientY - startPointerRef.current.y
 
     const clampedDx = Math.min(
-      Math.max(dx, dragBounds.current.minX),
-      dragBounds.current.maxX,
+      Math.max(dx, dragBoundsRef.current.minX),
+      dragBoundsRef.current.maxX,
     )
     const clampedDy = Math.min(
-      Math.max(dy, dragBounds.current.minY),
-      dragBounds.current.maxY,
+      Math.max(dy, dragBoundsRef.current.minY),
+      dragBoundsRef.current.maxY,
     )
 
     setPosition({
-      x: startPosition.current.x + clampedDx,
-      y: startPosition.current.y + clampedDy,
+      x: startPositionRef.current.x + clampedDx,
+      y: startPositionRef.current.y + clampedDy,
     })
   }, [])
 
   const onPointerUp = useCallback((e: React.PointerEvent) => {
-    dragging.current = false
+    draggingRef.current = false
     ;(e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId)
   }, [])
 
   const style: React.CSSProperties = {
     transform: `translate(${position.x}px, ${position.y}px)`,
-    cursor: dragging.current ? 'grabbing' : 'grab',
+    cursor: draggingRef.current ? 'grabbing' : 'grab',
     // prevent text-selection while dragging
     userSelect: 'none',
     touchAction: 'none',

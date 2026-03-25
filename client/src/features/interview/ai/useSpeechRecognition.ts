@@ -33,6 +33,8 @@ const initialState: State = {
   finalTranscript: '',
 }
 
+const punctuationRegex = /^[\p{P}\p{S}\s]*$/u
+
 function transcriptReducer(state: State, action: Action): State {
   if ('type' in action && action.type === 'reset') {
     return initialState
@@ -83,7 +85,7 @@ function transcriptReducer(state: State, action: Action): State {
   }
   const transcript = buildTextFromWords(newWords)
   // Skip if finalTranscript is just punctuation (e.g., '.')
-  if (newFinalTranscript && /^[\p{P}\p{S}\s]*$/u.test(newFinalTranscript)) {
+  if (newFinalTranscript && punctuationRegex.test(newFinalTranscript)) {
     return { ...state, words: newWords, finalWords: newFinalWords, pendingUtteranceWords: newPendingUtteranceWords, transcript } // Update transcript but not final
   }
   return { words: newWords, finalWords: newFinalWords, pendingUtteranceWords: newPendingUtteranceWords, transcript, finalTranscript: newFinalTranscript }

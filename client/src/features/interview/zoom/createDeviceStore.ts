@@ -90,6 +90,8 @@ export async function resolveDefaultLabels(
   }
 }
 
+const defaultDeviceRegex = /^Default\s*-\s*/
+
 // Resolves the browser 'default' device id to the real physical device id
 // so the Zoom SDK can switch to it.
 export function resolveDeviceId(deviceId: string, devices: MediaDevice[]): string {
@@ -99,7 +101,7 @@ export function resolveDeviceId(deviceId: string, devices: MediaDevice[]): strin
   if (!defaultDevice)
     return deviceId
   // Chromium labels the default device as "Default - <real device name>"
-  const cleanLabel = defaultDevice.label.replace(/^Default\s*-\s*/, '')
+  const cleanLabel = defaultDevice.label.replace(defaultDeviceRegex, '')
   const physical = devices.find(d =>
     d.deviceId !== 'default' && d.deviceId !== 'communications' && d.label === cleanLabel,
   )

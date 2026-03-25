@@ -6,6 +6,8 @@ import { googleSignIn } from '@/lib/auth-client'
 import { clearUrlParam, notifyError } from '@/utils/utils'
 import GoogleSignInImg from './web_dark_rd_ctn.svg'
 
+const underscoreRegex = /_/g
+
 export function SignInPage() {
   const { redirectTo, error } = useSearch({ from: '/sign-in' })
   const [loading, setLoading] = useState(false)
@@ -20,7 +22,7 @@ export function SignInPage() {
   // the errors are set by the better-auth callback as "?error=..."
   useEffect(() => {
     if (error) {
-      const formatError = (msg: string) => msg.replace(/_/g, ' ')
+      const formatError = (msg: string) => msg.replace(underscoreRegex, ' ')
       notifyError('Error signing in', formatError(error))
       clearUrlParam('error')
     }
