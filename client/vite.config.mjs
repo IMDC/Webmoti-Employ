@@ -6,6 +6,8 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
+const API_PREFIX_RE = /^\/api/
+
 const commitHash = process.env.APP_GIT_SHA ?? null
 const commitDate = process.env.APP_GIT_COMMIT_DATE ?? null
 
@@ -39,7 +41,7 @@ export default defineConfig({
       '/api': {
         target: 'http://127.0.0.1:8787',
         changeOrigin: true,
-        rewrite: path => path.replace(/^\/api/, ''),
+        rewrite: path => path.replace(API_PREFIX_RE, ''),
       },
     },
   },

@@ -16,4 +16,10 @@ export default antfu({
     'react-hooks-extra/no-direct-set-state-in-use-effect': 'off',
     'pnpm/json-enforce-catalog': 'off',
   },
+}, {
+  // it's ok because tanstack router handles hmr
+  files: ['src/routes/**'],
+  rules: {
+    'react-refresh/only-export-components': 'off',
+  },
 })

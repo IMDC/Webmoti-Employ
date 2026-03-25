@@ -9,10 +9,10 @@ interface TimeTabsProps {
 
 export function TimeTabs({ value, onChange }: TimeTabsProps) {
   const [rootRef, setRootRef] = useState<HTMLDivElement | null>(null)
-  const controlRefs = useRef<Record<string, HTMLButtonElement | null>>({})
+  const controlRef = useRef<Record<string, HTMLButtonElement | null>>({})
 
   const setControlRef = (key: string) => (el: HTMLButtonElement | null) => {
-    controlRefs.current[key] = el
+    controlRef.current[key] = el
   }
 
   return (
@@ -29,7 +29,7 @@ export function TimeTabs({ value, onChange }: TimeTabsProps) {
         </Tabs.Tab>
 
         <FloatingIndicator
-          target={value ? controlRefs.current[value] : null}
+          target={value ? controlRef.current[value] : null}
           parent={rootRef}
           className={classes.indicator}
         />
