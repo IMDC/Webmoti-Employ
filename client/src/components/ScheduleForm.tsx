@@ -69,14 +69,14 @@ interface ScheduleFormProps {
 
 const interviewTimeRange = getTimeRange({ startTime: '09:00', endTime: '16:00', interval: '00:30' })
 
-// Returns the next available 30-min slot from the time grid, or '09:00' if all have passed
+// Returns the next available 30-min slot from the time grid, or '' if all have passed
 function getDefaultStartTime(): string {
   const now = DateTime.local()
   const nextSlot = interviewTimeRange.find((time) => {
     const [hour, minute] = time.split(':').map(Number)
     return now.set({ hour, minute, second: 0, millisecond: 0 }) >= now
   })
-  return nextSlot ?? interviewTimeRange[0] ?? '09:00'
+  return nextSlot ?? ''
 }
 
 export function ScheduleForm({
@@ -167,6 +167,25 @@ export function ScheduleForm({
     return now.toFormat('HH:mm')
   }
 
+  function handleNextStep() {
+    const { date, startTime } = form.getValues()
+
+    if (!startTime) {
+      form.setFieldError('startTime', 'Please select a time')
+      return
+    }
+
+    const [hour, minute] = startTime.split(':').map(Number)
+    const selectedDateTime = DateTime.fromISO(date, { zone: 'local' }).set({ hour, minute })
+
+    if (selectedDateTime < DateTime.local()) {
+      form.setFieldError('startTime', 'Time is in the past')
+      return
+    }
+
+    setStep(1)
+  }
+
   const invites = form.values.invites
 
   return (
@@ -218,7 +237,7 @@ export function ScheduleForm({
             </Input.Wrapper>
 
             <Group justify="flex-end" mt="sm">
-              <Button onClick={() => setStep(1)} rightSection={<IconUsers size={16} />}>
+              <Button onClick={() => handleNextStep()} rightSection={<IconUsers size={16} />}>
                 Next
               </Button>
             </Group>
