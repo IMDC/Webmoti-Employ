@@ -66,11 +66,9 @@ export function InterviewCard({ interview }: InterviewCardProps) {
     <Card
       key={interview.id}
       padding="md"
-      shadow="md"
       radius="md"
       withBorder
       style={{
-        borderLeft: `3px solid var(--mantine-color-${statusColor}-5)`,
         transition: 'box-shadow 150ms ease, transform 150ms ease',
       }}
       onMouseEnter={(e) => {
@@ -85,6 +83,15 @@ export function InterviewCard({ interview }: InterviewCardProps) {
       {' '}
       <Group justify="space-between">
         <Group>
+          <span
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              backgroundColor: `var(--mantine-color-${statusColor}-5)`,
+              flexShrink: 0,
+            }}
+          />
           <Badge
             variant="gradient"
             gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
