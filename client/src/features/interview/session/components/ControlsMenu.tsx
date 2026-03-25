@@ -13,6 +13,7 @@ import {
 } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
 import { useAppActions, useAppBlurIntensity } from '@/useAppStore'
+import { isElectron } from '@/utils/utils'
 import { useIsVideoBlurred, useZoomSessionActions } from '../../zoom/useZoomSessionStore'
 import { StatisticsModal } from './StatisticsModal'
 
@@ -84,17 +85,19 @@ export function ControlsMenu({ onLayoutOpen, isMobile, sendDevIsJohnDoNotUseThis
             {isVideoBlurred ? 'Unblur Video' : 'Blur Video'}
           </Menu.Item>
 
-          <Menu.Item closeMenuOnClick={false} component="div">
-            <Text size="xs" fw={500} mb={4}>Eyetracker Blur</Text>
-            <Slider
-              min={0}
-              max={50}
-              value={blurIntensity}
-              onChange={setBlurIntensity}
-              label={value => `${value}px`}
-              size="sm"
-            />
-          </Menu.Item>
+          {isElectron() && (
+            <Menu.Item closeMenuOnClick={false} component="div">
+              <Text size="xs" fw={500} mb={4}>Eyetracker Blur</Text>
+              <Slider
+                min={0}
+                max={50}
+                value={blurIntensity}
+                onChange={setBlurIntensity}
+                label={value => `${value}px`}
+                size="sm"
+              />
+            </Menu.Item>
+          )}
 
           <Menu.Item onClick={() => setIsSettingsOpen(true)} leftSection={<IconSettings size={14} />}>
             Settings
