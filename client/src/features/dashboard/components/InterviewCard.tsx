@@ -68,19 +68,20 @@ export function InterviewCard({ interview }: InterviewCardProps) {
       padding="md"
       radius="md"
       withBorder
-      style={{
-        transition: 'box-shadow 150ms ease, transform 150ms ease',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = 'var(--mantine-shadow-sm)'
-        e.currentTarget.style.transform = 'translateY(-1px)'
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = 'none'
-        e.currentTarget.style.transform = 'none'
-      }}
+      styles={theme => ({
+        root: {
+          'transition': 'box-shadow 150ms ease, transform 150ms ease',
+          '&:hover': {
+            boxShadow: theme.shadows.sm,
+            transform: 'translateY(-1px)',
+          },
+          '&:focus-visible': {
+            boxShadow: theme.shadows.sm,
+            transform: 'translateY(-1px)',
+          },
+        },
+      })}
     >
-      {' '}
       <Group justify="space-between" wrap="wrap" gap="xs">
         <Group gap="xs">
           <Box

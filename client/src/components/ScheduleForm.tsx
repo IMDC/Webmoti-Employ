@@ -76,7 +76,7 @@ function getDefaultStartTime(): string {
     const [hour, minute] = time.split(':').map(Number)
     return now.set({ hour, minute, second: 0, millisecond: 0 }) >= now
   })
-  return nextSlot ?? '09:00'
+  return nextSlot ?? interviewTimeRange[0] ?? '09:00'
 }
 
 export function ScheduleForm({
@@ -133,6 +133,8 @@ export function ScheduleForm({
       const sessionId = await onSchedule(data)
       onSuccess(sessionId, data)
       form.reset()
+      setStep(0)
+      setUseCustomTime(false)
     }
     catch (error: unknown) {
       notifyError('Failed to schedule interview', error)

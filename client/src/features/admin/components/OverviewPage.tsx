@@ -194,16 +194,21 @@ function StatCard({ label, value, icon, color, onClick }: {
   return (
     <Card
       withBorder
-      style={{ cursor: 'pointer', transition: 'box-shadow 150ms ease, transform 150ms ease' }}
+      style={{ cursor: 'pointer' }}
       onClick={onClick}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = 'var(--mantine-shadow-sm)'
-        e.currentTarget.style.transform = 'translateY(-2px)'
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = 'none'
-        e.currentTarget.style.transform = 'none'
-      }}
+      styles={theme => ({
+        root: {
+          'transition': 'box-shadow 150ms ease, transform 150ms ease',
+          '&:hover': {
+            boxShadow: theme.shadows.sm,
+            transform: 'translateY(-2px)',
+          },
+          '&:focus-visible': {
+            boxShadow: theme.shadows.sm,
+            transform: 'translateY(-2px)',
+          },
+        },
+      })}
     >
       <Group justify="space-between">
         <div>
