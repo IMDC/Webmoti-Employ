@@ -137,7 +137,7 @@ export function getLocalBearerToken() {
 }
 
 export function setLocalBearerToken(bearerToken: string) {
-  localStorage.setItem(LOCAL_BEARER_TOKEN_KEY, encodeURIComponent(bearerToken))
+  localStorage.setItem(LOCAL_BEARER_TOKEN_KEY, bearerToken)
   // better-auth defaults to 7 day expiry
   // if changing this on server, make sure to change this as well
   localStorage.setItem(LOCAL_BEARER_TOKEN_EXPIRY_KEY, DateTime.now().plus({ days: 7 }).toISO())

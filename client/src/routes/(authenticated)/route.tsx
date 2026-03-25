@@ -14,6 +14,15 @@ import {
 } from '@/utils/utils'
 
 export const Route = createFileRoute('/(authenticated)')({
+  // extract the bearer token from the URL before the component mounts,
+  // so it's available to useSession() on the first render
+  beforeLoad: () => {
+    const authToken = getUrlAuthToken()
+    if (authToken) {
+      setLocalBearerToken(authToken)
+      clearUrlParam('authToken')
+    }
+  },
   component: AuthedLayout,
 })
 
@@ -23,45 +32,26 @@ function AuthedLayout() {
   const router = useRouter()
   const currentPath = router.state.location.pathname
 
-  useEffect(() => {
-  // because of a bug in the better-auth library, we pass the bearer token in the redirect url
-  // (instead of in the headers)
-    const authToken = getUrlAuthToken()
-    if (authToken) {
-      setLocalBearerToken(authToken)
-      clearUrlParam('authToken')
-    }
-  }, [])
-
   // redirect to sign-in if no user
   useEffect(() => {
-    if (!isPending && !data?.user) {
+    if (isPending)
+      return
+
+    if (!data?.user) {
+      if (getLocalBearerToken()) {
+        // no session but there is a token, the sign in failed
+        removeLocalBearerToken()
+        showErrorNotification(
+          'Error signing in',
+          'Session not found, please try again',
+        )
+      }
       navigate({ to: '/sign-in', search: { redirectTo: currentPath } })
     }
   }, [isPending, data?.user, navigate, currentPath])
 
-  if (isPending) {
+  if (isPending || !data?.user) {
     return <Loading />
-  }
-
-  if (!data?.user) {
-    if (getLocalBearerToken()) {
-      // no session but there is a token
-      // this means the sign in failed
-
-      removeLocalBearerToken()
-
-      showErrorNotification(
-        'Error signing in',
-        'Session not found, please try again',
-      )
-    }
-
-    // no session and no token
-    // this means the user probably just signed out
-    // (just return null since redirect will happen)
-
-    return null
   }
 
   return (

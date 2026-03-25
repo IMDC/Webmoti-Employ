@@ -15,7 +15,7 @@ import { betterAuthOptions } from './src/lib/better-auth-options'
 
 const { BETTER_AUTH_URL, BETTER_AUTH_SECRET } = process.env
 
-export const auth: ReturnType<typeof betterAuth> = betterAuth({
+export const auth = betterAuth({
   ...betterAuthOptions,
   database: {
     db: getMigrationDb(),
