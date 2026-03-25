@@ -1,5 +1,6 @@
 import type { InterviewResponse } from '@webmoti-employ/shared'
-import { Center, Pagination, Stack, Text } from '@mantine/core'
+import { Center, Pagination, Stack, Text, ThemeIcon } from '@mantine/core'
+import { IconCalendarOff } from '@tabler/icons-react'
 import { useState } from 'react'
 import { InterviewCard } from './InterviewCard'
 
@@ -14,7 +15,10 @@ export function InterviewCards({ interviews, pageSize = 5 }: InterviewCardsProps
   if (interviews.length === 0) {
     return (
       <Center mt="md">
-        <Stack align="center">
+        <Stack align="center" gap="xs">
+          <ThemeIcon size={40} radius="xl" variant="light" color="gray">
+            <IconCalendarOff size={20} />
+          </ThemeIcon>
           <Text fw="bolder">No interviews to show</Text>
         </Stack>
       </Center>

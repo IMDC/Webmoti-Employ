@@ -60,8 +60,29 @@ export function InterviewCard({ interview }: InterviewCardProps) {
   const formattedInterviewTime = startDt.toLocaleString(DateTime.DATETIME_MED)
   const relativeTime = startedToday ? startDt.toRelative() : null
 
+  const statusColor = isEnded ? 'gray' : startedToday ? 'teal' : 'blue'
+
   return (
-    <Card key={interview.id} shadow="sm" padding="sm" withBorder>
+    <Card
+      key={interview.id}
+      padding="md"
+      shadow="md"
+      radius="md"
+      withBorder
+      style={{
+        borderLeft: `3px solid var(--mantine-color-${statusColor}-5)`,
+        transition: 'box-shadow 150ms ease, transform 150ms ease',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = 'var(--mantine-shadow-sm)'
+        e.currentTarget.style.transform = 'translateY(-1px)'
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = 'none'
+        e.currentTarget.style.transform = 'none'
+      }}
+    >
+      {' '}
       <Group justify="space-between">
         <Group>
           <Badge
@@ -100,7 +121,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
       </Group>
 
       <Stack justify="center" align="center" flex="grow" mt="sm">
-        <Text fw="bolder"ff="monospace">
+        <Text fw="bolder" ff="monospace">
           {formattedInterviewTime}
         </Text>
 

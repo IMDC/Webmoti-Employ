@@ -1,4 +1,5 @@
-import { Center, Stack, Text } from '@mantine/core'
+import { Center, Stack, Text, ThemeIcon } from '@mantine/core'
+import { IconCalendarOff, IconExclamationCircle } from '@tabler/icons-react'
 import { DateTime } from 'luxon'
 import { useState } from 'react'
 import { useInterviews } from '../queries'
@@ -39,10 +40,13 @@ export function InterviewList() {
 
   if (error) {
     return (
-      <Center>
-        <Stack>
-          <Text fw="bolder">Error fetching interviews:</Text>
-          <Text fw="bolder">{error.message}</Text>
+      <Center mt="xl">
+        <Stack align="center" gap="xs">
+          <ThemeIcon size={48} radius="xl" variant="light" color="red">
+            <IconExclamationCircle size={24} />
+          </ThemeIcon>
+          <Text fw="bolder">Error fetching interviews</Text>
+          <Text c="dimmed" size="sm">{error.message}</Text>
         </Stack>
       </Center>
     )
@@ -50,8 +54,14 @@ export function InterviewList() {
 
   if (!interviews || interviews.length === 0) {
     return (
-      <Center>
-        <Text fw="bolder">You have no scheduled interviews</Text>
+      <Center mt="xl">
+        <Stack align="center" gap="xs">
+          <ThemeIcon size={48} radius="xl" variant="light" color="gray">
+            <IconCalendarOff size={24} />
+          </ThemeIcon>
+          <Text fw="bolder">No scheduled interviews</Text>
+          <Text c="dimmed" size="sm">Create a new interview to get started.</Text>
+        </Stack>
       </Center>
     )
   }

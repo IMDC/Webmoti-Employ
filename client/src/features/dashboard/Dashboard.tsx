@@ -4,14 +4,15 @@ import {
   AppShell,
   Box,
   Button,
-  Divider,
+  Card,
   Flex,
   Group,
   Modal,
-  Popover,
+  Paper,
   Stack,
   Text,
   TextInput,
+  ThemeIcon,
   Title,
   Transition,
 } from '@mantine/core'
@@ -19,11 +20,11 @@ import { useDisclosure, useValidatedState, useWindowScroll } from '@mantine/hook
 import {
   IconArrowUp,
   IconCalendarPlus,
-  IconSquareRoundedPlusFilled,
+  IconKeyboard,
   IconVideoPlus,
 } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
-import { useState } from 'react'
+import { DateTime } from 'luxon'
 import { RightHeader } from '@/components/RightHeader'
 import { HEADER_HEIGHT, HEADER_SIDE_PADDING, OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
 import { getFirstName, isElectron, notifySuccess } from '@/utils/utils'
@@ -34,8 +35,16 @@ import { JoinCodeInput } from './schema'
 
 declare const __APP_VERSION__: string
 
+function getGreeting(): string {
+  const hour = DateTime.local().hour
+  if (hour < 12)
+    return 'Good morning'
+  if (hour < 17)
+    return 'Good afternoon'
+  return 'Good evening'
+}
+
 export function Dashboard() {
-  const [isNewInterviewPopupOpen, setIsNewInterviewPopupOpen] = useState(false)
   const [isScheduleModalOpened, { open: openScheduleModal, close: closeScheduleModal }]
     = useDisclosure(false)
 
@@ -97,7 +106,7 @@ export function Dashboard() {
         <Flex justify="center" align="center" direction="column" w="100%">
           <Stack align="center" gap="xs">
             <Title ta="center" mt={50} fz={{ base: 25, sm: 35, md: 45 }} px="lg">
-              {`Welcome ${getFirstName(user.name)}!`}
+              {`${getGreeting()}, ${getFirstName(user.name)}!`}
             </Title>
             <Text c="dimmed">
               Your interview schedule is below.
@@ -110,55 +119,82 @@ export function Dashboard() {
             px="md"
             w={{ base: 300, sm: 500, lg: 700 }}
           >
-            <Flex direction="row" gap="lg" justify="center" wrap="wrap" mt={{ base: 25, sm: 50 }}>
-              <Popover opened={isNewInterviewPopupOpen} onChange={setIsNewInterviewPopupOpen}>
-                <Popover.Target>
-                  <Button
-                    onClick={() => setIsNewInterviewPopupOpen(o => !o)}
-                    leftSection={<IconSquareRoundedPlusFilled />}
-                  >
-                    New interview
-                  </Button>
-                </Popover.Target>
-
-                <Popover.Dropdown>
-                  <Stack>
-                    <Link to="/interview/prejoin">
-                      <Button leftSection={<IconVideoPlus />}>
-                        Start interview now
-                      </Button>
-                    </Link>
-                    <Button
-                      leftSection={<IconCalendarPlus />}
-                      onClick={() => {
-                        setIsNewInterviewPopupOpen(false)
-                        openScheduleModal()
-                      }}
-                    >
-                      Schedule interview
-                    </Button>
+            <Flex direction="row" gap="md" justify="center" wrap="wrap" mt={{ base: 25, sm: 50 }}>
+              <Link to="/interview/prejoin" style={{ textDecoration: 'none', flex: 1, minWidth: 180, maxWidth: 250 }}>
+                <Card
+                  shadow="sm"
+                  radius="md"
+                  padding="md"
+                  withBorder
+                  h="100%"
+                  style={{ cursor: 'pointer', transition: 'box-shadow 150ms ease, transform 150ms ease' }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = 'var(--mantine-shadow-md)'
+                    e.currentTarget.style.transform = 'translateY(-2px)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = 'var(--mantine-shadow-sm)'
+                    e.currentTarget.style.transform = 'none'
+                  }}
+                >
+                  <Stack align="center" gap="xs">
+                    <ThemeIcon size={40} radius="md" variant="light" color="blue">
+                      <IconVideoPlus size={22} />
+                    </ThemeIcon>
+                    <Text fw={600} size="sm">Start now</Text>
+                    <Text c="dimmed" size="xs" ta="center">Begin an interview immediately</Text>
                   </Stack>
-                </Popover.Dropdown>
-              </Popover>
+                </Card>
+              </Link>
 
-              <Group wrap="nowrap">
+              <Card
+                shadow="sm"
+                radius="md"
+                padding="md"
+                withBorder
+                h="100%"
+                style={{ cursor: 'pointer', flex: 1, minWidth: 180, maxWidth: 250, transition: 'box-shadow 150ms ease, transform 150ms ease' }}
+                onClick={openScheduleModal}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = 'var(--mantine-shadow-md)'
+                  e.currentTarget.style.transform = 'translateY(-2px)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = 'var(--mantine-shadow-sm)'
+                  e.currentTarget.style.transform = 'none'
+                }}
+              >
+                <Stack align="center" gap="xs">
+                  <ThemeIcon size={40} radius="md" variant="light" color="grape">
+                    <IconCalendarPlus size={22} />
+                  </ThemeIcon>
+                  <Text fw={600} size="sm">Schedule</Text>
+                  <Text c="dimmed" size="xs" ta="center">Plan an interview for later</Text>
+                </Stack>
+              </Card>
+            </Flex>
+
+            <Paper radius="md" p="sm" withBorder>
+              <Group wrap="nowrap" gap="xs">
+                <ThemeIcon size={28} radius="md" variant="subtle" color="gray">
+                  <IconKeyboard size={16} />
+                </ThemeIcon>
                 <TextInput
-                  placeholder="Interview code"
+                  placeholder="Enter interview code"
                   value={joinCode}
                   onChange={event => setJoinCode(event.currentTarget.value)}
                   error={!isJoinCodeValid && joinCode.length > 0 ? 'Invalid interview code' : false}
                   flex={1}
                   miw={0}
+                  variant="unstyled"
                 />
                 <Link to="/interview/prejoin/$id" params={{ id: joinCode }}>
-                  <Button disabled={!isJoinCodeValid}>
+                  <Button disabled={!isJoinCodeValid} size="sm">
                     Join
                   </Button>
                 </Link>
               </Group>
-            </Flex>
-
-            <Divider size="md" />
+            </Paper>
 
             <InterviewList />
           </Flex>
