@@ -1,5 +1,6 @@
 import { API_BASE, makeUser, render, screen, server, userEvent } from '@test-utils'
 import { http, HttpResponse } from 'msw'
+import { afterEach, beforeEach } from 'vitest'
 import { createUserStore } from '@/features/auth/hooks/createUserStore'
 import { UserStoreContext } from '@/features/auth/hooks/useUserStore'
 import { ScheduleForm } from './ScheduleForm'
@@ -31,6 +32,17 @@ function renderForm(onSuccess = vi.fn()) {
 }
 
 describe('scheduleForm', () => {
+  // Fix the clock to 6:00 AM so "9:30 AM" time slot is always in the future
+  beforeEach(() => {
+    const today = new Date()
+    today.setHours(6, 0, 0, 0)
+    vi.useFakeTimers({ now: today, shouldAdvanceTime: true })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('renders all form fields', () => {
     renderForm()
 
