@@ -9,6 +9,7 @@ import { OverviewPage } from './OverviewPage'
 
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => vi.fn(),
+  Link: ({ children, to, ...props }: any) => <a href={to} {...props}>{children}</a>,
 }))
 
 const overviewData = {
