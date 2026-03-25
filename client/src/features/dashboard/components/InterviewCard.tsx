@@ -81,8 +81,8 @@ export function InterviewCard({ interview }: InterviewCardProps) {
       }}
     >
       {' '}
-      <Group justify="space-between">
-        <Group>
+      <Group justify="space-between" wrap="wrap" gap="xs">
+        <Group gap="xs">
           <span
             style={{
               width: 8,
@@ -105,7 +105,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
             </Badge>
           )}
         </Group>
-        <Group gap="xs">
+        <Group gap="xs" wrap="nowrap">
           <UserList
             users={interview.invites ?? []}
             profiles={profiles}
@@ -158,10 +158,9 @@ export function InterviewCard({ interview }: InterviewCardProps) {
             : <Text fw="bold">{displayLine}</Text>}
         </Flex>
 
-        <Link to="/interview/prejoin/$id" params={{ id: interview.sessionId }}>
+        <Link to="/interview/prejoin/$id" params={{ id: interview.sessionId }} style={{ textDecoration: 'none', width: '100%', display: 'flex', justifyContent: 'center' }}>
           <Button
-            w="100%"
-            maw={250}
+            w={{ base: '100%', sm: 250 }}
             disabled={isEnded}
             leftSection={<IconVideoFilled />}
           >

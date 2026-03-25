@@ -84,7 +84,7 @@ export function PrejoinMenuBar() {
         </Tooltip>
       </Group>
 
-      <Stack gap={2}>
+      <Stack gap={2} visibleFrom="sm">
         {permissionState === 'denied'
           ? (
               <Text size="xs" c="red" ta="center">Media permissions blocked</Text>

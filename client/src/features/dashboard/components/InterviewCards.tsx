@@ -14,7 +14,7 @@ export function InterviewCards({ interviews, pageSize = 5 }: InterviewCardsProps
 
   if (interviews.length === 0) {
     return (
-      <Center mt="md">
+      <Center mt="md" w="100%">
         <Stack align="center" gap="xs">
           <ThemeIcon size={40} radius="xl" variant="light" color="gray">
             <IconCalendarOff size={20} />

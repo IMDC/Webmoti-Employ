@@ -27,7 +27,8 @@ function qualityColor(quality: string) {
 
 function ParticipantsTable({ participants }: { participants: SessionParticipant[] }) {
   return (
-    <Table striped highlightOnHover>
+    <Table.ScrollContainer minWidth={600}>
+      <Table striped highlightOnHover>
       <Table.Thead>
         <Table.Tr>
           <Table.Th>Name</Table.Th>
@@ -81,6 +82,7 @@ function ParticipantsTable({ participants }: { participants: SessionParticipant[
         )}
       </Table.Tbody>
     </Table>
+    </Table.ScrollContainer>
   )
 }
 
@@ -126,7 +128,7 @@ export function SessionHistoryPage() {
           }}
           maxDate={new Date()}
           clearable={false}
-          w={300}
+          w={{ base: '100%', xs: 300 }}
         />
       </Group>
 
@@ -135,7 +137,8 @@ export function SessionHistoryPage() {
       {isPending
         ? <Center h="60vh"><Loader type="dots" /></Center>
         : (
-            <Table striped highlightOnHover>
+            <Table.ScrollContainer minWidth={700}>
+              <Table striped highlightOnHover>
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>Session</Table.Th>
@@ -216,6 +219,7 @@ export function SessionHistoryPage() {
                 )}
               </Table.Tbody>
             </Table>
+            </Table.ScrollContainer>
           )}
 
       {totalPages > 1 && (

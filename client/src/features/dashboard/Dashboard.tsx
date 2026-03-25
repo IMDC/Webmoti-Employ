@@ -117,16 +117,17 @@ export function Dashboard() {
             direction="column"
             gap="md"
             px="md"
-            w={{ base: 300, sm: 500, lg: 700 }}
+            w={{ base: '100%', sm: 500, lg: 700 }}
           >
-            <Flex direction="row" gap="md" justify="center" wrap="wrap" mt={{ base: 25, sm: 50 }}>
-              <Link to="/interview/prejoin" style={{ textDecoration: 'none', flex: 1, minWidth: 180, maxWidth: 250 }}>
+            <Flex direction="row" gap="md" justify="center" wrap="wrap" align="stretch" mt={{ base: 25, sm: 50 }}>
+              <Link to="/interview/prejoin" style={{ textDecoration: 'none', flex: '1 1 0', minWidth: 140, maxWidth: 250, display: 'flex' }}>
                 <Card
                   shadow="sm"
                   radius="md"
                   padding="md"
                   withBorder
                   h="100%"
+                  w="100%"
                   style={{ cursor: 'pointer', transition: 'box-shadow 150ms ease, transform 150ms ease' }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.boxShadow = 'var(--mantine-shadow-md)'
@@ -142,7 +143,6 @@ export function Dashboard() {
                       <IconVideoPlus size={22} />
                     </ThemeIcon>
                     <Text fw={600} size="sm">Start now</Text>
-                    <Text c="dimmed" size="xs" ta="center">Begin an interview immediately</Text>
                   </Stack>
                 </Card>
               </Link>
@@ -153,7 +153,7 @@ export function Dashboard() {
                 padding="md"
                 withBorder
                 h="100%"
-                style={{ cursor: 'pointer', flex: 1, minWidth: 180, maxWidth: 250, transition: 'box-shadow 150ms ease, transform 150ms ease' }}
+                style={{ cursor: 'pointer', flex: '1 1 0', minWidth: 140, maxWidth: 250, transition: 'box-shadow 150ms ease, transform 150ms ease' }}
                 onClick={openScheduleModal}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.boxShadow = 'var(--mantine-shadow-md)'
@@ -169,7 +169,6 @@ export function Dashboard() {
                     <IconCalendarPlus size={22} />
                   </ThemeIcon>
                   <Text fw={600} size="sm">Schedule</Text>
-                  <Text c="dimmed" size="xs" ta="center">Plan an interview for later</Text>
                 </Stack>
               </Card>
             </Flex>
