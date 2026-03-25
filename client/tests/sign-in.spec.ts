@@ -4,8 +4,8 @@ test.describe('Sign-in page', () => {
   test('renders the sign-in card and Google button', async ({ page }) => {
     await page.goto('/sign-in')
 
-    await expect(page.getByText('Continue to WebMoti-Employ')).toBeVisible()
-    await expect(page.getByText('Sign in with your Google account')).toBeVisible()
+    await expect(page.getByText('WebMoti-Employ')).toBeVisible()
+    await expect(page.getByText('Sign in with your Google account to continue')).toBeVisible()
     await expect(page.getByAltText('Continue with Google')).toBeVisible()
   })
 
