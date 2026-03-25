@@ -20,6 +20,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { IconCalendarOff } from '@tabler/icons-react'
 import { DeleteButton } from '@/components/DeleteButton'
 import { notifyError } from '@/utils/utils'
+import adminClasses from '../admin.module.css'
 import { useAdminDeleteInterview, useAdminInterviews } from '../queries'
 import { AdminBurger } from './AdminBurger'
 
@@ -130,7 +131,7 @@ export function InterviewsPage() {
                   <Table.Tr
                     key={interview.id}
                     ref={highlight === interview.id ? highlightRef : undefined}
-                    className={highlight === interview.id ? 'admin-highlight-row' : undefined}
+                    className={highlight === interview.id ? adminClasses.highlightRow : undefined}
                   >
                     <Table.Td>
                       <Text size="sm" ff="monospace">{interview.id}</Text>

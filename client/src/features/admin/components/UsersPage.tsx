@@ -14,6 +14,7 @@ import { DateTime } from 'luxon'
 import { useEffect, useRef, useState } from 'react'
 import { DeleteButton } from '@/components/DeleteButton'
 import { notifyError, notifyWarning } from '@/utils/utils'
+import adminClasses from '../admin.module.css'
 import { useAdminDeleteUser, useAdminEmails, useAdminUsers } from '../queries'
 import { AdminBadge } from './AdminBadge'
 import { AdminBurger } from './AdminBurger'
@@ -80,7 +81,7 @@ export function UsersPage() {
                   <Table.Tr
                     key={user.id}
                     ref={highlight === user.id ? highlightRef : undefined}
-                    className={highlight === user.id ? 'admin-highlight-row' : undefined}
+                    className={highlight === user.id ? adminClasses.highlightRow : undefined}
                   >
                     <Table.Td>
                       <Group gap="sm">

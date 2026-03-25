@@ -4,7 +4,7 @@ import {
   AppShell,
   Box,
   Button,
-  Card,
+  Divider,
   Flex,
   Group,
   Modal,
@@ -21,11 +21,15 @@ import {
   IconArrowUp,
   IconCalendarPlus,
   IconKeyboard,
+  IconMoon,
+  IconSun,
+  IconSunset2,
   IconVideoPlus,
 } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
 import { RightHeader } from '@/components/RightHeader'
+import classes from './Dashboard.module.css'
 import { HEADER_HEIGHT, HEADER_SIDE_PADDING, OUTER_TOOLBAR_HEIGHT } from '@/utils/constants'
 import { getFirstName, isElectron, notifySuccess } from '@/utils/utils'
 import { useUser } from '../auth/hooks/useUserStore'
@@ -35,13 +39,13 @@ import { JoinCodeInput } from './schema'
 
 declare const __APP_VERSION__: string
 
-function getGreeting(): string {
+function getGreeting(): { text: string, icon: React.ReactNode, color: string } {
   const hour = DateTime.local().hour
   if (hour < 12)
-    return 'Good morning'
+    return { text: 'Good morning', icon: <IconSun size={28} />, color: 'yellow' }
   if (hour < 17)
-    return 'Good afternoon'
-  return 'Good evening'
+    return { text: 'Good afternoon', icon: <IconSunset2 size={28} />, color: 'orange' }
+  return { text: 'Good evening', icon: <IconMoon size={28} />, color: 'indigo' }
 }
 
 export function Dashboard() {
@@ -57,6 +61,7 @@ export function Dashboard() {
   )
 
   const user = useUser()
+  const greeting = getGreeting()
 
   return (
     <AppShell
@@ -103,103 +108,69 @@ export function Dashboard() {
           />
         </Modal>
 
-        <Flex justify="center" align="center" direction="column" w="100%">
-          <Stack align="center" gap="xs">
-            <Title ta="center" mt={50} fz={{ base: 25, sm: 35, md: 45 }} px="lg">
-              {`${getGreeting()}, ${getFirstName(user.name)}!`}
-            </Title>
-            <Text c="dimmed">
-              Your interview schedule is below.
-            </Text>
-          </Stack>
-
-          <Flex
-            direction="column"
-            gap="md"
+        <Flex justify="center" w="100%">
+          <Stack
+            gap="lg"
             px="md"
-            w={{ base: '100%', sm: 500, lg: 700 }}
+            w={{ base: '100%', sm: 550, lg: 750 }}
+            mt={{ base: 30, sm: 50 }}
           >
-            <Flex direction="row" gap="md" justify="center" wrap="wrap" align="stretch" mt={{ base: 25, sm: 50 }}>
-              <Link to="/interview/prejoin" style={{ textDecoration: 'none', flex: '1 1 0', minWidth: 140, maxWidth: 250, display: 'flex' }}>
-                <Card
-                  shadow="sm"
-                  radius="md"
-                  padding="md"
-                  withBorder
-                  h="100%"
-                  w="100%"
-                  style={{ cursor: 'pointer', transition: 'box-shadow 150ms ease, transform 150ms ease' }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow = 'var(--mantine-shadow-md)'
-                    e.currentTarget.style.transform = 'translateY(-2px)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = 'var(--mantine-shadow-sm)'
-                    e.currentTarget.style.transform = 'none'
-                  }}
-                >
-                  <Stack align="center" gap="xs">
-                    <ThemeIcon size={40} radius="md" variant="light" color="blue">
-                      <IconVideoPlus size={22} />
-                    </ThemeIcon>
-                    <Text fw={600} size="sm">Start now</Text>
-                  </Stack>
-                </Card>
-              </Link>
-
-              <Card
-                shadow="sm"
-                radius="md"
-                padding="md"
-                withBorder
-                h="100%"
-                flex="1 1 0"
-                miw={140}
-                maw={250}
-                style={{ cursor: 'pointer', transition: 'box-shadow 150ms ease, transform 150ms ease' }}
-                onClick={openScheduleModal}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = 'var(--mantine-shadow-md)'
-                  e.currentTarget.style.transform = 'translateY(-2px)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = 'var(--mantine-shadow-sm)'
-                  e.currentTarget.style.transform = 'none'
-                }}
-              >
-                <Stack align="center" gap="xs">
-                  <ThemeIcon size={40} radius="md" variant="light" color="grape">
-                    <IconCalendarPlus size={22} />
-                  </ThemeIcon>
-                  <Text fw={600} size="sm">Schedule</Text>
-                </Stack>
-              </Card>
+            {/* Hero: time-of-day icon + greeting */}
+            <Flex gap="md" align="center" direction={{ base: 'column', sm: 'row' }}>
+              <ThemeIcon className={classes.greetingIcon} size={48} radius="xl" variant="light" color={greeting.color}>
+                {greeting.icon}
+              </ThemeIcon>
+              <div style={{ textAlign: 'inherit' }}>
+                <Title fz={{ base: 22, sm: 30 }} ta={{ base: 'center', sm: 'left' }}>
+                  {`${greeting.text}, ${getFirstName(user.name)}!`}
+                </Title>
+                <Text c="dimmed" fz="sm" ta={{ base: 'center', sm: 'left' }}>Your interview schedule is below.</Text>
+              </div>
             </Flex>
 
-            <Paper radius="md" p="sm" withBorder>
-              <Group wrap="nowrap" gap="xs">
-                <ThemeIcon size={28} radius="md" variant="subtle" color="gray">
-                  <IconKeyboard size={16} />
-                </ThemeIcon>
-                <TextInput
-                  placeholder="Enter interview code"
-                  value={joinCode}
-                  onChange={event => setJoinCode(event.currentTarget.value)}
-                  error={!isJoinCodeValid && joinCode.length > 0 ? 'Invalid interview code' : false}
-                  flex={1}
-                  miw={0}
-                  variant="unstyled"
-                />
-                <Link to="/interview/prejoin/$id" params={{ id: joinCode }}>
-                  <Button disabled={!isJoinCodeValid} size="sm">
-                    Join
-                  </Button>
-                </Link>
-              </Group>
-            </Paper>
+            {/* Action bar: buttons + join code */}
+            <Group gap="sm" wrap="wrap" justify="center">
+              <Link to="/interview/prejoin" style={{ textDecoration: 'none' }}>
+                <Button leftSection={<IconVideoPlus size={18} />}>
+                  Start now
+                </Button>
+              </Link>
+              <Button
+                variant="light"
+                leftSection={<IconCalendarPlus size={18} />}
+                onClick={openScheduleModal}
+              >
+                Schedule
+              </Button>
+              <Paper radius="md" p={4} pl="sm" withBorder flex={1} miw={200}>
+                <Group wrap="nowrap" gap="xs">
+                  <ThemeIcon size={24} radius="md" variant="subtle" color="gray">
+                    <IconKeyboard size={14} />
+                  </ThemeIcon>
+                  <TextInput
+                    placeholder="Enter interview code"
+                    value={joinCode}
+                    onChange={event => setJoinCode(event.currentTarget.value)}
+                    error={!isJoinCodeValid && joinCode.length > 0 ? 'Invalid interview code' : false}
+                    flex={1}
+                    miw={0}
+                    variant="unstyled"
+                    size="sm"
+                  />
+                  <Link to="/interview/prejoin/$id" params={{ id: joinCode }}>
+                    <Button disabled={!isJoinCodeValid} size="xs">
+                      Join
+                    </Button>
+                  </Link>
+                </Group>
+              </Paper>
+            </Group>
 
+            <Divider />
+
+            {/* Interview list */}
             <InterviewList />
-          </Flex>
+          </Stack>
         </Flex>
 
         <Affix position={{ bottom: 20, right: 20 }}>
