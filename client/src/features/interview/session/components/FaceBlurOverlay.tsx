@@ -1,12 +1,9 @@
 import { useEffect, useRef } from 'react'
+import { useAppBlurIntensity } from '@/useAppStore'
 
-const MAX_BLUR = 75 // maximum blur when not looking
 const BLUR_INCREASE_RATE = 20 // px/sec blur increase when not looking
-const BLUR_DECREASE_RATE = MAX_BLUR // px/sec blur decrease when looking
 const TARGET_RADIUS = 150 // circle radius when fully blurred
 const START_RADIUS = TARGET_RADIUS * 2 // initial circle radius
-const CIRCLE_GROW_RATE
-  = ((START_RADIUS - TARGET_RADIUS) * BLUR_DECREASE_RATE) / MAX_BLUR // px/sec grow when looking
 const FEATHER = 75 // px, controls softness of the circle edge
 
 interface FaceBlurOverlayProps {
@@ -23,6 +20,12 @@ export function FaceBlurOverlay({
   const radiusRef = useRef(START_RADIUS)
   const lastTimeRef = useRef(performance.now())
   const lookingRef = useRef(isLookingAtInterviewer ?? false)
+
+  const maxBlur = useAppBlurIntensity()
+  const maxBlurRef = useRef(maxBlur)
+  useEffect(() => {
+    maxBlurRef.current = maxBlur
+  }, [maxBlur])
 
   const rafIdRef = useRef<number | null>(null)
   const cancelledRef = useRef(false)
@@ -41,19 +44,25 @@ export function FaceBlurOverlay({
       const dt = (time - lastTimeRef.current) / 1000
       lastTimeRef.current = time
 
+      const currentMax = maxBlurRef.current
+      // decrease rate matches max so unblur always takes ~1s
+      const blurDecreaseRate = currentMax
+      const circleGrowRate
+        = ((START_RADIUS - TARGET_RADIUS) * blurDecreaseRate) / (currentMax || 1)
+
       if (lookingRef.current) {
         // looking: fast unblur and grow back
-        blurRef.current -= BLUR_DECREASE_RATE * dt
-        radiusRef.current += CIRCLE_GROW_RATE * dt
+        blurRef.current -= blurDecreaseRate * dt
+        radiusRef.current += circleGrowRate * dt
         radiusRef.current = Math.min(START_RADIUS, radiusRef.current)
       }
       else {
         // not looking: increase blur
         blurRef.current += BLUR_INCREASE_RATE * dt
-        blurRef.current = Math.min(MAX_BLUR, blurRef.current)
+        blurRef.current = Math.min(currentMax, blurRef.current)
 
         // shrink radius proportionally to blur
-        const blurRatio = blurRef.current / MAX_BLUR
+        const blurRatio = blurRef.current / (currentMax || 1)
         radiusRef.current = START_RADIUS - blurRatio * (START_RADIUS - TARGET_RADIUS)
       }
 

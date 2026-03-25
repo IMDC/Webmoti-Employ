@@ -1,4 +1,4 @@
-import { Button, Menu, Tooltip } from '@mantine/core'
+import { Button, Menu, Slider, Text, Tooltip } from '@mantine/core'
 import {
   IconBlur,
   IconBlurOff,
@@ -12,7 +12,7 @@ import {
   IconUserFilled,
 } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
-import { useAppActions } from '@/useAppStore'
+import { useAppActions, useAppBlurIntensity } from '@/useAppStore'
 import { useIsVideoBlurred, useZoomSessionActions } from '../../zoom/useZoomSessionStore'
 import { StatisticsModal } from './StatisticsModal'
 
@@ -24,7 +24,8 @@ interface ControlsMenuProps {
 }
 
 export function ControlsMenu({ onLayoutOpen, isMobile, sendDevIsJohnDoNotUseThis, sendResetMessages }: ControlsMenuProps) {
-  const { setIsSettingsOpen } = useAppActions()
+  const { setIsSettingsOpen, setBlurIntensity } = useAppActions()
+  const blurIntensity = useAppBlurIntensity()
   const isVideoBlurred = useIsVideoBlurred()
   const { blurVideo } = useZoomSessionActions()
 
@@ -81,6 +82,18 @@ export function ControlsMenu({ onLayoutOpen, isMobile, sendDevIsJohnDoNotUseThis
             leftSection={isVideoBlurred ? <IconBlur size={14} /> : <IconBlurOff size={14} />}
           >
             {isVideoBlurred ? 'Unblur Video' : 'Blur Video'}
+          </Menu.Item>
+
+          <Menu.Item closeMenuOnClick={false} component="div">
+            <Text size="xs" fw={500} mb={4}>Eyetracker Blur</Text>
+            <Slider
+              min={0}
+              max={50}
+              value={blurIntensity}
+              onChange={setBlurIntensity}
+              label={value => `${value}px`}
+              size="sm"
+            />
           </Menu.Item>
 
           <Menu.Item onClick={() => setIsSettingsOpen(true)} leftSection={<IconSettings size={14} />}>
