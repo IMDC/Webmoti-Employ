@@ -19,3 +19,4 @@ dist/
 # this is generated at root level
 .vercel/
 .ruff_cache/
+package-lock.json
