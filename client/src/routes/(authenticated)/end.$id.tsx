@@ -38,7 +38,7 @@ function EndScreen() {
               </ThemeIcon>
 
               <Stack align="center" gap="xs">
-                <Title order={2} ta="center">Interview Complete</Title>
+                <Title order={1} size="h2" ta="center">Interview Complete</Title>
                 <Text c="dimmed" ta="center">
                   Thanks for attending the interview.
                 </Text>
