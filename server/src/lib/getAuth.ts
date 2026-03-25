@@ -1,3 +1,4 @@
+import type { User } from 'better-auth'
 import { betterAuth } from 'better-auth'
 import { APIError } from 'better-auth/api'
 import { bearer } from 'better-auth/plugins'
@@ -11,7 +12,7 @@ import { socialBearer } from './socialBearerPlugin'
  *
  * This is separate from the better-auth.config.ts files since you need to pass in env at runtime
  */
-export function getAuth(env: CloudflareBindings): ReturnType<typeof betterAuth> {
+export function getAuth(env: CloudflareBindings) {
   const IS_DEV = env.IS_DEV
   const db = getDb(IS_DEV
     ? env.LOCAL_DATABASE_URL
@@ -51,7 +52,8 @@ export function getAuth(env: CloudflareBindings): ReturnType<typeof betterAuth> 
     databaseHooks: {
       user: {
         create: {
-          before: async ({ email }) => {
+          before: async (user: User) => {
+            const { email } = user
             if (!email) {
               throw new APIError('BAD_REQUEST', { message: 'Google account not allowed' })
             }
