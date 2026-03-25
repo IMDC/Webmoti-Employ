@@ -15,7 +15,9 @@
 
 .statCard {
   cursor: pointer;
-  transition: box-shadow 150ms ease, transform 150ms ease;
+  transition:
+    box-shadow 150ms ease,
+    transform 150ms ease;
 }
 
 .statCard:hover,
