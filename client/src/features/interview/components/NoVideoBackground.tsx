@@ -15,10 +15,7 @@ export function NoVideoBackground({ profileUrl, isLoadingProfiles }: NoVideoBack
         h="100%"
         bgp="center"
         bgsz="cover"
-        style={{
-          backgroundImage: `url(${profileUrl})`,
-          filter: 'blur(100px)',
-        }}
+        style={{ backgroundImage: `url(${profileUrl})`, filter: 'blur(100px)' }}
       />
       <Center pos="absolute" w="100%" h="100%">
         {!isLoadingProfiles

@@ -1,5 +1,7 @@
-import { Button, Center, Group, Stack, Title } from '@mantine/core'
+import { Button, Card, Center, Group, Stack, Text, ThemeIcon, Title, Transition } from '@mantine/core'
+import { IconCircleCheck, IconHome, IconVideo } from '@tabler/icons-react'
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
 
 export const Route = createFileRoute('/(authenticated)/end/$id')({
   beforeLoad: () => {
@@ -16,21 +18,46 @@ export const Route = createFileRoute('/(authenticated)/end/$id')({
 
 function EndScreen() {
   const { id } = Route.useParams()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
     <Center h="100vh">
-      <Stack align="center" gap="xl">
-        <Title ta="center" px="lg">Thanks for attending the interview</Title>
-        <Group>
-          <Link to="/interview/prejoin/$id" params={{ id }}>
-            <Button>Rejoin</Button>
-          </Link>
+      <Transition mounted={mounted} transition="fade-up" duration={400}>
+        {styles => (
+          <Card shadow="md" radius="lg" padding="xl" withBorder w={420} style={styles}>
+            <Stack align="center" gap="lg">
+              <ThemeIcon size={64} radius="xl" variant="light" color="teal">
+                <IconCircleCheck size={36} />
+              </ThemeIcon>
 
-          <Link to="/">
-            <Button>Go to Dashboard</Button>
-          </Link>
-        </Group>
-      </Stack>
+              <Stack align="center" gap="xs">
+                <Title order={2} ta="center">Interview Complete</Title>
+                <Text c="dimmed" ta="center">
+                  Thanks for attending the interview.
+                </Text>
+              </Stack>
+
+              <Group mt="sm">
+                <Link to="/interview/prejoin/$id" params={{ id }}>
+                  <Button variant="light" leftSection={<IconVideo size={18} />}>
+                    Rejoin
+                  </Button>
+                </Link>
+
+                <Link to="/">
+                  <Button leftSection={<IconHome size={18} />}>
+                    Go to Dashboard
+                  </Button>
+                </Link>
+              </Group>
+            </Stack>
+          </Card>
+        )}
+      </Transition>
     </Center>
   )
 }

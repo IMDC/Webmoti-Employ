@@ -1,5 +1,5 @@
 import type { InterviewResponse } from '@webmoti-employ/shared'
-import { ActionIcon, Avatar, Badge, Button, Card, Divider, Flex, Group, Stack, Text, Tooltip } from '@mantine/core'
+import { ActionIcon, Avatar, Badge, Box, Button, Card, Divider, Flex, Group, Stack, Text, Tooltip } from '@mantine/core'
 import { IconReport, IconTie, IconTrash, IconVideoFilled } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
@@ -60,10 +60,37 @@ export function InterviewCard({ interview }: InterviewCardProps) {
   const formattedInterviewTime = startDt.toLocaleString(DateTime.DATETIME_MED)
   const relativeTime = startedToday ? startDt.toRelative() : null
 
+  const statusColor = isEnded ? 'gray' : startedToday ? 'teal' : 'blue'
+
   return (
-    <Card key={interview.id} shadow="sm" padding="sm" withBorder>
-      <Group justify="space-between">
-        <Group>
+    <Card
+      key={interview.id}
+      padding="md"
+      radius="md"
+      withBorder
+      styles={theme => ({
+        root: {
+          'transition': 'box-shadow 150ms ease, transform 150ms ease',
+          '&:hover': {
+            boxShadow: theme.shadows.sm,
+            transform: 'translateY(-1px)',
+          },
+          '&:focus-visible': {
+            boxShadow: theme.shadows.sm,
+            transform: 'translateY(-1px)',
+          },
+        },
+      })}
+    >
+      <Group justify="space-between" wrap="wrap" gap="xs">
+        <Group gap="xs">
+          <Box
+            w={8}
+            h={8}
+            bg={`var(--mantine-color-${statusColor}-5)`}
+            bdrs="50%"
+            style={{ flexShrink: 0 }}
+          />
           <Badge
             variant="gradient"
             gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
@@ -77,7 +104,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
             </Badge>
           )}
         </Group>
-        <Group gap="xs">
+        <Group gap="xs" wrap="nowrap">
           <UserList
             users={interview.invites ?? []}
             profiles={profiles}
@@ -100,7 +127,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
       </Group>
 
       <Stack justify="center" align="center" flex="grow" mt="sm">
-        <Text fw="bolder"ff="monospace">
+        <Text fw="bolder">
           {formattedInterviewTime}
         </Text>
 
@@ -130,10 +157,9 @@ export function InterviewCard({ interview }: InterviewCardProps) {
             : <Text fw="bold">{displayLine}</Text>}
         </Flex>
 
-        <Link to="/interview/prejoin/$id" params={{ id: interview.sessionId }}>
+        <Link to="/interview/prejoin/$id" params={{ id: interview.sessionId }} style={{ textDecoration: 'none', width: '100%', display: 'flex', justifyContent: 'center' }}>
           <Button
-            w="100%"
-            maw={250}
+            w={{ base: '100%', sm: 250 }}
             disabled={isEnded}
             leftSection={<IconVideoFilled />}
           >

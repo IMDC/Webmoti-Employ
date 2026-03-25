@@ -43,38 +43,50 @@ describe('scheduleForm', () => {
     vi.useRealTimers()
   })
 
-  it('renders all form fields', () => {
+  it('renders all form fields', async () => {
+    const user = userEvent.setup()
     renderForm()
 
+    // Step 1: date and time
     expect(screen.getByText('Interview date')).toBeInTheDocument()
     expect(screen.getByText('Interview time')).toBeInTheDocument()
+
+    // Navigate to step 2
+    await user.click(screen.getByText('Next'))
+
     expect(screen.getByText('Schedule interview')).toBeInTheDocument()
-    expect(screen.getByText('No invites added yet')).toBeInTheDocument()
+    expect(screen.getByText('No participants invited yet')).toBeInTheDocument()
     expect(screen.getByText('Add invitation')).toBeInTheDocument()
-    expect(screen.getByText('Open Google Calendar')).toBeInTheDocument()
+    expect(screen.getByText('Create Google Calendar invite')).toBeInTheDocument()
   })
 
   it('adds an invite row when clicking Add invitation', async () => {
     const user = userEvent.setup()
     renderForm()
 
+    // Navigate to step 2
+    await user.click(screen.getByText('Next'))
+
     await user.click(screen.getByText('Add invitation'))
 
-    expect(screen.getByPlaceholderText('Email')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Email address')).toBeInTheDocument()
     expect(screen.getByText('Interviewer')).toBeInTheDocument()
-    // "No invites added yet" should be gone
-    expect(screen.queryByText('No invites added yet')).not.toBeInTheDocument()
+    // "No participants invited yet" should be gone
+    expect(screen.queryByText('No participants invited yet')).not.toBeInTheDocument()
   })
 
   it('removes an invite row when clicking the trash button', async () => {
     const user = userEvent.setup()
     renderForm()
 
+    // Navigate to step 2
+    await user.click(screen.getByText('Next'))
+
     // Add two invites
     await user.click(screen.getByText('Add invitation'))
     await user.click(screen.getByText('Add invitation'))
 
-    const emailInputs = screen.getAllByPlaceholderText('Email')
+    const emailInputs = screen.getAllByPlaceholderText('Email address')
     expect(emailInputs).toHaveLength(2)
 
     // Remove the first one
@@ -82,20 +94,23 @@ describe('scheduleForm', () => {
     expect(trashButtons).toHaveLength(2)
     await user.click(trashButtons[0])
 
-    expect(screen.getAllByPlaceholderText('Email')).toHaveLength(1)
+    expect(screen.getAllByPlaceholderText('Email address')).toHaveLength(1)
   })
 
   it('shows validation error for invalid email in invite', async () => {
     const user = userEvent.setup()
     renderForm()
 
+    // Pick a time slot on step 1
+    await user.click(screen.getByText('9:30 AM'))
+
+    // Navigate to step 2
+    await user.click(screen.getByText('Next'))
+
     await user.click(screen.getByText('Add invitation'))
 
-    const emailInput = screen.getByPlaceholderText('Email')
+    const emailInput = screen.getByPlaceholderText('Email address')
     await user.type(emailInput, 'not-an-email')
-
-    // Pick a time slot
-    await user.click(screen.getByText('9:30 AM'))
 
     // Submit the form
     await user.click(screen.getByText('Schedule interview'))
@@ -119,10 +134,11 @@ describe('scheduleForm', () => {
 
     renderForm(onSuccess)
 
-    // Pick a time slot
+    // Pick a time slot on step 1
     await user.click(screen.getByText('9:30 AM'))
 
-    // Submit
+    // Navigate to step 2 and submit
+    await user.click(screen.getByText('Next'))
     await user.click(screen.getByText('Schedule interview'))
 
     await vi.waitFor(() => {
@@ -147,12 +163,15 @@ describe('scheduleForm', () => {
 
     renderForm(onSuccess)
 
+    // Pick a time slot on step 1
+    await user.click(screen.getByText('9:30 AM'))
+
+    // Navigate to step 2
+    await user.click(screen.getByText('Next'))
+
     // Add an invite
     await user.click(screen.getByText('Add invitation'))
-    await user.type(screen.getByPlaceholderText('Email'), 'candidate@example.com')
-
-    // Pick a time slot
-    await user.click(screen.getByText('9:30 AM'))
+    await user.type(screen.getByPlaceholderText('Email address'), 'candidate@example.com')
 
     // Submit
     await user.click(screen.getByText('Schedule interview'))
@@ -182,10 +201,11 @@ describe('scheduleForm', () => {
 
     renderForm()
 
-    // Pick a time slot
+    // Pick a time slot on step 1
     await user.click(screen.getByText('9:30 AM'))
 
-    // Submit
+    // Navigate to step 2 and submit
+    await user.click(screen.getByText('Next'))
     await user.click(screen.getByText('Schedule interview'))
 
     // onSuccess should NOT be called (the form should still be visible)

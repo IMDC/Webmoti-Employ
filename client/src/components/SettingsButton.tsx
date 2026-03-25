@@ -6,7 +6,7 @@ export function SettingsButton() {
   const { setIsSettingsOpen } = useAppActions()
 
   return (
-    <ActionIcon variant="transparent" onClick={() => setIsSettingsOpen(true)}>
+    <ActionIcon variant="subtle" onClick={() => setIsSettingsOpen(true)}>
       <IconSettings />
     </ActionIcon>
   )

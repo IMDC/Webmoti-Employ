@@ -42,18 +42,18 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
       overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
     >
       <Stack>
-        <Text ff="monospace">{`Client Version: ${__APP_VERSION__ ?? 'null'}`}</Text>
-        <Text ff="monospace">{`Commit SHA: ${__APP_SHA__}`}</Text>
-        <Text ff="monospace">{`Commit Date: ${formatDate(__APP_COMMIT_DATE__)}`}</Text>
-        <Text ff="monospace">{`Built At: ${formatDate(__APP_BUILD_DATE__)}`}</Text>
+        <Text>{`Client Version: ${__APP_VERSION__ ?? 'null'}`}</Text>
+        <Text>{`Commit SHA: ${__APP_SHA__}`}</Text>
+        <Text>{`Commit Date: ${formatDate(__APP_COMMIT_DATE__)}`}</Text>
+        <Text>{`Built At: ${formatDate(__APP_BUILD_DATE__)}`}</Text>
 
         {isElectron() && electronInfo && (
           <>
             <Divider />
-            <Text ff="monospace">{`Electron Version: ${electronInfo.version}`}</Text>
-            <Text ff="monospace">{`Electron SHA: ${electronInfo.sha}`}</Text>
-            <Text ff="monospace">{`Electron Commit Date: ${formatDate(electronInfo.commitDate)}`}</Text>
-            <Text ff="monospace">{`Electron Built At: ${formatDate(electronInfo.buildDate)}`}</Text>
+            <Text>{`Electron Version: ${electronInfo.version}`}</Text>
+            <Text>{`Electron SHA: ${electronInfo.sha}`}</Text>
+            <Text>{`Electron Commit Date: ${formatDate(electronInfo.commitDate)}`}</Text>
+            <Text>{`Electron Built At: ${formatDate(electronInfo.buildDate)}`}</Text>
           </>
         )}
       </Stack>

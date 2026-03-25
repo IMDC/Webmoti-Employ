@@ -83,7 +83,7 @@ test.describe('Dashboard', () => {
 
     await page.goto('/')
 
-    await expect(page.getByText('Welcome Test!')).toBeVisible()
+    await expect(page.getByText(/Good (morning|afternoon|evening), Test!/)).toBeVisible()
     await expect(page).toHaveURL('/')
   })
 
@@ -100,7 +100,7 @@ test.describe('Dashboard', () => {
 
     await page.goto('/')
 
-    await expect(page.getByText('You have no scheduled interviews')).toBeVisible()
+    await expect(page.getByText('No scheduled interviews')).toBeVisible()
   })
 
   test('displays scheduled interviews', async ({ page }) => {

@@ -14,7 +14,7 @@ export function Corner({
   xOffset = 20,
   yOffset = 20,
 }: CornerProps) {
-  const styleMap = {
+  const positionProps = {
     'top-left': { top: yOffset, left: xOffset },
     'top-right': { top: yOffset, right: xOffset },
     'bottom-left': { bottom: yOffset, left: xOffset },
@@ -24,9 +24,7 @@ export function Corner({
   return (
     <Box
       pos="absolute"
-      style={{
-        ...styleMap[position],
-      }}
+      {...positionProps[position]}
     >
       {children}
     </Box>

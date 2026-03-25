@@ -12,7 +12,7 @@ export function RightHeader() {
 
   return (
     <Group>
-      <Text ff="monospace">{time}</Text>
+      <Text ff="monospace" c="dimmed">{time}</Text>
       {isAdmin && (
         <Tooltip label="Admin">
           <ActionIcon component={Link} to="/admin" variant="subtle" size="lg" aria-label="Admin">

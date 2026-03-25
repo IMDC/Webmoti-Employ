@@ -1,0 +1,15 @@
+@keyframes greeting-icon-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.greetingIcon {
+  animation: greeting-icon-enter 0.5s ease-out;
+}

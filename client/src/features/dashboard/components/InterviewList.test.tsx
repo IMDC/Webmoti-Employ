@@ -77,8 +77,8 @@ describe('interviewList', () => {
     expect(skeletons.length).toBeGreaterThan(0)
 
     // Should not show error or empty state while loading
-    expect(screen.queryByText('Error fetching interviews:')).not.toBeInTheDocument()
-    expect(screen.queryByText('You have no scheduled interviews')).not.toBeInTheDocument()
+    expect(screen.queryByText('Error fetching interviews')).not.toBeInTheDocument()
+    expect(screen.queryByText('No scheduled interviews')).not.toBeInTheDocument()
   })
 
   it('shows error state when fetch fails', async () => {
@@ -90,7 +90,7 @@ describe('interviewList', () => {
 
     renderWithUser(<InterviewList />)
 
-    expect(await screen.findByText('Error fetching interviews:')).toBeInTheDocument()
+    expect(await screen.findByText('Error fetching interviews')).toBeInTheDocument()
   })
 
   it('shows empty state when no interviews exist', async () => {
@@ -102,7 +102,7 @@ describe('interviewList', () => {
 
     renderWithUser(<InterviewList />)
 
-    expect(await screen.findByText('You have no scheduled interviews')).toBeInTheDocument()
+    expect(await screen.findByText('No scheduled interviews')).toBeInTheDocument()
   })
 
   it('defaults to "today" tab and shows today interviews', async () => {

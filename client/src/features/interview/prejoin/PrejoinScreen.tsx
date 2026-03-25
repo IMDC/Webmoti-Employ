@@ -1,4 +1,5 @@
-import { AppShell, Box, Button, Flex, Group, Stack, Text, Title } from '@mantine/core'
+import { AppShell, Box, Button, Card, Flex, Group, Paper, Stack, Text, Title } from '@mantine/core'
+import { IconArrowLeft, IconLogin } from '@tabler/icons-react'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { Loading } from '@/components/Loading'
@@ -116,8 +117,8 @@ export function PrejoinScreen() {
       <AppShell.Header>
         <Flex justify="space-between" align="center" w="100vw" h="100%" p="lg" pl="xs">
           <Link to="/">
-            <Button variant="subtle">
-              ← Back to Dashboard
+            <Button variant="subtle" leftSection={<IconArrowLeft size={16} />}>
+              Dashboard
             </Button>
           </Link>
 
@@ -133,22 +134,35 @@ export function PrejoinScreen() {
         <JoiningScreen visible={callState === 'joining' || callState === 'joined'} />
 
         <Flex justify="center" align="center" h="100%">
-          <Group justify="center" p="xl" m="xl">
-            <Stack w={350}>
-              <PreviewTile height={196.875} width={350} name={user.name} profileUrl={userProfileUrl} />
+          <Flex
+            direction={{ base: 'column', md: 'row' }}
+            justify="center"
+            align="center"
+            gap="xl"
+            p={{ base: 'sm', sm: 'xl' }}
+            m={{ base: 'sm', sm: 'xl' }}
+          >
+            <Card shadow="sm" radius="md" withBorder p="md">
+              <Stack w={{ base: '70vw', sm: 350 }} maw={350}>
+                <PreviewTile height={196.875} width={350} name={user.name} profileUrl={userProfileUrl} />
 
-              <PrejoinMenuBar />
-            </Stack>
+                <PrejoinMenuBar />
+              </Stack>
+            </Card>
 
             <Stack>
               <Title ta={{ base: 'center', sm: 'start' }}>
                 Join Interview
               </Title>
-              <Group>
-                <MyCopyButton copyText={interviewSession.sessionId} />
-                <Text ff="monospace" fz={{ base: 'xs', sm: 'sm', lg: 'lg' }}>{interviewSession.sessionId}</Text>
-              </Group>
+              <Paper radius="md" p="xs" withBorder>
+                <Group gap="xs">
+                  <MyCopyButton copyText={interviewSession.sessionId} />
+                  <Text ff="monospace" fz={{ base: 'xs', sm: 'sm', lg: 'lg' }}>{interviewSession.sessionId}</Text>
+                </Group>
+              </Paper>
               <Button
+                size="md"
+                leftSection={<IconLogin size={18} />}
                 // it's very important to disable the button since if the client is still initializing, you can't join
                 // this might still be a bug in the zoom store
                 // Also for some reason you have to wait until permission is finalized,
@@ -160,7 +174,7 @@ export function PrejoinScreen() {
                 Join
               </Button>
             </Stack>
-          </Group>
+          </Flex>
         </Flex>
       </AppShell.Main>
     </AppShell>

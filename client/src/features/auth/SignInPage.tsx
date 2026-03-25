@@ -1,4 +1,4 @@
-import { Button, Card, Center, Stack, Text, Title } from '@mantine/core'
+import { Button, Card, Center, Stack, Text, Title, Transition } from '@mantine/core'
 import { useSearch } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { Loading } from '@/components/Loading'
@@ -11,6 +11,11 @@ const underscoreRegex = /_/g
 export function SignInPage() {
   const { redirectTo, error } = useSearch({ from: '/sign-in' })
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleGoogleLogin = async () => {
     setLoading(true)
@@ -34,30 +39,37 @@ export function SignInPage() {
 
   return (
     <Center h="100vh">
-      <Card w={400} radius="lg" padding="xl" withBorder>
-        <Stack align="center">
-          <Title size="xl" ta="center">
-            Continue to WebMoti-Employ
-          </Title>
-          <Text size="sm" c="dimmed" ta="center">
-            Sign in with your Google account
-          </Text>
-          <Button
-            onClick={handleGoogleLogin}
-            variant="default"
-            size="md"
-            radius="md"
-            px="xs"
-            style={{ padding: 0, background: 'none', border: 'none' }}
-          >
-            <img
-              src={GoogleSignInImg}
-              alt="Continue with Google"
-              style={{ width: 180 }}
-            />
-          </Button>
-        </Stack>
-      </Card>
+      <Transition mounted={mounted} transition="fade-up" duration={400}>
+        {styles => (
+          <Card w={400} radius="lg" padding="xl" shadow="md" withBorder style={styles}>
+            <Stack align="center" gap="lg">
+              <Stack align="center" gap="xs">
+                <Title size="xl" ta="center">
+                  WebMoti-Employ
+                </Title>
+                <Text size="sm" c="dimmed" ta="center">
+                  Sign in with your Google account to continue
+                </Text>
+              </Stack>
+              <Button
+                onClick={handleGoogleLogin}
+                variant="default"
+                size="md"
+                radius="md"
+                p={0}
+                bg="none"
+                bd="none"
+              >
+                <img
+                  src={GoogleSignInImg}
+                  alt="Continue with Google"
+                  style={{ width: 180 }}
+                />
+              </Button>
+            </Stack>
+          </Card>
+        )}
+      </Transition>
     </Center>
   )
 }

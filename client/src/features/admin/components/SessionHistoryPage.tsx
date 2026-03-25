@@ -27,60 +27,62 @@ function qualityColor(quality: string) {
 
 function ParticipantsTable({ participants }: { participants: SessionParticipant[] }) {
   return (
-    <Table striped highlightOnHover>
-      <Table.Thead>
-        <Table.Tr>
-          <Table.Th>Name</Table.Th>
-          <Table.Th>Device</Table.Th>
-          <Table.Th>Joined</Table.Th>
-          <Table.Th>Left</Table.Th>
-          <Table.Th>Location</Table.Th>
-          <Table.Th>Audio</Table.Th>
-          <Table.Th>Video</Table.Th>
-        </Table.Tr>
-      </Table.Thead>
-      <Table.Tbody>
-        {participants.map(p => (
-          <Table.Tr key={p.id}>
-            <Table.Td>
-              {p.userName
-                ? (
-                    <div>
-                      <Text size="sm" fw={500}>{p.userName}</Text>
-                      <Text size="xs" c="dimmed">{p.userEmail}</Text>
-                    </div>
-                  )
-                : <Text size="sm" c="dimmed">{p.name || p.user_key || 'Unknown'}</Text>}
-            </Table.Td>
-            <Table.Td><Text size="sm">{p.device || '-'}</Text></Table.Td>
-            <Table.Td>
-              <Text size="sm">{DateTime.fromJSDate(p.join_time).toLocaleString(DateTime.TIME_SIMPLE)}</Text>
-            </Table.Td>
-            <Table.Td>
-              <Text size="sm">{DateTime.fromJSDate(p.leave_time).toLocaleString(DateTime.TIME_SIMPLE)}</Text>
-            </Table.Td>
-            <Table.Td><Text size="sm">{p.location || '-'}</Text></Table.Td>
-            <Table.Td>
-              {p.audio_quality
-                ? <Badge size="xs" color={qualityColor(p.audio_quality)}>{p.audio_quality}</Badge>
-                : <Text size="sm" c="dimmed">-</Text>}
-            </Table.Td>
-            <Table.Td>
-              {p.video_quality
-                ? <Badge size="xs" color={qualityColor(p.video_quality)}>{p.video_quality}</Badge>
-                : <Text size="sm" c="dimmed">-</Text>}
-            </Table.Td>
-          </Table.Tr>
-        ))}
-        {participants.length === 0 && (
+    <Table.ScrollContainer minWidth={600}>
+      <Table striped highlightOnHover>
+        <Table.Thead>
           <Table.Tr>
-            <Table.Td colSpan={7}>
-              <Text c="dimmed" ta="center">No participant data available</Text>
-            </Table.Td>
+            <Table.Th>Name</Table.Th>
+            <Table.Th>Device</Table.Th>
+            <Table.Th>Joined</Table.Th>
+            <Table.Th>Left</Table.Th>
+            <Table.Th>Location</Table.Th>
+            <Table.Th>Audio</Table.Th>
+            <Table.Th>Video</Table.Th>
           </Table.Tr>
-        )}
-      </Table.Tbody>
-    </Table>
+        </Table.Thead>
+        <Table.Tbody>
+          {participants.map(p => (
+            <Table.Tr key={p.id}>
+              <Table.Td>
+                {p.userName
+                  ? (
+                      <div>
+                        <Text size="sm" fw={500}>{p.userName}</Text>
+                        <Text size="xs" c="dimmed">{p.userEmail}</Text>
+                      </div>
+                    )
+                  : <Text size="sm" c="dimmed">{p.name || p.user_key || 'Unknown'}</Text>}
+              </Table.Td>
+              <Table.Td><Text size="sm">{p.device || '-'}</Text></Table.Td>
+              <Table.Td>
+                <Text size="sm">{DateTime.fromJSDate(p.join_time).toLocaleString(DateTime.TIME_SIMPLE)}</Text>
+              </Table.Td>
+              <Table.Td>
+                <Text size="sm">{DateTime.fromJSDate(p.leave_time).toLocaleString(DateTime.TIME_SIMPLE)}</Text>
+              </Table.Td>
+              <Table.Td><Text size="sm">{p.location || '-'}</Text></Table.Td>
+              <Table.Td>
+                {p.audio_quality
+                  ? <Badge size="xs" color={qualityColor(p.audio_quality)}>{p.audio_quality}</Badge>
+                  : <Text size="sm" c="dimmed">-</Text>}
+              </Table.Td>
+              <Table.Td>
+                {p.video_quality
+                  ? <Badge size="xs" color={qualityColor(p.video_quality)}>{p.video_quality}</Badge>
+                  : <Text size="sm" c="dimmed">-</Text>}
+              </Table.Td>
+            </Table.Tr>
+          ))}
+          {participants.length === 0 && (
+            <Table.Tr>
+              <Table.Td colSpan={7}>
+                <Text c="dimmed" ta="center">No participant data available</Text>
+              </Table.Td>
+            </Table.Tr>
+          )}
+        </Table.Tbody>
+      </Table>
+    </Table.ScrollContainer>
   )
 }
 
@@ -126,7 +128,7 @@ export function SessionHistoryPage() {
           }}
           maxDate={new Date()}
           clearable={false}
-          w={300}
+          w={{ base: '100%', xs: 300 }}
         />
       </Group>
 
@@ -135,87 +137,89 @@ export function SessionHistoryPage() {
       {isPending
         ? <Center h="60vh"><Loader type="dots" /></Center>
         : (
-            <Table striped highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>Session</Table.Th>
-                  <Table.Th>Start</Table.Th>
-                  <Table.Th>End</Table.Th>
-                  <Table.Th>Duration</Table.Th>
-                  <Table.Th>Participants</Table.Th>
-                  <Table.Th>Features</Table.Th>
-                  <Table.Th>Interview</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {paginatedSessions?.map(session => (
-                  <Table.Tr key={session.id} style={{ cursor: 'pointer' }} onClick={() => handleRowClick(session.id)}>
-                    <Table.Td>
-                      <Text size="sm" ff="monospace">
-                        {session.session_key
-                          ? `${session.session_key.slice(0, 8)}...`
-                          : session.session_name.slice(0, 12)}
-                      </Text>
-                    </Table.Td>
-                    <Table.Td>
-                      <Text size="sm">
-                        {DateTime.fromJSDate(session.start_time).toLocaleString(DateTime.DATETIME_MED)}
-                      </Text>
-                    </Table.Td>
-                    <Table.Td>
-                      <Text size="sm">
-                        {DateTime.fromJSDate(session.end_time).toLocaleString(DateTime.DATETIME_MED)}
-                      </Text>
-                    </Table.Td>
-                    <Table.Td>
-                      <Text size="sm">{session.duration}</Text>
-                    </Table.Td>
-                    <Table.Td>
-                      <Badge size="sm" variant="light">
-                        {session.user_count}
-                        {' '}
-                        {session.user_count === 1 ? 'user' : 'users'}
-                      </Badge>
-                    </Table.Td>
-                    <Table.Td>
-                      <Group gap={4}>
-                        {session.has_voip && <Tooltip label="Audio"><IconMicrophone size={16} /></Tooltip>}
-                        {session.has_video && <Tooltip label="Video"><IconVideo size={16} /></Tooltip>}
-                        {session.has_screen_share && <Tooltip label="Screen Share"><IconScreenShare size={16} /></Tooltip>}
-                        {session.has_recording && <Tooltip label="Recording"><IconMovie size={16} /></Tooltip>}
-                      </Group>
-                    </Table.Td>
-                    <Table.Td>
-                      {session.interviewId
-                        ? (
-                            <Badge
-                              size="sm"
-                              variant="outline"
-                              style={{ cursor: 'pointer' }}
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                navigate({ to: '/admin/interviews', search: { highlight: session.interviewId! } })
-                              }}
-                            >
-                              #
-                              {session.interviewId}
-                            </Badge>
-                          )
-                        : (
-                            <Text size="sm" c="dimmed">N/A</Text>
-                          )}
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
-                {sessions?.length === 0 && (
+            <Table.ScrollContainer minWidth={700}>
+              <Table striped highlightOnHover>
+                <Table.Thead>
                   <Table.Tr>
-                    <Table.Td colSpan={7}>
-                      <Text c="dimmed" ta="center">No sessions found in this date range</Text>
-                    </Table.Td>
+                    <Table.Th>Session</Table.Th>
+                    <Table.Th>Start</Table.Th>
+                    <Table.Th>End</Table.Th>
+                    <Table.Th>Duration</Table.Th>
+                    <Table.Th>Participants</Table.Th>
+                    <Table.Th>Features</Table.Th>
+                    <Table.Th>Interview</Table.Th>
                   </Table.Tr>
-                )}
-              </Table.Tbody>
-            </Table>
+                </Table.Thead>
+                <Table.Tbody>
+                  {paginatedSessions?.map(session => (
+                    <Table.Tr key={session.id} style={{ cursor: 'pointer' }} onClick={() => handleRowClick(session.id)}>
+                      <Table.Td>
+                        <Text size="sm" ff="monospace">
+                          {session.session_key
+                            ? `${session.session_key.slice(0, 8)}...`
+                            : session.session_name.slice(0, 12)}
+                        </Text>
+                      </Table.Td>
+                      <Table.Td>
+                        <Text size="sm">
+                          {DateTime.fromJSDate(session.start_time).toLocaleString(DateTime.DATETIME_MED)}
+                        </Text>
+                      </Table.Td>
+                      <Table.Td>
+                        <Text size="sm">
+                          {DateTime.fromJSDate(session.end_time).toLocaleString(DateTime.DATETIME_MED)}
+                        </Text>
+                      </Table.Td>
+                      <Table.Td>
+                        <Text size="sm">{session.duration}</Text>
+                      </Table.Td>
+                      <Table.Td>
+                        <Badge size="sm" variant="light">
+                          {session.user_count}
+                          {' '}
+                          {session.user_count === 1 ? 'user' : 'users'}
+                        </Badge>
+                      </Table.Td>
+                      <Table.Td>
+                        <Group gap={4}>
+                          {session.has_voip && <Tooltip label="Audio"><IconMicrophone size={16} /></Tooltip>}
+                          {session.has_video && <Tooltip label="Video"><IconVideo size={16} /></Tooltip>}
+                          {session.has_screen_share && <Tooltip label="Screen Share"><IconScreenShare size={16} /></Tooltip>}
+                          {session.has_recording && <Tooltip label="Recording"><IconMovie size={16} /></Tooltip>}
+                        </Group>
+                      </Table.Td>
+                      <Table.Td>
+                        {session.interviewId
+                          ? (
+                              <Badge
+                                size="sm"
+                                variant="outline"
+                                style={{ cursor: 'pointer' }}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  navigate({ to: '/admin/interviews', search: { highlight: session.interviewId! } })
+                                }}
+                              >
+                                #
+                                {session.interviewId}
+                              </Badge>
+                            )
+                          : (
+                              <Text size="sm" c="dimmed">N/A</Text>
+                            )}
+                      </Table.Td>
+                    </Table.Tr>
+                  ))}
+                  {sessions?.length === 0 && (
+                    <Table.Tr>
+                      <Table.Td colSpan={7}>
+                        <Text c="dimmed" ta="center">No sessions found in this date range</Text>
+                      </Table.Td>
+                    </Table.Tr>
+                  )}
+                </Table.Tbody>
+              </Table>
+            </Table.ScrollContainer>
           )}
 
       {totalPages > 1 && (
