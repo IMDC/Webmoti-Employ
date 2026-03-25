@@ -18,20 +18,6 @@
   "packageRules": [
     // NPM ---------------------------------------------------
     {
-      "description": "Group non-eslint npm minor updates",
-      "matchManagers": ["npm"],
-      "matchUpdateTypes": ["minor"],
-      "matchPackageNames": ["!/eslint/"],
-      "groupName": "minor updates group"
-    },
-    {
-      "description": "Group non-eslint npm patch updates",
-      "matchManagers": ["npm"],
-      "matchUpdateTypes": ["patch"],
-      "matchPackageNames": ["!/eslint/"],
-      "groupName": "patch updates group"
-    },
-    {
       "description": "Group eslint-related minor/patch updates",
       "matchManagers": ["npm"],
       "matchUpdateTypes": ["minor", "patch"],
@@ -39,12 +25,26 @@
       "groupName": "eslint group"
     },
     {
+      "description": "Group npm minor updates",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor"],
+      "matchPackageNames": ["!/eslint/"],
+      "groupName": "minor updates group"
+    },
+    {
+      "description": "Group npm patch updates",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["patch"],
+      "matchPackageNames": ["!/eslint/"],
+      "groupName": "patch updates group"
+    },
+    {
       "description": "Pinned packages: disabled due to compatibility issues",
       "matchPackageNames": ["wrangler", "vitest"],
       "enabled": false
     },
     {
-      "description": "Separate better-auth updates (minor versions can be breaking)",
+      "description": "Group better-auth updates (minor versions can be breaking)",
       "matchManagers": ["npm"],
       "matchPackageNames": ["better-auth"],
       "groupName": "better-auth group",
