@@ -19,8 +19,9 @@ import {
   IconShieldCheck,
   IconUsers,
 } from '@tabler/icons-react'
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
+import adminClasses from '../admin.module.css'
 import { useAdminOverview } from '../queries'
 import { AdminBurger } from './AdminBurger'
 
@@ -96,7 +97,7 @@ function OverviewContent({ data }: { data: ReturnType<typeof useAdminOverview>['
         <Card withBorder>
           <Group justify="space-between" mb="sm">
             <Title order={5}>Recent Interviews</Title>
-            <Anchor size="xs" onClick={() => navigate({ to: '/admin/interviews' })}>
+            <Anchor component={Link} to="/admin/interviews" size="xs">
               View all
             </Anchor>
           </Group>
@@ -144,7 +145,7 @@ function OverviewContent({ data }: { data: ReturnType<typeof useAdminOverview>['
         <Card withBorder>
           <Group justify="space-between" mb="sm">
             <Title order={5}>Upcoming Interviews</Title>
-            <Anchor size="xs" onClick={() => navigate({ to: '/admin/interviews' })}>
+            <Anchor component={Link} to="/admin/interviews" size="xs">
               View all
             </Anchor>
           </Group>
@@ -198,7 +199,7 @@ function StatCard({ label, value, icon, color, onClick }: {
   return (
     <Card
       withBorder
-      style={{ cursor: 'pointer' }}
+      className={adminClasses.statCard}
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -207,14 +208,6 @@ function StatCard({ label, value, icon, color, onClick }: {
           e.preventDefault()
           onClick()
         }
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = 'var(--mantine-shadow-sm)'
-        e.currentTarget.style.transform = 'translateY(-2px)'
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = 'none'
-        e.currentTarget.style.transform = 'none'
       }}
     >
       <Group justify="space-between">
