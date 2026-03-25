@@ -56,8 +56,9 @@ export function SignInPage() {
                 variant="default"
                 size="md"
                 radius="md"
-                px="xs"
-                style={{ padding: 0, background: 'none', border: 'none' }}
+                p={0}
+                bg="none"
+                bd="none"
               >
                 <img
                   src={GoogleSignInImg}

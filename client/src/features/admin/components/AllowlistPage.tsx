@@ -60,7 +60,7 @@ export function AllowlistPage() {
           value={email}
           onChange={e => setEmail(e.currentTarget.value)}
           onKeyDown={e => e.key === 'Enter' && handleAdd()}
-          style={{ flex: 1 }}
+          flex={1}
         />
         <Button
           leftSection={<IconPlus size={16} />}

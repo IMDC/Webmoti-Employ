@@ -198,7 +198,7 @@ function StatCard({ label, value, icon, color, onClick }: {
           <Text size="xs" c="dimmed" tt="uppercase" fw={700}>{label}</Text>
           <Text size="xl" fw={700}>{value}</Text>
         </div>
-        <Badge size="lg" variant="light" color={color} style={{ padding: 8 }}>
+        <Badge size="lg" variant="light" color={color} p={8}>
           {icon}
         </Badge>
       </Group>

@@ -1,5 +1,5 @@
 import type { InterviewResponse } from '@webmoti-employ/shared'
-import { ActionIcon, Avatar, Badge, Button, Card, Divider, Flex, Group, Stack, Text, Tooltip } from '@mantine/core'
+import { ActionIcon, Avatar, Badge, Box, Button, Card, Divider, Flex, Group, Stack, Text, Tooltip } from '@mantine/core'
 import { IconReport, IconTie, IconTrash, IconVideoFilled } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
@@ -83,14 +83,12 @@ export function InterviewCard({ interview }: InterviewCardProps) {
       {' '}
       <Group justify="space-between" wrap="wrap" gap="xs">
         <Group gap="xs">
-          <span
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              backgroundColor: `var(--mantine-color-${statusColor}-5)`,
-              flexShrink: 0,
-            }}
+          <Box
+            w={8}
+            h={8}
+            bg={`var(--mantine-color-${statusColor}-5)`}
+            bdrs="50%"
+            style={{ flexShrink: 0 }}
           />
           <Badge
             variant="gradient"

@@ -1,5 +1,5 @@
 import type { InterviewFeedback } from '../hooks/useInterviewFeedback'
-import { Center, Group, Stack, Text, useMantineTheme } from '@mantine/core'
+import { Box, Center, Group, Stack, Text, useMantineTheme } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import {
   IconAlertTriangleFilled,
@@ -77,7 +77,7 @@ function FeedbackIcon({ icon, label, isActive }: {
 
   return (
     <Stack align="center" gap={0}>
-      <div style={{ color: '#FFC107' }}>{icon}</div>
+      <Box c="#FFC107">{icon}</Box>
       <Text fz={{ base: 'lg', xl: 'xl' }} fw="bold" c="#FFC107">{label}</Text>
     </Stack>
   )

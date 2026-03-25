@@ -153,7 +153,10 @@ export function Dashboard() {
                 padding="md"
                 withBorder
                 h="100%"
-                style={{ cursor: 'pointer', flex: '1 1 0', minWidth: 140, maxWidth: 250, transition: 'box-shadow 150ms ease, transform 150ms ease' }}
+                flex="1 1 0"
+                miw={140}
+                maw={250}
+                style={{ cursor: 'pointer', transition: 'box-shadow 150ms ease, transform 150ms ease' }}
                 onClick={openScheduleModal}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.boxShadow = 'var(--mantine-shadow-md)'
