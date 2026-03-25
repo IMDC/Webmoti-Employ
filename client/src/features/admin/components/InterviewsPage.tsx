@@ -117,6 +117,7 @@ export function InterviewsPage() {
           size="xs"
           loading={clearInstantMutation.isPending}
           onClick={async () => {
+            // eslint-disable-next-line no-alert
             if (!window.confirm('Delete all instant interviews?'))
               return
             try {
