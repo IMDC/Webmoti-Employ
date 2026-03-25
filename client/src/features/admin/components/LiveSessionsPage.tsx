@@ -1,5 +1,6 @@
-import { Alert, Badge, Center, Group, Loader, Stack, Table, Text, Title } from '@mantine/core'
+import { Alert, Badge, Center, Group, Loader, Stack, Table, Text, ThemeIcon, Title } from '@mantine/core'
 import { useNavigate } from '@tanstack/react-router'
+import { IconVideoOff } from '@tabler/icons-react'
 import { DateTime } from 'luxon'
 import { useLiveSessions } from '../queries'
 import { AdminBurger } from './AdminBurger'
@@ -24,7 +25,8 @@ export function LiveSessionsPage() {
       {isPending
         ? <Center h="60vh"><Loader type="dots" /></Center>
         : (
-            <Table striped highlightOnHover>
+            <Table.ScrollContainer minWidth={600}>
+              <Table striped highlightOnHover>
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>Session</Table.Th>
@@ -82,12 +84,18 @@ export function LiveSessionsPage() {
                 {sessions?.length === 0 && (
                   <Table.Tr>
                     <Table.Td colSpan={5}>
-                      <Text c="dimmed" ta="center">No active sessions</Text>
+                      <Stack align="center" gap="xs" py="md">
+                        <ThemeIcon size={40} radius="xl" variant="light" color="gray">
+                          <IconVideoOff size={20} />
+                        </ThemeIcon>
+                        <Text c="dimmed" ta="center">No active sessions</Text>
+                      </Stack>
                     </Table.Td>
                   </Table.Tr>
                 )}
               </Table.Tbody>
             </Table>
+            </Table.ScrollContainer>
           )}
     </Stack>
   )

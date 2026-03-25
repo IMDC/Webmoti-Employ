@@ -134,9 +134,16 @@ export function PrejoinScreen() {
         <JoiningScreen visible={callState === 'joining' || callState === 'joined'} />
 
         <Flex justify="center" align="center" h="100%">
-          <Group justify="center" p="xl" m="xl">
+          <Flex
+            direction={{ base: 'column', md: 'row' }}
+            justify="center"
+            align="center"
+            gap="xl"
+            p={{ base: 'sm', sm: 'xl' }}
+            m={{ base: 'sm', sm: 'xl' }}
+          >
             <Card shadow="sm" radius="md" withBorder p="md">
-              <Stack w={350}>
+              <Stack w={{ base: '70vw', sm: 350 }} maw={350}>
                 <PreviewTile height={196.875} width={350} name={user.name} profileUrl={userProfileUrl} />
 
                 <PrejoinMenuBar />
@@ -167,7 +174,7 @@ export function PrejoinScreen() {
                 Join
               </Button>
             </Stack>
-          </Group>
+          </Flex>
         </Flex>
       </AppShell.Main>
     </AppShell>

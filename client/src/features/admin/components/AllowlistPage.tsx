@@ -8,9 +8,10 @@ import {
   Table,
   Text,
   TextInput,
+  ThemeIcon,
   Title,
 } from '@mantine/core'
-import { IconPlus } from '@tabler/icons-react'
+import { IconMailOff, IconPlus } from '@tabler/icons-react'
 import { DateTime } from 'luxon'
 import { useState } from 'react'
 import { DeleteButton } from '@/components/DeleteButton'
@@ -74,7 +75,8 @@ export function AllowlistPage() {
       {isPending
         ? <Center h="60vh"><Loader type="dots" /></Center>
         : (
-            <Table striped highlightOnHover>
+            <Table.ScrollContainer minWidth={500}>
+              <Table striped highlightOnHover>
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>Email</Table.Th>
@@ -120,12 +122,18 @@ export function AllowlistPage() {
                 {allowlist?.length === 0 && adminEmails?.length === 0 && (
                   <Table.Tr>
                     <Table.Td colSpan={4}>
-                      <Text c="dimmed" ta="center">No emails in allowlist</Text>
+                      <Stack align="center" gap="xs" py="md">
+                        <ThemeIcon size={40} radius="xl" variant="light" color="gray">
+                          <IconMailOff size={20} />
+                        </ThemeIcon>
+                        <Text c="dimmed" ta="center">No emails in allowlist</Text>
+                      </Stack>
                     </Table.Td>
                   </Table.Tr>
                 )}
               </Table.Tbody>
             </Table>
+            </Table.ScrollContainer>
           )}
     </Stack>
   )

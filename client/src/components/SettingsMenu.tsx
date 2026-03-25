@@ -1,4 +1,4 @@
-import { Button, Group, Modal, Stack, Switch, Text } from '@mantine/core'
+import { Button, Divider, Group, Modal, Stack, Switch, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useAppActions, useAppIsColorblindModeOn, useAppIsSettingsOpen } from '@/useAppStore'
 import { AboutModal } from './AboutModal'
@@ -29,10 +29,14 @@ export function SettingsMenu() {
             onChange={event => setIsColorblindModeOn(event.currentTarget.checked)}
           />
 
+          <Divider />
+
           <Group>
             <Text>Change theme</Text>
             <ColorSchemeToggle />
           </Group>
+
+          <Divider />
 
           <Button
             variant="default"

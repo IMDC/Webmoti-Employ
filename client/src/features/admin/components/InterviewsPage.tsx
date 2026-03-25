@@ -9,6 +9,7 @@ import {
   Stack,
   Table,
   Text,
+  ThemeIcon,
   Title,
   Tooltip,
 } from '@mantine/core'
@@ -16,6 +17,7 @@ import { DatePickerInput } from '@mantine/dates'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { DateTime } from 'luxon'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { IconCalendarOff } from '@tabler/icons-react'
 import { DeleteButton } from '@/components/DeleteButton'
 import { notifyError } from '@/utils/utils'
 import { useAdminDeleteInterview, useAdminInterviews } from '../queries'
@@ -111,7 +113,8 @@ export function InterviewsPage() {
       {isPending
         ? <Center h="60vh"><Loader type="dots" /></Center>
         : (
-            <Table striped highlightOnHover>
+            <Table.ScrollContainer minWidth={700}>
+              <Table striped highlightOnHover>
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>ID</Table.Th>
@@ -190,12 +193,18 @@ export function InterviewsPage() {
                 {filteredInterviews.length === 0 && (
                   <Table.Tr>
                     <Table.Td colSpan={6}>
-                      <Text c="dimmed" ta="center">No interviews found</Text>
+                      <Stack align="center" gap="xs" py="md">
+                        <ThemeIcon size={40} radius="xl" variant="light" color="gray">
+                          <IconCalendarOff size={20} />
+                        </ThemeIcon>
+                        <Text c="dimmed" ta="center">No interviews found</Text>
+                      </Stack>
                     </Table.Td>
                   </Table.Tr>
                 )}
               </Table.Tbody>
             </Table>
+            </Table.ScrollContainer>
           )}
 
       {totalPages > 1 && (

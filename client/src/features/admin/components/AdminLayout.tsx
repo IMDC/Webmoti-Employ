@@ -53,6 +53,8 @@ export function AdminLayout() {
             leftSection={<item.icon size={18} />}
             active={pathname === item.path}
             onClick={() => handleNav(item.path)}
+            variant="light"
+            styles={{ root: { borderRadius: 'var(--mantine-radius-md)' } }}
           />
         ))}
         <Divider my="sm" />
@@ -60,6 +62,8 @@ export function AdminLayout() {
           label="Back to Dashboard"
           leftSection={<IconArrowLeft size={18} />}
           onClick={() => handleNav('/')}
+          variant="subtle"
+          styles={{ root: { borderRadius: 'var(--mantine-radius-md)' } }}
         />
       </AppShell.Navbar>
       <AppShell.Main>
