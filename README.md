@@ -28,7 +28,7 @@ WebMoti-Employ is an app that uses eyetracking to deliver real-time feedback dur
 
 ![Dashboard](img/dashboard.png)
 
-![Interview room](img/room.png)
+![Interview room](img/interview-room.png)
 
 [See more app screenshots here](img/screenshots.md)
 
@@ -79,6 +79,14 @@ Hosting:
 ## Real-time feedback pipeline
 
 Real-time feedback is done using eye tracking and AI analysis.
+
+Our system provides 4 distinct feedback notifications:
+
+- Eyetracking: If the candidate is not looking at the interviewer for a while, we progressively blur the video background to shift focus back to the interviewer. There is also a text notification.
+- Question hints: Two short AI generated hints to help answer the current question. Both the candidate and interviewer will see these hints.
+- Off topic feedback: If the candidate goes off topic, we show a text notification to remind them.
+- Stopwatch: When a question is asked, a stopwatch starts counting up to show how much time has passed for the current question.
+
 
 ### Eyetracking
 
