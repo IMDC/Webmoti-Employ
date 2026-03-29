@@ -190,7 +190,7 @@ Steps to update dependencies:
 
 ## Desktop App
 
-The desktop app is a cross platform Electron app that wraps the React client and runs a Python server in the background. This allows us to connect to the eyetracker using the Tobii Pro Python SDK.
+The desktop app is a cross platform Electron app that loads the hosted React client and runs a Python server in the background. This allows us to connect to the eyetracker using the Tobii Pro Python SDK.
 
 [More info about desktop app here](electron/README.md)
 
@@ -278,6 +278,6 @@ Solution: Use Chrome instead for developing.
 
 ### Problem with pnpm lockfile
 
-This problem could manifest in many different ways, for example zoom video not working or a strange error in the console. Usually this will happen after the dependencies were changed, maybe with dependabot or manually.
+This problem could manifest in many different ways, for example zoom video not working or a strange error in the console. This could happen after the dependencies were changed, maybe with Renovate or manually.
 
-Solution: Delete `pnpm-lock.yaml` and run `pnpm i` to regenerate the lockfile.
+Solution: Delete `pnpm-lock.yaml`, run `pnpm clean-modules`, and run `pnpm i` to regenerate the lockfile.

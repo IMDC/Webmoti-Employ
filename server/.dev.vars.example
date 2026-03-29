@@ -15,17 +15,22 @@ BETTER_AUTH_URL=http://localhost:8787 # for dev
 
 CORS_ORIGIN=http://localhost:5173 # for dev
 
-# for kysely-codegen
-DATABASE_URL=YOUR_NEON_DATABASE_URL_HERE
-
-# for local auth
-LOCAL_DATABASE_URL=YOUR_WRANGLER_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE_HERE
-
 GROQ_API_KEY=YOUR_GROQ_API_KEY_HERE
 
 SPEECHMATICS_API_KEY=YOUR_SPEECHMATICS_API_KEY_HERE
 
 ADMIN_EMAILS=ADMIN_EMAILS_SEPARATED_BY_COMMAS_HERE
+
+
+# ------ Local variables --------------
+
+# These variables should not be deployed
+
+# for kysely-codegen
+DATABASE_URL=YOUR_NEON_DATABASE_URL_HERE
+
+# for local auth
+LOCAL_DATABASE_URL=YOUR_WRANGLER_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE_HERE
 
 # used to know if running in dev mode. this shouldn't be set for production.
 IS_DEV=true

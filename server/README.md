@@ -84,7 +84,7 @@ Steps:
 2. (optional) Setup hyperdrive if you haven't already
 3. Create project: `cd server` `pnpm run deploy`
 4. Go to cloudflare dashboard and then to your worker
-5. In `Settings` > `Variables and Secrets`, add everything in `.dev.vars` except `DATABASE_URL` and `LOCAL_DATABASE_URL`. You can copy the whole env and paste it into the `Variable name` field which speeds up the process (make sure you exclude the two database ones).
+5. In `Settings` > `Variables and Secrets`, add everything in `.dev.vars` except `DATABASE_URL`,  `LOCAL_DATABASE_URL` and `IS_DEV`. You can copy the whole env and paste it into the `Variable name` field which speeds up the process (make sure you exclude the two database ones).
 6. For `BETTER_AUTH_URL`, set this to the url of the server (the deployed cloudflare worker). Set `CORS_ORIGIN` to the deployed client vercel url.
 7. Set the type of all the secrets to `Secret` instead of `Text` (Except for ADMIN_EMAILS, set that to `Text` since you may edit this sometimes)
 8. Press `Deploy`
@@ -205,8 +205,7 @@ A good resource for this is: <https://hono.dev/examples/better-auth-on-cloudflar
 
 1. Use the site to generate the `BETTER_AUTH_SECRET` (or `npx @better-auth/cli secret`). Also generate a second one to put in the GitHub repo secrets so it works in the CI.
 2. For the `BETTER_AUTH_URL`, you can set this to `http://localhost:8787` for dev (assuming the hono app runs on port `8787`). For production you can set this to the actual url of the Cloudflare deployed hono app.
-3. (optional) Create Better Auth Table SQL: `pnpm run db:better-auth-gen`. This will generate `src/db/better-auth-schema.sql` which we don't use, but it's useful to use for creating local tables in the local Postgresql database.
-4. [Run better-auth migrations](#migrations)
+3. [Run better-auth migrations](#migrations) to generate the tables
 
 #### Google OAuth Setup
 

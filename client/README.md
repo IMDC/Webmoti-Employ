@@ -1,6 +1,6 @@
 # @webmoti-employ/client
 
-This is a React and Vite app that's deployed online and also wrapped in Electron for the desktop app.
+This is a React and Vite app that's deployed online.
 
 ## Setup
 
@@ -31,11 +31,7 @@ The client is deployed on Vercel. Since Vercel doesn't allow collaborators on th
 
 Steps for automatic deployments:
 
-(These are outdated now since Vercel changed something recently)
-<https://vercel.com/guides/how-can-i-use-github-actions-with-vercel>
-<https://faisalhusa.in/blog/vercel-free-tier-cicd-fix>
-
-See https://github.com/DaviZCodes/vercel-hobby-collaboration-github-actions for a working workflow
+See https://github.com/DaviZCodes/vercel-hobby-collaboration-github-actions for a working workflow and instructions.
 
 1. In Vercel dashboard > `Account settings` > `Tokens`, make a new API token.
 2. Inside the generated `.vercel` folder (from above steps), save the projectId and orgId from the project.json. You can also get this from the Vercel dashboard.
