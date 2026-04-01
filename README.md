@@ -176,6 +176,9 @@ We use Github actions for CI/CD automation. There are five main workflows:
    - Runs when files in `electron/python/` change
    - Lints Python code with Ruff
    - Runs Python tests with pytest
+6. `GitHub Actions Security Analysis`
+   - Checks GitHub Actions workflows for security issues using `zizmor`
+   - You can run zizmor locally too: `uvx zizmor .\.github\`
 
 ## Renovate
 

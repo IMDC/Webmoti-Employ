@@ -14,7 +14,6 @@ concurrency:
 
 permissions:
   contents: read
-  deployments: write
 
 jobs:
   build:
@@ -30,13 +29,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
 
       # this copies the example .dev.vars so typegen populates CloudflareBindings properly
       - name: Mock env for server typegen
         working-directory: server
         run: |
           cp .dev.vars.example .dev.vars
-          echo "BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }}" >> .dev.vars
+          echo "BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET" >> .dev.vars
 
       - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4
         with:
@@ -83,10 +84,20 @@ jobs:
     if: github.ref == 'refs/heads/master'
     uses: ./.github/workflows/deploy-vercel.yml
     needs: [build]
-    secrets: inherit
+    permissions:
+      contents: read
+      deployments: write
+    secrets:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
   deploy-cloudflare:
     if: github.ref == 'refs/heads/master'
     uses: ./.github/workflows/deploy-cloudflare.yml
     needs: [build]
-    secrets: inherit
+    permissions:
+      contents: read
+    secrets:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

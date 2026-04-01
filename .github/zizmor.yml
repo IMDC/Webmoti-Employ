@@ -1,0 +1,8 @@
+rules:
+  # GitHub environments are not available on org free plan for private repos
+  secrets-outside-env:
+    disable: true
+  # setup-node cache + wrangler deploy: low risk since deploy only runs on master
+  cache-poisoning:
+    ignore:
+      - deploy-cloudflare.yml
