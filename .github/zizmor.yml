@@ -6,3 +6,8 @@ rules:
   cache-poisoning:
     ignore:
       - deploy-cloudflare.yml
+  # dorny/paths-filter needs git credentials, deploy checkouts already use persist-credentials: false
+  artipacked:
+    ignore:
+      - deploy-cloudflare.yml
+      - deploy-vercel.yml
