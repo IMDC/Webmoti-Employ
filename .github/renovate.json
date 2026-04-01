@@ -2,14 +2,14 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
-    "schedule:weekly",
+    "schedule:monthly",
     "helpers:pinGitHubActionDigests",
     ":configMigration"
   ],
   "timezone": "America/Toronto",
   "enabledManagers": ["npm", "github-actions", "pyenv", "pep621"],
   "prConcurrentLimit": 10,
-  "minimumReleaseAge": "7 days",
+  "minimumReleaseAge": "14 days",
   "vulnerabilityAlerts": {
     "enabled": true,
     "schedule": ["at any time"],
