@@ -27,13 +27,13 @@
     "create-migration": "node scripts/create-migration-file.js"
   },
   "dependencies": {
-    "@ai-sdk/groq": "3.0.30",
+    "@ai-sdk/groq": "3.0.60",
     "@hono-rate-limiter/cloudflare": "^0.2.2",
     "@hono/zod-validator": "^0.7.6",
     "@speechmatics/auth": "^0.1.0",
     "@webmoti-employ/shared": "workspace:^",
     "@zoom/videosdk": "catalog:",
-    "ai": "6.0.128",
+    "ai": "6.0.264",
     "better-auth": "catalog:",
     "hono": "4.12.8",
     "hono-rate-limiter": "^0.5.3",
