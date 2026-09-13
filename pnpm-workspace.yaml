@@ -20,8 +20,8 @@ packages:
 
 overrides:
   # @cloudflare/vitest-pool-workers requires vitest 3.2
-  '@vitest/runner': 3.2.4
-  '@vitest/snapshot': 3.2.4
+  '@vitest/runner': 3.2.7
+  '@vitest/snapshot': 3.2.7
   # pg-connection-string v2.10.0 introduces a bug with vitest-pool-workers
   pg-connection-string: 2.9.1
   vitest: 3.2.4
