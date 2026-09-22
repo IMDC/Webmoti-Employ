@@ -28,16 +28,16 @@ export interface Account {
 }
 
 export interface Allowlist {
+  addedById: string | null;
   createdAt: Generated<Timestamp>;
   email: string;
   id: Generated<number>;
-  addedById: string | null;
 }
 
 export interface Interview {
   createdAt: Generated<Timestamp>;
-  hostId: string;
   endTime: Timestamp | null;
+  hostId: string;
   id: Generated<number>;
   isInstant: Generated<boolean>;
   sessionId: Generated<string>;

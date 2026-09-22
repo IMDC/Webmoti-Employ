@@ -1,7 +1,6 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "baseUrl": ".",
     "module": "commonjs",
     "moduleResolution": "node",
     "types": ["../shared/src/electron"],

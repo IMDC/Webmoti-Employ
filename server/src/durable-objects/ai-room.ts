@@ -2,7 +2,7 @@
 
 import type { IntervieweeNotification } from '@webmoti-employ/shared'
 import type { ModelMessage } from 'ai'
-import { groq } from '@ai-sdk/groq'
+import { createGroq } from '@ai-sdk/groq'
 import { WebSocketMessage } from '@webmoti-employ/shared'
 import { generateText } from 'ai'
 import { debugLog } from '@/utils/logger'
@@ -35,11 +35,13 @@ export class AiRoom {
   private generating = false
   private transcriptQueue: QueuedTranscript[] = []
 
-  private model = groq('meta-llama/llama-4-scout-17b-16e-instruct')
+  private model: ReturnType<ReturnType<typeof createGroq>>
 
   constructor(state: DurableObjectState, env: CloudflareBindings) {
     this.state = state
     this.env = env
+    const groq = createGroq({ apiKey: env.GROQ_API_KEY })
+    this.model = groq('openai/gpt-oss-20b')
     // add system prompt to beginning of message list
     this.messages.push({ role: 'system', content: SYSTEM_PROMPT })
     this.startPing()
@@ -150,7 +152,7 @@ export class AiRoom {
     void this.broadcastMessage(broadcastMsg)
 
     // don't await this
-    void this.processQueue()
+    this.state.waitUntil(this.processQueue())
   }
 
   private async processQueue() {
@@ -175,6 +177,9 @@ export class AiRoom {
       this.messages.push({ role: 'user', content: transcript })
       const response = await this.generateAiResponse()
       await this.handleAiResponse(response, wordCount)
+    }
+    catch (error) {
+      console.error('AI feedback generation failed:', error)
     }
     finally {
       this.generating = false

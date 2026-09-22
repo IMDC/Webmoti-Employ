@@ -4,7 +4,6 @@
     "composite": true,
     "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "baseUrl": "./",
     "paths": {
       "@webmoti-employ/shared": ["../shared/src/index.ts"],
       "@/*": ["./src/*"],
