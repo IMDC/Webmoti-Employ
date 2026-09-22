@@ -71,7 +71,7 @@ export async function signOut() {
   removeLocalBearerToken()
 }
 
-export const { useSession } = authClient
+export const useSession: typeof authClient.useSession = authClient.useSession
 
 export type Session = typeof authClient.$Infer.Session
 export type User = typeof authClient.$Infer.Session.user
